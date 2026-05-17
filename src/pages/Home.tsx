@@ -21,7 +21,7 @@ interface HomeProps {
   onScenarioOpen: () => void;
 }
 
-const BOT_USERNAME = "ToucheBot";
+const BOT_USERNAME = "ToucheCoupleBot";
 
 // ── SVG icons ────────────────────────────────────────────────────────────────
 function IconCompliments({ r, g, b, active }: { r:number; g:number; b:number; active:boolean }) {

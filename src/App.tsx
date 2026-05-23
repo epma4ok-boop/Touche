@@ -27,16 +27,44 @@ function saveCoupleId(id: string) {
 async function tryLinkCouple(refUserId: number): Promise<string | null> {
   try {
     const initData = window.Telegram?.WebApp?.initData;
-    if (!initData) return null;
+    if (!initData) {
+      alert("❌ Нет initData");
+      console.error("❌ No initData");
+      return null;
+    }
+    
+    alert("🔵 Отправляем запрос в /api/couple/link");
+    console.log("🔵 Sending request", { refUserId });
+    
     const res = await fetch("/api/couple/link", {
       method: "POST",
-      headers: { "Content-Type": "application/json", "x-telegram-init-data": initData },
+      headers: { 
+        "Content-Type": "application/json", 
+        "x-telegram-init-data": initData 
+      },
       body: JSON.stringify({ refUserId }),
     });
-    if (!res.ok) return null;
+    
+    alert(`🔵 Статус ответа: ${res.status}`);
+    console.log("🔵 Response status:", res.status);
+    
+    if (!res.ok) {
+      const text = await res.text();
+      alert(`❌ Ошибка ${res.status}: ${text}`);
+      console.error("❌ Error response:", text);
+      return null;
+    }
+    
     const data = await res.json();
+    alert(`🔵 Ответ: ${JSON.stringify(data)}`);
+    console.log("🔵 Response data:", data);
+    
     return data.coupleId ?? null;
-  } catch { return null; }
+  } catch (err: any) {
+    alert(`❌ Исключение: ${err.message}`);
+    console.error("❌ Exception:", err);
+    return null;
+  }
 }
 
 export default function App() {
@@ -65,22 +93,26 @@ export default function App() {
     if (startParam.startsWith("ref_") && !getCoupleId()) {
       const refUserId = parseInt(startParam.replace("ref_", ""), 10);
       alert("🔵 refUserId: " + refUserId);
+      console.log("🔵 refUserId:", refUserId);
+      
       if (!isNaN(refUserId) && refUserId !== tg?.initDataUnsafe?.user?.id) {
         setLinkStatus("linking");
-        alert("🔵 linking...");
+        alert("🔵 Связываем пару...");
         const coupleId = await tryLinkCouple(refUserId);
         if (coupleId) {
           saveCoupleId(coupleId);
           setLinkStatus("linked");
-          alert("🔵 linked! coupleId: " + coupleId);
+          alert("✅ Пара соединена! coupleId: " + coupleId);
           await new Promise(r => setTimeout(r, 1200));
         } else {
           setLinkStatus("error");
-          alert("🔴 error: coupleId not created");
+          alert("❌ Ошибка: пара не создана");
         }
       } else {
-        alert("🔴 invalid refUserId or same as caller");
+        alert("❌ Неверный refUserId или тот же пользователь");
       }
+    } else {
+      alert("❌ startParam не начинается с ref_ или пара уже есть");
     }
 
     if (saved) { setLang(saved); setPhase("home"); }

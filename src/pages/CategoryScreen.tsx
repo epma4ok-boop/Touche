@@ -3,7 +3,7 @@ import { useEffect, useCallback, useState, useRef } from "react";
 import HeartbeatCanvas from "@/components/HeartbeatCanvas";
 import { UI, CATEGORY_CONFIG, CATEGORIES_ORDER, type Lang, type Category } from "@/data/i18n";
 import { playReveal, playDismiss } from "@/hooks/useSensualSound";
-import { tasks as staticTasks } from "@/data/tasks";
+import { TASKS_RU, TASKS_EN } from "@/data/tasks";
 
 declare global {
   interface Window {

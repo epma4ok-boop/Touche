@@ -196,13 +196,17 @@ export default function ScenarioScreen({ lang, onBack }: ScenarioScreenProps) {
   const t = T[lang];
   const primaryColor = { r: 155, g: 15, b: 90 };
 
+  // ── ИСПРАВЛЕНАЯ ФУНКЦИЯ handleInvite ──
   const handleInvite = useCallback(() => {
     const tg = (window as any).Telegram?.WebApp;
     const userId = tg?.initDataUnsafe?.user?.id;
     if (tg?.openTelegramLink && userId) {
-      tg.openTelegramLink(`https://t.me/share/url?url=https://t.me/${BOT_USERNAME}?start=ref_${userId}&text=${encodeURIComponent(lang==="en"?"Join me on Touché — evening scenarios for couples":"Присоединяйся ко мне в Touché — сценарии для пар на вечер")}`);
+      // Прямая ссылка на Mini App с параметром startapp
+      const inviteLink = `https://t.me/${BOT_USERNAME}/Touche?startapp=ref_${userId}`;
+      tg.openTelegramLink(inviteLink);
     }
-  }, [lang]);
+  }, []);
+  // ───────────────────────────────────────
 
   const handleHoldComplete = useCallback(async () => {
     const coupleId = getCoupleId();

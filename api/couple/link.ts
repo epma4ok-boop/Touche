@@ -1,22 +1,3 @@
-typescript
-export default async function handler(req: VercelRequest, res: VercelResponse) {
-  console.log("🔵 /api/couple/link called", { method: req.method });
-  try {
-    // ... весь существующий код
-  } catch (error: any) {
-    console.error("🔴 FATAL ERROR:", error);
-    return res.status(500).json({ error: error.message });
-  }
-}// api/couple/link.ts
-// POST /api/couple/link
-// Links two Telegram users into a couple.
-// Called when user B opens the app via user A's referral link.
-//
-// Body: { refUserId: number }   — user A's Telegram ID (from start_param ref_<id>)
-// Headers: x-telegram-init-data — raw initData string for auth
-//
-// Response: { coupleId: string }
-
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { createClient } from "@supabase/supabase-js";
 import { validateTelegramInitData } from "./_auth.js";
@@ -27,12 +8,19 @@ const supabase = createClient(
 );
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
+  console.log("🔵 /api/couple/link called", { method: req.method });
+  
+  if (req.method !== "POST") {
+    return res.status(405).json({ error: "Method not allowed" });
+  }
 
   // Validate caller
   const initData = req.headers["x-telegram-init-data"] as string;
   const caller = validateTelegramInitData(initData, process.env.BOT_TOKEN!);
-  if (!caller) return res.status(401).json({ error: "Invalid initData" });
+  if (!caller) {
+    console.error("❌ Invalid initData");
+    return res.status(401).json({ error: "Invalid initData" });
+  }
 
   const { refUserId } = req.body as { refUserId: number };
   if (!refUserId || refUserId === caller.id) {
@@ -46,7 +34,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     .or(`user_a_id.eq.${caller.id},user_b_id.eq.${caller.id}`)
     .maybeSingle();
 
-  if (existing) return res.status(200).json({ coupleId: existing.id, already: true });
+  if (existing) {
+    return res.status(200).json({ coupleId: existing.id, already: true });
+  }
 
   // Create couple
   const { data, error } = await supabase
@@ -55,7 +45,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     .select("id")
     .single();
 
-  if (error) return res.status(500).json({ error: error.message });
+  if (error) {
+    console.error("❌ Supabase error:", error);
+    return res.status(500).json({ error: error.message });
+  }
 
   // Deliver any pending scenario card to this user (role_b)
   const { data: pending } = await supabase

@@ -1,4 +1,3 @@
-// src/App.tsx — with couple linking on startup via start_param
 import { useState, useCallback, useEffect } from "react";
 import Home from "@/pages/Home";
 import CategoryScreen from "@/pages/CategoryScreen";
@@ -25,15 +24,6 @@ function saveCoupleId(id: string) {
   try { localStorage.setItem(COUPLE_ID_KEY, id); } catch {}
 }
 
-function checkPendingScenario() {
-  try {
-    const raw = localStorage.getItem("touche_pending_scenario_incoming");
-    if (raw) { localStorage.removeItem("touche_pending_scenario_incoming"); return JSON.parse(raw); }
-  } catch {}
-  return null;
-}
-
-// Attempts to link this user with the refUserId extracted from start_param
 async function tryLinkCouple(refUserId: number): Promise<string | null> {
   try {
     const initData = window.Telegram?.WebApp?.initData;
@@ -66,7 +56,7 @@ export default function App() {
     const tg = window.Telegram?.WebApp;
     const saved = getSavedLang();
 
-    // Detect invite start_param — e.g. "ref_12345678"
+    // ── ПАРНАЯ СВЯЗКА: обрабатываем startapp параметр ──
     const startParam = tg?.initDataUnsafe?.start_param ?? "";
     if (startParam.startsWith("ref_") && !getCoupleId()) {
       const refUserId = parseInt(startParam.replace("ref_", ""), 10);
@@ -76,17 +66,13 @@ export default function App() {
         if (coupleId) {
           saveCoupleId(coupleId);
           setLinkStatus("linked");
-          // Brief success moment then continue to home
           await new Promise(r => setTimeout(r, 1200));
         } else {
           setLinkStatus("error");
         }
       }
     }
-
-    // Pending scenario card from partner
-    const pending = checkPendingScenario();
-    if (pending) console.info("Pending scenario for partner:", pending);
+    // ─────────────────────────────────────────────────
 
     if (saved) { setLang(saved); setPhase("home"); }
     else { setPhase("lang"); }

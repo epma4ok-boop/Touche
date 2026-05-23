@@ -1,4 +1,13 @@
-// api/couple/link.ts
+typescript
+export default async function handler(req: VercelRequest, res: VercelResponse) {
+  console.log("🔵 /api/couple/link called", { method: req.method });
+  try {
+    // ... весь существующий код
+  } catch (error: any) {
+    console.error("🔴 FATAL ERROR:", error);
+    return res.status(500).json({ error: error.message });
+  }
+}// api/couple/link.ts
 // POST /api/couple/link
 // Links two Telegram users into a couple.
 // Called when user B opens the app via user A's referral link.

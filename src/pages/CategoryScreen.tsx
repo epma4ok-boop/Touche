@@ -257,7 +257,7 @@ export default function CategoryScreen({ lang,category,onBack,onCategoryChange,s
     tg?.HapticFeedback?.impactOccurred("medium");
     setIsCasting(true); setHintText(t.tapping);
     const [aiTask]=await Promise.all([generateAITask(category,lang), useServerLimit(category)]);
-    const picked=aiTask??pickStaticTask(category);
+    const picked=aiTask??pickStaticTask(category, lang);
     const src:"ai"|"fallback"=aiTask?"ai":"fallback";
     const today=getTodayStr();
     const newLimits={...limits};

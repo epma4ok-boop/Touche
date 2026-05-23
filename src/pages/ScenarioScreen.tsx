@@ -200,12 +200,15 @@ export default function ScenarioScreen({ lang, onBack }: ScenarioScreenProps) {
   const handleInvite = useCallback(() => {
     const tg = (window as any).Telegram?.WebApp;
     const userId = tg?.initDataUnsafe?.user?.id;
-    if (tg?.openTelegramLink && userId) {
-      // Прямая ссылка на Mini App с параметром startapp
+    if (userId) {
       const inviteLink = `https://t.me/${BOT_USERNAME}/Touche?startapp=ref_${userId}`;
-      tg.openTelegramLink(inviteLink);
+      const message = lang === "en" 
+        ? "Join me on Touché — evening scenarios for couples" 
+        : "Присоединяйся ко мне в Touché — сценарии для пар на вечер";
+      
+      tg.openTelegramLink(`https://t.me/share/url?url=${encodeURIComponent(inviteLink)}&text=${encodeURIComponent(message)}`);
     }
-  }, []);
+  }, [lang]);
   // ───────────────────────────────────────
 
   const handleHoldComplete = useCallback(async () => {

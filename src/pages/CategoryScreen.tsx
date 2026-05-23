@@ -363,7 +363,7 @@ export default function CategoryScreen({ lang,category,onBack,onCategoryChange,s
       new Promise(res=>setTimeout(res, 800+Math.random()*400)),
     ]);
 
-    const picked = aiTask ?? pickStaticTask(category);
+    const picked = aiTask ?? pickStaticTask(category, lang);
     const source: "ai"|"fallback" = aiTask ? "ai" : "fallback";
 
     const newEntry:HistoryEntry = { id:`${Date.now()}-${Math.random()}`, text:picked, category, date:new Date().toISOString() };

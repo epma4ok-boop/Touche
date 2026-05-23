@@ -56,23 +56,32 @@ export default function App() {
     const tg = window.Telegram?.WebApp;
     const saved = getSavedLang();
 
-    // ── ПАРНАЯ СВЯЗКА: обрабатываем startapp параметр ──
+    // ── ДИАГНОСТИКА: показываем start_param ──
     const startParam = tg?.initDataUnsafe?.start_param ?? "";
+    alert("🔵 startParam: " + (startParam || "пусто"));
+    console.log("🔵 startParam:", startParam);
+    // ─────────────────────────────────────────
+
     if (startParam.startsWith("ref_") && !getCoupleId()) {
       const refUserId = parseInt(startParam.replace("ref_", ""), 10);
+      alert("🔵 refUserId: " + refUserId);
       if (!isNaN(refUserId) && refUserId !== tg?.initDataUnsafe?.user?.id) {
         setLinkStatus("linking");
+        alert("🔵 linking...");
         const coupleId = await tryLinkCouple(refUserId);
         if (coupleId) {
           saveCoupleId(coupleId);
           setLinkStatus("linked");
+          alert("🔵 linked! coupleId: " + coupleId);
           await new Promise(r => setTimeout(r, 1200));
         } else {
           setLinkStatus("error");
+          alert("🔴 error: coupleId not created");
         }
+      } else {
+        alert("🔴 invalid refUserId or same as caller");
       }
     }
-    // ─────────────────────────────────────────────────
 
     if (saved) { setLang(saved); setPhase("home"); }
     else { setPhase("lang"); }

@@ -8,7 +8,7 @@
 // Response: { invoiceLink: string }
 
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { validateTelegramInitData } from "../couple/_auth";
+import { validateTelegramInitData } from "../couple/_auth.js";
 
 const BOT_TOKEN = process.env.BOT_TOKEN!;
 

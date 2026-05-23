@@ -3,7 +3,8 @@ import { useEffect, useCallback, useState, useRef } from "react";
 import HeartbeatCanvas from "@/components/HeartbeatCanvas";
 import { UI, CATEGORY_CONFIG, CATEGORIES_ORDER, type Lang, type Category } from "@/data/i18n";
 import { playReveal, playDismiss } from "@/hooks/useSensualSound";
-import { tasks as staticTasks } from "@/data/tasks";
+import { TASKS_RU, TASKS_EN } from "@/data/tasks";
+import type { Category } from "@/data/i18n";
 
 declare global {
   interface Window {
@@ -81,9 +82,13 @@ async function generateAITask(category:Category, lang:Lang): Promise<string|null
   } catch { return null; }
 }
 
-function pickStaticTask(category:Category): string {
-  const pool = staticTasks[category] ?? [];
-  return pool[Math.floor(Math.random()*pool.length)] ?? "Обними партнёра.";
+function pickStaticTask(category: Category, lang: "ru" | "en"): string {
+  const tasksForLang = lang === "ru" ? TASKS_RU : TASKS_EN;
+  const pool = tasksForLang[category];
+  if (!pool || pool.length === 0) {
+    return lang === "ru" ? "Обними партнёра." : "Hug your partner.";
+  }
+  return pool[Math.floor(Math.random() * pool.length)];
 }
 
 // ── Category dots ────────────────────────────────────────────────────────────

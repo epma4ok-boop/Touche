@@ -9,7 +9,7 @@
 
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { createClient } from "@supabase/supabase-js";
-import { validateTelegramInitData } from "../couple/_auth";
+import { validateTelegramInitData } from "../couple/_auth.js";
 import { SCENARIOS } from "../../src/data/scenarios";
 
 const supabase = createClient(

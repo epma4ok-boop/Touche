@@ -357,7 +357,7 @@ export default function CategoryScreen({ lang,category,onBack,onCategoryChange,s
       useServerLimit(category),
     ]);
 
-    const picked = aiTask ?? pickStaticTask(category);
+    const picked = aiTask ?? pickStaticTask(category, lang);
     const src: "ai"|"fallback" = aiTask ? "ai" : "fallback";
 
     // Update local cache

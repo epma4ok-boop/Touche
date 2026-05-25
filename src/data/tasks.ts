@@ -223,5 +223,6 @@ export const TASKS_EN: Record<Category, string[]> = {
     "Exhibition scene: the submissive holds poses on command and stays still while the dominant inspects and touches. Finish with sex.",
     "All evening the submissive addresses the other as 'master' or 'mistress'. Breaking the rule means punishment. Sex only with permission.",
     "BDSM night with no limits: agree on a safe word and forbidden zones — then try everything else without shame.",
+    export const tasks = TASKS_RU;
   ],
 };

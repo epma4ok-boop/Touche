@@ -1,5 +1,5 @@
 import { useState, useCallback } from "react";
-import Home from "@/pages/Home";
+import Home from "@/pages/Home.tsx";
 import CategoryScreen from "@/pages/CategoryScreen";
 import ScenarioScreen from "@/pages/ScenarioScreen";
 import SplashScreen from "@/components/SplashScreen";

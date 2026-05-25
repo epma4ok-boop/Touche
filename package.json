@@ -23,7 +23,7 @@
     "@supabase/supabase-js": "^2.106.1",
     "@vercel/node": "^5.8.4",
     "react": "^19.1.0",
-    "react-dom": "^19.1.0"
+    "react-dom": "^19.1.0",
     "wouter": "^3.9.0"
   }
 }

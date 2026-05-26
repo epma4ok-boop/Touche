@@ -26,91 +26,127 @@ const supabase = createClient(
 const FALLBACKS: Record<string, Record<string, { title: string; role_a: string; role_b: string }>> = {
   romantic: {
     ru: {
-      title: "Детектив и свидетель",
-      role_a: "Ты детектив. Веди мягкий допрос — задавай личные вопросы, пытайся узнать тайны партнёра. Правило: не трогать, только слова.",
-      role_b: "Ты скрываешь кое-что интересное. Уходи от ответов, дразни детектива намёками — но не сдавайся легко.",
+      title: "Фотограф и модель",
+      role_a: "Ты фотограф. Проводишь съёмку. Жёсткое правило: НЕ КАСАТЬСЯ модели. Твоя задача — сделать лучшие снимки, но тело партнёрши сводит с ума. Командуй позами, смотри в упор.",
+      role_b: "Ты модель. Твоя задача — соблазнить фотографа лёгкими прикосновениями, взглядами, движением бёдер. Нарушь его правило — заставь забыть о камере.",
     },
     en: {
-      title: "Detective & Witness",
-      role_a: "You're a detective. Conduct a gentle interrogation — ask personal questions, try to uncover secrets. Rule: no touching, words only.",
-      role_b: "You're hiding something interesting. Evade the questions, tease with hints — but don't give in easily.",
+      title: "Photographer & Model",
+      role_a: "You're a photographer. You have a strict rule: DO NOT TOUCH the model. Your task is to take great shots, but your partner's body drives you crazy.",
+      role_b: "You're the model. Your task is to seduce the photographer with light touches, glances, hip movements. Break their rule.",
     },
   },
   passion: {
     ru: {
-      title: "Фотограф и модель",
-      role_a: "Ты фотограф. Снимай партнёра, ищи красоту в каждом движении. Жёсткое правило: не касаться, не приставать — только снимать.",
-      role_b: "Ты модель. Притягивай взгляд фотографа: двигайся, меняй позы, соблазняй. Твоя цель — сломать его правило.",
+      title: "Медсестра и пациент",
+      role_a: "Ты медсестра. Проводишь 'тщательный' осмотр: долго держишь за запястье, скользишь по ноге выше колена. Когда пациент краснеет — делай пометку и улыбайся.",
+      role_b: "Ты пациент. Медсестра слишком внимательна. Ты понимаешь, что происходит. Когда она касается внутренней стороны бедра — не сдерживай стона.",
     },
     en: {
-      title: "Photographer & Model",
-      role_a: "You're a photographer. Capture your partner, find beauty in every movement. Strict rule: no touching, no advances — just shoot.",
-      role_b: "You're the model. Draw the photographer's gaze: move, pose, seduce. Your goal is to break their rule.",
+      title: "Nurse & Patient",
+      role_a: "You're a nurse conducting a 'thorough' examination. Hold their wrist too long, slide your hand up their thigh. Smile when they blush.",
+      role_b: "You're the patient. The nurse is too attentive. You know what's happening. Don't hold back a moan when they touch your inner thigh.",
     },
   },
   hard: {
     ru: {
       title: "Хозяин и слуга",
-      role_a: "Ты хозяин. Отдавай конкретные смелые приказы, не объясняй причин. Требуй исполнения.",
-      role_b: "Ты слуга, который хочет произвести впечатление. Исполняй каждый приказ — но всегда добавляй немного больше, чем просят.",
+      role_a: "Ты хозяин. На 30 минут отдавай команды: позы, движения, действия. Не объясняй. Твоя воля — закон. Можешь использовать лёгкие шлепки как наказание.",
+      role_b: "Ты слуга. На 30 минут ты полностью подчиняешься. Выполняй каждую команду без возражений. Твоё тело принадлежит хозяину.",
     },
     en: {
       title: "Master & Servant",
-      role_a: "You're the master. Give specific bold commands without explanation. Demand compliance.",
-      role_b: "You're the servant trying to impress. Carry out every order — but always give a little more than asked.",
+      role_a: "You're the master. For 30 minutes, give commands: positions, movements, actions. No explanations needed. Your word is law.",
+      role_b: "You're the servant. For 30 minutes, you obey completely. Your body belongs to the master.",
     },
   },
 };
 
-/* ── System prompts ────────────────────────────────────────────── */
+/* ── Extended system prompts with roles, fetish elements, explicit content ── */
 const SYSTEM_PROMPTS: Record<string, (intensity: string) => string> = {
-  ru: (intensity) => `Ты сценарист для взрослых пар. Придумай ролевую игру с двумя ПРОТИВОПОЛОЖНЫМИ ролями.
+  ru: (intensity) => `Ты создаёшь откровенные ролевые сценарии для взрослых пар (18+).
 
-Уровень интенсивности: ${
-    intensity === "romantic"
-      ? "романтика — нежно, без откровенности, создаём атмосферу и интригу"
-      : intensity === "passion"
-      ? "страсть — чувственно, смело, флирт и желание (18+)"
-      : "жёстко — откровенно, прямо, без цензуры (18+)"
-  }
+Допустимые роли:
+- Медсестра и пациент
+- Учитель и ученица
+- Начальник и подчинённая
+- Врач и пациентка (гинеколог, стоматолог, массажист)
+- Полицейский и задержанная
+- Профессор и студентка
+- Тренер и спортсменка
+- Хозяин и служанка
+- Фотограф и модель
+- Сосед и соседка (за стенкой)
+- Сантехник и домохозяйка
+- Преподаватель вокала и ученица
+- Библиотекарь и посетительница
+- Таксист и пассажирка
 
-Структура:
-- Роль A имеет ОГРАНИЧЕНИЕ (что-то запрещено или недоступно)
-- Роль B должна нарушить это ограничение или соблазнить носителя роли A
+Элементы, которые можно использовать:
+- Раздевание (медленно, командами, как наказание/поощрение)
+- Прикосновения с намёком (скользящие, задерживающиеся)
+- Поцелуи (куда именно, как долго, с каким подтекстом)
+- Запрет на оргазм (роль А контролирует финиш)
+- Счёт или спор ("если проиграешь — сделаешь минет")
+- Шлепки как наказание
+- Связывание рук / завязывание глаз
+- Использование предметов (ремень, галстук, ложка)
+- Ролевой костюм (надеть / снять / представить)
+- Фразы, которые нужно произнести вслух
+- Игры с температурой (лёд, горячее дыхание)
+- Зеркала (смотреть на себя)
 
-Примеры хорошей механики:
-• Фотограф (не может трогать) ↔ Модель (должна соблазнить)
-• Врач (холоден и профессионален) ↔ Пациент (притворяется больным)
-• Скульптор (только смотрит и направляет) ↔ Модель (оживает)
+Уровни интенсивности:
+- romantic: игриво, нежно, без явной откровенности
+- passion: чувственно, смело, с флиртом и откровенными намёками (18+)
+- hard: прямо, дерзко, с элементами БДСМ, унижения, полного подчинения (18+)
 
-Верни ТОЛЬКО JSON — никаких пояснений:
-{"title":"...","role_a":"...","role_b":"..."}
+Каждая роль: 2–4 предложения. Указывай запреты и правила. Диалог можно вставлять в кавычках.
 
-Каждая роль: 2–3 предложения. Конкретные инструкции. Живой язык.`,
+Верни ТОЛЬКО JSON без пояснений:
+{"title":"Название","role_a":"текст роли А","role_b":"текст роли Б"}`,
 
-  en: (intensity) => `You are a scenario writer for adult couples. Create a roleplay with two OPPOSING roles.
+  en: (intensity) => `You create explicit roleplay scenarios for adult couples (18+).
 
-Intensity level: ${
-    intensity === "romantic"
-      ? "romantic — tender, tasteful, build atmosphere and intrigue"
-      : intensity === "passion"
-      ? "passionate — sensual, bold, flirt and desire (18+)"
-      : "hard — explicit, direct, uncensored (18+)"
-  }
+Allowed roles:
+- Nurse and patient
+- Teacher and student
+- Boss and subordinate
+- Doctor and patient (gynecologist, dentist, massage therapist)
+- Police officer and detained person
+- Professor and student
+- Coach and athlete
+- Master and servant
+- Photographer and model
+- Neighbor and neighbor (thin wall)
+- Plumber and housewife
+- Vocal coach and student
+- Librarian and visitor
+- Taxi driver and passenger
 
-Structure:
-- Role A has a CONSTRAINT (something forbidden or off-limits)
-- Role B must break that constraint or seduce the Role A person
+Elements you can use:
+- Undressing (slowly, by command, as punishment/reward)
+- Suggestive touches (sliding, lingering)
+- Kisses (where, how long, with what implication)
+- Orgasm denial (role A controls when the other can finish)
+- Bet or counting ("if you lose, you'll give me a blowjob")
+- Spanking as punishment
+- Hand tying / blindfolding
+- Using objects (belt, tie, spoon)
+- Roleplay costume (put on / take off / imagine)
+- Phrases to say out loud
+- Temperature play (ice, hot breath)
+- Mirrors (watching yourself)
 
-Good mechanic examples:
-• Photographer (can't touch) ↔ Model (must seduce)
-• Doctor (cold/professional) ↔ Patient (faking illness)
-• Sculptor (only looks and directs) ↔ Model (comes alive)
+Intensity levels:
+- romantic: playful, tender, no explicit content
+- passion: sensual, bold, flirtatious with explicit hints (18+)
+- hard: direct, daring, with BDSM elements, humiliation, total submission (18+)
 
-Return ONLY JSON — no explanations:
-{"title":"...","role_a":"...","role_b":"..."}
+Each role: 2–4 sentences. Specify restrictions and rules. Dialogue can be in quotes.
 
-Each role: 2–3 sentences. Concrete instructions. Vivid language.`,
+Return ONLY JSON without explanations:
+{"title":"...","role_a":"...","role_b":"..."}`,
 };
 
 /* ── Send Telegram notification ────────────────────────────────── */
@@ -181,7 +217,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   try {
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 10_000);
+    const timeout = setTimeout(() => controller.abort(), 12_000);
 
     const aiRes = await fetch(DEEPSEEK_URL, {
       method: "POST",
@@ -194,19 +230,18 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         messages: [
           {
             role: "system",
-            content:
-              (SYSTEM_PROMPTS[lang] ?? SYSTEM_PROMPTS.ru)(intensity),
+            content: (SYSTEM_PROMPTS[lang] ?? SYSTEM_PROMPTS.ru)(intensity),
           },
           {
             role: "user",
             content:
               lang === "ru"
-                ? "Придумай новый сценарий. Верни только JSON."
-                : "Create a new scenario. Return JSON only.",
+                ? `Создай сценарий уровня ${intensity}. Верни ТОЛЬКО JSON.`
+                : `Create a ${intensity} level scenario. Return ONLY JSON.`,
           },
         ],
-        max_tokens: 350,
-        temperature: 1.15,
+        max_tokens: 400,
+        temperature: 1.2,
         response_format: { type: "json_object" },
       }),
       signal: controller.signal,
@@ -222,17 +257,17 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     if (parsed?.title && parsed?.role_a && parsed?.role_b) {
       generated = {
-        title:  String(parsed.title),
+        title: String(parsed.title),
         role_a: String(parsed.role_a),
         role_b: String(parsed.role_b),
       };
     } else {
       throw new Error("Unexpected AI response shape");
     }
-  } catch {
+  } catch (err) {
+    console.error("AI generation failed:", err);
     source = "fallback";
-    const fb =
-      FALLBACKS[intensity as keyof typeof FALLBACKS] ?? FALLBACKS.passion;
+    const fb = FALLBACKS[intensity as keyof typeof FALLBACKS] ?? FALLBACKS.passion;
     generated = (fb[lang as "ru" | "en"] ?? fb.ru);
   }
 
@@ -253,13 +288,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const { data: session } = await supabase
     .from("scenario_sessions")
     .insert({
-      couple_id:     coupleId,
-      pulled_by:     caller.id,
+      couple_id: coupleId,
+      pulled_by: caller.id,
       lang,
-      title:         generated.title,
-      role_a_text:   generated.role_a,
-      role_b_text:   generated.role_b,
-      ai_generated:  true,
+      title: generated.title,
+      role_a_text: generated.role_a,
+      role_b_text: generated.role_b,
+      ai_generated: true,
       pending_for_b: !!partnerTgId,
     })
     .select("id")
@@ -279,9 +314,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   return res.status(200).json({
-    ok:        true,
-    title:     generated.title,
-    roleA:     generated.role_a,
+    ok: true,
+    title: generated.title,
+    roleA: generated.role_a,
     sessionId: session?.id ?? null,
     notified,
     source,

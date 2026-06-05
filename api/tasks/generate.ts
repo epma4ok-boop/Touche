@@ -2,168 +2,208 @@
 // POST /api/tasks/generate
 // Body: { category: string, lang: "ru"|"en"|"hi"|"pt"|"es" }
 // Headers: x-telegram-init-data
-// Returns: { task: string }
+// Returns: { task: string, source: "ai"|"fallback" }
 
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { validateTelegramInitData } from "../couple/_auth.js";
+import { TASKS_RU, TASKS_EN } from "../../src/data/tasks.js";
 
 const DEEPSEEK_API_KEY = process.env.DEEPSEEK_API_KEY!;
 const DEEPSEEK_URL = "https://api.deepseek.com/v1/chat/completions";
 
-const FALLBACKS: Record<string, Record<string, string[]>> = {
-  compliments: {
-    ru: [
-      "Посмотри партнёру в глаза и скажи конкретно: что именно в его характере восхищает тебя больше всего — не внешность, а поступок или черта.",
-      "Напиши ему сообщение: опиши один момент за последнюю неделю, когда ты почувствовал(-а) гордость за него.",
-      "Скажи вслух три комплимента — каждый должен начинаться с «Когда ты...» и заканчиваться тем, как это влияет на тебя.",
-    ],
-    en: [
-      "Look your partner in the eyes and tell them one specific thing about their character that you truly admire — not appearance, but a quality or action.",
-      "Send them a message describing one moment from this past week when you felt proud of them.",
-      "Say three compliments out loud, each starting with 'When you...' and ending with how it makes you feel.",
-    ],
-    hi: ["अपने साथी की आंखों में देखें और उनके एक गुण के बारे में बताएं।", "उन्हें एक संदेश भेजें: पिछले सप्ताह का एक पल बताएं।", "तीन तारीफ जोर से बोलें — हर एक 'जब तुम...' से शुरू हो।"],
-    pt: ["Olhe nos olhos do seu parceiro e diga uma coisa específica sobre o caráter dele.", "Envie uma mensagem descrevendo um momento desta semana em que você se sentiu orgulhoso.", "Diga três elogios em voz alta, cada um começando com 'Quando você...'"],
-    es: ["Mira a los ojos de tu pareja y dile una cosa específica de su carácter.", "Envíale un mensaje describiendo un momento de esta semana.", "Di tres cumplidos en voz alta, cada uno comenzando con 'Cuando tú...'"],
-  },
-  tenderness: {
-    ru: [
-      "Попроси партнёра лечь и помассируй ему голову и виски — медленно, кончиками пальцев — ровно пять минут. Без слов.",
-      "Обними его сзади и синхронизируйте дыхание: вдох вместе, выдох вместе — три минуты.",
-      "Медленно поцелуй партнёра три раза: лоб, щека, губы — каждый поцелуй держи три секунды.",
-    ],
-    en: [
-      "Ask your partner to lie down and massage their scalp and temples — slowly, with your fingertips — for exactly five minutes. No words.",
-      "Hold them from behind and synchronize your breathing: inhale together, exhale together — three minutes.",
-      "Slowly kiss your partner three times: forehead, cheek, lips — hold each kiss for three seconds.",
-    ],
-    hi: ["साथी को लेटने के लिए कहें और धीरे-धीरे सिर की मालिश करें।", "उन्हें पीछे से गले लगाएं और सांस मिलाएं।", "धीरे-धीरे तीन बार चूमें: माथा, गाल, होंठ।"],
-    pt: ["Peça ao seu parceiro para deitar e massageie o couro cabeludo — devagar — por cinco minutos.", "Abrace-o por trás e sincronize a respiração.", "Beije seu parceiro lentamente três vezes: testa, bochecha, lábios."],
-    es: ["Pídele a tu pareja que se recueste y masajea su cuero cabeludo — despacio.", "Abrázalo por detrás y sincronicen la respiración.", "Besa lentamente a tu pareja tres veces: frente, mejilla, labios."],
-  },
-  desire: {
-    ru: [
-      "Подойди к партнёру сзади, прошепчи на ухо одно предложение о том, что ты хочешь сделать с ним этим вечером — и уйди.",
-      "Пошли ему одно сообщение без объяснений: опиши, что именно ты хочешь снять с него первым.",
-      "Укуси партнёра за мочку уха — легко — и посмотри в глаза. Ни слова.",
-    ],
-    en: [
-      "Walk up behind your partner, whisper one sentence about what you want to do with them tonight — then walk away.",
-      "Send them one message, no explanation: describe what you want to take off them first.",
-      "Gently bite your partner's earlobe — softly — then look them in the eyes. Not a word.",
-    ],
-    hi: ["साथी के पीछे जाएं, कान में एक वाक्य फुसफुसाएं — और चले जाएं।", "उन्हें एक संदेश भेजें: आप पहले क्या उतारना चाहते हैं।", "कान की लौ को हल्के से काटें — और आंखों में देखें।"],
-    pt: ["Aproxime-se pelo lado de trás, sussurre uma frase sobre o que você quer fazer — depois se afaste.", "Envie uma mensagem sem explicação: descreva o que você quer tirar primeiro.", "Morda levemente o lóbulo da orelha — depois olhe nos olhos."],
-    es: ["Acércate por detrás, susúrrale una frase sobre lo que quieres hacer — luego aléjate.", "Envíale un mensaje sin explicación.", "Muerde suavemente el lóbulo de la oreja — luego mírala a los ojos."],
-  },
-  passion: {
-    ru: [
-      "Поцелуй партнёра без предупреждения — медленно и глубоко — и скажи вслух, что именно в его теле заводит тебя прямо сейчас.",
-      "Возьми его руку и положи туда, где ты хочешь чувствовать прикосновение. Смотри в глаза, не отрывайся.",
-      "Ляг сверху и двигайся медленно — без спешки. Только глаза в глаза.",
-    ],
-    en: [
-      "Kiss your partner without warning — slowly and deeply — then say out loud exactly what about their body turns you on right now.",
-      "Take their hand and place it where you want to feel their touch. Hold eye contact.",
-      "Lie on top and move slowly — no rush. Eyes only on each other.",
-    ],
-    hi: ["बिना चेतावनी के साथी को चूमें — धीरे और गहरे।", "उनका हाथ लें और वहां रखें जहां स्पर्श महसूस करना है।", "ऊपर लेटें और धीरे-धीरे हिलें।"],
-    pt: ["Beije seu parceiro sem aviso — lentamente e profundamente.", "Pegue a mão dele e coloque onde você quer sentir o toque.", "Deite por cima e mova-se devagar."],
-    es: ["Besa a tu pareja sin aviso — lenta y profundamente.", "Toma su mano y ponla donde quieres sentir su toque.", "Recuéstate encima y muévete lentamente."],
-  },
-  hard: {
-    ru: [
-      "Скажи партнёру, какую позу ты хочешь прямо сейчас — и объясни, почему именно она. Подробно.",
-      "Возьми полный контроль: командуй позой, скоростью, расстоянием. Он выполняет. Ты решаешь.",
-      "Прикажи партнёру раздеться медленно — пока ты смотришь — и не позволяй ему прикасаться к тебе, пока ты сам(-а) не разрешишь.",
-    ],
-    en: [
-      "Tell your partner which position you want right now — and explain exactly why. In detail.",
-      "Take full control: command the position, speed, distance. They obey. You decide.",
-      "Order your partner to undress slowly — while you watch — and don't let them touch you until you give permission.",
-    ],
-    hi: ["साथी को बताएं कि आप अभी कौन सी स्थिति चाहते हैं — और कारण बताएं।", "पूरा नियंत्रण लें।", "साथी को धीरे-धीरे कपड़े उतारने का आदेश दें।"],
-    pt: ["Diga ao seu parceiro qual posição você quer agora — e explique exatamente por quê.", "Assuma o controle total.", "Ordene ao seu parceiro que se dispa devagar."],
-    es: ["Dile a tu pareja qué posición quieres ahora mismo — y explica por qué.", "Toma el control total.", "Ordena a tu pareja que se desvista lentamente."],
-  },
-};
+// ─────────────────────────────────────────────────────────────────────────────
+// ЗАПРЕЩЁННЫЕ ФРАЗЫ (физиологический бред, глупости, которые не должны появляться)
+// ─────────────────────────────────────────────────────────────────────────────
+const FORBIDDEN_PHRASES = [
+  "выдыхает тебе в шею",
+  "отстранись и посмотри",
+  "задержись и отстранись",
+  "пусть повиснет в воздухе",
+  "дыши в кожу",
+  "кожу дыханием",
+  "томление",
+  "прелюдия к прелюдии",
+  "красивая эрекция",
+];
 
-// ── Sexologist-psychologist persona ──────────────────────────────
-const PERSONA_RU = `Ты — доктор Соня, сертифицированный сексолог-психолог с 15-летней клинической практикой. Ты создаёшь задания для пар с психологической глубиной: они помогают преодолеть рутину, углубить близость и разжечь интерес. Твои задания всегда конкретные, неожиданные и психологически продуманные. Никогда банальные.`;
-
-const PERSONA_EN = `You are Dr. Sofia — a certified sex therapist and couples psychologist with 15 years of clinical practice. You design intimacy tasks that are psychologically grounded, specific, and slightly unexpected — helping couples break routine and deepen connection. Your tasks draw from somatic therapy, sensate focus, and erotic psychology. Never generic.`;
-
+// ─────────────────────────────────────────────────────────────────────────────
+// СИСТЕМНЫЕ ПРОМПТЫ ДЛЯ КАЖДОЙ КАТЕГОРИИ (с эталонами)
+// ─────────────────────────────────────────────────────────────────────────────
 const SYSTEM_PROMPTS: Record<string, Record<string, string>> = {
   compliments: {
-    ru: `${PERSONA_RU}
+    ru: `Ты создаёшь короткие, тёплые задания для пар в категории «Комплименты». Это только слова — текст или голосовое. Без действий, без касаний.
 
-Категория: Комплименты. Задание — конкретный, живой комплимент или признание: упомяни реальный поступок, черту характера или момент — не внешность. Формат: прямое указание партнёру. Максимум 2 предложения. Никаких банальностей типа «ты красивый».`,
-    en: `${PERSONA_EN}
+Правила:
+- Только позитивные высказывания
+- Одно короткое действие (написать, сказать, отправить)
+- Никаких просьб, вопросов, воспоминаний
+- Без «отстранись», «пусть повиснет в воздухе» и другой поэзии
 
-Category: Compliments. The task is a specific, vivid compliment or acknowledgment: mention a real action, character trait, or moment — not appearance. Format: direct instruction to the partner. Max 2 sentences. No clichés.`,
-    hi: `${PERSONA_EN}\nCategory: Compliments. Write ONE specific task in Hindi (हिंदी). Max 2 sentences. Direct instruction.`,
-    pt: `${PERSONA_EN}\nCategoria: Elogios. Tarefa específica e viva. Máx 2 frases. Instrução direta em Português.`,
-    es: `${PERSONA_EN}\nCategoría: Cumplidos. Tarea específica y vívida. Máx 2 frases. Instrucción directa en Español.`,
+Вот примеры правильных заданий в нужном стиле:
+1. «Открой чат и напиши «Скучаю». Одно слово. Без объяснений.»
+2. «Напиши партнёру: «Ты мне нравишься». Прямо сейчас. Не жди ответа.»
+3. «Скажи вслух: «Ты красивая/красивый». Просто так, без повода.»
+4. «Отправь голосовое: «Ты классный/классная».»
+
+Сгенерируй **одно новое задание** в таком же стиле. Не копируй эталоны дословно — придумай новый вариант, но сохрани тон и длину. Запрещённые фразы: выдыхает в шею, отстранись, задержись и отстранись, повиснет в воздухе, дыши в кожу. Верни только текст задания, без кавычек и пояснений.`,
+    en: `You create short, warm tasks for couples in the "Compliments" category. Words only — text or voice. No actions, no touch.
+
+Rules:
+- Positive statements only
+- One short action (write, say, send)
+- No questions, no memories, no "pause and look away"
+- No poetic nonsense
+
+Examples:
+1. "Open the chat and text 'Miss you'. One word. No explanation."
+2. "Text your partner: 'I like you'. Right now. Don't wait for a reply."
+3. "Say out loud: 'You're beautiful'. Just because."
+4. "Send a voice message: 'You're great'."
+
+Generate **one new task** in the same style. Don't copy examples verbatim — create a new variation. Keep the tone and length. Return only the task text, no quotes, no explanations.`,
   },
   tenderness: {
-    ru: `${PERSONA_RU}
+    ru: `Ты создаёшь задания для категории «Нежность». Это физическая близость без прелюдии и без намёка на секс. Объятия, поцелуи (нестрастные), массаж, лёгкие покусывания.
 
-Категория: Нежность. Задание — конкретное тактильное действие: прикосновение, поцелуй, объятие. Укажи куда, как и сколько времени. Без эротики, но чувственно. Максимум 2 предложения. Прямое указание.`,
-    en: `${PERSONA_EN}
+Правила:
+- Никаких «отстранись», «посмотри в глаза», «дыши в шею»
+- Поцелуи в губы — можно, но без углубления (просто задержаться)
+- Массаж — конкретные зоны (шея, плечи, стопы)
+- Без эрогенных зон (грудь, ягодицы, пах)
 
-Category: Tenderness. The task is a specific tactile action: touch, kiss, or embrace. State where, how, and for how long. Sensual but not explicit. Max 2 sentences. Direct instruction.`,
-    hi: `${PERSONA_EN}\nCategory: Tenderness. ONE specific tactile task in Hindi. Max 2 sentences.`,
-    pt: `${PERSONA_EN}\nCategoria: Ternura. Tarefa tátil específica. Máx 2 frases. Instrução direta em Português.`,
-    es: `${PERSONA_EN}\nCategoría: Ternura. Tarea táctil específica. Máx 2 frases. Instrucción en Español.`,
+Эталоны:
+1. «Подойди сзади, обними и целуй шею. Медленно.»
+2. «Поцелуй в губы. Медленно. Задержись на пару секунд.»
+3. «Сделай массаж шеи и плеч. Найди напряжённое место — задержись там.»
+4. «Легко прикуси мочку уха. Подержи пару секунд, отпусти. Поцелуй это же место.»
+
+Сгенерируй **одно новое задание** в таком же стиле. Коротко, без выдуманных ощущений, без физиологического бреда. Верни только текст.`,
+    en: `You create tasks for the "Tenderness" category. Physical closeness without foreplay or hints of sex. Hugs, kisses (not passionate), massage, light biting.
+
+Rules:
+- No "pause", "look in the eyes", "breathe into the skin"
+- Kisses on lips — allowed, but don't deepen (just pause)
+- Massage — specific areas (neck, shoulders, feet)
+- No erogenous zones (chest, butt, crotch)
+
+Examples:
+1. "Come from behind, hug and kiss the neck. Slowly."
+2. "Kiss on the lips. Slow. Pause for a moment."
+3. "Massage neck and shoulders. Find a tense spot — stay there."
+4. "Gently bite the earlobe. Hold. Let go. Kiss the same spot."
+
+Generate **one new task** in the same style. Short, no made-up sensations, no physiological nonsense. Return only text.`,
   },
   desire: {
-    ru: `${PERSONA_RU}
+    ru: `Ты создаёшь задания для категории «Желание». Это прелюдия. Раздевание, страстные поцелуи, эрогенные зоны, эротические движения. Без орального секса и проникновения.
 
-Категория: Желание (18+). Задание — эротическая прелюдия с психологическим напряжением: шёпот, взгляд, лёгкое прикосновение, намёк. НЕ секс — только предвкушение и желание. Максимум 2 предложения. Прямое указание. Неожиданно.`,
-    en: `${PERSONA_EN}
+Правила:
+- Можно: раздевание, поцелуи с языком, прикосновения к эрогенным зонам (грудь, ягодицы, внутренняя сторона бедра, пах через ткань)
+- Можно: откровенные команды и короткие фразы («Я хочу тебя», «Снимай»)
+- Нельзя: оральный секс, проникновение, BDSM
+- Без «отстранись», «посмотри в глаза» (кроме естественного контекста)
 
-Category: Desire (18+). The task is erotic foreplay with psychological tension: whisper, eye contact, light touch, teasing hint. NOT sex — just anticipation and desire. Unexpected. Max 2 sentences. Direct instruction.`,
-    hi: `${PERSONA_EN}\nCategory: Desire (18+). Erotic prelude task in Hindi. Max 2 sentences.`,
-    pt: `${PERSONA_EN}\nCategoria: Desejo (18+). Prelúdio erótico. Máx 2 frases. Instrução em Português.`,
-    es: `${PERSONA_EN}\nCategoría: Deseo (18+). Preludio erótico. Máx 2 frases. Instrucción en Español.`,
+Эталоны:
+1. «Поцелуй партнёра глубоко, с языком. Руками в волосы, на спину, на ягодицы.»
+2. «Проведи рукой по внутренней стороне бедра. От колена вверх — остановись прямо перед трусами.»
+3. «Разденься полностью и пройди мимо партнёра. Пусть видит. Не прячься.»
+4. «Разденься, ляг на спину и дай партнёру смотреть. Пусть трогает, изучает.»
+
+Сгенерируй **одно новое задание** в таком же стиле. Верни только текст.`,
+    en: `You create tasks for the "Desire" category. This is foreplay. Undressing, passionate kisses, erogenous zones, erotic movements. No oral sex or penetration.
+
+Rules:
+- Allowed: undressing, tongue kisses, touching erogenous zones (chest, butt, inner thigh, crotch over fabric)
+- Allowed: direct commands and short phrases ("I want you", "Take it off")
+- Not allowed: oral sex, penetration, BDSM
+- No "pause and look away" (except natural context)
+
+Examples:
+1. "Kiss deeply, with tongue. Hands in hair, on back, on butt."
+2. "Trace hand up inner thigh. Stop just before underwear."
+3. "Get completely naked and walk past your partner. Let them see you."
+4. "Get naked, lie on your back and let your partner watch. Let them touch, explore."
+
+Generate **one new task** in the same style. Return only text.`,
   },
   passion: {
-    ru: `${PERSONA_RU}
+    ru: `Ты создаёшь задания для категории «Страсть». Это оральный и вагинальный/анальный секс. Откровенно, прямо, без BDSM и ролевых игр.
 
-Категория: Страсть (18+). Задание — конкретное действие во время секса: поза, движение, взгляд, слова. Чувственно и прямо, без эвфемизмов. Психологически богато. Максимум 2 предложения.`,
-    en: `${PERSONA_EN}
+Правила:
+- Можно: минет, куннилингус, вагинальный и анальный секс, разные позы
+- Можно: команды и короткие фразы («Войди», «Ляг», «Не торопись»)
+- Нельзя: BDSM, ролевые игры («хозяин и слуга», «полицейский»), связывание
+- Язык — прямой, без эвфемизмов, но без пошлости
 
-Category: Passion (18+). The task is a specific sexual action: position, movement, eye contact, or words spoken during sex. Sensual and direct — no euphemisms. Psychologically rich. Max 2 sentences.`,
-    hi: `${PERSONA_EN}\nCategory: Passion (18+). Specific sexual action task in Hindi. Max 2 sentences.`,
-    pt: `${PERSONA_EN}\nCategoria: Paixão (18+). Ação sexual específica. Máx 2 frases. Português.`,
-    es: `${PERSONA_EN}\nCategoría: Pasión (18+). Acción sexual específica. Máx 2 frases. Español.`,
+Эталоны:
+1. «Опустись на колени перед партнёром. Сделай минет / кунни. Не торопись.»
+2. «Ляг на спину. Попроси партнёра сесть сверху лицом к тебе. Двигайтесь медленно.»
+3. «Войди в партнёра медленно. Остановись внутри на пару секунд. Потом начни двигаться.»
+4. «Сделай партнёру минет / кунни до финиша. Не останавливайся в конце.»
+
+Сгенерируй **одно новое задание** в таком же стиле. Верни только текст.`,
+    en: `You create tasks for the "Passion" category. Oral and vaginal/anal sex. Explicit, direct, no BDSM or roleplay.
+
+Rules:
+- Allowed: blowjob, cunnilingus, vaginal and anal sex, various positions
+- Allowed: commands and short phrases ("Enter", "Lie down", "Take your time")
+- Not allowed: BDSM, roleplay ("master and servant", "cop"), tying
+- Language — direct, no euphemisms, no vulgarity
+
+Examples:
+1. "Get on your knees. Give oral. Take your time."
+2. "Lie on your back. Ask partner to sit on top facing you. Move slowly."
+3. "Enter slowly. Stop inside for a few seconds. Then start moving."
+4. "Give oral to finish. Don't stop at the end."
+
+Generate **one new task** in the same style. Return only text.`,
   },
   hard: {
-    ru: `${PERSONA_RU}
+    ru: `Ты создаёшь задания для категории «Хард». Это жёстко, ролевые игры, элементы BDSM, приказы, с нотками извращения. С safe word по желанию.
 
-Категория: Хард (18+). Задание — откровенное действие с элементами контроля: доминирование, команды, медленное раздевание, ограничения движений, психологическое подчинение. Конкретно, без цензуры, прямо. Максимум 2 предложения.`,
-    en: `${PERSONA_EN}
+Правила:
+- Можно: ролевые игры (хозяин/слуга, полицейский/задержанный, учитель/ученик), связывание (ремень, галстук), повязка на глаза, шлепки, приказы, запрет на оргазм
+- Можно: грубость в рамках согласия (волосы, сила)
+- Обязательно: без реальной жестокости, всё в рамках consensual
+- Нельзя: опасные действия (удушение, кровь, оружие)
 
-Category: Hard (18+). The task involves control dynamics: dominance, commands, slow undressing, restraint, psychological submission. Specific, direct, no censorship. Max 2 sentences.`,
-    hi: `${PERSONA_EN}\nCategory: Hard (18+). Dominant control task in Hindi. Max 2 sentences.`,
-    pt: `${PERSONA_EN}\nCategoria: Intenso (18+). Tarefa de dominância e controle. Máx 2 frases. Português.`,
-    es: `${PERSONA_EN}\nCategoría: Intenso (18+). Tarea de dominancia y control. Máx 2 frases. Español.`,
+Эталоны:
+1. «Свяжи партнёру руки ремнём или галстуком. Сделай минет / кунни. Не останавливайся, пока не попросит.»
+2. «Скажи партнёру: «Встань на колени». Подойди ближе. Пусть смотрит снизу вверх.»
+3. «Завяжи партнёру глаза. Делай что хочешь — руками, губами. Пусть угадывает, что дальше.»
+4. «Шлёпни партнёра по ягодицам пять раз. Не сильно. Спроси: «Ещё?». Если да — продолжай.»
+
+Сгенерируй **одно новое задание** в таком же стиле. Верни только текст.`,
+    en: `You create tasks for the "Hard" category. Rough, roleplay, BDSM elements, commands, with a hint of kink. Safe word optional.
+
+Rules:
+- Allowed: roleplay (master/servant, cop/detained, teacher/student), tying (belt, tie), blindfold, spanking, commands, orgasm denial
+- Allowed: roughness within consent (hair, force)
+- Required: no real cruelty, all consensual
+- Not allowed: dangerous actions (choking, blood, weapons)
+
+Examples:
+1. "Tie partner's hands with a belt or tie. Give oral. Don't stop until asked."
+2. "Say: 'Get on your knees'. Come closer. Let them look up."
+3. "Blindfold your partner. Do whatever you want — hands, lips. Let them guess."
+4. "Spank partner's butt five times. Not hard. Ask: 'More?'. If yes — continue."
+
+Generate **one new task** in the same style. Return only text.`,
   },
 };
 
-function userMsg(lang: string): string {
-  if (lang === "ru") return "Придумай одно оригинальное, неожиданное задание. Только само задание — без объяснений, заголовков и кавычек.";
-  if (lang === "hi") return "एक मूल, अप्रत्याशित कार्य बनाएं। केवल कार्य।";
-  if (lang === "pt") return "Crie uma tarefa original e inesperada. Apenas a tarefa, sem explicações.";
-  if (lang === "es") return "Crea una tarea original e inesperada. Solo la tarea, sin explicaciones.";
-  return "Create one original, unexpected task. Just the task itself — no explanations, no quotes, no headers.";
+// ─────────────────────────────────────────────────────────────────────────────
+// ФОЛБЭК (из статичного файла, на случай ошибки DeepSeek)
+// ─────────────────────────────────────────────────────────────────────────────
+function getFallback(category: string, lang: string): string {
+  const pool = lang === "ru" ? TASKS_RU : TASKS_EN;
+  const categoryTasks = pool[category as keyof typeof pool] ?? pool.compliments;
+  return categoryTasks[Math.floor(Math.random() * categoryTasks.length)];
 }
 
-function pickFallback(category: string, lang: string): string {
-  const pool = FALLBACKS[category]?.[lang] ?? FALLBACKS[category]?.["en"] ?? ["Hold your partner close for one full minute. No phones."];
-  return pool[Math.floor(Math.random() * pool.length)];
-}
-
+// ─────────────────────────────────────────────────────────────────────────────
+// ОСНОВНОЙ ХЕНДЛЕР
+// ─────────────────────────────────────────────────────────────────────────────
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   res.setHeader("Access-Control-Allow-Origin", "https://t.me");
   res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
@@ -178,14 +218,19 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const { category, lang = "ru" } = req.body as { category: string; lang?: string };
   if (!category) return res.status(400).json({ error: "category required" });
 
+  // Проверяем, есть ли ключ API
+  if (!DEEPSEEK_API_KEY) {
+    return res.status(200).json({ task: getFallback(category, lang), source: "fallback" });
+  }
+
   const systemPrompt = SYSTEM_PROMPTS[category]?.[lang] ?? SYSTEM_PROMPTS[category]?.["en"];
-  if (!systemPrompt || !DEEPSEEK_API_KEY) {
-    return res.status(200).json({ task: pickFallback(category, lang), source: "fallback" });
+  if (!systemPrompt) {
+    return res.status(200).json({ task: getFallback(category, lang), source: "fallback" });
   }
 
   try {
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 7000);
+    const timeout = setTimeout(() => controller.abort(), 8000);
 
     const response = await fetch(DEEPSEEK_URL, {
       method: "POST",
@@ -194,23 +239,36 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         model: "deepseek-chat",
         messages: [
           { role: "system", content: systemPrompt },
-          { role: "user",   content: userMsg(lang) },
+          { role: "user", content: "Сгенерируй одно задание." },
         ],
-        max_tokens: 160,
-        temperature: 1.25,
+        max_tokens: 180,
+        temperature: 1.35,
       }),
       signal: controller.signal,
     });
 
     clearTimeout(timeout);
-    if (!response.ok) return res.status(200).json({ task: pickFallback(category, lang), source: "fallback" });
+
+    if (!response.ok) {
+      console.error("DeepSeek API error:", response.status);
+      return res.status(200).json({ task: getFallback(category, lang), source: "fallback" });
+    }
 
     const data = await response.json();
-    const task = (data.choices?.[0]?.message?.content ?? "").trim();
-    if (!task) return res.status(200).json({ task: pickFallback(category, lang), source: "fallback" });
+    let task = data.choices?.[0]?.message?.content?.trim() ?? "";
+
+    // Очистка от кавычек и лишних символов
+    task = task.replace(/^["']|["']$/g, "").replace(/\\"/g, '"');
+
+    // Проверка на запрещённые фразы (если есть — берём фолбэк)
+    const hasForbidden = FORBIDDEN_PHRASES.some(phrase => task.toLowerCase().includes(phrase.toLowerCase()));
+    if (!task || task.length < 10 || hasForbidden) {
+      return res.status(200).json({ task: getFallback(category, lang), source: "fallback" });
+    }
 
     return res.status(200).json({ task, source: "ai" });
-  } catch {
-    return res.status(200).json({ task: pickFallback(category, lang), source: "fallback" });
+  } catch (error) {
+    console.error("DeepSeek request failed:", error);
+    return res.status(200).json({ task: getFallback(category, lang), source: "fallback" });
   }
 }

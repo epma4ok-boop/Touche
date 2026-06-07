@@ -592,7 +592,7 @@ function CoupleModal({ lang, coupleId, pendingRefUserId, onLink, onUnlink, onClo
   const [linking, setLinking] = useState(false);
 
   const myId = window.Telegram?.WebApp?.initDataUnsafe?.user?.id;
-  const BOT = "ToucheGameBot";
+  const BOT = "ToucheCoupleBot";
 
   function handleShareMyLink() {
     const tg = window.Telegram?.WebApp;
@@ -977,7 +977,7 @@ export default function Home({
   const handleInvite = useCallback(() => {
     const tg = window.Telegram?.WebApp;
     tg?.HapticFeedback?.impactOccurred("light");
-    const link = "https://t.me/ToucheGameBot/Touche";
+    const link = "https://t.me/ToucheCoupleBot/Touche";
     const msg = INVITE_MSG[lang];
     tg?.openTelegramLink?.(`https://t.me/share/url?url=${encodeURIComponent(link)}&text=${encodeURIComponent(msg)}`);
   }, [lang]);

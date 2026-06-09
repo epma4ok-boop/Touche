@@ -3,14 +3,14 @@ import type { Category } from "./i18n";
 
 export const TASKS_RU: Record<Category, string[]> = {
   // ─────────────────────────────────────────────────────────────────────────────
-  // КОМПЛИМЕНТЫ (Только речь/текст. Слова, которые сближают)
+  // КОМПЛИМЕНТЫ
   // ─────────────────────────────────────────────────────────────────────────────
   compliments: [
     "Открой чат и напиши «Скучаю». Одно слово. Без объяснений.",
     "Напиши партнёру: «Ты моё чудо». Прямо сейчас. Не жди ответа.",
     "Скажи вслух: «Ты прекрасна/прекрасен». Просто так, без повода.",
     "Отправь голосовое: «Я очень соскучилась/соскучился».",
-    "Напиши партнеру «Спасибо, что ты есть».Добавь сердечко",
+    "Напиши партнеру «Спасибо, что ты есть». Добавь сердечко",
     "Без повода скажи партнеру: «Мне с тобой хорошо».",
     "Напиши партнеру: «Я тебя люблю». Не жди ответа. Сделай это для себя",
     "Скажи: «Я скучал(а)» — даже если вы расстались час назад.",
@@ -75,10 +75,10 @@ export const TASKS_RU: Record<Category, string[]> = {
   ],
 
   // ─────────────────────────────────────────────────────────────────────────────
-  // НЕЖНОСТЬ (Объятия, поцелуи, массаж, покусывания. Без прелюдии и намёков)
+  // НЕЖНОСТЬ
   // ─────────────────────────────────────────────────────────────────────────────
   tenderness: [
-   "Подойди сзади, обними и целуй шею. Медленно.",
+    "Подойди сзади, обними и целуй шею. Медленно.",
     "Обними партнера и поцелуй в плечо.",
     "Возьми лицо партнёра в ладони и поцелуй в нос.",
     "Поцелуй в губы. Медленно. Задержись на пару секунд.",
@@ -109,12 +109,12 @@ export const TASKS_RU: Record<Category, string[]> = {
     "Прижмись к ней/нему и скажи: «Никуда не хочу отсюда».",
     "Погладь её/его по щеке со словами «Твоя кожа — как шёлк».",
     "Прижмись к груди партнера и послушай сердцебиение.",
-    "Перед сном обними крепко, поцелуй нежно и скажи :«Сладких снов».",
-    "Сделай чай, включи на телевизоре имитацию камина. Просто посидите без телефонов в приятной обстановке.", 
+    "Перед сном обними крепко, поцелуй нежно и скажи: «Сладких снов».",
+    "Сделай чай, включи на телевизоре имитацию камина. Просто посидите без телефонов в приятной обстановке.",
   ],
 
   // ─────────────────────────────────────────────────────────────────────────────
-  // ЖЕЛАНИЕ (Прелюдия. Раздевание, эрогенные зоны, страстные поцелуи, откровенные действия)
+  // ЖЕЛАНИЕ
   // ─────────────────────────────────────────────────────────────────────────────
   desire: [
     "Поцелуй партнёра глубоко, с языком. Руками в волосы, на спину, на ягодицы.",
@@ -154,14 +154,14 @@ export const TASKS_RU: Record<Category, string[]> = {
     "Отправь партнёру фото своих голых ног, раздвинутых. Скажи «Жду тебя здесь».",
     "Запиши видео, как ты раздеваешься перед камерой, но не до конца. Дразни.",
     "Проведи языком по ореолам сосков, очень медленно. Подключай руки",
-    "Напиши партнеру сообщение :"Я уже влажная/твердый". Даже если партнер сидит рядом.",
-    "Разденься и ляг на кровать, пусть это немног сведет его/ее с ума.",
+    "Напиши партнеру сообщение: 'Я уже влажная/твердый'. Даже если партнер сидит рядом.",
+    "Разденься и ляг на кровать, пусть это немного сведет его/ее с ума.",
     "Отправь партнёру эротическую фотографию (откровенную).",
     "Поцелуй партнёра туда через ткань. Туда, кусать нельзя, но целовать можно.",
   ],
 
   // ─────────────────────────────────────────────────────────────────────────────
-  // СТРАСТЬ (Оральный секс, секс, мастурбация партнёра, массаж гениталий. Без BDSM и жёстких ролей)
+  // СТРАСТЬ
   // ─────────────────────────────────────────────────────────────────────────────
   passion: [
     "Опустись на колени перед партнёром. Ласкай его ртом — неторопливо, вдумчиво, без спешки. Пусть каждое движение будет осознанным. Продолжай, пока не захочешь остановиться.",
@@ -182,7 +182,7 @@ export const TASKS_RU: Record<Category, string[]> = {
   ],
 
   // ─────────────────────────────────────────────────────────────────────────────
-  // ХАРД (Жёстко, ролевые игры, BDSM, секс-игрушки, костюмы. С нотками извращения)
+  // ХАРД
   // ─────────────────────────────────────────────────────────────────────────────
   hard: [
     "Уложи партнёра на спину. Медленно встань над его лицом. Опускайся неспешно — управляй бёдрами, задавай ритм сама. Он под тобой, в твоей власти. Позволь ему работать.",
@@ -203,29 +203,75 @@ export const TASKS_RU: Record<Category, string[]> = {
   ],
 };
 
-// Английская версия (полностью аналогична русской по структуре и стилю)
+// Английская версия
 export const TASKS_EN: Record<Category, string[]> = {
   compliments: [
-    "Open the chat and text 'Miss you'.",
-    "Text your partner: 'I like you'. Right now.",
-    "Say out loud: 'You're beautiful'.",
-    "Send a voice message: 'You're great'.",
-    "Text 'Thank you for being here'.",
-    "Say: 'I feel good with you'.",
-    "Text: 'I love you'.",
+    "Open the chat and text 'Miss you'. One word. No explanation.",
+    "Text your partner: 'You're my miracle'. Right now.",
+    "Say out loud: 'You're beautiful/handsome'. Just because.",
+    "Send a voice message: 'I miss you so much'.",
+    "Text your partner 'Thank you for being here'. Add a heart.",
+    "Tell your partner: 'I feel good with you'. No reason needed.",
+    "Text your partner: 'I love you'. Don't wait for a reply. Do it for yourself.",
     "Say: 'I missed you' — even if you parted an hour ago.",
-    "Text: 'You're my favorite person'.",
-    "Say: 'Your hands are so warm'.",
-    "Text: 'I feel calm when you're near'.",
-    "Say: 'Something's off without you'.",
-    "Text: 'I thought about you today'.",
-    "Say: 'You're the best thing that happened to me this year'.",
-    "Say: 'You smell good'.",
-    "Say: 'I love your laugh'.",
-    "Say: 'You understand me so well'.",
-    "Text: 'Thanks for today'.",
-    "Say: 'You are my peace'.",
-    "Text: 'You are my good one'.",
+    "Text: 'You are my love'.",
+    "Text: 'I want you to be near me'.",
+    "Text: 'I've been thinking about you all day'.",
+    "Say: 'You're the best thing that ever happened to me'.",
+    "Tell your partner: 'You smell good'.",
+    "Say: 'I love your laugh, laugh more often'.",
+    "Say: 'I appreciate that you understand me'.",
+    "Text: 'Thanks for today'. Add a heart.",
+    "Take a selfie, blow a kiss and send it to your partner.",
+    "Buy your partner a snack. Something they really love.",
+    "Make a mini surprise tonight — flowers, a card, or their favorite treat.",
+    "Send a voice message: 'I'm thinking of you'. Nothing else.",
+    "Text your partner: 'You inspire me to be better. That's the truth.'",
+    "Record a short video: say something warm to your partner. Send it.",
+    "Pick a photo of you together and send it with the caption 'My happiness'.",
+    "Write a list of three things you're grateful for about your partner today. Send it.",
+    "Send your partner a song that reminds you of them. Write why.",
+    "Take a screenshot of a warm message they sent you. Send it back with 'I scroll through this and smile'.",
+    "Send your partner a meme or gif that describes your relationship. Write 'This is us'.",
+    "Write your partner a long warm message before sleep. Leave it for the morning.",
+    "Record a video message: tell your partner what you value about them. Send it.",
+    "Send a photo of a place where you had a good time together. Write 'I want to go back there with you'.",
+    "Write your partner a compliment on a piece of paper and put it under their pillow.",
+    "Send a voice message confessing your love, even if you're in the same room.",
+    "Take a selfie in their shirt (or with their belongings). Send it with the caption 'Missing you'.",
+    "Text your partner what character trait of theirs you admire most. In detail.",
+    "Send a photo of a sunset/sunrise with the caption 'I was thinking of you'.",
+    "Record a video of yourself smiling just thinking about them. Send it.",
+    "Text your partner: 'You make me happier. Thank you'.",
+    "Send a voice message: 'I'm hugging you right now'. Let them imagine it.",
+    "Make a collage of your photos together. Send it.",
+    "Text your partner: 'Even an ordinary day feels like a holiday with you'.",
+    "Send an emoji that describes them. Write why.",
+    "Text your partner: 'You're the best thing that happened to me'. Just because.",
+    "Send a photo of your breakfast/lunch with the caption 'Wish you were here'.",
+    "Record a voice note: read a poem or sing a song about them.",
+    "Text your partner: 'I'm proud of who you are'.",
+    "Send a video of you dancing to their favorite music. Say you did it for them.",
+    "Write a long message listing their best qualities. At least five.",
+    "Take a selfie holding their photo. Send it with 'You're always with me'.",
+    "Send a voice message whispering their name. Say you just wanted to say it.",
+    "Text your partner: 'You're my main person. Thank you for being here'.",
+    "Record a video message: look into the camera and say warm words to your partner.",
+    "Send your partner a link to a place you want to go together. Write 'Anywhere with you'.",
+    "Make a collage of their photos. Send it with the caption 'My beauty'.",
+    "Text your partner: 'I love your smile' — they'll definitely smile.",
+    "Text your partner: 'You're the reason I'm smiling today'.",
+    "Send a heart animation and write 'This is me right now'.",
+    "Take a selfie with their favorite item. Send it with 'Thinking of you'.",
+    "Text your partner: 'Thank you for caring'.",
+    "Send a photo of a starry sky with 'Looking at the stars and thinking of you'.",
+    "Record a voice note wishing your partner good night. Send it before they sleep.",
+    "Text your partner: 'You make this world better just by being in it'.",
+    "Send a photo of yourself happy. Write 'You made me like this'.",
+    "Text your partner: 'You're my rock. Thank you for being there'.",
+    "Text your partner: 'You're the most patient person I know. Thank you for tolerating me'.",
+    "Take a selfie with 'Yours' written on your phone screen. Send it.",
+    "Text your partner: 'You're my inspiration. Thank you for every day'.",
   ],
   tenderness: [
     "Come from behind, hug and kiss the neck. Slowly.",
@@ -237,34 +283,73 @@ export const TASKS_EN: Record<Category, string[]> = {
     "Massage feet.",
     "Gently bite the earlobe. Hold. Let go. Kiss the same spot.",
     "Bite the shoulder — not hard, in breathing rhythm.",
-    "Gently bite the collarbone.",
+    "Gently bite the collarbone, then kiss it softly.",
     "Kiss the neck and hold your lips there for a moment.",
     "Hug and lie in silence. No phones.",
     "Kiss the neck, then move to the shoulder.",
-    "Trace lips along the shoulder.",
-    "Put your head on partner's chest. Let them hug you.",
+    "Put your head on partner's lap. Relax and enjoy the silence.",
     "Hug from behind and bury your nose in their neck. Just stand there.",
     "Stroke the back. Slowly. Don't talk.",
     "Hold hands and just sit in silence.",
-    "Kiss the forehead.",
+    "Kiss the forehead. Gently and sweetly.",
     "Kiss the cheek. Then again. Then on the lips.",
+    "Record a voice message whispering 'I love you'. Let them listen before sleep.",
+    "Take a selfie blowing a kiss. Send it with 'This is for you'.",
+    "Record a video of you kissing. Send it to your partner. Let them rewatch it.",
+    "Take a selfie together in bed.",
+    "Take a photo of their hand in yours. For your personal collection.",
+    "Take a selfie in their arms. Send it with 'My safe place'.",
+    "Record a video of you dancing a slow dance at home.",
+    "Gently say 'Lie on your stomach'. Give them a back and neck massage.",
+    "Stand with them in front of a mirror, hug tightly and take a selfie.",
+    "Press against them and say: 'I don't want to leave here'.",
+    "Stroke their cheek and say 'Your skin is like silk'.",
+    "Press your ear to your partner's chest and listen to their heartbeat.",
+    "Before sleep, hug tightly, kiss gently and say 'Sweet dreams'.",
+    "Make tea, put on a fireplace simulation on TV. Just sit together without phones.",
   ],
   desire: [
     "Kiss deeply, with tongue. Hands in hair, on back, on butt.",
-    "Stand in front. Take off your shirt slowly. Let them watch. Then unbutton their pants.",
+    "Stand in front. Take off your shirt slowly. Let them watch.",
     "Trace hand up inner thigh. Stop just before underwear.",
     "Get completely naked and walk past your partner. Let them see you.",
     "Get naked, lie on your back and let your partner watch. Let them touch, explore.",
     "Lick a nipple. At the same time — hand between legs, over fabric.",
-    "Take off your partner's underwear yourself. Slowly. Watch what you're doing.",
-    "Put your hand on your partner's crotch over clothes. Don't move. Stay silent.",
+    "Take off your partner's underwear yourself. Slowly. Watch their reaction.",
+    "Put your hand on your partner's crotch over clothes. Don't move. Stay silent. Look in their eyes and smile.",
     "Kiss your partner on lips, move to neck, then chest. Hands on thighs.",
     "Say: 'I want you'. Quietly. Look in the eyes. Then stay silent.",
-    "Turn your partner with back to you. Trace hands from shoulder blades to butt.",
-    "Lie on your stomach. Ask partner to lie on top. Just stay like that.",
-    "Kneel in front of your partner. Look up. Don't rush.",
-    "Command: 'Take off your pants'. Once. Looking in the eyes.",
-    "Kiss your partner through fabric. Right there. You can't bite, but you can kiss.",
+    "Turn your partner with back to you. Trace hands from shoulders to butt, slowly.",
+    "Send your partner a photo in your underwear. Say 'Think about me today'.",
+    "Record a video of you undressing slowly. Send it to them. Let them watch.",
+    "Take a suggestive selfie (lips, neck, collarbone, clothes barely visible). Send it with 'Waiting for you'.",
+    "Send a voice message whispering 'I want you right now'. Nothing else.",
+    "Record a video of you touching yourself over your underwear. Send it.",
+    "Take a close-up photo of your underwear. Send it with 'Yours'.",
+    "Send an erotic photo (face hidden). Say 'Guess whose body this is'.",
+    "Record a video of you dancing erotically. Send it.",
+    "Take a selfie biting your lip. Send it with 'I want to bite you'.",
+    "Record a voice message with your aroused breathing. Send it.",
+    "Record a video of you slowly touching your own body. Send it to your partner.",
+    "Record a video of you taking off your bra/shirt. Send it.",
+    "Take a photo of yourself after a shower. Send it with 'Someone's missing next to me'.",
+    "Send an erotic photo in stockings/underwear. Say 'I'm waiting for you to take them off'.",
+    "Take a naked selfie together.",
+    "Send a voice message whispering 'I'm already wet/hard just thinking about you'.",
+    "Take a photo of your partner in a sexy pose.",
+    "Agree to play erotic photographer. Decide on your roles yourselves.",
+    "Send your partner a 10-second erotic video. Say 'The rest when we meet'.",
+    "Record a voice message whispering 'Take everything off me'. Send it.",
+    "Take a selfie in a steamy bathroom. Say 'It's too hot here without you'.",
+    "Take a photo of your butt in the mirror. Send it with 'Want to spank me?'",
+    "Send a short moaning voice message. Just a short one. Let them imagine.",
+    "Send a photo of your bare legs spread apart. Say 'Waiting for you here'.",
+    "Record a video of you undressing but not all the way. Tease.",
+    "Lick around the areolas very slowly. Use your hands too.",
+    "Text your partner: 'I'm already wet/hard'. Even if they're sitting right next to you.",
+    "Get naked and lie on the bed. Let that drive them a little crazy.",
+    "Send an explicit erotic photo to your partner.",
+    "Kiss your partner there through the fabric. You can't bite there, but you can kiss.",
   ],
   passion: [
     "Get on your knees in front of your partner. Use your mouth — slowly, intentionally. Watch their reactions. Every movement deliberate. Continue as long as you want.",
@@ -302,5 +387,4 @@ export const TASKS_EN: Record<Category, string[]> = {
   ],
 };
 
-// Для обратной совместимости (по умолчанию русские задания)
 export const tasks = TASKS_RU;

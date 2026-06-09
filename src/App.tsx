@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import Home from "@/pages/Home";
 import CategoryScreen from "@/pages/CategoryScreen";
 import ScenarioScreen from "@/pages/ScenarioScreen";
@@ -112,6 +112,15 @@ export async function apiLinkCouple(refUserId: number): Promise<string | null> {
 }
 
 export default function App() {
+  // Telegram WebApp expand — разворачивает приложение на весь экран
+  useEffect(() => {
+    const tg = window.Telegram?.WebApp;
+    if (tg) {
+      tg.ready();
+      tg.expand();
+    }
+  }, []);
+
   const [phase, setPhase] = useState<AppPhase>("splash");
   const [lang, setLang] = useState<Lang>("ru");
   const [gender, setGender] = useState<Gender>("female");
@@ -179,7 +188,6 @@ export default function App() {
   const handleLangSelect = useCallback((chosen: Lang) => {
     try { localStorage.setItem(LANG_KEY, chosen); } catch {}
     setLang(chosen);
-    // After lang — always show gender selection
     setPhase("gender");
   }, []);
 

@@ -1,5 +1,3 @@
-// ВРЕМЕННО: пропускаем проверку лимитов
-return res.status(200).json({ ok: true, remaining: 999 });
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { createClient } from "@supabase/supabase-js";
 import { validateTelegramInitData } from "../couple/_auth.js";
@@ -22,14 +20,20 @@ async function hasActiveSubscription(userId: number): Promise<boolean> {
 }
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
+  if (req.method !== "POST") {
+    return res.status(405).json({ error: "Method not allowed" });
+  }
 
   const initData = req.headers["x-telegram-init-data"] as string;
   const caller = validateTelegramInitData(initData, process.env.BOT_TOKEN!);
-  if (!caller) return res.status(401).json({ error: "Unauthorized" });
+  if (!caller) {
+    return res.status(401).json({ error: "Unauthorized" });
+  }
 
-  const { category } = req.body;
-  if (!category) return res.status(400).json({ error: "category required" });
+  const { category } = req.body as { category: string };
+  if (!category) {
+    return res.status(400).json({ error: "category required" });
+  }
 
   const today = new Date().toISOString().slice(0, 10);
 
@@ -40,7 +44,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
   }
 
-  // Прямой запрос к таблице вместо RPC
   const { data: existing } = await supabase
     .from("user_daily_limits")
     .select("count, bonus")
@@ -57,7 +60,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(403).json({ error: "limit_exceeded", remaining: 0 });
   }
 
-  // Увеличиваем счётчик
   await supabase
     .from("user_daily_limits")
     .upsert(

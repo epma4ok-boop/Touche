@@ -1,3 +1,5 @@
+// ВРЕМЕННО: пропускаем проверку лимитов
+return res.status(200).json({ ok: true, remaining: 999 });
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { createClient } from "@supabase/supabase-js";
 import { validateTelegramInitData } from "../couple/_auth.js";

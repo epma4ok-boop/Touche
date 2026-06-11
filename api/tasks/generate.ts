@@ -164,7 +164,7 @@
     const initData = req.headers["x-telegram-init-data"] as string | undefined;
     if (!initData) return res.status(401).json({ error: "Missing init data" });
 
-    const ok = validateTelegramInitData(initData);
+    const ok = validateTelegramInitData(initData, process.env.BOT_TOKEN!);
     if (!ok) return res.status(403).json({ error: "Invalid init data" });
 
     const { category = "compliments", lang = "en", gender = "other" } = req.body ?? {};

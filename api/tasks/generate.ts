@@ -1,6 +1,6 @@
 // api/tasks/generate.ts
 // POST /api/tasks/generate
-// Body: { category, lang, gender? } — gender всегда male или female
+// Body: { category, lang, gender? }
 
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { validateTelegramInitData } from "../couple/_auth.js";
@@ -23,17 +23,6 @@ const STATIC_POOLS: Record<string, StaticPool> = {
   es: TASKS_ES,
 };
 
-// ── Запрещённые паттерны ──────────────────────────────────────────────────────
-const FORBIDDEN = [
-  "скажи мне", "сделай мне", "попроси меня", "посмотри на меня",
-  "ласкай меня", "трогай меня", "целуй меня", "обними меня", "расскажи мне",
-  "tell me", "do it to me", "touch me", "kiss me", "hold me", "look at me",
-  "растворись", "замри в тишине", "почувствуй вечность", "слейтесь",
-  "пусть повиснет", "дыши в кожу", "прелюдия к прелюдии", "томление",
-  "давай я ", "я буду ", "я сделаю тебе", "я хочу тебя", "let me ", "i will do",
-  "выдыхает", "вдох", "выдох",
-];
-
 // ── Fallback из статического пула ─────────────────────────────────────────────
 function getFallback(cat: string, lang: string): string {
   const pool = STATIC_POOLS[lang] ?? STATIC_POOLS["en"];
@@ -41,393 +30,208 @@ function getFallback(cat: string, lang: string): string {
   return list[Math.floor(Math.random() * list.length)];
 }
 
-// ── Build 5 gold-standard examples from the static pool ──────────────────────
-function getGoldExamples(cat: string, lang: string, count = 5): string {
-  const pool = STATIC_POOLS[lang] ?? STATIC_POOLS["en"];
-  const list = [...((pool as StaticPool)[cat] ?? (pool as StaticPool)["compliments"])];
-  for (let i = list.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [list[i], list[j]] = [list[j], list[i]];
-  }
-  return list.slice(0, count).map((t, i) => `${i + 1}. ${t}`).join("\n");
-}
+// ── Системные промпты (ИИ НЕ говорит от себя, только задание) ──────────────
+function buildSystemPrompt(category: string, lang: string, gender: string): string {
+  const genderMap: Record<string, Record<string, string>> = {
+    ru: {
+      male:   "Пользователь — мужчина, партнёр — женщина. Используй 'ты' для пользователя, 'она/её/ей' для партнёрши. Глаголы мужского рода.",
+      female: "Пользователь — женщина, партнёр — мужчина. Используй 'ты' для пользователя, 'он/его/ему' для партнёра. Глаголы женского рода.",
+    },
+    en: {
+      male:   "User is male, partner is female. Use 'you' for user, 'she/her' for partner. Male verbs.",
+      female: "User is female, partner is male. Use 'you' for user, 'he/him' for partner. Female verbs.",
+    },
+    hi: {
+      male:   "उपयोगकर्ता पुरुष है, पार्टनर महिला है।",
+      female: "उपयोगकर्ता महिला है, पार्टनर पुरुष है।",
+    },
+    pt: {
+      male:   "Usuário é homem, parceira é mulher. Use 'você' e 'ela/dela'.",
+      female: "Usuária é mulher, parceiro é homem. Use 'você' e 'ele/dele'.",
+    },
+    es: {
+      male:   "El usuario es hombre, la pareja es mujer. Usa 'tú' y 'ella/su'.",
+      female: "La usuaria es mujer, la pareja es hombre. Usa 'tú' y 'él/su'.",
+    },
+  };
 
-// ── Hard category: 10 flavor types ────────────────────────────────────────────
-const HARD_FLAVOR_KEYS = [
-  "roleplay", "edging", "ice_wax", "blindfold", "commands",
-  "striptease", "mirror", "binding", "voice_control", "spanking",
-] as const;
+  const genderLine = genderMap[lang]?.[gender] ?? genderMap["en"]["male"];
 
-type HardFlavorKey = typeof HARD_FLAVOR_KEYS[number];
+  const prompts: Record<string, Record<string, string>> = {
+    compliments: {
+      ru: `Сгенерируй ОДНО задание для категории "Комплименты".
 
-function pickHardFlavor(): HardFlavorKey {
-  return HARD_FLAVOR_KEYS[Math.floor(Math.random() * HARD_FLAVOR_KEYS.length)];
-}
+Типы заданий (выбери один случайно):
+- сказать или написать тёплое слово («Скучаю», «Ты красивая», «Я люблю тебя»)
+- записать голосовое с тёплыми словами
+- отправить селфи с улыбкой
+- отправить селфи с воздушным поцелуем
+- записать короткое видео с тёплым обращением
+- сделать мини-сюрприз (шоколад, записка, чай)
+- написать благодарность за конкретную мелочь сегодня
 
-const HARD_FLAVORS: Record<string, Record<HardFlavorKey, string>> = {
-  ru: {
-    roleplay:   "ТИП ЗАДАНИЯ: РОЛЕВАЯ ИГРА. Опиши конкретную ситуацию с ролями. Без связывания.",
-    edging:     "ТИП ЗАДАНИЯ: ЭДЖИНГ. Доведи до самого края, остановись, повтори. Укажи число раз. Без связывания.",
-    ice_wax:    "ТИП ЗАДАНИЯ: ТЕМПЕРАТУРА. Лёд или воск, конкретный маршрут по телу. Без связывания.",
-    blindfold:  "ТИП ЗАДАНИЯ: ПОВЯЗКА НА ГЛАЗА. Касайся неожиданно. Без связывания.",
-    commands:   "ТИП ЗАДАНИЯ: ГОЛОСОВОЕ ДОМИНИРОВАНИЕ. Приказы, запрет двигаться, команды. Без связывания.",
-    striptease: "ТИП ЗАДАНИЯ: СТРИПТИЗ. Медленно, под музыку, по команде. Без связывания.",
-    mirror:     "ТИП ЗАДАНИЯ: ЗЕРКАЛО. Смотреть на отражение, не отводить взгляд. Без связывания.",
-    binding:    "ТИП ЗАДАНИЯ: СВЯЗЫВАНИЕ. Шарф, платок, конкретная поза.",
-    voice_control: "ТИП ЗАДАНИЯ: ГОЛОСОВОЕ УПРАВЛЕНИЕ. Командуй партнёру, что делать, куда двигаться, когда ускориться. Ты ведёшь голосом и касаешься одновременно. Без связывания.",
-    spanking:   "ТИП ЗАДАНИЯ: ШЛЕПКИ. Место, сила, чередование с поглаживаниями. Без связывания.",
-  },
-  en: {
-    roleplay:   "TYPE: ROLEPLAY. Specific scenario with roles. No binding.",
-    edging:     "TYPE: EDGING. Edge, stop, repeat. No binding.",
-    ice_wax:    "TYPE: TEMPERATURE. Ice or wax, body path. No binding.",
-    blindfold:  "TYPE: BLINDFOLD. Unexpected touch. No binding.",
-    commands:   "TYPE: VOICE DOMINANCE. Orders, freeze, commands. No binding.",
-    striptease: "TYPE: STRIPTEASE. Slow, to music, on command. No binding.",
-    mirror:     "TYPE: MIRROR. Watch reflection, don't look away. No binding.",
-    binding:    "TYPE: BINDING. Scarf, cloth, specific pose.",
-    voice_control: "TYPE: VOICE CONTROL. Guide your partner with your voice — speed, depth, rhythm. Use touch at the same time. No binding.",
-    spanking:   "TYPE: SPANKING. Location, intensity, alternating with strokes. No binding.",
-  },
-  hi: {
-    roleplay:   "प्रकार: भूमिका। कोई बंधन नहीं।",
-    edging:     "प्रकार: एजिंग। कोई बंधन नहीं।",
-    ice_wax:    "प्रकार: बर्फ या मोम। कोई बंधन नहीं।",
-    blindfold:  "प्रकार: आंखों पर पट्टी। कोई बंधन नहीं।",
-    commands:   "प्रकार: आदेश। कोई बंधन नहीं।",
-    striptease: "प्रकार: स्ट्रिपटीज़। कोई बंधन नहीं।",
-    mirror:     "प्रकार: दर्पण। कोई बंधन नहीं।",
-    binding:    "प्रकार: बंधन।",
-    voice_control: "प्रकार: आवाज नियंत्रण। आवाज और हाथ दोनों का प्रयोग करें।",
-    spanking:   "प्रकार: थप्पड़। कोई बंधन नहीं।",
-  },
-  pt: {
-    roleplay:   "TIPO: ROLEPLAY. Sem amarrar.",
-    edging:     "TIPO: EDGING. Sem amarrar.",
-    ice_wax:    "TIPO: GELO OU VELA. Sem amarrar.",
-    blindfold:  "TIPO: VENDA. Sem amarrar.",
-    commands:   "TIPO: ORDENS. Sem amarrar.",
-    striptease: "TIPO: STRIPTEASE. Sem amarrar.",
-    mirror:     "TIPO: ESPELHO. Sem amarrar.",
-    binding:    "TIPO: AMARRAR.",
-    voice_control: "TIPO: CONTROLE POR VOZ. Use voz e mãos ao mesmo tempo.",
-    spanking:   "TIPO: PALMADAS. Sem amarrar.",
-  },
-  es: {
-    roleplay:   "TIPO: JUEGO DE ROL. Sin atar.",
-    edging:     "TIPO: EDGING. Sin atar.",
-    ice_wax:    "TIPO: HIELO O VELA. Sin atar.",
-    blindfold:  "TIPO: VENDA. Sin atar.",
-    commands:   "TIPO: ÓRDENES. Sin atar.",
-    striptease: "TIPO: STRIPTEASE. Sin atar.",
-    mirror:     "TIPO: ESPEJO. Sin atar.",
-    binding:    "TIPO: ATAR.",
-    voice_control: "TIPO: CONTROL POR VOZ. Usa voz y manos al mismo tiempo.",
-    spanking:   "TIPO: NALGADAS. Sin atar.",
-  },
-};
+Правила: одно действие, без касаний, без намёков на секс, до 180 символов. Верни только текст задания, без кавычек, без пояснений.`,
+      en: `Generate ONE task for "Compliments" category.
 
-// ─────────────────────────────────────────────────────────────────────────────
-// ПРОМПТЫ — все категории (с конкретными типами)
-// ─────────────────────────────────────────────────────────────────────────────
+Types (pick one randomly):
+- say or text a warm word ("Miss you", "You're beautiful", "I love you")
+- send a voice message with warm words
+- send a smiling selfie
+- send a selfie with a kiss gesture
+- record a short video with a warm message
+- make a mini-surprise (chocolate, note, tea)
+- write gratitude for a specific small thing today
 
-const NEUTRAL: Record<string, Record<string, string>> = {
-  compliments: {
-    ru: `Ты генератор заданий для пар. Категория: КОМПЛИМЕНТЫ.
+Rules: one action, no touching, no sexual hints, max 180 chars. Return only the task text, no quotes, no explanations.`,
+    },
+    tenderness: {
+      ru: `Сгенерируй ОДНО задание для категории "Нежность".
 
-Типы заданий:
-- слова: сказать или написать тёплое слово
-- голосовое: записать и отправить
-- текст: написать с теплом
-- селфи с улыбкой
-- селфи с поцелуем
-- короткое видео с обращением
-- мини-сюрприз (шоколад, записка, чай)
-- благодарность за конкретную мелочь
+Типы заданий (выбери один случайно):
+- обнять сзади и постоять так
+- поцеловать в губы медленно
+- поцеловать в шею или плечо
+- сделать массаж (голова, шея, спина, руки, ноги)
+- почесать спину или голову
+- легко прикусить мочку уха или плечо
+- взять за руку и смотреть друг на друга
+- отправить селфи с воздушным поцелуем
+- отправить старое совместное фото с вопросом «помнишь?»
 
-Правила:
-- Одно действие
-- Обращение "ты"
-- Партнёр — третье лицо (она/он)
-- Без касаний, без намёков на секс
-- До 180 символов
-- Без поэзии, без "я рекомендую"
+Правила: одно действие, без раздевания, без эрогенных зон, без намёков на секс, до 180 символов. Верни только текст задания, без кавычек, без пояснений.`,
+      en: `Generate ONE task for "Tenderness" category.
 
-Выбери ОДИН тип и сгенерируй задание в этом стиле.`,
-    en: `You generate couple tasks. Category: COMPLIMENTS.
+Types (pick one randomly):
+- hug from behind and stand still
+- kiss on the lips slowly
+- kiss the neck or shoulder
+- give a massage (head, neck, back, arms, legs)
+- scratch the back or head
+- gently bite the earlobe or shoulder
+- hold hands and look at each other
+- send a selfie with a kiss gesture
+- send an old photo together with "remember?"
 
-Types:
-- words: say or text a warm word
-- voice: record and send
-- text: warm message
-- selfie with smile
-- selfie with a kiss gesture
-- short video message
-- mini-surprise (chocolate, note, tea)
-- gratitude for a specific small thing
+Rules: one action, no undressing, no erogenous zones, no sexual hints, max 180 chars. Return only the task text, no quotes, no explanations.`,
+    },
+    desire: {
+      ru: `Сгенерируй ОДНО задание для категории "Желание" — прелюдия, без секса.
 
-Rules:
-- One action
-- Address "you"
-- Partner = third person (she/he)
-- No touching, no sexual hints
-- Max 180 chars
-- No poetry, no "I recommend"
+Типы заданий (выбери один случайно):
+- медленно раздеться перед партнёром
+- пройти мимо партнёра полностью голым
+- надеть фартук на голое тело и готовить
+- сделать фото в белье и отправить
+- записать видео в белье
+- положить руку на пах поверх одежды
+- массировать вокруг эрогенных зон, не касаясь центра
+- поцеловать и облизать вокруг сосков, не касаясь
+- прошептать на ухо грязную фразу
+- поцеловать глубоко, с языком
+- лечь голой и дать партнёру смотреть
 
-Pick ONE type and generate a task in that style.`,
-    hi: `जोड़ों के लिए टास्क। श्रेणी: तारीफ। एक काम। स्पर्श नहीं। 180 अक्षर।`,
-    pt: `Tarefas para casais. Categoria: ELOGIOS. Uma ação. Sem toque. 180 caracteres.`,
-    es: `Tareas para parejas. Categoría: PIROPOS. Una acción. Sin tocar. 180 caracteres.`,
-  },
-  tenderness: {
-    ru: `Ты генератор заданий для пар. Категория: НЕЖНОСТЬ.
+Правила: одно действие, без секса, без орального, без проникновения, до 200 символов. Верни только текст задания, без кавычек, без пояснений.`,
+      en: `Generate ONE task for "Desire" category — foreplay, no sex.
 
-Типы заданий:
-- объятия (сзади, молча, долгие)
-- поцелуи (в губы, медленно, без страсти)
-- поцелуи в шею / плечо
-- массаж (голова, шея, спина, руки, ноги)
-- почесывания (спина, голова)
-- лёгкие покусывания (мочка уха, плечо, ключица)
-- прикосновения (рука в руке, смотреть друг на друга с нежностью)
-- селфи с воздушным поцелуем
-- старое совместное фото с вопросом «помнишь?»
+Types (pick one randomly):
+- undress slowly in front of partner
+- walk past partner completely naked
+- put on an apron on naked body and cook
+- take a photo in lingerie and send
+- record a video in lingerie
+- put a hand on crotch over clothes
+- massage around erogenous zones, not touching the center
+- kiss and lick around nipples, not touching
+- whisper a dirty phrase in the ear
+- kiss deeply with tongue
+- lie down naked and let partner look
 
-Правила:
-- Одно действие
-- Без раздевания
-- Без эрогенных зон
-- Без намёков на секс
-- До 180 символов
-- Без «посидим молча»
+Rules: one action, no sex, no oral, no penetration, max 200 chars. Return only the task text, no quotes, no explanations.`,
+    },
+    passion: {
+      ru: `Сгенерируй ОДНО задание для категории "Страсть" — секс красиво, чувственно.
 
-Выбери ОДИН тип и сгенерируй задание в этом стиле.`,
-    en: `You generate couple tasks. Category: TENDERNESS.
+Типы заданий (выбери один случайно):
+- войти медленно, застыть, начать по ритму дыхания
+- сделать оральный секс, глядя в глаза
+- встать перед зеркалом, войти сзади
+- вставить наушники с музыкой, делать всё молча
+- провести кубиком льда по телу, потом оральный секс
+- нанести взбитые сливки, слизывать, потом оральный секс
+- сделать массаж с маслом, потом секс
+- снять фото голого тела красиво и отправить
+- записать видео голого тела без лица
+- снять секс на видео для коллекции, красиво
+- надеть съедобные трусы и снять зубами
 
-Types:
-- hugs (from behind, silent, long)
-- kisses (on lips, slow, not passionate)
-- neck/shoulder kisses
-- massage (head, neck, back, arms, legs)
-- scratching (back, head)
-- light bites (earlobe, shoulder, collarbone)
-- touch (hold hands, look at each other gently)
-- selfie with a kiss gesture
-- old photo with "remember?"
+Правила: одно действие, без пошлости, без грубости, без подчинения, до 200 символов. Верни только текст задания, без кавычек, без пояснений.`,
+      en: `Generate ONE task for "Passion" category — beautiful, sensual sex.
 
-Rules:
-- One action
-- No undressing
-- No erogenous zones
-- No sexual hints
-- Max 180 chars
+Types (pick one randomly):
+- enter slowly, freeze, start with breathing rhythm
+- perform oral sex, looking into eyes
+- stand in front of mirror, enter from behind
+- put on headphones with music, do everything silently
+- run an ice cube over the body, then oral sex
+- apply whipped cream, lick off, then oral sex
+- give an oil massage, then sex
+- take a beautiful nude photo and send
+- record a nude video without face
+- record sex for collection, beautifully
+- put on edible underwear and remove with teeth
 
-Pick ONE type and generate a task in that style.`,
-    hi: `श्रेणी: कोमलता। एक काम। कोई कपड़े नहीं। 180 अक्षर।`,
-    pt: `Categoria: TERNURA. Uma ação. Sem despir. 180 caracteres.`,
-    es: `Categoría: TERNURA. Una acción. Sin desnudar. 180 caracteres.`,
-  },
-  desire: {
-    ru: `Ты генератор заданий для пар. Категория: ЖЕЛАНИЕ — прелюдия, разогрев, без секса.
+Rules: one action, no vulgarity, no roughness, no submission, max 200 chars. Return only the task text, no quotes, no explanations.`,
+    },
+    hard: {
+      ru: `Сгенерируй ОДНО задание для категории "Хард" — секс с контролем и игрой власти.
 
-Типы заданий:
-- раздевание (своё или партнёра)
-- обнажение в быту (фартук, проход мимо, падение полотенца)
-- фото / видео в белье
-- касания через ткань
-- массаж вокруг эрогенных зон (не касаясь центра)
-- поцелуи и облизывания вокруг эрогенных зон (не касаясь центра)
-- грязные слова на ухо (коротко, прямо, шёпотом)
-- страстные поцелуи с языком
-- демонстрация тела без стеснения (лечь, дать смотреть)
-- ролевой намёк (рубашка на голое тело)
+Типы заданий (выбери один случайно):
+- подчинение на 30 минут, стоп-слово обязательно
+- приказы: «Ляг», «Закрой глаза», «Не двигайся»
+- связать руки шарфом
+- надеть маску на глаза и делать что хочешь
+- надеть наручники
+- использовать лёгкую плетку по спине или ягодицам
+- сесть на лицо партнёру и командовать
+- сделать минет до финиша в рот и проглотить
+- сделать глубокий минет до горла
+- держать за голову во время минета и задавать темп
+- снять секс грязно, без света, для себя
+- снять от первого лица (рука, член, влагалище)
+- включить камеру и приказать смотреть в неё
+- массировать и одновременно входить
+- шлёпать по ягодицам в ритм движениям
+- ролевая игра (начальник/подчинённый) на 10 минут
+- довести до края, остановить, повторить три раза
 
-Правила:
-- Одно действие
-- Без секса, без орального, без проникновения
-- До 200 символов
-- Без поэзии
+Правила: стоп-слово всегда, без красивых ракурсов, без эстетики, до 200 символов. Верни только текст задания, без кавычек, без пояснений.`,
+      en: `Generate ONE task for "Hard" category — sex with control and power play.
 
-Выбери ОДИН тип и сгенерируй задание в этом стиле.`,
-    en: `You generate couple tasks. Category: DESIRE — foreplay, arousal, no sex.
+Types (pick one randomly):
+- submission for 30 minutes, safe word required
+- commands: "Lie down", "Close your eyes", "Don't move"
+- tie hands with a scarf
+- put on a blindfold and do whatever you want
+- put on handcuffs
+- use a light whip on back or butt
+- sit on partner's face and command
+- give oral to finish in mouth and swallow
+- give deep throat
+- hold head during oral and set pace
+- record dirty sex without light for yourselves
+- record first-person (hand, penis, vagina)
+- turn on camera and command to look into it
+- massage and penetrate at the same time
+- spank butt in rhythm of movements
+- roleplay (boss/subordinate) for 10 minutes
+- bring to edge, stop, repeat three times
 
-Types:
-- undressing (self or partner)
-- public nudity hints (apron, walking by, towel drop)
-- photo/video in lingerie
-- touching through fabric
-- massage around erogenous zones
-- kissing/licking around erogenous zones
-- dirty whispers in ear (short, direct)
-- passionate tongue kisses
-- body showing without shame
-- role hint (shirt on naked body)
+Rules: safe word always, no beautiful angles, no aesthetics, max 200 chars. Return only the task text, no quotes, no explanations.`,
+    },
+  };
 
-Rules:
-- One action
-- No sex, no oral, no penetration
-- Max 200 chars
-
-Pick ONE type and generate a task in that style.`,
-    hi: `श्रेणी: इच्छा। एक काम। कोई सेक्स नहीं। 200 अक्षर।`,
-    pt: `Categoria: DESEJO. Uma ação. Sem sexo. 200 caracteres.`,
-    es: `Categoría: DESEO. Una acción. Sin sexo. 200 caracteres.`,
-  },
-  passion: {
-    ru: `Ты генератор заданий для пар. Категория: СТРАСТЬ — секс, снятый красиво.
-
-Типы заданий:
-- позы (конкретные, с атмосферой)
-- оральный секс (минет / кунни, нежно, смотреть в глаза)
-- смена темпа (медленно войти, застыть, начать по ритму дыхания)
-- зеркало (войти сзади, смотреть в отражение)
-- наушники (музыка, молча, касаться)
-- массаж с хэппи-эндом (реальный массаж, потом секс)
-- лёд + оральный (провести льдом, потом горячий рот)
-- взбитые сливки + оральный (нанести, слизывать, потом оральный)
-- фото голого тела (красиво, с тенью, отправить)
-- видео голого тела (без лица, только тело и движение)
-- съёмка секса для коллекции (красиво, с атмосферой)
-- тёплое масло (нанести, скользить, войти)
-- съедобные трусы (снимать зубами, потом оральный)
-
-Правила:
-- Одно действие
-- Без пошлости, без грубости, без подчинения
-- До 200 символов
-
-Выбери ОДИН тип и сгенерируй задание в этом стиле.`,
-    en: `You generate couple tasks. Category: PASSION — beautiful, aesthetic sex.
-
-Types:
-- positions (specific, with atmosphere)
-- oral sex (gentle, eye contact)
-- pace changes (slow entry, pause, rhythm)
-- mirror (enter from behind, watch reflection)
-- headphones (music, silence, touch)
-- massage with happy ending
-- ice + oral (ice over skin, then hot mouth)
-- whipped cream + oral (apply, lick, then oral)
-- nude photo (beautiful, with shadow, send)
-- nude video (no face, only body)
-- sex video for collection (beautiful, atmospheric)
-- warm oil (apply, glide, enter)
-- edible underwear (remove with teeth, then oral)
-
-Rules:
-- One action
-- No vulgarity, no roughness, no submission
-- Max 200 chars
-
-Pick ONE type and generate a task in that style.`,
-    hi: `श्रेणी: जुनून। एक काम। कोई अशिष्टता नहीं। 200 अक्षर।`,
-    pt: `Categoria: PAIXÃO. Uma ação. Sem vulgaridade. 200 caracteres.`,
-    es: `Categoría: PASIÓN. Una acción. Sin vulgaridad. 200 caracteres.`,
-  },
-  hard: {
-    ru: `Ты генератор заданий для пар. Категория: ХАРД — секс с контролем и игрой власти.
-
-Типы заданий:
-- подчинение на время (30 мин, стоп-слово обязательно)
-- команды (приказы, запрет двигаться)
-- связывание (шарф, ремень, руки за спиной)
-- маска на глаза (не видит, ждёт команды)
-- наручники (руки за спиной или над головой)
-- плетка (лёгкая, по спине/ягодицам, чередовать с поглаживаниями)
-- грязный минет / кунни (сесть на лицо, командовать)
-- минет с окончанием в рот (финиш в рот, проглотить)
-- глубокий минет (до горла, три раза)
-- контроль во время минета (держать за голову, задавать темп)
-- съёмка грязного секса (для себя, без света)
-- съёмка от первого лица (рука, член, влагалище, стоны)
-- съёмка + подчинение (смотреть в камеру, выполнять команды)
-- массаж + секс одновременно (массировать и входить)
-- шлепки во время секса (в ритм движениям)
-- ролевая игра (начальник/подчинённый, 10 мин, поменяться)
-- запрет на оргазм (довести, остановить, повторить три раза)
-
-Правила:
-- Одно действие
-- Без красивых ракурсов, без эстетики
-- Стоп-слово всегда присутствует
-- До 200 символов
-
-Выбери ОДИН тип и сгенерируй задание в этом стиле.`,
-    en: `You generate couple tasks. Category: HARD — sex with control and power play.
-
-Types:
-- submission (30 min, safe word required)
-- commands (orders, freeze)
-- binding (scarf, belt, hands behind back)
-- blindfold (can't see, waits for commands)
-- handcuffs (hands behind or above head)
-- light whip (back/butt, alternate with strokes)
-- dirty oral (sit on face, command)
-- oral with finish in mouth (swallow)
-- deep throat (three times)
-- control during oral (hold head, set pace)
-- dirty sex video (for yourselves, no light)
-- first-person video (hand, penis, vagina, moans)
-- video + submission (look at camera, obey)
-- massage + sex simultaneously (massage and penetrate)
-- spanking during sex (in rhythm)
-- roleplay (boss/subordinate, 10 min, switch)
-- orgasm denial (edge, stop, repeat three times)
-
-Rules:
-- One action
-- No beautiful angles, no aesthetics
-- Safe word always present
-- Max 200 chars
-
-Pick ONE type and generate a task in that style.`,
-    hi: `श्रेणी: हार्ड। एक काम। 200 अक्षर।`,
-    pt: `Categoria: HARD. Uma ação. 200 caracteres.`,
-    es: `Categoría: HARD. Una acción. 200 caracteres.`,
-  },
-};
-
-const GENDER_SUFFIX: Record<string, Record<string, string>> = {
-  ru: {
-    male:   "Пользователь — МУЖЧИНА, партнёр — ЖЕНЩИНА. Используй она/её/ей для партнёра. Глаголы — мужского рода.",
-    female: "Пользователь — ЖЕНЩИНА, партнёр — МУЖЧИНА. Используй он/его/ему для партнёра. Глаголы — женского рода.",
-  },
-  en: {
-    male:   "User is MALE, partner is FEMALE. Use she/her for partner. Verbs — male.",
-    female: "User is FEMALE, partner is MALE. Use he/him for partner. Verbs — female.",
-  },
-  hi: {
-    male:   "उपयोगकर्ता पुरुष है, पार्टनर महिला है।",
-    female: "उपयोगकर्ता महिला है, पार्टनर पुरुष है।",
-  },
-  pt: {
-    male:   "Usuário é HOMEM, parceira é MULHER. Use ela/dela.",
-    female: "Usuária é MULHER, parceiro é HOMEM. Use ele/dele.",
-  },
-  es: {
-    male:   "El usuario es HOMBRE, la pareja es MUJER. Usa ella/su.",
-    female: "La usuaria es MUJER, la pareja es HOMBRE. Usa él/su.",
-  },
-};
-
-function buildPrompt(cat: string, lang: string, gender: string): string {
-  const base = NEUTRAL[cat]?.[lang] ?? NEUTRAL["compliments"]["en"];
-
-  const resolvedGender = (gender === "male" || gender === "female") ? gender : "male";
-  const genderLine = GENDER_SUFFIX[lang]?.[resolvedGender] ?? GENDER_SUFFIX["en"]["male"];
-
-  let flavorLine = "";
-  if (cat === "hard") {
-    const flavorKey = pickHardFlavor();
-    const flavorPool = HARD_FLAVORS[lang] ?? HARD_FLAVORS["en"];
-    flavorLine = `\n\n${flavorPool[flavorKey]}`;
-  }
-
-  const goldLine = lang !== "hi"
-    ? `\n\nЭТАЛОНЫ (пиши В ТОМ ЖЕ СТИЛЕ):\n${getGoldExamples(cat, lang)}`
-    : "";
-
-  return `${base}\n\n${genderLine}${flavorLine}${goldLine}\n\nОДНО новое задание. Только текст, без кавычек, без пояснений.`;
+  const base = prompts[category]?.[lang] ?? prompts["compliments"]["en"];
+  return `${base}\n\n${genderLine}`;
 }
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
@@ -446,7 +250,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
-    const prompt = buildPrompt(category, lang, gender);
+    const systemPrompt = buildSystemPrompt(category, lang, gender);
+
     const aiRes = await fetch(DEEPSEEK_URL, {
       method: "POST",
       headers: {
@@ -455,8 +260,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       },
       body: JSON.stringify({
         model: "deepseek-chat",
-        messages: [{ role: "user", content: prompt }],
-        max_tokens: 150,
+        messages: [
+          { role: "system", content: systemPrompt },
+          { role: "user", content: "Сгенерируй одно задание." },
+        ],
+        max_tokens: 160,
         temperature: 0.9,
       }),
     });
@@ -468,13 +276,18 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const data = await aiRes.json();
     let task: string = data.choices?.[0]?.message?.content?.trim() ?? "";
 
-    if (task.startsWith('"') && task.endsWith('"')) task = task.slice(1, -1).trim();
-    if (task.startsWith("'") && task.endsWith("'")) task = task.slice(1, -1).trim();
+    // Чистка
+    task = task.replace(/^["']|["']$/g, "").trim();
+    task = task.replace(/^\d+\.\s*/, "");
 
-    const lower = task.toLowerCase();
-    const hasForbidden = FORBIDDEN.some((f) => lower.includes(f));
+    // Запрещённые фразы
+    const forbidden = [
+      "я рекомендую", "тебе стоит", "можешь попробовать",
+      "выдыхает", "дыши в", "посмотри в глаза", "отстранись",
+    ];
+    const hasForbidden = forbidden.some(f => task.toLowerCase().includes(f));
 
-    if (!task || task.length < 20 || task.length > 400 || hasForbidden) {
+    if (!task || task.length < 15 || task.length > 300 || hasForbidden) {
       return res.json({ task: getFallback(category, lang) });
     }
 

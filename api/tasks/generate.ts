@@ -55,272 +55,88 @@ function getGenderLine(lang: string, gender: string): string {
   return map[lang]?.[gender] ?? map["en"]["male"];
 }
 
+// ─── ПРОМПТЫ (ИИ сам придумывает, а не выбирает из списка) ────────────────
+
 const PROMPTS: Record<string, Record<string, string>> = {
   compliments: {
-    ru: `Сгенерируй ОДНО задание для категории "КОМПЛИМЕНТЫ".
+    ru: `Ты генератор заданий для категории "КОМПЛИМЕНТЫ".
 
-Выбери ОДИН из этих типов:
-1. Скажи партнёру тёплое слово ("Скучаю", "Ты красивая/красивый", "Я тебя люблю")
-2. Напиши партнёру тёплое слово
-3. Отправь голосовое с тёплыми словами
-4. Сделай селфи с улыбкой и отправь
-5. Сделай селфи с воздушным поцелуем и отправь
-6. Запиши короткое видео с тёплым обращением
-7. Купи шоколадку без повода
-8. Напиши записку с комплиментом и положи под подушку
-9. Напиши благодарность за конкретную мелочь сегодня
-10. Напиши партнёру, что ценишь его/её характер
-11. Отправь фото места, где вам было хорошо вместе
-12. Напиши длинное тёплое сообщение перед сном
-13. Сделай коллаж из ваших совместных фото
-14. Отправь песню, которая ассоциируется с партнёром
-15. Скажи комплимент действию партнёра
-16. Напиши список из трёх вещей, за которые благодарен(на) сегодня
-17. Сделай селфи в его/её вещи и отправь
-18. Напиши партнёру, что он/она делает тебя счастливее
+Суть категории: тёплые слова, жесты внимания, маленькие сюрпризы без физического контакта.
+Что можно: сказать или написать тёплое слово, записать голосовое, сделать селфи с улыбкой или воздушным поцелуем, записать короткое видео с обращением, сделать мини-сюрприз (шоколад, записка, чай), написать благодарность за конкретную мелочь, отправить старое фото с тёплым воспоминанием.
+Чего нельзя: касаться партнёра, раздеваться, намёков на секс.
 
-Правила: ОДНО действие, без касаний, без намёков на секс, до 180 символов.
-Верни ТОЛЬКО текст задания. Без кавычек, без пояснений.`,
-    en: `Generate ONE task for "COMPLIMENTS" category.
+Твоя задача: придумать ОДНО новое, оригинальное задание в рамках этой категории. Не копируй примеры дословно, а создавай свои варианты. Одно действие, до 180 символов. Только текст задания, без кавычек, без пояснений.`,
+    en: `You are a task generator for the "COMPLIMENTS" category.
 
-Pick ONE type:
-1. Say a warm word to your partner ("Miss you", "You're beautiful", "I love you")
-2. Text a warm word
-3. Send a voice message with warm words
-4. Take a smiling selfie and send
-5. Take a selfie with a kiss gesture and send
-6. Record a short video with a warm message
-7. Buy a chocolate bar for no reason
-8. Write a note with a compliment and put it under the pillow
-9. Write gratitude for a specific small thing today
-10. Text your partner what you value about their character
-11. Send a photo of a place where you were good together
-12. Write a long warm message before sleep
-13. Make a collage of your photos together
-14. Send a song that reminds you of your partner
-15. Compliment your partner's action
-16. Write a list of three things you're grateful for today
-17. Take a selfie in their clothes and send
-18. Text your partner that they make you happier
+The essence: warm words, gestures of attention, small surprises without physical contact.
+What you can do: say or write a warm word, record a voice message, take a selfie with a smile or a kiss gesture, record a short video with an appeal, make a mini-surprise (chocolate, note, tea), write gratitude for a specific little thing, send an old photo with a warm memory.
+What you cannot do: touch your partner, undress, hints of sex.
 
-Rules: ONE action, no touching, no sexual hints, max 180 chars.
-Return ONLY the task text. No quotes, no explanations.`,
+Your task: come up with ONE new, original task within this category. Do not copy examples verbatim, create your own variations. One action, up to 180 characters. Only the task text, no quotes, no explanations.`,
   },
   tenderness: {
-    ru: `Сгенерируй ОДНО задание для категории "НЕЖНОСТЬ".
+    ru: `Ты генератор заданий для категории "НЕЖНОСТЬ".
 
-Выбери ОДИН из этих типов:
-1. Подойди сзади, обними и постой так минуту
-2. Поцелуй в губы медленно, задержись
-3. Поцелуй в шею или плечо
-4. Сделай массаж (голова, шея, спина, руки, ноги)
-5. Почеши спину или голову
-6. Легко прикуси мочку уха
-7. Легко прикуси плечо или ключицу
-8. Возьми за руку и смотри друг на друга
-9. Сделай селфи с воздушным поцелуем и отправь
-10. Отправь старое совместное фото с вопросом "помнишь?"
-11. Укрой партнёра пледом
-12. Положи голову партнёру на колени
-13. Погладь по спине медленно
-14. Приготовь чай или кофе
-15. Прижмись щекой к его/её щеке
-16. Сделай массаж стоп
-17. Обними и закрой глаза
-18. Поправь волосы партнёру
-19. Поцелуй в лоб
-20. Легко прикуси нижнюю губу
+Суть категории: мягкий физический контакт, тепло, уют, безопасность. Без эротики.
+Что можно: объятия (сзади, долгие), поцелуи (в губы медленно, в шею, в плечо), массаж (голова, шея, спина, руки, ноги), почесывания, лёгкие покусывания (мочка уха, плечо, ключица), прикосновения (взять за руку, смотреть друг на друга), селфи с воздушным поцелуем, отправить старое совместное фото.
+Чего нельзя: раздеваться, трогать эрогенные зоны, намёков на секс.
 
-Правила: ОДНО действие, без раздевания, без эрогенных зон, без намёков на секс, до 180 символов.
-Верни ТОЛЬКО текст задания. Без кавычек, без пояснений.`,
-    en: `Generate ONE task for "TENDERNESS" category.
+Твоя задача: придумать ОДНО новое, оригинальное задание в рамках этой категории. Не копируй примеры дословно, а создавай свои варианты. Одно действие, до 180 символов. Только текст задания, без кавычек, без пояснений.`,
+    en: `You are a task generator for the "TENDERNESS" category.
 
-Pick ONE type:
-1. Hug from behind and stand for a minute
-2. Kiss on the lips slowly, hold
-3. Kiss the neck or shoulder
-4. Give a massage (head, neck, back, arms, legs)
-5. Scratch the back or head
-6. Gently bite the earlobe
-7. Gently bite the shoulder or collarbone
-8. Hold hands and look at each other
-9. Take a selfie with a kiss gesture and send
-10. Send an old photo together with "remember?"
-11. Cover your partner with a blanket
-12. Put your head on your partner's lap
-13. Stroke the back slowly
-14. Make tea or coffee
-15. Press your cheek to theirs
-16. Give a foot massage
-17. Hug and close your eyes
-18. Fix your partner's hair
-19. Kiss the forehead
-20. Gently bite the lower lip
+The essence: soft physical contact, warmth, comfort, safety. Without eroticism.
+What you can do: hugs (from behind, long), kisses (on the lips slowly, on the neck, on the shoulder), massage (head, neck, back, arms, legs), scratching, light bites (earlobe, shoulder, collarbone), touches (hold hands, look at each other), selfie with a kiss gesture, send an old photo together.
+What you cannot do: undress, touch erogenous zones, hint at sex.
 
-Rules: ONE action, no undressing, no erogenous zones, no sexual hints, max 180 chars.
-Return ONLY the task text. No quotes, no explanations.`,
+Your task: come up with ONE new, original task within this category. Do not copy examples verbatim, create your own variations. One action, up to 180 characters. Only the task text, no quotes, no explanations.`,
   },
   desire: {
-    ru: `Сгенерируй ОДНО задание для категории "ЖЕЛАНИЕ" — прелюдия, без секса.
+    ru: `Ты генератор заданий для категории "ЖЕЛАНИЕ" — прелюдия, разогрев, без секса.
 
-Выбери ОДИН из этих типов:
-1. Медленно разденься перед партнёром
-2. Пройди мимо партнёра полностью голым
-3. Надень фартук на голое тело и начни готовить
-4. Сделай фото в белье и отправь
-5. Запиши видео в белье и отправь
-6. Положи руку на пах поверх одежды и смотри в глаза
-7. Массируй вокруг эрогенных зон, не касаясь центра
-8. Поцелуй вокруг сосков, не касаясь их
-9. Оближи внутреннюю сторону бедра, не касаясь центра
-10. Прошепчи на ухо грязную фразу
-11. Поцелуй глубоко, с языком
-12. Ляг голой и дай партнёру смотреть и трогать
-13. Надень его/её рубашку на голое тело и сядь рядом
-14. Сделай фото в сексуальной позе и отправь
-15. Раздень партнёра медленно
-16. Проведи рукой от колена вверх по бедру, остановись у трусов
-17. Сядь на колени перед партнёром
-18. Прикажи партнёру снять штаны
-19. Поцелуй через ткань
-20. Сделай фото своих голых ног, раздвинутых
+Суть: возбуждение, игра, демонстрация тела, напряжение. Секса нет.
+Что можно: раздевание (своё или партнёра), обнажение в быту (фартук, проход мимо, падение полотенца), фото/видео в белье, касания через ткань, массаж вокруг эрогенных зон (не касаясь центра), поцелуи и облизывания вокруг эрогенных зон, грязные слова на ухо, страстные поцелуи с языком, демонстрация тела без стеснения.
+Чего нельзя: секс, оральный секс, проникновение.
 
-Правила: ОДНО действие, без секса, без орального, без проникновения, до 200 символов.
-Верни ТОЛЬКО текст задания. Без кавычек, без пояснений.`,
-    en: `Generate ONE task for "DESIRE" category — foreplay, no sex.
+Твоя задача: придумать ОДНО новое, оригинальное задание в рамках этой категории. Не копируй примеры дословно, а создавай свои варианты. Одно действие, до 200 символов. Только текст задания, без кавычек, без пояснений.`,
+    en: `You are a task generator for the "DESIRE" category — foreplay, warm-up, without sex.
 
-Pick ONE type:
-1. Slowly undress in front of your partner
-2. Walk past your partner completely naked
-3. Put on an apron on your naked body and start cooking
-4. Take a photo in lingerie and send
-5. Record a video in lingerie and send
-6. Put your hand on the crotch over clothes and look into eyes
-7. Massage around erogenous zones, not touching the center
-8. Kiss around the nipples, not touching them
-9. Lick the inner thigh, not touching the center
-10. Whisper a dirty phrase in the ear
-11. Kiss deeply with tongue
-12. Lie down naked and let your partner look and touch
-13. Put on their shirt on your naked body and sit next to them
-14. Take a photo in a sexy pose and send
-15. Slowly undress your partner
-16. Run your hand from the knee up the thigh, stop at the underwear
-17. Kneel in front of your partner
-18. Command your partner to take off their pants
-19. Kiss through fabric
-20. Take a photo of your naked legs spread
+The essence: arousal, play, body display, tension. No sex.
+What you can do: undressing (yourself or your partner), nudity in everyday life (apron, walking past, dropping a towel), photo/video in lingerie, touching through fabric, massage around erogenous zones (not touching the center), kisses and licking around erogenous zones, dirty words in the ear, passionate kisses with tongue, body demonstration without embarrassment.
+What you cannot do: sex, oral sex, penetration.
 
-Rules: ONE action, no sex, no oral, no penetration, max 200 chars.
-Return ONLY the task text. No quotes, no explanations.`,
+Your task: come up with ONE new, original task within this category. Do not copy examples verbatim, create your own variations. One action, up to 200 characters. Only the task text, no quotes, no explanations.`,
   },
   passion: {
-    ru: `Сгенерируй ОДНО задание для категории "СТРАСТЬ" — секс красиво, чувственно.
+    ru: `Ты генератор заданий для категории "СТРАСТЬ" — секс красиво, чувственно, без пошлости.
 
-Выбери ОДИН из этих типов:
-1. Войди медленно, застынь, начни в ритме дыхания
-2. Сделай оральный секс, глядя в глаза
-3. Встаньте перед зеркалом, войди сзади
-4. Вставь наушники с музыкой, делай всё молча
-5. Проведи кубиком льда по телу, потом оральный секс
-6. Нанеси взбитые сливки, слизывай, потом оральный секс
-7. Сделай массаж с тёплым маслом, потом войди
-8. Сделай фото голого тела красиво и отправь
-9. Запиши видео голого тела без лица
-10. Снимите секс на видео для коллекции, красиво
-11. Надень съедобные трусы и сними зубами
-12. Начни медленно, постепенно ускоряйся
-13. Ляг на бок, пусть войдёт медленно, смотри в глаза
-14. Войди, потом поцелуй в шею, потом продолжай
-15. Сделай глубокий оральный секс
-16. Используй подушки для позы
-17. Войди стоя, держи партнёра за бёдра
-18. Сделай фото частей тела во время секса
-19. Запиши голос во время секса
-20. Доведи партнёра до оргазма и продолжай
+Суть: яркий, чувственный секс, снятый красиво или прожитый глубоко.
+Что можно: разные позы, оральный секс, смена темпа, зеркало, наушники с музыкой, массаж с хэппи-эндом, лёд + оральный, сливки + оральный, фото/видео голого тела (красиво), съёмка секса для коллекции, тёплое масло, съедобные трусы.
+Чего нельзя: пошлость, грубость, подчинение, съёмка в упор.
 
-Правила: ОДНО действие, без пошлости, без грубости, без подчинения, до 200 символов.
-Верни ТОЛЬКО текст задания. Без кавычек, без пояснений.`,
-    en: `Generate ONE task for "PASSION" category — beautiful, sensual sex.
+Твоя задача: придумать ОДНО новое, оригинальное задание в рамках этой категории. Не копируй примеры дословно, а создавай свои варианты. Одно действие, до 200 символов. Только текст задания, без кавычек, без пояснений.`,
+    en: `You are a task generator for the "PASSION" category — sex beautifully, sensually, without vulgarity.
 
-Pick ONE type:
-1. Enter slowly, freeze, start with breathing rhythm
-2. Perform oral sex looking into eyes
-3. Stand in front of mirror, enter from behind
-4. Put on headphones with music, do everything silently
-5. Run an ice cube over the body, then oral sex
-6. Apply whipped cream, lick off, then oral sex
-7. Give a massage with warm oil, then enter
-8. Take a beautiful nude photo and send
-9. Record a nude video without face
-10. Record sex for collection, beautifully
-11. Put on edible underwear and remove with teeth
-12. Start slowly, gradually speed up
-13. Lie on your side, let them enter slowly, look into eyes
-14. Enter, then kiss the neck, then continue
-15. Perform deep oral sex
-16. Use pillows for position
-17. Enter standing, hold your partner's hips
-18. Take a photo of body parts during sex
-19. Record voice during sex
-20. Bring your partner to orgasm and continue
+The essence: bright, sensual sex, filmed beautifully or lived deeply.
+What you can do: different positions, oral sex, tempo changes, mirror, headphones with music, massage with a happy ending, ice + oral, whipped cream + oral, photo/video of a naked body (beautifully), filming sex for a collection, warm oil, edible underwear.
+What you cannot do: vulgarity, rudeness, submission, close-up shooting.
 
-Rules: ONE action, no vulgarity, no roughness, no submission, max 200 chars.
-Return ONLY the task text. No quotes, no explanations.`,
+Your task: come up with ONE new, original task within this category. Do not copy examples verbatim, create your own variations. One action, up to 200 characters. Only the task text, no quotes, no explanations.`,
   },
   hard: {
-    ru: `Сгенерируй ОДНО задание для категории "ХАРД" — секс с контролем и игрой власти.
+    ru: `Ты генератор заданий для категории "ХАРД" — секс с контролем и игрой власти.
 
-Выбери ОДИН из этих типов:
-1. Подчинение на 30 минут, стоп-слово обязательно
-2. Прикажи: "Ляг", "Закрой глаза", "Не двигайся"
-3. Свяжи руки шарфом
-4. Надень маску на глаза и делай что хочешь
-5. Надень наручники
-6. Используй лёгкую плетку по спине или ягодицам
-7. Сядь на лицо партнёру и командуй
-8. Сделай минет до финиша в рот и проглоти
-9. Сделай глубокий минет до горла
-10. Держи за голову во время минета и задавай темп
-11. Снимите секс грязно, без света, для себя
-12. Сними от первого лица (рука, член, влагалище)
-13. Включи камеру и прикажи смотреть в неё
-14. Массируй и одновременно входи
-15. Шлёпай по ягодицам в ритм движениям
-16. Ролевая игра (начальник/подчинённый) на 10 минут
-17. Доведи до края, останови, повтори три раза
-18. Прикажи партнёру встать на колени
-19. Держи партнёра за волосы во время секса
-20. Используй стоп-слово, если что-то не так
+Суть: секс с подчинением, командами, игрой. Стоп-слово всегда.
+Что можно: подчинение на время, команды, связывание (шарф, ремень), маска на глаза, наручники, лёгкая плетка, грязный оральный (сесть на лицо, командовать), минет с окончанием в рот, глубокий минет, контроль во время минета, съёмка грязно (без света), съёмка от первого лица, съёмка + подчинение, массаж + секс одновременно, шлепки во время секса, ролевая игра, запрет на оргазм.
+Чего нельзя: красивые ракурсы, эстетика, равноправный секс без роли.
 
-Правила: стоп-слово всегда, без красивых ракурсов, без эстетики, до 200 символов.
-Верни ТОЛЬКО текст задания. Без кавычек, без пояснений.`,
-    en: `Generate ONE task for "HARD" category — sex with control and power play.
+Твоя задача: придумать ОДНО новое, оригинальное задание в рамках этой категории. Не копируй примеры дословно, а создавай свои варианты. Одно действие, до 200 символов. Только текст задания, без кавычек, без пояснений.`,
+    en: `You are a task generator for the "HARD" category — sex with control and power play.
 
-Pick ONE type:
-1. Submission for 30 minutes, safe word required
-2. Command: "Lie down", "Close your eyes", "Don't move"
-3. Tie hands with a scarf
-4. Put on a blindfold and do whatever you want
-5. Put on handcuffs
-6. Use a light whip on back or buttocks
-7. Sit on partner's face and command
-8. Give oral to finish in mouth and swallow
-9. Perform deep throat
-10. Hold head during oral and set the pace
-11. Record dirty sex without light for yourselves
-12. Record first-person (hand, penis, vagina)
-13. Turn on camera and command to look into it
-14. Massage and penetrate at the same time
-15. Spank buttocks in rhythm of movements
-16. Roleplay (boss/subordinate) for 10 minutes
-17. Bring to edge, stop, repeat three times
-18. Command your partner to kneel
-19. Hold partner's hair during sex
-20. Use a safe word if something is wrong
+The essence: sex with submission, commands, play. Safe word always.
+What you can do: submission for time, commands, binding (scarf, belt), blindfold, handcuffs, light whip, dirty oral (sit on face, command), oral with finish in mouth, deep throat, control during oral, dirty filming (no light), first-person filming, filming + submission, massage + sex simultaneously, spanking during sex, roleplay, orgasm denial.
+What you cannot do: beautiful angles, aesthetics, equal sex without a role.
 
-Rules: safe word always, no beautiful angles, no aesthetics, max 200 chars.
-Return ONLY the task text. No quotes, no explanations.`,
+Your task: come up with ONE new, original task within this category. Do not copy examples verbatim, create your own variations. One action, up to 200 characters. Only the task text, no quotes, no explanations.`,
   },
 };
 
@@ -360,7 +176,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           { role: "user", content: userMessage },
         ],
         max_tokens: 160,
-        temperature: 0.9,
+        temperature: 1.1,
       }),
     });
 
@@ -377,7 +193,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const forbidden = [
       "я рекомендую", "тебе стоит", "можешь попробовать",
       "выдыхает", "дыши в", "посмотри в глаза", "отстранись",
-      "я хочу", "давай я", "я буду",
+      "я хочу", "давай я", "я буду", "попробуй",
     ];
     const hasForbidden = forbidden.some(f => task.toLowerCase().includes(f));
 

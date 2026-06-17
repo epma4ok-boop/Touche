@@ -128,79 +128,54 @@ const HARD_FLAVORS: Record<string, Record<HardFlavorKey, string>> = {
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
-// ПРОМПТЫ — нейтральные категории (пол добавляется снизу)
+// ПРОМПТЫ — все категории
 // ─────────────────────────────────────────────────────────────────────────────
 
 const NEUTRAL: Record<string, Record<string, string>> = {
   compliments: {
-    ru: `Ты генератор заданий для влюблённых пар. Категория: КОМПЛИМЕНТЫ.
-
-ДОПУСТИМО: написать/сказать тёплое слово, отправить селфи с поцелуем, мини-сюрприз (цветок, шоколад, любимый напиток), голосовое с тёплыми словами.
-ЗАПРЕЩЕНО: объятия, поцелуи, массаж, раздевание, намёки на секс.
-ТРЕБОВАНИЯ: одно конкретное действие, обращение «ты», партнёр — третье лицо (пол ниже), без поэзии, до 180 символов.`,
-    en: `You generate couple tasks. Category: COMPLIMENTS.
-ALLOWED: warm words, selfie, mini-surprise, voice note.
-FORBIDDEN: hugs, kisses, massage, undressing, sexual hints.
-RULES: one action, address "you", partner = 3rd person (gender below), no poetry, max 180 chars.`,
-    hi: `जोड़ों के लिए टास्क बनाएं। श्रेणी: तारीफ। गर्म शब्द, सेल्फी, सरप्राइज। 180 अक्षरों तक। एक टास्क।`,
-    pt: `Gere tarefas para casais. Categoria: ELOGIOS. Palavras calorosas, selfie, mini-surpresa. Até 180 chars. UMA tarefa.`,
-    es: `Genera tareas para parejas. Categoría: PIROPOS. Palabras cálidas, selfie, mini-sorpresa. Hasta 180 chars. UNA tarea.`,
+    ru: `Ты генератор заданий для пар. Категория: КОМПЛИМЕНТЫ — слова, селфи, короткие видео, мини-сюрпризы. Без касаний, без намёков на секс.
+Одно действие. Обращение "ты". Партнёр — третье лицо. До 180 символов. Без поэзии.`,
+    en: `Generate couple tasks. Category: COMPLIMENTS — words, selfies, short videos, mini-surprises. No touching, no sexual hints.
+One action. Address "you". Partner = third person. Max 180 chars. No poetry.`,
+    hi: `जोड़ों के लिए टास्क। श्रेणी: तारीफ — शब्द, सेल्फी, वीडियो। स्पर्श नहीं। 180 अक्षर।`,
+    pt: `Tarefas para casais. Categoria: ELOGIOS — palavras, selfies, vídeos. Sem toque. 180 caracteres.`,
+    es: `Tareas para parejas. Categoría: PIROPOS — palabras, selfies, vídeos. Sin tocar. 180 caracteres.`,
   },
   tenderness: {
-    ru: `Категория: НЕЖНОСТЬ — мягкий физический контакт, без эротики.
-ДОПУСТИМО: объятия, нежные поцелуи, массаж шеи/плеч/спины/стоп, держать за руку.
-ЗАПРЕЩЕНО: эрогенные зоны, страстные поцелуи с языком, раздевание, секс.
-Одно конкретное физическое действие, до 180 символов.`,
-    en: `Category: TENDERNESS — gentle physical contact, no eroticism.
-ALLOWED: hugs, gentle kisses, neck/shoulder/back/foot massage, holding hands.
-FORBIDDEN: erogenous zones, tongue kisses, undressing, sex.
-One concrete action, max 180 chars.`,
-    hi: `श्रेणी: कोमलता। गले लगाना, हल्का स्पर्श। 180 अक्षरों तक। एक टास्क।`,
-    pt: `Categoria: TERNURA — contato físico suave. Uma ação. Até 180 chars.`,
-    es: `Categoría: TERNURA — contacto físico suave. Una acción. Hasta 180 chars.`,
+    ru: `Категория: НЕЖНОСТЬ — объятия, поцелуи (нестрастные), массаж, лёгкие покусывания, селфи с воздушным поцелуем.
+Без раздевания, без эрогенных зон. Одно действие. До 180 символов.`,
+    en: `Category: TENDERNESS — hugs, gentle kisses, massage, light bites, selfie with a kiss.
+No undressing, no erogenous zones. One action. Max 180 chars.`,
+    hi: `श्रेणी: कोमलता — गले लगाना, हल्का चुंबन, मालिश। कोई कपड़े नहीं। 180 अक्षर।`,
+    pt: `Categoria: TERNURA — abraços, beijos suaves, massagem. Sem despir. 180 caracteres.`,
+    es: `Categoría: TERNURA — abrazos, besos suaves, masaje. Sin desnudar. 180 caracteres.`,
   },
   desire: {
-    ru: `Категория: ЖЕЛАНИЕ — возбуждение, прелюдия, эротика без явного секса.
-ДОПУСТИМО: страстные поцелуи, раздевание, прикосновения к груди/ягодицам, смелые слова, фривольное фото.
-ЗАПРЕЩЕНО: явный секс, оральный секс, проникновение в тексте.
-Одно конкретное действие, до 200 символов.`,
-    en: `Category: DESIRE — arousal, foreplay, erotics without explicit sex.
-ALLOWED: passionate kisses, undressing, touching chest/butt, bold words, flirty photo.
-FORBIDDEN: explicit sex, oral sex, penetration in text.
-One action, max 200 chars.`,
-    hi: `श्रेणी: इच्छा। कामुक संकेत, जोशीला चुंबन। 200 अक्षरों तक। एक टास्क।`,
-    pt: `Categoria: DESEJO — excitação, preliminares. Uma ação. Até 200 chars.`,
-    es: `Categoría: DESEO — excitación, preludio. Una acción. Hasta 200 chars.`,
+    ru: `Категория: ЖЕЛАНИЕ — прелюдия, раздевание, фото в белье, обнажение в быту, грязные слова на ухо, массаж вокруг эрогенных зон.
+बез секса, без орального, без проникновения. Одно действие. До 200 символов.`,
+    en: `Category: DESIRE — foreplay, undressing, lingerie photos, public nudity hints, dirty whispers, massage around erogenous zones.
+No sex, no oral, no penetration. One action. Max 200 chars.`,
+    hi: `श्रेणी: इच्छा — प्रीलुड, कपड़े उतारना, अंडरवियर फोटो। कोई सेक्स नहीं। 200 अक्षर।`,
+    pt: `Categoria: DESEJO — preliminares, despir, fotos em lingerie. Sem sexo. 200 caracteres.`,
+    es: `Categoría: DESEO — preludio, desvestirse, fotos en lencería. Sin sexo. 200 caracteres.`,
   },
   passion: {
-    ru: `Категория: СТРАСТЬ — откровенные сексуальные задания для взрослых пар (18+).
-ДОПУСТИМО: секс (позиции, темп, декорации), оральный секс, ролевые игры, секс-игрушки.
-ЗАПРЕЩЕНО: шаблонные фразы, расплывчатость, поэзия.
-Одно конкретное действие, до 200 символов.`,
-    en: `Category: PASSION — explicit sexual tasks for adult couples (18+).
-ALLOWED: sex (positions, pace, setting), oral sex, roleplay, toys.
-FORBIDDEN: clichés, vagueness, poetry.
-One concrete action, max 200 chars.`,
-    hi: `श्रेणी: जुनून (18+)। स्पष्ट यौन टास्क। 200 अक्षरों तक। एक टास्क।`,
-    pt: `Categoria: PAIXÃO (18+) — tarefas sexuais explícitas. Uma ação. Até 200 chars.`,
-    es: `Categoría: PASIÓN (18+) — tareas sexuales explícitas. Una acción. Hasta 200 chars.`,
+    ru: `Категория: СТРАСТЬ — секс, снятый красиво. Позы, оральный, смена темпа, сенсорная депривация (повязка, наушники), массаж с хэппи-эндом.
+Без пошлости, без грубости, без подчинения. Одно действие. До 200 символов.`,
+    en: `Category: PASSION — beautiful, aesthetic sex. Positions, oral, pace changes, sensory deprivation (blindfold, headphones), massage with happy ending.
+No vulgarity, no roughness, no submission. One action. Max 200 chars.`,
+    hi: `श्रेणी: जुनून — सुंदर सेक्स। कोई अशिष्टता नहीं। 200 अक्षर।`,
+    pt: `Categoria: PAIXÃO — sexo bonito. Sem vulgaridade. 200 caracteres.`,
+    es: `Categoría: PASIÓN — sexo bonito. Sin vulgaridad. 200 caracteres.`,
   },
   hard: {
-    ru: `Категория: ХАРД — BDSM-лайт, доминирование/подчинение, ролевые игры (18+).
-
-СТИЛЬ ОБЯЗАТЕЛЕН: пиши ТОЛЬКО от второго лица — короткие конкретные команды («Прикажи», «Поставь», «Скажи», «Доведи», «Возьми»). ЗАПРЕЩЕНО использовать «Я», «Мы», «Давай я» — ИИ не участник, ИИ даёт задание.
-СЛЕДУЙ ТИП ЗАДАНИЯ (указан ниже) — это важнее примеров.
-ЗАПРЕЩЕНО: насилие без согласия, жёсткое унижение без контекста, начинать с «Свяжи руки/запястья» если тип не СВЯЗЫВАНИЕ.
-Одно конкретное задание, до 200 символов.`,
-    en: `Category: HARD — BDSM-lite, D/s dynamics, roleplay (18+).
-
-MANDATORY STYLE: write ONLY in second person — short direct commands ("Command", "Tell", "Bring", "Order", "Take"). FORBIDDEN to write "I", "We", "Let me" — the AI gives the task, it is not a participant.
-FOLLOW THE TASK TYPE (specified below) — it overrides examples.
-FORBIDDEN: non-consensual violence, harsh humiliation without context, starting with "Tie hands/wrists" unless TYPE is BINDING.
-One concrete task, max 200 chars.`,
-    hi: `श्रेणी: साहसिक (18+)। केवल दूसरे पुरुष में लिखें — आदेश दें। "मैं" का उपयोग न करें। 200 अक्षरों तक। एक टास्क।`,
-    pt: `Categoria: INTENSO (18+) — BDSM-lite. Escreva APENAS na segunda pessoa — comandos diretos. Proibido usar "Eu". Uma tarefa. Até 200 chars.`,
-    es: `Categoría: INTENSO (18+) — BDSM-lite. Escriba SOLO en segunda persona — comandos directos. Prohibido usar "Yo". Una tarea. Hasta 200 chars.`,
+    ru: `Категория: ХАРД — подчинение на время, команды, запреты, стоп-слово. Связывание, ролевые игры, шлепки — иногда. Массаж + секс одновременно.
+Без красивых ракурсов. Без эстетики. Одно задание. До 200 символов.`,
+    en: `Category: HARD — submission, commands, restrictions, safe word. Tying, roleplay, spanking — sometimes. Massage + sex simultaneously.
+No beautiful angles. No aesthetics. One task. Max 200 chars.`,
+    hi: `श्रेणी: हार्ड — आज्ञाकारिता, आदेश, सुरक्षित शब्द। 200 अक्षर।`,
+    pt: `Categoria: HARD — submissão, comandos, palavra de segurança. 200 caracteres.`,
+    es: `Categoría: HARD — sumisión, órdenes, palabra de seguridad. 200 caracteres.`,
   },
 };
 
@@ -230,11 +205,9 @@ const GENDER_SUFFIX: Record<string, Record<string, string>> = {
 function buildPrompt(cat: string, lang: string, gender: string): string {
   const base = NEUTRAL[cat]?.[lang] ?? NEUTRAL["compliments"]["en"];
 
-  // Gender: only male/female, default to male
   const resolvedGender = (gender === "male" || gender === "female") ? gender : "male";
   const genderLine = GENDER_SUFFIX[lang]?.[resolvedGender] ?? GENDER_SUFFIX["en"]["male"];
 
-  // Hard category: inject random flavor type for variety
   let flavorLine = "";
   if (cat === "hard") {
     const flavorKey = pickHardFlavor();

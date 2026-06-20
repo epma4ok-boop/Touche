@@ -1,294 +1,374 @@
-// api/tasks/generate.ts
-// POST /api/tasks/generate
+// api/tasks/generate.ts  — POST /api/tasks/generate
 // Body: { category, lang, gender? }
 
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { validateTelegramInitData } from "../couple/_auth.js";
-import { TASKS_RU } from "../../src/data/tasks-ru.js";
-import { TASKS_EN } from "../../src/data/tasks-en.js";
-import { TASKS_HI } from "../../src/data/tasks-hi.js";
-import { TASKS_PT } from "../../src/data/tasks-pt.js";
-import { TASKS_ES } from "../../src/data/tasks-es.js";
+import { TASKS_RU, TASKS_EN } from "../../src/data/tasks.js";
 
 const DEEPSEEK_API_KEY = process.env.DEEPSEEK_API_KEY!;
-const DEEPSEEK_URL = "https://api.deepseek.com/v1/chat/completions";
+const DEEPSEEK_URL    = "https://api.deepseek.com/v1/chat/completions";
 
-type StaticPool = Record<string, string[]>;
+// ── Запрещённые паттерны ──────────────────────────────────────────────────────
+const FORBIDDEN = [
+  "скажи мне", "сделай мне", "попроси меня", "посмотри на меня",
+  "ласкай меня", "трогай меня", "целуй меня", "обними меня", "расскажи мне",
+  "tell me", "do it to me", "touch me", "kiss me", "hold me", "look at me",
+  "растворись", "замри в тишине", "почувствуй вечность", "слейтесь",
+  "пусть повиснет", "дыши в кожу", "прелюдия к прелюдии", "томление",
+];
 
-const STATIC_POOLS: Record<string, StaticPool> = {
-  ru: TASKS_RU,
-  en: TASKS_EN,
-  hi: TASKS_HI,
-  pt: TASKS_PT,
-  es: TASKS_ES,
-};
-
+// ── Fallback из статического пула ─────────────────────────────────────────────
 function getFallback(cat: string, lang: string): string {
-  const pool = STATIC_POOLS[lang] ?? STATIC_POOLS["en"];
-  const list = (pool as StaticPool)[cat] ?? (pool as StaticPool)["compliments"];
+  const pool = lang === "ru" ? TASKS_RU : TASKS_EN;
+  const list = pool[cat as keyof typeof pool] ?? pool.compliments;
   return list[Math.floor(Math.random() * list.length)];
 }
 
-function getGenderLine(lang: string, gender: string): string {
-  const map: Record<string, Record<string, string>> = {
-    ru: {
-      male: "Пользователь — мужчина, партнёр — женщина. Используй 'ты' для пользователя, 'она/её/ей' для партнёрши. Глаголы мужского рода.",
-      female: "Пользователь — женщина, партнёр — мужчина. Используй 'ты' для пользователя, 'он/его/ему' для партнёра. Глаголы женского рода.",
-    },
-    en: {
-      male: "User is male, partner is female. Use 'you' for user, 'she/her' for partner. Male verbs.",
-      female: "User is female, partner is male. Use 'you' for user, 'he/him' for partner. Female verbs.",
-    },
-    hi: {
-      male: "उपयोगकर्ता पुरुष है, पार्टनर महिला है।",
-      female: "उपयोगकर्ता महिला है, पार्टनर पुरुष है।",
-    },
-    pt: {
-      male: "Usuário é homem, parceira é mulher. Use 'você' e 'ela/dela'.",
-      female: "Usuária é mulher, parceiro é homem. Use 'você' e 'ele/dele'.",
-    },
-    es: {
-      male: "El usuario es hombre, la pareja es mujer. Usa 'tú' y 'ella/su'.",
-      female: "La usuaria es mujer, la pareja es hombre. Usa 'tú' y 'él/su'.",
-    },
-  };
-  return map[lang]?.[gender] ?? map["en"]["male"];
-}
+// ─────────────────────────────────────────────────────────────────────────────
+// ПРОМПТЫ — нейтральные категории (пол добавляется снизу)
+// ─────────────────────────────────────────────────────────────────────────────
 
-// ─── ПРОМПТЫ ────────────────
+const NEUTRAL: Record<string, Record<string, string>> = {
 
-const PROMPTS: Record<string, Record<string, string>> = {
+  // ── Комплименты ─────────────────────────────────────────────────────────────
   compliments: {
-    ru: `Ты генератор коротких заданий для пар. Категория: "КОМПЛИМЕНТЫ" — тёплые слова, жесты внимания, маленькие сюрпризы без физического контакта.
+    ru: `Ты генератор заданий для влюблённых пар. Категория: КОМПЛИМЕНТЫ — маленькие тёплые действия, которые сближают без физической близости.
 
-ПРАВИЛА:
-- Задание должно быть реалистичным и выполнимым в реальной жизни.
-- Одно действие, до 180 символов.
-- Используй обращение на "ты".
-- НЕ используй "я", "мы", "мне", "нам" — ты даёшь задание, а не участвуешь.
-- НЕ используй поэзию, метафоры, общие фразы.
+ДОПУСТИМО:
+- Написать или сказать тёплое слово (комплимент, благодарность, признательность)
+- Отправить селфи (с улыбкой, с воздушным поцелуем, с сердечками пальцами)
+- Сделать мини-сюрприз: купить цветок, шоколадку, открытку, любимый напиток партнёра
+- Приготовить чай/кофе без повода, принести плед, оставить записку
+- Отправить короткое голосовое с тёплыми словами
 
-Примеры правильных заданий (не копируй их, придумай своё):
-- Напиши партнёру: «Скучаю».
-- Сделай селфи с улыбкой и отправь.
-- Купи шоколадку без повода.
+ЗАПРЕЩЕНО: объятия, поцелуи, массаж, раздевание, намёки на секс — это другие категории.
 
-Твоя задача: придумать ОДНО новое задание для категории "КОМПЛИМЕНТЫ". Только текст задания, без кавычек, без пояснений.`,
-    en: `You generate short tasks for couples. Category: "COMPLIMENTS" — warm words, gestures of attention, small surprises without physical contact.
+ТРЕБОВАНИЯ К ТЕКСТУ:
+- Одно конкретное действие
+- Обращение на «ты»; о партнёре — третье лицо (пол ниже)
+- Без поэзии, без метафор
+- Грамматически правильный русский язык
+- До 180 символов
+
+ПРАВИЛЬНЫЕ ПРИМЕРЫ:
+Сделай селфи, сложи губы в поцелуе и отправь партнёру.
+Купи шоколадку без повода. Просто так.
+Напиши партнёру: «Сегодня ты сказал(а) мне то, что я давно хотел(а) услышать. Спасибо.»
+Сделай мини-сюрприз сегодня вечером — цветок, открытку или его любимую вкусняшку.
+Отправь голосовое: «Я подумал(а) о тебе». Без продолжения.
+Напиши: «Ты вдохновляешь меня быть лучше. Это правда.»
+
+ОДНО новое задание. Только текст, без кавычек, без пояснений.`,
+
+    en: `You generate tasks for couples. Category: COMPLIMENTS — small warm actions that bring couples closer without physical intimacy.
+
+ALLOWED:
+- Text or say a warm word (compliment, gratitude, appreciation)
+- Send a selfie (smiling, blowing a kiss, making a heart with fingers)
+- Make a mini-surprise: buy flowers, chocolate, a card, partner's favorite drink
+- Make tea/coffee for no reason, bring a blanket, leave a note
+- Send a short voice note with warm words
+
+FORBIDDEN: hugs, kisses, massage, undressing, hints of sex — those are other categories.
 
 RULES:
-- The task must be realistic and doable in real life.
-- One action, up to 180 characters.
-- Use "you" as the address.
-- DO NOT use "I", "we", "me" — you are giving the task, not participating.
-- DO NOT use poetry, metaphors, vague phrases.
+- One concrete action
+- Address as "you"; partner = third person (gender below)
+- No poetry, no metaphors
+- Correct grammar
+- Max 180 chars
 
-Examples of correct tasks (don't copy them, create your own):
-- Text your partner: "Miss you".
-- Take a smiling selfie and send it.
-- Buy a chocolate bar for no reason.
+GOOD EXAMPLES:
+Take a selfie, blow a kiss, and send it to your partner.
+Buy a chocolate bar for no reason. Just because.
+Text your partner: "What you said to me today — I really needed to hear that. Thank you."
+Make a mini-surprise tonight — flowers, a card, or their favorite snack.
+Send a voice note: "I was thinking about you." Nothing else.
+Text: "You make me want to be a better person. That's the truth."
 
-Your task: come up with ONE new task for the "COMPLIMENTS" category. Only task text, no quotes, no explanations.`,
+ONE new task. Text only, no quotes, no explanation.`,
   },
+
+  // ── Нежность ────────────────────────────────────────────────────────────────
   tenderness: {
-    ru: `Ты генератор коротких заданий для пар. Категория: "НЕЖНОСТЬ" — мягкий физический контакт, тепло, уют. Без эротики.
+    ru: `Ты генератор заданий для влюблённых пар. Категория: НЕЖНОСТЬ — мягкий физический контакт, без эротики.
 
-ПРАВИЛА:
-- Задание должно быть реалистичным и выполнимым в реальной жизни.
-- Одно действие, до 180 символов.
-- Используй обращение на "ты".
-- НЕ используй "я", "мы", "мне", "нам" — ты даёшь задание, а не участвуешь.
-- НЕ используй поэзию, метафоры, общие фразы.
+ДОПУСТИМО: объятия, поцелуи в губы (не страстные), поцелуй в щёку/лоб/шею, массаж шеи/плеч/спины/стоп, лёгкие покусывания мочки уха, держать за руку.
+ЗАПРЕЩЕНО: эрогенные зоны, страстные поцелуи с языком, раздевание, намёки на секс.
 
-Примеры правильных заданий (не копируй их, придумай своё):
-- Подойди сзади, обними и постой так минуту.
-- Поцелуй в губы медленно, задержись на пару секунд.
-- Сделай массаж шеи и плеч.
+ТРЕБОВАНИЯ К ТЕКСТУ:
+- Одно конкретное физическое действие
+- Обращение на «ты»; о партнёре — третье лицо (уточнено ниже)
+- Нельзя «дыши мне», «смотри на меня»
+- Только реальные движения обычного человека
+- Грамматически правильный русский язык
+- До 180 символов
 
-Твоя задача: придумать ОДНО новое задание для категории "НЕЖНОСТЬ". Только текст задания, без кавычек, без пояснений.`,
-    en: `You generate short tasks for couples. Category: "TENDERNESS" — soft physical contact, warmth, comfort. Without eroticism.
+ПРАВИЛЬНЫЕ ПРИМЕРЫ:
+Подойди к ней сзади, обними за плечи и поцелуй в шею. Медленно.
+Возьми его руку и помассируй каждый палец. Не торопись.
+Поцелуй её в губы — тихо, без спешки. Задержись на пару секунд.
+Прикуси ему мочку уха. Легко. Подержи секунду, отпусти.
+
+ОДНО новое задание. Только текст, без кавычек.`,
+
+    en: `You generate tasks for couples. Category: TENDERNESS — gentle physical contact, no eroticism.
+
+ALLOWED: hugs, gentle lip/cheek/neck/forehead kisses, neck/shoulder/back/foot massage, light earlobe bite, holding hands.
+FORBIDDEN: erogenous zones, passionate tongue kisses, undressing, sexual hints.
 
 RULES:
-- The task must be realistic and doable in real life.
-- One action, up to 180 characters.
-- Use "you" as the address.
-- DO NOT use "I", "we", "me" — you are giving the task, not participating.
-- DO NOT use poetry, metaphors, vague phrases.
+- One concrete physical action
+- Address as "you"; partner = third person (gender below)
+- No "breathe to me", "look at me"
+- Realistic human movements only
+- Correct grammar
+- Max 180 chars
 
-Examples of correct tasks (don't copy them, create your own):
-- Come from behind, hug and stand for a minute.
-- Kiss on the lips slowly, hold for a few seconds.
-- Give a neck and shoulder massage.
+GOOD EXAMPLES:
+Come up behind her, wrap your arms around her shoulders and kiss her neck. Slowly.
+Take his hand and massage each finger. No rush.
+Kiss her gently on the lips. Stay there for a few seconds.
 
-Your task: come up with ONE new task for the "TENDERNESS" category. Only task text, no quotes, no explanations.`,
+ONE new task. Text only, no quotes.`,
   },
+
+  // ── Желание ─────────────────────────────────────────────────────────────────
   desire: {
-    ru: `Ты генератор коротких заданий для пар. Категория: "ЖЕЛАНИЕ" — прелюдия, разогрев, возбуждение. Без секса.
+    ru: `Ты генератор заданий для влюблённых пар. Категория: ЖЕЛАНИЕ — возбуждение, прелюдия.
 
-ПРАВИЛА:
-- Задание должно быть реалистичным и выполнимым в реальной жизни.
-- Одно действие, до 200 символов.
-- Используй обращение на "ты".
-- НЕ используй "я", "мы", "мне", "нам" — ты даёшь задание, а не участвуешь.
-- НЕ используй поэзию, метафоры, общие фразы.
+ДОПУСТИМО: страстные поцелуи с языком, раздевание (своё или партнёра), касания груди / ягодиц / внутренней поверхности бедра / паха через ткань, просьба посмотреть на тебя раздетым(ой).
+ЗАПРЕЩЕНО: оральный секс, проникновение, прямой контакт с гениталиями.
 
-Примеры правильных заданий (не копируй их, придумай своё):
-- Разденься медленно перед партнёром.
-- Сделай фото в белье и отправь.
-- Прошепчи на ухо грязную фразу.
+ТРЕБОВАНИЯ К ТЕКСТУ:
+- Одно действие или одна сцена — конкретная, телесная
+- Обращение на «ты»; о партнёре — третье лицо (пол ниже)
+- Нельзя «сделай мне», «смотри на меня» (ИИ — не партнёр)
+- Только анатомически реальные движения
+- Грамматически правильный русский язык
+- До 200 символов
 
-Твоя задача: придумать ОДНО новое задание для категории "ЖЕЛАНИЕ". Только текст задания, без кавычек, без пояснений.`,
-    en: `You generate short tasks for couples. Category: "DESIRE" — foreplay, warm-up, arousal. Without sex.
+ПРАВИЛЬНЫЕ ПРИМЕРЫ:
+Поцелуй её глубоко, с языком. Одна рука — в волосы, другая — на спину.
+Медленно расстегни её рубашку. Смотри на неё. Поцелуй ключицы.
+Проведи рукой по внутренней стороне его бедра снизу вверх — остановись у края трусов.
+Прижми его к стене. Поцелуй в шею и спустись к ключицам.
+
+ОДНО новое задание. Только текст, без кавычек.`,
+
+    en: `You generate tasks for couples. Category: DESIRE — arousal, foreplay.
+
+ALLOWED: deep tongue kisses, undressing (self or partner), touching chest/butt/inner thigh/groin over fabric.
+FORBIDDEN: oral sex, penetration, direct genital contact.
 
 RULES:
-- The task must be realistic and doable in real life.
-- One action, up to 200 characters.
-- Use "you" as the address.
-- DO NOT use "I", "we", "me" — you are giving the task, not participating.
-- DO NOT use poetry, metaphors, vague phrases.
+- One concrete action or scene
+- Address as "you"; partner = third person (gender below)
+- NEVER "do it to me", "look at me" — you are not the partner
+- Only anatomically realistic movements
+- Correct grammar
+- Max 200 chars
 
-Examples of correct tasks (don't copy them, create your own):
-- Undress slowly in front of your partner.
-- Take a photo in lingerie and send it.
-- Whisper a dirty phrase in the ear.
+GOOD EXAMPLES:
+Kiss her deeply with your tongue. One hand in her hair, the other on her back.
+Slowly unbutton his shirt. Look at him. Kiss his collarbone.
+Run your hand up her inner thigh from the knee — stop just at the edge of her underwear.
 
-Your task: come up with ONE new task for the "DESIRE" category. Only task text, no quotes, no explanations.`,
+ONE new task. Text only, no quotes.`,
   },
+
+  // ── Страсть ─────────────────────────────────────────────────────────────────
   passion: {
-    ru: `Ты генератор коротких заданий для пар. Категория: "СТРАСТЬ" — чувственный секс, красиво и без пошлости.
+    ru: `Ты генератор заданий для влюблённых пар. Категория: СТРАСТЬ — секс и оральный секс, но без BDSM и ролевых игр.
 
-ПРАВИЛА:
-- Задание должно быть реалистичным и выполнимым в реальной жизни.
-- Одно действие, до 200 символов.
-- Используй обращение на "ты".
-- НЕ используй "я", "мы", "мне", "нам" — ты даёшь задание, а не участвуешь.
-- НЕ используй поэзию, метафоры, общие фразы.
+ДОПУСТИМО: оральный секс, разные позы, смена темпа, секс-игрушки (вибратор, наручники-игрушка, лёгкий сабмиссив).
+ЗАПРЕЩЕНО: BDSM, ролевые игры («хозяин и слуга», «полицейский»), связывание без игрушек, жёсткость без согласия.
 
-Примеры правильных заданий (не копируй их, придумай своё):
-- Войди медленно, застынь на пару секунд, начни двигаться в ритме дыхания.
-- Сделай минет, глядя в глаза партнёру.
-- Снимите секс на видео для своей коллекции.
+ТРЕБОВАНИЯ К ТЕКСТУ:
+- Одно конкретное действие
+- Обращение на «ты»; о партнёре — третье лицо (пол ниже)
+- Язык — прямой, без эвфемизмов, но без пошлости
+- До 200 символов
 
-Твоя задача: придумать ОДНО новое задание для категории "СТРАСТЬ". Только текст задания, без кавычек, без пояснений.`,
-    en: `You generate short tasks for couples. Category: "PASSION" — sensual sex, beautiful and without vulgarity.
+ПРАВИЛЬНЫЕ ПРИМЕРЫ:
+Опустись на колени перед партнёром. Сделай минет / кунни. Не торопись.
+Ляг на спину. Попроси партнёра сесть сверху лицом к тебе. Двигайтесь медленно.
+Войди в партнёра медленно. Остановись внутри на пару секунд. Потом начни двигаться.
+Сделай партнёру минет / кунни до финиша. Не останавливайся в конце.
+
+ОДНО новое задание. Только текст, без кавычек.`,
+
+    en: `You generate tasks for couples. Category: PASSION — sex and oral sex, without BDSM and roleplay.
+
+ALLOWED: oral sex, different positions, tempo changes, sex toys (vibrator, toy handcuffs, light submission).
+FORBIDDEN: BDSM, roleplay ("master and servant", "cop"), tying without toys, roughness without consent.
 
 RULES:
-- The task must be realistic and doable in real life.
-- One action, up to 200 characters.
-- Use "you" as the address.
-- DO NOT use "I", "we", "me" — you are giving the task, not participating.
-- DO NOT use poetry, metaphors, vague phrases.
+- One concrete action
+- Address as "you"; partner = third person (gender below)
+- Direct language, no euphemisms, no vulgarity
+- Max 200 chars
 
-Examples of correct tasks (don't copy them, create your own):
-- Enter slowly, pause for a few seconds, start moving with breathing rhythm.
-- Perform oral sex, looking into your partner's eyes.
-- Record your sex on video for your personal collection.
+GOOD EXAMPLES:
+Get on your knees. Give oral. Take your time.
+Lie on your back. Ask partner to sit on top facing you. Move slowly.
+Enter slowly. Stop inside for a few seconds. Then start moving.
+Give oral to finish. Don't stop at the end.
 
-Your task: come up with ONE new task for the "PASSION" category. Only task text, no quotes, no explanations.`,
+ONE new task. Text only, no quotes.`,
   },
+
+  // ── Хард ────────────────────────────────────────────────────────────────────
   hard: {
-    ru: `Ты генератор коротких заданий для пар. Категория: "ХАРД" — секс с элементами игры, подчинения или контроля. Только для гетеро пар (Мужчина + Женщина).
+    ru: `Ты генератор заданий для влюблённых пар. Категория: ХАРД — BDSM, доминирование, ролевые игры, грязные разговоры. Всё в рамках согласия.
 
-ПРАВИЛА:
-- Задание должно быть реалистичным и выполнимым в реальной жизни.
-- Одно действие, до 200 символов.
-- Используй обращение на "ты".
-- НЕ используй "я", "мы", "мне", "нам" — ты даёшь задание, а не участвуешь.
-- НЕ используй поэзию, метафоры, общие фразы.
-- Учитывай физиологию: действия должны быть логичными для гетеро пары.
+ДОПУСТИМО: ролевые игры (хозяин/слуга, полицейский/задержанный, учитель/ученик), связывание (ремень, галстук), повязка на глаза, шлепки, приказы, запрет на оргазм.
+ЗАПРЕЩЕНО: удушение, реальная боль, оружие, кровь.
 
-Примеры правильных заданий (не копируй их, придумай своё):
-- Прикажи партнёру встать на колени.
-- Свяжи руки шарфом и делай что хочешь.
-- Сделай минет до финиша в рот и проглоти.
+ТРЕБОВАНИЯ К ТЕКСТУ:
+- Одно конкретное действие
+- Обращение на «ты»; о партнёре — третье лицо (пол ниже)
+- Прямой, резкий стиль — без романтики и лирики
+- До 200 символов
 
-Твоя задача: придумать ОДНО новое задание для категории "ХАРД". Только текст задания, без кавычек, без пояснений.`,
-    en: `You generate short tasks for couples. Category: "HARD" — sex with elements of play, submission, or control. Only for heterosexual couples (Man + Woman).
+ПРАВИЛЬНЫЕ ПРИМЕРЫ:
+Свяжи партнёру руки ремнём или галстуком. Сделай минет / кунни. Не останавливайся, пока не попросит.
+Скажи партнёру: «Встань на колени». Подойди ближе. Пусть смотрит снизу вверх.
+Завяжи партнёру глаза. Делай что хочешь — руками, губами. Пусть угадывает, что дальше.
+Шлёпни партнёра по ягодицам пять раз. Не сильно. Спроси: «Ещё?». Если да — продолжай.
+
+ОДНО новое задание. Только текст, без кавычек.`,
+
+    en: `You generate tasks for couples. Category: HARD — BDSM, dominance, roleplay, dirty talk. All consensual.
+
+ALLOWED: roleplay (master/servant, cop/detained, teacher/student), tying (belt, tie), blindfold, spanking, commands, orgasm denial.
+FORBIDDEN: choking, real injury, weapons, blood.
 
 RULES:
-- The task must be realistic and doable in real life.
-- One action, up to 200 characters.
-- Use "you" as the address.
-- DO NOT use "I", "we", "me" — you are giving the task, not participating.
-- DO NOT use poetry, metaphors, vague phrases.
-- Consider physiology: actions must be logical for a heterosexual couple.
+- One concrete action
+- Address as "you"; partner = third person (gender below)
+- Direct, sharp style — no romance, no poetry
+- Max 200 chars
 
-Examples of correct tasks (don't copy them, create your own):
-- Command your partner to kneel.
-- Tie their hands with a scarf and do whatever you want.
-- Perform oral sex to finish in the mouth and swallow.
+GOOD EXAMPLES:
+Tie partner's hands with a belt or tie. Give oral. Don't stop until asked.
+Say: "Get on your knees". Come closer. Let them look up.
+Blindfold your partner. Do whatever you want — hands, lips. Let them guess.
+Spank partner's butt five times. Not hard. Ask: "More?". If yes — continue.
 
-Your task: come up with ONE new task for the "HARD" category. Only task text, no quotes, no explanations.`,
+ONE new task. Text only, no quotes.`,
   },
 };
 
-function getPrompt(category: string, lang: string): string {
-  return PROMPTS[category]?.[lang] ?? PROMPTS[category]?.["en"] ?? PROMPTS["compliments"]["en"];
+// ── Сообщение пользователя на нативном языке ─────────────────────────────────
+const USER_MSG: Record<string, string> = {
+  ru: "Сгенерируй одно задание.",
+  en: "Generate one task.",
+  hi: "एक टास्क बनाएं।",
+  pt: "Gere uma tarefa.",
+  es: "Genera una tarea.",
+};
+
+// ── Лёгкий гендерный контекст для нейтральных категорий ─────────────────────
+function genderCtx(gender: string | undefined, lang: string): string {
+  if (!gender) return "";
+  const g = gender === "male" ? "male" : "female";
+  const ctx: Record<string, Record<string, string>> = {
+    ru: {
+      male:   "\n\nПОЛ: Пользователь — МУЖЧИНА, партнёрша — ЖЕНЩИНА. Глаголы мужского рода. О партнёрше: «она/её/ей».",
+      female: "\n\nПОЛ: Пользователь — ЖЕНЩИНА, партнёр — МУЖЧИНА. Глаголы женского рода. О партнёре: «он/его/ему».",
+    },
+    en: {
+      male:   "\n\nGENDER: User is a MAN, partner is a WOMAN. Use she/her for partner.",
+      female: "\n\nGENDER: User is a WOMAN, partner is a MAN. Use he/him for partner.",
+    },
+    hi: {
+      male:   "\n\nलिंग: उपयोगकर्ता पुरुष है, पार्टनर महिला है।",
+      female: "\n\nलिंग: उपयोगकर्ता महिला है, पार्टनर पुरुष है।",
+    },
+    pt: {
+      male:   "\n\nGÊNERO: Usuário é homem, parceira é mulher. Use ela/a para a parceira.",
+      female: "\n\nGÊNERO: Usuária é mulher, parceiro é homem. Use ele/o para o parceiro.",
+    },
+    es: {
+      male:   "\n\nGÉNERO: Usuario es hombre, pareja es mujer. Use ella para la pareja.",
+      female: "\n\nGÉNERO: Usuaria es mujer, pareja es hombre. Use él para la pareja.",
+    },
+  };
+  return ctx[lang]?.[g] ?? "";
 }
 
+// ── Строим system-промпт ──────────────────────────────────────────────────────
+function buildSystem(category: string, lang: string, gender: string | undefined): string | null {
+  const g = gender === "male" || gender === "female" ? gender : "male";
+
+  const nDef = NEUTRAL[category];
+  if (!nDef) return null;
+  const base = nDef[lang] ?? nDef["en"];
+  if (!base) return null;
+  return base + genderCtx(gender, lang);
+}
+
+const MAX_CHARS = 260;
+
 export default async function handler(req: VercelRequest, res: VercelResponse) {
+  res.setHeader("Access-Control-Allow-Origin", "https://t.me");
+  res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type, x-telegram-init-data");
+  if (req.method === "OPTIONS") return res.status(200).end();
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
 
-  const initData = req.headers["x-telegram-init-data"] as string | undefined;
-  if (!initData) return res.status(401).json({ error: "Missing init data" });
+  const initData = req.headers["x-telegram-init-data"] as string;
+  if (!validateTelegramInitData(initData, process.env.BOT_TOKEN!))
+    return res.status(401).json({ error: "Unauthorized" });
 
-  const ok = validateTelegramInitData(initData, process.env.BOT_TOKEN!);
-  if (!ok) return res.status(403).json({ error: "Invalid init data" });
+  const { category, lang = "ru", gender } = req.body as {
+    category: string; lang?: string; gender?: string;
+  };
 
-  const { category = "compliments", lang = "en", gender = "male" } = req.body ?? {};
+  if (!category) return res.status(400).json({ error: "category required" });
+  if (!DEEPSEEK_API_KEY) return res.status(200).json({ task: getFallback(category, lang), source: "fallback" });
 
-  if (!DEEPSEEK_API_KEY) {
-    return res.json({ task: getFallback(category, lang) });
-  }
+  const systemPrompt = buildSystem(category, lang, gender);
+  if (!systemPrompt) return res.status(200).json({ task: getFallback(category, lang), source: "fallback" });
 
   try {
-    const systemPrompt = `${getPrompt(category, lang)}\n\n${getGenderLine(lang, gender)}`;
-    const userMessage = lang === "ru" ? "Сгенерируй одно задание." : "Generate one task.";
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), 9000);
 
-    const aiRes = await fetch(DEEPSEEK_URL, {
+    const resp = await fetch(DEEPSEEK_URL, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${DEEPSEEK_API_KEY}`,
-      },
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${DEEPSEEK_API_KEY}` },
       body: JSON.stringify({
         model: "deepseek-chat",
         messages: [
           { role: "system", content: systemPrompt },
-          { role: "user", content: userMessage },
+          { role: "user",   content: USER_MSG[lang] ?? "Generate one task." },
         ],
         max_tokens: 160,
-        temperature: 1.1,
+        temperature: 0.9,
+        top_p: 0.95,
       }),
+      signal: ctrl.signal,
     });
 
-    if (!aiRes.ok) {
-      return res.json({ task: getFallback(category, lang) });
-    }
+    clearTimeout(timer);
+    if (!resp.ok) return res.status(200).json({ task: getFallback(category, lang), source: "fallback" });
 
-    const data = await aiRes.json();
+    const data = await resp.json();
     let task: string = data.choices?.[0]?.message?.content?.trim() ?? "";
 
-    task = task.replace(/^["']|["']$/g, "").trim();
+    // Убираем обрамляющие кавычки
+    task = task.replace(/^[«"'„"']|[»"'"']$/g, "").trim();
+    // Убираем нумерацию типа "1. "
     task = task.replace(/^\d+\.\s*/, "");
 
-    const forbidden = [
-      "я рекомендую", "тебе стоит", "можешь попробовать", "попробуйте",
-      "выдыхает", "дыши в", "посмотри в глаза", "отстранись",
-      "я хочу", "давай я", "я буду", "мы с тобой", "мы будем",
-      "я предлагаю", "я думаю", "мне кажется", "по моему мнению",
-      "ты можешь", "ты сможешь", "было бы неплохо",
-      "i recommend", "you can try", "you could", "i think", "i suggest",
-      "let's", "we will", "we should", "i want",
-    ];
-    const hasForbidden = forbidden.some(f => task.toLowerCase().includes(f));
+    const bad = FORBIDDEN.some(p => task.toLowerCase().includes(p));
+    if (!task || task.length < 10 || task.length > MAX_CHARS || bad)
+      return res.status(200).json({ task: getFallback(category, lang), source: "fallback" });
 
-    if (!task || task.length < 15 || task.length > 350 || hasForbidden) {
-      return res.json({ task: getFallback(category, lang) });
-    }
-
-    return res.json({ task });
+    return res.status(200).json({ task, source: "ai" });
   } catch {
-    return res.json({ task: getFallback(category, lang) });
+    return res.status(200).json({ task: getFallback(category, lang), source: "fallback" });
   }
 }

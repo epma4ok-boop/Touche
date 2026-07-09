@@ -969,7 +969,7 @@ export default function Home({
     tg?.onEvent?.("viewportChanged", updateVh);
     const tm = setTimeout(updateVh, 500);
     requestAnimationFrame(() => setMounted(true));
-    function onIntimacyUpdate() { setIntimacyKey(k => k + 1); }
+    function onIntimacyUpdate() { setIntimacyKey(k => k+1); }
     window.addEventListener("touche-intimacy-updated", onIntimacyUpdate);
     return () => {
       tg?.offEvent?.("viewportChanged", updateVh);
@@ -1063,11 +1063,29 @@ export default function Home({
         {/* ── List ── */}
         <div style={{ flex: 1, overflowY: "auto", overflowX: "hidden", padding: `10px 14px max(28px,env(safe-area-inset-bottom))`, display: "flex", flexDirection: "column", gap: 10, position: "relative", zIndex: 1, scrollbarWidth: "none" as const }}>
           <IntimacyIndex lang={lang} refreshKey={intimacyKey} index={0} />
-          {CATEGORIES_ORDER.map((cat, i) => (
-            <Card key={cat} type={cat} title={catTitle[cat]} sub={catSub[cat]} onClick={() => onCategorySelect(cat)} index={i + 1} />
-          ))}
-          <Card type="scenarios" title={SCENARIO_LABELS[lang].title} sub={SCENARIO_LABELS[lang].sub} onClick={handleScenarioClick} index={CATEGORIES_ORDER.length + 1} />
-          <Card type="invite"    title={INVITE_LABELS[lang].title}   sub={INVITE_LABELS[lang].sub}   onClick={handleInvite}        index={CATEGORIES_ORDER.length + 2} />
+          <Card
+            type="tenderness"
+            title={lang === "ru" ? "Нежность" : lang === "hi" ? "कोमलता" : lang === "pt" ? "Ternura" : lang === "es" ? "Ternura" : "Tenderness"}
+            sub={lang === "ru" ? "тёплые слова · прикосновения" : "warm words · gentle touch"}
+            onClick={() => onCategorySelect(Math.random() > 0.5 ? "compliments" : "tenderness")}
+            index={1}
+          />
+          <Card
+            type="desire"
+            title={t.catDesire}
+            sub={t.catDesireSub}
+            onClick={() => onCategorySelect("desire")}
+            index={2}
+          />
+          <Card
+            type="passion"
+            title={lang === "ru" ? "Страсть" : lang === "hi" ? "जुनून" : lang === "pt" ? "Paixão" : lang === "es" ? "Pasión" : "Passion"}
+            sub={lang === "ru" ? "пикантно · откровенно · 18+" : "spicy · explicit · 18+"}
+            onClick={() => onCategorySelect(Math.random() > 0.5 ? "passion" : "hard")}
+            index={3}
+          />
+          <Card type="scenarios" title={SCENARIO_LABELS[lang].title} sub={SCENARIO_LABELS[lang].sub} onClick={handleScenarioClick} index={4} />
+          <Card type="invite"    title={INVITE_LABELS[lang].title}   sub={INVITE_LABELS[lang].sub}   onClick={handleInvite}        index={5} />
         </div>
       </div>
 

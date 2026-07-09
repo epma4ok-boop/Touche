@@ -43,7 +43,7 @@ function getInitData(): string {
 
 async function fetchServerRemaining(category: Category): Promise<{ remaining: number; locked: boolean } | null> {
   try {
-    const res = await fetch(`/api/limits/get?category=${category}`, {
+    const res = await fetch(`/api/limits?category=${category}`, {
       headers: { "x-telegram-init-data": getInitData() },
     });
     if (!res.ok) return null;
@@ -56,7 +56,7 @@ async function fetchServerRemaining(category: Category): Promise<{ remaining: nu
 
 async function consumeServerLimit(category: Category): Promise<boolean> {
   try {
-    const res = await fetch("/api/limits/use", {
+    const res = await fetch("/api/limits", {
       method: "POST",
       headers: { "Content-Type": "application/json", "x-telegram-init-data": getInitData() },
       body: JSON.stringify({ category }),
@@ -398,20 +398,16 @@ export default function CategoryScreen({ lang, gender, category, onBack, onCateg
   }, [isCasting, remaining, category, lang, history, t]);
 
   const handleDismiss = useCallback(() => {
-    // Track locally (always)
     addLocalPoints(category);
     window.dispatchEvent(new CustomEvent("touche-intimacy-updated"));
-
-    // If coupled, also report to server asynchronously
     if (coupleId) {
       const initData = window.Telegram?.WebApp?.initData ?? "";
-      fetch("/api/couple/tasks/complete", {
+      fetch("/api/couple/intimacy?action=complete", {
         method: "POST",
         headers: { "Content-Type": "application/json", "x-telegram-init-data": initData },
         body: JSON.stringify({ category }),
-      }).catch(() => {/* ignore — local tracking already done */});
+      }).catch(() => {});
     }
-
     setShowReveal(false);
     setTimeout(() => { setTaskText(""); setHintText(t.hint); }, 400);
   }, [category, coupleId, t.hint]);

@@ -383,32 +383,37 @@ export default function IntimacyIndex({lang,refreshKey=0,index=0,children}:Intim
                 </div>
               </div>
 
-              {/* Row 2: big score + streak */}
-              <div style={{display:"flex",alignItems:"flex-end",justifyContent:"space-between",marginBottom:18}}>
-                <div style={{display:"flex",alignItems:"baseline",gap:7}}>
-                  <span style={{fontFamily:"'Plus Jakarta Sans',sans-serif",fontWeight:900,fontSize:68,color:"rgba(255,238,248,0.97)",lineHeight:1,letterSpacing:"-0.04em",textShadow:`0 0 36px rgba(${rgb},0.45)`}}>{score}</span>
-                  <span style={{fontFamily:"'Plus Jakarta Sans',sans-serif",fontSize:15,color:"rgba(255,238,248,0.28)",paddingBottom:5}}>{lang==="ru"?"бал.":"pts"}</span>
-                </div>
-                {data.streakDays>0?(
-                  <div style={{display:"flex",flexDirection:"column",alignItems:"flex-end",gap:3,paddingBottom:5}}>
-                    <StatGlyph id="streak" color="rgba(255,185,60,0.92)" size={20}/>
-                    <span style={{fontFamily:"'Plus Jakarta Sans',sans-serif",fontWeight:700,fontSize:13,color:"rgba(255,185,60,0.92)"}}>{t.streak(data.streakDays)}</span>
+              {/* Row 2: circular gauge — score + progress fused into one dial */}
+              <div style={{display:"flex",alignItems:"center",gap:22,marginBottom:16}}>
+                <div style={{position:"relative",flexShrink:0,width:132,height:132}}>
+                  <Ring progress={prog} color={lvl.color} size={132}/>
+                  <div style={{position:"absolute",inset:0,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:1}}>
+                    <span style={{fontFamily:"'Plus Jakarta Sans',sans-serif",fontWeight:900,fontSize:38,color:"rgba(255,238,248,0.97)",lineHeight:1,letterSpacing:"-0.03em",textShadow:`0 0 30px rgba(${rgb},0.5)`}}>{score}</span>
+                    <span style={{fontFamily:"'Plus Jakarta Sans',sans-serif",fontSize:10,color:"rgba(255,238,248,0.30)",letterSpacing:"0.08em",textTransform:"uppercase"}}>{lang==="ru"?"баллов":"pts"}</span>
+                    <span style={{fontFamily:"'Plus Jakarta Sans',sans-serif",fontWeight:700,fontSize:11,color:lvl.color,marginTop:3}}>{Math.round(prog*100)}%</span>
                   </div>
-                ):(
-                  <div style={{fontFamily:"'Plus Jakarta Sans',sans-serif",fontSize:12,color:"rgba(255,238,248,0.20)",maxWidth:110,textAlign:"right",lineHeight:1.4,paddingBottom:5}}>{t.noStreak}</div>
-                )}
-              </div>
-
-              {/* Row 3: progress bar */}
-              <div style={{marginBottom:14}}>
-                <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:6}}>
-                  <span style={{fontFamily:"'Plus Jakarta Sans',sans-serif",fontSize:11,color:"rgba(255,238,248,0.26)"}}>
-                    {nextLvl?(lang==="ru"?nextLvl.nameRu:nextLvl.nameEn):t.maxLevel}
-                  </span>
-                  <span style={{fontFamily:"'Plus Jakarta Sans',sans-serif",fontSize:11,color:"rgba(255,238,248,0.20)"}}>{nextLvl?`${data.score} / ${nextLvl.min}`:""}</span>
                 </div>
-                <div style={{height:5,borderRadius:99,background:"rgba(255,238,248,0.07)",overflow:"hidden"}}>
-                  <div style={{height:"100%",borderRadius:99,width:`${Math.round(prog*100)}%`,background:`linear-gradient(90deg,rgba(${PR},${PG},${PB},0.55),${lvl.color})`,boxShadow:`0 0 10px ${lvl.color}`,transition:"width 1.2s cubic-bezier(.22,1,.36,1)"}}/>
+                <div style={{flex:1,display:"flex",flexDirection:"column",gap:9,minWidth:0}}>
+                  <div>
+                    <div style={{fontFamily:"'Plus Jakarta Sans',sans-serif",fontSize:10,color:"rgba(255,238,248,0.24)",letterSpacing:"0.07em",textTransform:"uppercase",marginBottom:3}}>
+                      {nextLvl?t.progress:t.maxLevel}
+                    </div>
+                    {nextLvl && (
+                      <div style={{display:"flex",alignItems:"center",gap:6}}>
+                        <LevelGlyph id={nextLvl.iconId} color={lvl.color} size={13}/>
+                        <span style={{fontFamily:"'Plus Jakarta Sans',sans-serif",fontWeight:700,fontSize:14,color:"rgba(255,238,248,0.82)"}}>{lang==="ru"?nextLvl.nameRu:nextLvl.nameEn}</span>
+                      </div>
+                    )}
+                    {nextLvl && <div style={{fontFamily:"'Plus Jakarta Sans',sans-serif",fontSize:11,color:"rgba(255,238,248,0.20)",marginTop:2}}>{data.score} / {nextLvl.min}</div>}
+                  </div>
+                  {data.streakDays>0?(
+                    <div style={{display:"flex",alignItems:"center",gap:6}}>
+                      <StatGlyph id="streak" color="rgba(255,185,60,0.92)" size={16}/>
+                      <span style={{fontFamily:"'Plus Jakarta Sans',sans-serif",fontWeight:700,fontSize:12,color:"rgba(255,185,60,0.92)"}}>{t.streak(data.streakDays)}</span>
+                    </div>
+                  ):(
+                    <div style={{fontFamily:"'Plus Jakarta Sans',sans-serif",fontSize:11,color:"rgba(255,238,248,0.20)",lineHeight:1.4}}>{t.noStreak}</div>
+                  )}
                 </div>
               </div>
 

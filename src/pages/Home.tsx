@@ -3,6 +3,7 @@ import type { Gender } from "@/components/GenderSelect";
 import { GENDER_KEY } from "@/components/GenderSelect";
 import { UI, CATEGORIES_ORDER, LANG_CYCLE, type Lang, type Category } from "@/data/i18n";
 import IntimacyIndex from "@/components/IntimacyIndex";
+import SmokeBackground from "@/components/SmokeBackground";
 
 declare global {
   interface Window {
@@ -1020,6 +1021,7 @@ export default function Home({
         opacity: mounted ? 1 : 0, transition: "opacity .30s ease",
         fontFamily: "'Plus Jakarta Sans','DM Sans',sans-serif",
       }}>
+        <SmokeBackground />
         <div style={{ position: "absolute", top: -140, left: "50%", transform: "translateX(-50%)", width: 560, height: 500, borderRadius: "50%", background: `radial-gradient(circle,rgba(${PR},${PG},${PB},0.08) 0%,transparent 68%)`, pointerEvents: "none", zIndex: 0 }} />
 
         {/* ── Header ── */}

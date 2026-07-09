@@ -5,6 +5,7 @@ import { UI, CATEGORY_CONFIG, CATEGORIES_ORDER, type Lang, type Category } from 
 import { playReveal, playDismiss } from "@/hooks/useSensualSound";
 import { TASKS_RU, TASKS_EN } from "@/data/tasks";
 import { addLocalPoints } from "@/data/intimacy";
+import SmokeBackground from "@/components/SmokeBackground";
 
 const BG = "#0d0610";
 const TEXT_P = "rgba(255,238,248,0.88)";
@@ -421,6 +422,7 @@ export default function CategoryScreen({ lang, gender, category, onBack, onCateg
       onTouchEnd={handleTouchEnd}
       style={{ position: "fixed", inset: 0, background: BG, display: "flex", flexDirection: "column", overflow: "hidden", height, opacity: mounted ? 1 : 0, transform: mounted ? "translateX(0)" : `translateX(${enterX}px)`, transition: mounted ? "opacity .32s ease,transform .38s cubic-bezier(.22,1,.36,1)" : "none" }}
     >
+      <SmokeBackground />
       {/* Top bar */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", paddingTop: topPadding, paddingLeft: 20, paddingRight: 20, paddingBottom: 6, flexShrink: 0, position: "relative", zIndex: 10 }}>
         <button onClick={onBack} style={{ background: "transparent", border: "none", cursor: "pointer", fontFamily: "'Plus Jakarta Sans',sans-serif", fontWeight: 400, fontSize: 14, letterSpacing: "0.01em", color: TEXT_S, padding: "4px 0", minWidth: 56 }}>

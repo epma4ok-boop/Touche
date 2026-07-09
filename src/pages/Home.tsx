@@ -2,6 +2,7 @@ import { useEffect, useCallback, useState } from "react";
 import type { Gender } from "@/components/GenderSelect";
 import { GENDER_KEY } from "@/components/GenderSelect";
 import { UI, CATEGORIES_ORDER, LANG_CYCLE, type Lang, type Category } from "@/data/i18n";
+import IntimacyIndex from "@/components/IntimacyIndex";
 
 declare global {
   interface Window {
@@ -953,6 +954,7 @@ export default function Home({
   const [vh, setVh] = useState<number | null>(null);
   const [showCoupleModal, setShowCoupleModal] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
+  const [intimacyKey, setIntimacyKey] = useState(0);
   const [showScenarioGate, setShowScenarioGate] = useState(false);
   const topPx = useTelegramTopInset();
 
@@ -967,7 +969,13 @@ export default function Home({
     tg?.onEvent?.("viewportChanged", updateVh);
     const tm = setTimeout(updateVh, 500);
     requestAnimationFrame(() => setMounted(true));
-    return () => { tg?.offEvent?.("viewportChanged", updateVh); clearTimeout(tm); };
+    function onIntimacyUpdate() { setIntimacyKey(k => k + 1); }
+    window.addEventListener("touche-intimacy-updated", onIntimacyUpdate);
+    return () => {
+      tg?.offEvent?.("viewportChanged", updateVh);
+      clearTimeout(tm);
+      window.removeEventListener("touche-intimacy-updated", onIntimacyUpdate);
+    };
   }, []);
 
   useEffect(() => {
@@ -1054,11 +1062,12 @@ export default function Home({
 
         {/* ── List ── */}
         <div style={{ flex: 1, overflowY: "auto", overflowX: "hidden", padding: `10px 14px max(28px,env(safe-area-inset-bottom))`, display: "flex", flexDirection: "column", gap: 10, position: "relative", zIndex: 1, scrollbarWidth: "none" as const }}>
+          <IntimacyIndex lang={lang} refreshKey={intimacyKey} index={0} />
           {CATEGORIES_ORDER.map((cat, i) => (
-            <Card key={cat} type={cat} title={catTitle[cat]} sub={catSub[cat]} onClick={() => onCategorySelect(cat)} index={i} />
+            <Card key={cat} type={cat} title={catTitle[cat]} sub={catSub[cat]} onClick={() => onCategorySelect(cat)} index={i + 1} />
           ))}
-          <Card type="scenarios" title={SCENARIO_LABELS[lang].title} sub={SCENARIO_LABELS[lang].sub} onClick={handleScenarioClick} index={CATEGORIES_ORDER.length} />
-          <Card type="invite"    title={INVITE_LABELS[lang].title}   sub={INVITE_LABELS[lang].sub}   onClick={handleInvite}        index={CATEGORIES_ORDER.length + 1} />
+          <Card type="scenarios" title={SCENARIO_LABELS[lang].title} sub={SCENARIO_LABELS[lang].sub} onClick={handleScenarioClick} index={CATEGORIES_ORDER.length + 1} />
+          <Card type="invite"    title={INVITE_LABELS[lang].title}   sub={INVITE_LABELS[lang].sub}   onClick={handleInvite}        index={CATEGORIES_ORDER.length + 2} />
         </div>
       </div>
 

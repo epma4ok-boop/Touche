@@ -4,6 +4,7 @@ import HeartbeatCanvas from "@/components/HeartbeatCanvas";
 import { UI, CATEGORY_CONFIG, CATEGORIES_ORDER, type Lang, type Category } from "@/data/i18n";
 import { playReveal, playDismiss } from "@/hooks/useSensualSound";
 import { TASKS_RU, TASKS_EN } from "@/data/tasks";
+import { addLocalPoints } from "@/data/intimacy";
 
 const BG = "#0d0610";
 const TEXT_P = "rgba(255,238,248,0.88)";
@@ -299,9 +300,9 @@ function HistoryPanel({ entries, open, onClose, accentRgb, lang }: {
 }
 
 // ── Main screen ───────────────────────────────────────────────────────────────
-interface Props { lang: Lang; gender?: import("@/components/GenderSelect").Gender; category: Category; onBack: () => void; onCategoryChange: (c: Category) => void; swipeDir: "left" | "right"; }
+interface Props { lang: Lang; gender?: import("@/components/GenderSelect").Gender; category: Category; onBack: () => void; onCategoryChange: (c: Category) => void; swipeDir: "left" | "right"; coupleId?: string | null; }
 
-export default function CategoryScreen({ lang, gender, category, onBack, onCategoryChange, swipeDir }: Props) {
+export default function CategoryScreen({ lang, gender, category, onBack, onCategoryChange, swipeDir, coupleId }: Props) {
   const cfg = CATEGORY_CONFIG[category]; const { r, g, b } = cfg; const t = UI[lang];
 
   const [mounted, setMounted] = useState(false);
@@ -397,9 +398,23 @@ export default function CategoryScreen({ lang, gender, category, onBack, onCateg
   }, [isCasting, remaining, category, lang, history, t]);
 
   const handleDismiss = useCallback(() => {
+    // Track locally (always)
+    addLocalPoints(category);
+    window.dispatchEvent(new CustomEvent("touche-intimacy-updated"));
+
+    // If coupled, also report to server asynchronously
+    if (coupleId) {
+      const initData = window.Telegram?.WebApp?.initData ?? "";
+      fetch("/api/couple/tasks/complete", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "x-telegram-init-data": initData },
+        body: JSON.stringify({ category }),
+      }).catch(() => {/* ignore — local tracking already done */});
+    }
+
     setShowReveal(false);
     setTimeout(() => { setTaskText(""); setHintText(t.hint); }, 400);
-  }, [t.hint]);
+  }, [category, coupleId, t.hint]);
 
   const enterX = swipeDir === "left" ? 60 : -60;
   const height = vh ? `${vh}px` : "100dvh";

@@ -30,3 +30,13 @@ body,
 body {
   font-family: 'Plus Jakarta Sans', 'DM Sans', sans-serif;
 }
+
+@keyframes smokeRise1 {
+  0% { transform: translateY(0%); }
+  100% { transform: translateY(-50%); }
+}
+
+@keyframes smokeRise2 {
+  0% { transform: translateY(0%) scaleX(-1); }
+  100% { transform: translateY(-50%) scaleX(-1); }
+}

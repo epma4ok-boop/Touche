@@ -13,15 +13,21 @@ export function getPoints(category: Category): number {
   return rand(40,55);
 }
 
-export interface IntimacyLevel { min:number; max:number; icon:string; nameRu:string; nameEn:string; color:string; }
+/**
+ * Visual identity id for a level — rendered as custom line-art (LevelGlyph),
+ * never as an emoji. Keep in sync with LevelGlyph in IntimacyIndex.tsx.
+ */
+export type LevelIconId = "ice" | "sprout" | "sun" | "flame" | "closeness" | "deepbond" | "onesoul";
+
+export interface IntimacyLevel { min:number; max:number; iconId:LevelIconId; nameRu:string; nameEn:string; color:string; }
 export const LEVELS: IntimacyLevel[] = [
-  { min:0,    max:99,       icon:"❄️", nameRu:"Лёд",            nameEn:"Ice",          color:"rgba(130,200,255,0.85)" },
-  { min:100,  max:299,      icon:"🌱", nameRu:"Первые ростки",  nameEn:"First sparks", color:"rgba(130,220,140,0.85)" },
-  { min:300,  max:599,      icon:"☀️", nameRu:"Тепло",          nameEn:"Warmth",       color:"rgba(255,200,80,0.85)"  },
-  { min:600,  max:999,      icon:"🔥", nameRu:"Искра",          nameEn:"Spark",        color:"rgba(255,140,60,0.85)"  },
-  { min:1000, max:1499,     icon:"💕", nameRu:"Близость",       nameEn:"Closeness",    color:"rgba(255,100,160,0.85)" },
-  { min:1500, max:2499,     icon:"❤️", nameRu:"Глубокая связь", nameEn:"Deep bond",    color:"rgba(220,36,118,0.95)"  },
-  { min:2500, max:Infinity, icon:"♾️", nameRu:"Единое целое",   nameEn:"One soul",     color:"rgba(200,160,255,0.95)" },
+  { min:0,    max:99,       iconId:"ice",       nameRu:"Лёд",            nameEn:"Ice",          color:"rgba(130,200,255,0.85)" },
+  { min:100,  max:299,      iconId:"sprout",    nameRu:"Первые ростки",  nameEn:"First sparks", color:"rgba(130,220,140,0.85)" },
+  { min:300,  max:599,      iconId:"sun",       nameRu:"Тепло",          nameEn:"Warmth",       color:"rgba(255,200,80,0.85)"  },
+  { min:600,  max:999,      iconId:"flame",     nameRu:"Искра",          nameEn:"Spark",        color:"rgba(255,140,60,0.85)"  },
+  { min:1000, max:1499,     iconId:"closeness", nameRu:"Близость",       nameEn:"Closeness",    color:"rgba(255,100,160,0.85)" },
+  { min:1500, max:2499,     iconId:"deepbond",  nameRu:"Глубокая связь", nameEn:"Deep bond",    color:"rgba(220,36,118,0.95)"  },
+  { min:2500, max:Infinity, iconId:"onesoul",   nameRu:"Единое целое",   nameEn:"One soul",     color:"rgba(200,160,255,0.95)" },
 ];
 export function getLevel(score: number): IntimacyLevel {
   return LEVELS.find(l => score >= l.min && score <= l.max) ?? LEVELS[0];

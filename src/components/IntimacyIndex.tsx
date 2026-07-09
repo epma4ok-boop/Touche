@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from "react";
-import { loadLocal, getLevel, getLevelProgress, LEVELS, type IntimacyLocal } from "@/data/intimacy";
+import { loadLocal, getLevel, getLevelProgress, LEVELS, type IntimacyLocal, type LevelIconId } from "@/data/intimacy";
 import type { Lang } from "@/data/i18n";
 
 const PR = 220, PG = 36, PB = 118;
@@ -12,7 +12,8 @@ const T = {
     noStreak:"Выполните первое задание", progress:"До следующего уровня",
     maxLevel:"Высший уровень!", history:"7 дней", noHistory:"Выполните первое задание вместе",
     close:"Закрыть", today:"сег.", yesterday:"вчера", pts:"бал.",
-    decay:"−5% за пропуск дня (макс. 50 бал.)", tapHint:"нажмите для деталей",
+    decay:"−5% за пропуск дня (макс. 50 бал.)", tapHint:"нажмите, чтобы открыть категории",
+    collapseHint:"свернуть", detailsHint:"подробная статистика",
   },
   en: { title:"Intimacy Index", level:"Level",
     streak:(n:number)=>`${n} day${n===1?"":"s"} streak`,
@@ -20,7 +21,8 @@ const T = {
     noStreak:"Complete your first task", progress:"To next level",
     maxLevel:"Highest level!", history:"7 days", noHistory:"Complete your first task together",
     close:"Close", today:"today", yesterday:"yest.", pts:"pts",
-    decay:"−5% per missed day (max 50 pts)", tapHint:"tap for details",
+    decay:"−5% per missed day (max 50 pts)", tapHint:"tap to open categories",
+    collapseHint:"collapse", detailsHint:"detailed stats",
   },
 };
 function getT(lang: Lang) { return T[lang==="ru"?"ru":"en"]; }
@@ -36,6 +38,108 @@ function useCountUp(target: number, duration=900) {
     raf=requestAnimationFrame(tick); return ()=>cancelAnimationFrame(raf);
   },[target,duration]);
   return val;
+}
+
+/* ─── LevelGlyph — hand-drawn line-art per level, never emoji ───── */
+function LevelGlyph({ id, color, size=22, opacity=1, glow=false }:{ id:LevelIconId; color:string; size?:number; opacity?:number; glow?:boolean; }) {
+  const common = {
+    width: size, height: size, viewBox: "0 0 24 24", fill: "none",
+    stroke: color, strokeWidth: 1.6, strokeLinecap: "round" as const, strokeLinejoin: "round" as const,
+    style: { opacity, display: "block" as const, filter: glow ? `drop-shadow(0 0 6px ${color})` : undefined },
+  };
+  switch (id) {
+    case "ice":
+      return (
+        <svg {...common}>
+          <line x1="12" y1="2" x2="12" y2="22"/>
+          <line x1="3.5" y1="7" x2="20.5" y2="17"/>
+          <line x1="3.5" y1="17" x2="20.5" y2="7"/>
+          <path d="M12 2 L9.5 5.5 M12 2 L14.5 5.5"/>
+          <path d="M12 22 L9.5 18.5 M12 22 L14.5 18.5"/>
+          <path d="M3.5 7 L6.5 6.3 M3.5 7 L5.3 9.6"/>
+          <path d="M20.5 17 L17.5 17.7 M20.5 17 L18.7 14.4"/>
+          <path d="M3.5 17 L6.5 17.7 M3.5 17 L5.3 14.4"/>
+          <path d="M20.5 7 L17.5 6.3 M20.5 7 L18.7 9.6"/>
+        </svg>
+      );
+    case "sprout":
+      return (
+        <svg {...common}>
+          <path d="M12 21 V11"/>
+          <path d="M12 12c0-6-6-9-9-9 0 6 4 10 9 9z" fill={`${color}`} fillOpacity={0.14}/>
+          <path d="M12 10c0-5 5-8 9-8 0 5-4 9-9 8z" fill={`${color}`} fillOpacity={0.14}/>
+        </svg>
+      );
+    case "sun":
+      return (
+        <svg {...common}>
+          <circle cx="12" cy="12" r="4.6"/>
+          <line x1="12" y1="1.5" x2="12" y2="4.5"/>
+          <line x1="12" y1="19.5" x2="12" y2="22.5"/>
+          <line x1="1.5" y1="12" x2="4.5" y2="12"/>
+          <line x1="19.5" y1="12" x2="22.5" y2="12"/>
+          <line x1="4.4" y1="4.4" x2="6.5" y2="6.5"/>
+          <line x1="17.5" y1="17.5" x2="19.6" y2="19.6"/>
+          <line x1="19.6" y1="4.4" x2="17.5" y2="6.5"/>
+          <line x1="6.5" y1="17.5" x2="4.4" y2="19.6"/>
+        </svg>
+      );
+    case "flame":
+      return (
+        <svg {...common}>
+          <path d="M12 2c0 0-1.5 3-1.5 5.5C10.5 9.5 11 11 12 12c1-1 1.5-2.5 1.5-4.5 0 0 2 2.5 2 5 0 2-1 4-3.5 5.5C9.5 16.5 8 14.5 8 12.5c0-1.5.5-2.5.5-2.5S6 12.5 6 15.5C6 19 8.5 22 12 22s6-3 6-6.5C18 10 12 2 12 2z"
+            fill={color} fillOpacity={0.18} />
+        </svg>
+      );
+    case "closeness":
+      return (
+        <svg {...common}>
+          <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"
+            fill={color} fillOpacity={0.20} />
+        </svg>
+      );
+    case "deepbond":
+      return (
+        <svg {...common}>
+          <path d="M12 22s-8-4.5-8-11.8A5.6 5.6 0 0 1 8.8 4.8C10.4 4.1 12 5 12 5s1.6-.9 3.2-.2A5.6 5.6 0 0 1 20 10.2C20 17.5 12 22 12 22z"
+            fill={color} fillOpacity={0.22} />
+          <path d="M12 8.5c0 0 .8 1.2.8 2.2 0 .9-.8 1.8-.8 1.8s-.8-.9-.8-1.8c0-1 .8-2.2.8-2.2z" fill={color} stroke="none" />
+        </svg>
+      );
+    case "onesoul":
+      return (
+        <svg {...common}>
+          <circle cx="8.2" cy="12" r="5"/>
+          <circle cx="15.8" cy="12" r="5"/>
+        </svg>
+      );
+    default: return null;
+  }
+}
+
+/* ─── LevelWatermark — the "expensive" full-bleed treatment ─────── */
+function LevelWatermark({ nameRu, nameEn, lang, iconId, color }:{ nameRu:string; nameEn:string; lang:Lang; iconId:LevelIconId; color:string; }) {
+  const label = (lang==="ru" ? nameRu : nameEn).toUpperCase();
+  return (
+    <div aria-hidden style={{ position:"absolute", inset:0, overflow:"hidden", borderRadius:"inherit", pointerEvents:"none" }}>
+      {/* huge translucent type running across the whole card */}
+      <div style={{
+        position:"absolute", right:-6, bottom:-20, whiteSpace:"nowrap",
+        fontFamily:"'Plus Jakarta Sans',sans-serif", fontWeight:800, fontSize:64,
+        letterSpacing:"-0.02em", lineHeight:1, color:"transparent",
+        WebkitTextStroke:`1px ${color}55`,
+        opacity:0.5, userSelect:"none",
+      }}>
+        {label}
+      </div>
+      {/* soft drifting glyph, large and faint */}
+      <div style={{ position:"absolute", top:"6%", right:"4%", animation:"levelDrift 7s ease-in-out infinite" }}>
+        <LevelGlyph id={iconId} color={color} size={118} opacity={0.16} />
+      </div>
+      {/* ambient wash */}
+      <div style={{ position:"absolute", inset:0, background:`radial-gradient(120% 90% at 82% -10%, ${color}2e 0%, transparent 60%)` }} />
+    </div>
+  );
 }
 
 function Ring({progress,color,size=80}:{progress:number;color:string;size?:number}) {
@@ -70,6 +174,20 @@ function HistoryChart({history}:{history:IntimacyLocal["history"]}) {
   );
 }
 
+/* ─── Small line-icons used inside the modal (replace 🔥 ✓ 📉) ──── */
+function StatGlyph({ id, color=PINK, size=17 }:{ id:"streak"|"tasks"|"decay"; color?:string; size?:number }) {
+  const common = { width:size, height:size, viewBox:"0 0 24 24", fill:"none", stroke:color, strokeWidth:1.8, strokeLinecap:"round" as const, strokeLinejoin:"round" as const };
+  if (id==="streak") return (
+    <svg {...common}><path d="M12 2c0 0-1.5 3-1.5 5.5C10.5 9.5 11 11 12 12c1-1 1.5-2.5 1.5-4.5 0 0 2 2.5 2 5 0 2-1 4-3.5 5.5C9.5 16.5 8 14.5 8 12.5c0-1.5.5-2.5.5-2.5S6 12.5 6 15.5C6 19 8.5 22 12 22s6-3 6-6.5C18 10 12 2 12 2z" fill={color} fillOpacity={0.18}/></svg>
+  );
+  if (id==="tasks") return (
+    <svg {...common}><circle cx="12" cy="12" r="9"/><polyline points="8 12.5 10.8 15 16 9.5"/></svg>
+  );
+  return (
+    <svg {...common}><polyline points="4 8 10 14 14 10 20 17"/><polyline points="15 17 20 17 20 12"/></svg>
+  );
+}
+
 function IntimacyModal({lang,data,onClose}:{lang:Lang;data:IntimacyLocal;onClose:()=>void}) {
   const t=getT(lang); const lvl=getLevel(data.score); const prog=getLevelProgress(data.score);
   const nextLvl=LEVELS[LEVELS.indexOf(lvl)+1]; const score=useCountUp(data.score);
@@ -95,7 +213,7 @@ function IntimacyModal({lang,data,onClose}:{lang:Lang;data:IntimacyLocal;onClose
           <div style={{position:"relative",flexShrink:0}}>
             <Ring progress={prog} color={lvl.color} size={88}/>
             <div style={{position:"absolute",inset:0,display:"flex",alignItems:"center",justifyContent:"center"}}>
-              <span style={{fontSize:22}}>{lvl.icon}</span>
+              <LevelGlyph id={lvl.iconId} color={lvl.color} size={30} glow/>
             </div>
           </div>
           <div style={{flex:1}}>
@@ -108,23 +226,23 @@ function IntimacyModal({lang,data,onClose}:{lang:Lang;data:IntimacyLocal;onClose
         </div>
         {/* Stats */}
         <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:16}}>
-          {[{icon:"🔥",main:data.streakDays>0?t.streak(data.streakDays):t.noStreak},{icon:"✓",main:t.tasks(data.totalTasks)}].map((item,i)=>(
+          {[{id:"streak" as const,main:data.streakDays>0?t.streak(data.streakDays):t.noStreak},{id:"tasks" as const,main:t.tasks(data.totalTasks)}].map((item,i)=>(
             <div key={i} style={{padding:"13px 14px",borderRadius:16,background:`rgba(${PR},${PG},${PB},0.07)`,border:`1px solid rgba(${PR},${PG},${PB},0.14)`}}>
-              <div style={{fontSize:18,marginBottom:5}}>{item.icon}</div>
+              <div style={{marginBottom:7}}><StatGlyph id={item.id}/></div>
               <div style={{fontFamily:"'Plus Jakarta Sans',sans-serif",fontWeight:700,fontSize:13,color:"rgba(255,238,248,0.88)",lineHeight:1.35}}>{item.main}</div>
             </div>
           ))}
         </div>
         {/* Decay */}
         <div style={{marginBottom:16,padding:"10px 14px",borderRadius:14,background:"rgba(255,238,248,0.03)",border:"1px solid rgba(255,238,248,0.06)",display:"flex",alignItems:"center",gap:10}}>
-          <span style={{fontSize:15}}>📉</span>
+          <StatGlyph id="decay" color="rgba(255,238,248,0.32)" size={15}/>
           <span style={{fontFamily:"'Plus Jakarta Sans',sans-serif",fontSize:12,color:"rgba(255,238,248,0.30)",lineHeight:1.4}}>{t.decay}</span>
         </div>
         {/* Progress bar */}
         <div style={{marginBottom:20}}>
           <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}}>
             <span style={{fontFamily:"'Plus Jakarta Sans',sans-serif",fontSize:11,color:"rgba(255,238,248,0.32)",letterSpacing:"0.06em",textTransform:"uppercase"}}>{nextLvl?t.progress:t.maxLevel}</span>
-            {nextLvl&&<span style={{fontFamily:"'Plus Jakarta Sans',sans-serif",fontSize:12,color:lvl.color}}>{nextLvl.icon} {lang==="ru"?nextLvl.nameRu:nextLvl.nameEn}</span>}
+            {nextLvl&&<span style={{fontFamily:"'Plus Jakarta Sans',sans-serif",fontSize:12,color:lvl.color,display:"flex",alignItems:"center",gap:5}}><LevelGlyph id={nextLvl.iconId} color={lvl.color} size={13}/> {lang==="ru"?nextLvl.nameRu:nextLvl.nameEn}</span>}
           </div>
           <div style={{height:5,borderRadius:99,background:"rgba(255,238,248,0.07)",overflow:"hidden"}}>
             <div style={{height:"100%",borderRadius:99,width:`${Math.round(prog*100)}%`,background:`linear-gradient(90deg,rgba(${PR},${PG},${PB},0.5),${lvl.color})`,boxShadow:`0 0 8px ${lvl.color}`,transition:"width 1.2s cubic-bezier(.22,1,.36,1)"}}/>
@@ -166,7 +284,7 @@ function IntimacyModal({lang,data,onClose}:{lang:Lang;data:IntimacyLocal;onClose
               const active=getLevel(data.score)===l;
               return (
                 <div key={i} style={{display:"flex",alignItems:"center",gap:12,padding:"9px 14px",borderRadius:12,background:active?`rgba(${PR},${PG},${PB},0.12)`:"transparent",border:`1px solid ${active?`rgba(${PR},${PG},${PB},0.28)`:"transparent"}`,transition:"all .3s"}}>
-                  <span style={{fontSize:15,width:22,textAlign:"center"}}>{l.icon}</span>
+                  <div style={{width:22,display:"flex",justifyContent:"center"}}><LevelGlyph id={l.iconId} color={active?l.color:"rgba(255,238,248,0.30)"} size={16}/></div>
                   <div style={{flex:1}}>
                     <span style={{fontFamily:"'Plus Jakarta Sans',sans-serif",fontWeight:active?700:400,fontSize:13,color:active?l.color:"rgba(255,238,248,0.38)"}}>{lang==="ru"?l.nameRu:l.nameEn}</span>
                   </div>
@@ -184,11 +302,18 @@ function IntimacyModal({lang,data,onClose}:{lang:Lang;data:IntimacyLocal;onClose
   );
 }
 
-interface IntimacyIndexProps { lang:Lang; refreshKey?:number; index?:number; }
+interface IntimacyIndexProps {
+  lang: Lang;
+  refreshKey?: number;
+  index?: number;
+  /** Category cards rendered inside the index once it is opened/collapsed. */
+  children?: React.ReactNode;
+}
 
-export default function IntimacyIndex({lang,refreshKey=0,index=0}:IntimacyIndexProps) {
+export default function IntimacyIndex({lang,refreshKey=0,index=0,children}:IntimacyIndexProps) {
   const [data,setData]=useState<IntimacyLocal>(()=>loadLocal());
-  const [open,setOpen]=useState(false);
+  const [open,setOpen]=useState(false);       // false = big hero, true = compact header + categories
+  const [modalOpen,setModalOpen]=useState(false);
   const [pulse,setPulse]=useState(false);
 
   useEffect(()=>{setData(loadLocal());},[refreshKey]);
@@ -203,71 +328,118 @@ export default function IntimacyIndex({lang,refreshKey=0,index=0}:IntimacyIndexP
   const nextLvl=LEVELS[LEVELS.indexOf(lvl)+1]; const t=getT(lang);
   const rgb=lvl.color.match(/[\d.]+/g)?.slice(0,3).join(",")??`${PR},${PG},${PB}`;
 
-  const handleOpen=useCallback(()=>{
-    setOpen(true);
+  const toggle=useCallback(()=>{
+    setOpen(o=>!o);
     (window.Telegram?.WebApp as {HapticFeedback?:{impactOccurred:(s:string)=>void}})?.HapticFeedback?.impactOccurred("medium");
+  },[]);
+  const openDetails=useCallback((e:React.MouseEvent)=>{
+    e.stopPropagation();
+    setModalOpen(true);
+    (window.Telegram?.WebApp as {HapticFeedback?:{impactOccurred:(s:string)=>void}})?.HapticFeedback?.impactOccurred("light");
   },[]);
 
   return (
     <>
-      <button onClick={handleOpen} style={{
-        width:"100%",textAlign:"left",cursor:"pointer",
-        background:`linear-gradient(135deg,rgba(${rgb},0.16) 0%,rgba(${PR},${PG},${PB},0.06) 55%,rgba(0,0,0,0) 100%)`,
-        border:`1px solid rgba(${rgb},0.35)`,borderRadius:22,padding:"18px 20px 16px",
-        animation:`fadeSlideUp .42s cubic-bezier(.22,1,.36,1) ${index*55}ms both`,
+      <style>{`
+        @keyframes levelDrift {
+          0%,100% { transform: translateY(0px) rotate(0deg); }
+          50%      { transform: translateY(-8px) rotate(3deg); }
+        }
+        @keyframes categoriesIn {
+          from { opacity:0; transform:translateY(-6px); }
+          to   { opacity:1; transform:translateY(0); }
+        }
+      `}</style>
+      <div style={{
+        width:"100%", borderRadius:26, position:"relative", overflow:"hidden",
+        background:`linear-gradient(150deg,rgba(${rgb},0.17) 0%,rgba(${PR},${PG},${PB},0.06) 55%,rgba(12,6,10,0.98) 100%)`,
+        border:`1px solid rgba(${rgb},0.35)`,
         boxShadow:pulse?`0 0 44px rgba(${rgb},0.45),0 0 88px rgba(${rgb},0.18)`:`0 0 28px rgba(${rgb},0.18),0 0 56px rgba(${PR},${PG},${PB},0.07)`,
-        position:"relative",overflow:"hidden",transition:"box-shadow 0.55s ease",
+        animation:`fadeSlideUp .42s cubic-bezier(.22,1,.36,1) ${index*55}ms both`,
+        transition:"box-shadow 0.55s ease, padding .38s cubic-bezier(.22,1,.36,1)",
+        padding: open ? "16px 16px 14px" : "22px 22px 20px",
       }}>
-        {/* bg orb */}
-        <div style={{position:"absolute",top:-60,right:-40,width:200,height:200,borderRadius:"50%",background:`radial-gradient(circle,rgba(${rgb},0.20) 0%,transparent 68%)`,pointerEvents:"none",transition:"background 1s"}}/>
+        {!open && <LevelWatermark nameRu={lvl.nameRu} nameEn={lvl.nameEn} lang={lang} iconId={lvl.iconId} color={lvl.color} />}
         {/* shimmer line */}
         <div style={{position:"absolute",top:0,left:"8%",right:"8%",height:1,background:`linear-gradient(90deg,transparent,rgba(${rgb},0.72),transparent)`,pointerEvents:"none"}}/>
 
-        {/* Row 1: title + level badge */}
-        <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:12}}>
-          <span style={{fontFamily:"'Plus Jakarta Sans',sans-serif",fontSize:11,fontWeight:600,color:"rgba(255,238,248,0.40)",letterSpacing:"0.13em",textTransform:"uppercase"}}>{t.title}</span>
-          <div style={{display:"flex",alignItems:"center",gap:6,padding:"4px 11px",borderRadius:99,background:`rgba(${rgb},0.15)`,border:`1px solid rgba(${rgb},0.32)`}}>
-            <span style={{fontSize:13}}>{lvl.icon}</span>
-            <span style={{fontFamily:"'Plus Jakarta Sans',sans-serif",fontWeight:700,fontSize:12,color:lvl.color,textShadow:`0 0 10px ${lvl.color}`}}>{lang==="ru"?lvl.nameRu:lvl.nameEn}</span>
-          </div>
-        </div>
+        <button onClick={toggle} style={{ all:"unset", display:"block", width:"100%", cursor:"pointer", position:"relative", zIndex:1 }}>
+          {!open ? (
+            <>
+              {/* Row 1: title + level badge + details button */}
+              <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:14}}>
+                <span style={{fontFamily:"'Plus Jakarta Sans',sans-serif",fontSize:12,fontWeight:600,color:"rgba(255,238,248,0.42)",letterSpacing:"0.13em",textTransform:"uppercase"}}>{t.title}</span>
+                <div style={{display:"flex",alignItems:"center",gap:8}}>
+                  <div style={{display:"flex",alignItems:"center",gap:6,padding:"5px 12px",borderRadius:99,background:`rgba(${rgb},0.15)`,border:`1px solid rgba(${rgb},0.32)`}}>
+                    <LevelGlyph id={lvl.iconId} color={lvl.color} size={14} glow/>
+                    <span style={{fontFamily:"'Plus Jakarta Sans',sans-serif",fontWeight:700,fontSize:12,color:lvl.color,textShadow:`0 0 10px ${lvl.color}`}}>{lang==="ru"?lvl.nameRu:lvl.nameEn}</span>
+                  </div>
+                  <span onClick={openDetails} role="button" aria-label={t.detailsHint} style={{
+                    width:26,height:26,borderRadius:99,display:"flex",alignItems:"center",justifyContent:"center",
+                    border:"1px solid rgba(255,238,248,0.14)",background:"rgba(255,238,248,0.04)",cursor:"pointer",
+                  }}>
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="rgba(255,238,248,0.45)" strokeWidth="2.2" strokeLinecap="round"><line x1="12" y1="11" x2="12" y2="17"/><circle cx="12" cy="7.2" r="0.6" fill="rgba(255,238,248,0.45)" stroke="none"/></svg>
+                  </span>
+                </div>
+              </div>
 
-        {/* Row 2: big score + streak */}
-        <div style={{display:"flex",alignItems:"flex-end",justifyContent:"space-between",marginBottom:14}}>
-          <div style={{display:"flex",alignItems:"baseline",gap:6}}>
-            <span style={{fontFamily:"'Plus Jakarta Sans',sans-serif",fontWeight:900,fontSize:54,color:"rgba(255,238,248,0.97)",lineHeight:1,letterSpacing:"-0.04em",textShadow:`0 0 32px rgba(${rgb},0.42)`}}>{score}</span>
-            <span style={{fontFamily:"'Plus Jakarta Sans',sans-serif",fontSize:14,color:"rgba(255,238,248,0.26)",paddingBottom:4}}>{lang==="ru"?"бал.":"pts"}</span>
-          </div>
-          {data.streakDays>0?(
-            <div style={{display:"flex",flexDirection:"column",alignItems:"flex-end",gap:2,paddingBottom:4}}>
-              <span style={{fontSize:24}}>🔥</span>
-              <span style={{fontFamily:"'Plus Jakarta Sans',sans-serif",fontWeight:700,fontSize:13,color:"rgba(255,185,60,0.92)"}}>{t.streak(data.streakDays)}</span>
+              {/* Row 2: big score + streak */}
+              <div style={{display:"flex",alignItems:"flex-end",justifyContent:"space-between",marginBottom:18}}>
+                <div style={{display:"flex",alignItems:"baseline",gap:7}}>
+                  <span style={{fontFamily:"'Plus Jakarta Sans',sans-serif",fontWeight:900,fontSize:68,color:"rgba(255,238,248,0.97)",lineHeight:1,letterSpacing:"-0.04em",textShadow:`0 0 36px rgba(${rgb},0.45)`}}>{score}</span>
+                  <span style={{fontFamily:"'Plus Jakarta Sans',sans-serif",fontSize:15,color:"rgba(255,238,248,0.28)",paddingBottom:5}}>{lang==="ru"?"бал.":"pts"}</span>
+                </div>
+                {data.streakDays>0?(
+                  <div style={{display:"flex",flexDirection:"column",alignItems:"flex-end",gap:3,paddingBottom:5}}>
+                    <StatGlyph id="streak" color="rgba(255,185,60,0.92)" size={20}/>
+                    <span style={{fontFamily:"'Plus Jakarta Sans',sans-serif",fontWeight:700,fontSize:13,color:"rgba(255,185,60,0.92)"}}>{t.streak(data.streakDays)}</span>
+                  </div>
+                ):(
+                  <div style={{fontFamily:"'Plus Jakarta Sans',sans-serif",fontSize:12,color:"rgba(255,238,248,0.20)",maxWidth:110,textAlign:"right",lineHeight:1.4,paddingBottom:5}}>{t.noStreak}</div>
+                )}
+              </div>
+
+              {/* Row 3: progress bar */}
+              <div style={{marginBottom:14}}>
+                <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:6}}>
+                  <span style={{fontFamily:"'Plus Jakarta Sans',sans-serif",fontSize:11,color:"rgba(255,238,248,0.26)"}}>
+                    {nextLvl?(lang==="ru"?nextLvl.nameRu:nextLvl.nameEn):t.maxLevel}
+                  </span>
+                  <span style={{fontFamily:"'Plus Jakarta Sans',sans-serif",fontSize:11,color:"rgba(255,238,248,0.20)"}}>{nextLvl?`${data.score} / ${nextLvl.min}`:""}</span>
+                </div>
+                <div style={{height:5,borderRadius:99,background:"rgba(255,238,248,0.07)",overflow:"hidden"}}>
+                  <div style={{height:"100%",borderRadius:99,width:`${Math.round(prog*100)}%`,background:`linear-gradient(90deg,rgba(${PR},${PG},${PB},0.55),${lvl.color})`,boxShadow:`0 0 10px ${lvl.color}`,transition:"width 1.2s cubic-bezier(.22,1,.36,1)"}}/>
+                </div>
+              </div>
+
+              {/* Row 4: tap hint */}
+              <div style={{display:"flex",alignItems:"center",justifyContent:"flex-end",gap:4}}>
+                <span style={{fontFamily:"'Plus Jakarta Sans',sans-serif",fontSize:10,color:"rgba(255,238,248,0.18)",letterSpacing:"0.05em"}}>{t.tapHint}</span>
+                <svg width={10} height={10} viewBox="0 0 24 24" fill="none" stroke={`rgba(${PR},${PG},${PB},0.32)`} strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" style={{transform:"rotate(90deg)"}}><polyline points="9 18 15 12 9 6"/></svg>
+              </div>
+            </>
+          ) : (
+            <div style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+              <div style={{display:"flex",alignItems:"center",gap:10}}>
+                <LevelGlyph id={lvl.iconId} color={lvl.color} size={18} glow/>
+                <span style={{fontFamily:"'Plus Jakarta Sans',sans-serif",fontWeight:800,fontSize:22,color:"rgba(255,238,248,0.95)",letterSpacing:"-0.02em"}}>{score}</span>
+                <span style={{fontFamily:"'Plus Jakarta Sans',sans-serif",fontWeight:600,fontSize:12,color:lvl.color}}>{lang==="ru"?lvl.nameRu:lvl.nameEn}</span>
+              </div>
+              <span style={{fontFamily:"'Plus Jakarta Sans',sans-serif",fontSize:11,color:"rgba(255,238,248,0.32)",display:"flex",alignItems:"center",gap:4}}>
+                {t.collapseHint}
+                <svg width={9} height={9} viewBox="0 0 24 24" fill="none" stroke="rgba(255,238,248,0.4)" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+              </span>
             </div>
-          ):(
-            <div style={{fontFamily:"'Plus Jakarta Sans',sans-serif",fontSize:12,color:"rgba(255,238,248,0.20)",maxWidth:110,textAlign:"right",lineHeight:1.4,paddingBottom:4}}>{t.noStreak}</div>
           )}
-        </div>
+        </button>
 
-        {/* Row 3: progress bar */}
-        <div style={{marginBottom:10}}>
-          <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:6}}>
-            <span style={{fontFamily:"'Plus Jakarta Sans',sans-serif",fontSize:11,color:"rgba(255,238,248,0.26)"}}>
-              {nextLvl?`${lang==="ru"?nextLvl.nameRu:nextLvl.nameEn} ${nextLvl.icon}`:t.maxLevel}
-            </span>
-            <span style={{fontFamily:"'Plus Jakarta Sans',sans-serif",fontSize:11,color:"rgba(255,238,248,0.20)"}}>{nextLvl?`${data.score} / ${nextLvl.min}`:""}</span>
+        {open && (
+          <div style={{ marginTop:14, display:"flex", flexDirection:"column", gap:9, position:"relative", zIndex:1, animation:"categoriesIn .32s cubic-bezier(.22,1,.36,1) both" }}>
+            {children}
           </div>
-          <div style={{height:5,borderRadius:99,background:"rgba(255,238,248,0.07)",overflow:"hidden"}}>
-            <div style={{height:"100%",borderRadius:99,width:`${Math.round(prog*100)}%`,background:`linear-gradient(90deg,rgba(${PR},${PG},${PB},0.55),${lvl.color})`,boxShadow:`0 0 10px ${lvl.color}`,transition:"width 1.2s cubic-bezier(.22,1,.36,1)"}}/>
-          </div>
-        </div>
-
-        {/* Row 4: tap hint */}
-        <div style={{display:"flex",alignItems:"center",justifyContent:"flex-end",gap:4}}>
-          <span style={{fontFamily:"'Plus Jakarta Sans',sans-serif",fontSize:10,color:"rgba(255,238,248,0.16)",letterSpacing:"0.05em"}}>{t.tapHint}</span>
-          <svg width={10} height={10} viewBox="0 0 24 24" fill="none" stroke={`rgba(${PR},${PG},${PB},0.32)`} strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
-        </div>
-      </button>
-      {open&&<IntimacyModal lang={lang} data={data} onClose={()=>setOpen(false)}/>}
+        )}
+      </div>
+      {modalOpen&&<IntimacyModal lang={lang} data={data} onClose={()=>setModalOpen(false)}/>}
     </>
   );
 }

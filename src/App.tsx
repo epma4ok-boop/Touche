@@ -296,6 +296,7 @@ import { useState, useCallback, useEffect } from "react";
             onBack={handleBack}
             onCategoryChange={handleCategoryChange}
             swipeDir={swipeDir}
+            coupleId={coupleId}
           />
         )}
         {phase === "scenario"    && <ScenarioScreen lang={lang} onBack={handleBack} />}

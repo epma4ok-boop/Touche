@@ -248,8 +248,8 @@ function IntimacyModal({lang,data,onClose}:{lang:Lang;data:IntimacyLocal;onClose
             <div style={{height:"100%",borderRadius:99,width:`${Math.round(prog*100)}%`,background:`linear-gradient(90deg,rgba(${PR},${PG},${PB},0.5),${lvl.color})`,boxShadow:`0 0 8px ${lvl.color}`,transition:"width 1.2s cubic-bezier(.22,1,.36,1)"}}/>
           </div>
           {nextLvl&&<div style={{display:"flex",justifyContent:"space-between",marginTop:4}}>
-            <span style={{fontFamily:"'Plus Jakarta Sans',sans-serif",fontSize:10,color:"rgba(255,238,248,0.20)"}}>{data.score}</span>
-            <span style={{fontFamily:"'Plus Jakarta Sans',sans-serif",fontSize:10,color:"rgba(255,238,248,0.20)"}}>{nextLvl.min}</span>
+            <span style={{fontFamily:"'Plus Jakarta Sans',sans-serif",fontSize:10,color:"rgba(255,238,248,0.34)"}}>{data.score}</span>
+            <span style={{fontFamily:"'Plus Jakarta Sans',sans-serif",fontSize:10,color:"rgba(255,238,248,0.34)"}}>{nextLvl.min}</span>
           </div>}
         </div>
         {/* Chart */}
@@ -262,7 +262,7 @@ function IntimacyModal({lang,data,onClose}:{lang:Lang;data:IntimacyLocal;onClose
         {/* History list */}
         <div style={{marginBottom:18}}>
           {data.history.length===0
-            ?<div style={{textAlign:"center",padding:"22px 0",fontFamily:"'Plus Jakarta Sans',sans-serif",fontSize:13,color:"rgba(255,238,248,0.25)"}}>{t.noHistory}</div>
+            ?<div style={{textAlign:"center",padding:"22px 0",fontFamily:"'Plus Jakarta Sans',sans-serif",fontSize:13,color:"rgba(255,238,248,0.34)"}}>{t.noHistory}</div>
             :<div style={{display:"flex",flexDirection:"column",gap:7}}>
               {[...data.history].reverse().slice(0,5).map((h,i)=>{
                 const label=h.date===today?t.today:h.date===yest?t.yesterday:h.date.slice(5).replace("-",".");
@@ -288,13 +288,13 @@ function IntimacyModal({lang,data,onClose}:{lang:Lang;data:IntimacyLocal;onClose
                   <div style={{flex:1}}>
                     <span style={{fontFamily:"'Plus Jakarta Sans',sans-serif",fontWeight:active?700:400,fontSize:13,color:active?l.color:"rgba(255,238,248,0.38)"}}>{lang==="ru"?l.nameRu:l.nameEn}</span>
                   </div>
-                  <span style={{fontFamily:"'Plus Jakarta Sans',sans-serif",fontSize:11,color:"rgba(255,238,248,0.20)"}}>{l.max===Infinity?`${l.min}+`:`${l.min}–${l.max}`}</span>
+                  <span style={{fontFamily:"'Plus Jakarta Sans',sans-serif",fontSize:11,color:"rgba(255,238,248,0.34)"}}>{l.max===Infinity?`${l.min}+`:`${l.min}–${l.max}`}</span>
                 </div>
               );
             })}
           </div>
         </div>
-        <button onClick={onClose} style={{width:"100%",padding:"14px",borderRadius:16,border:"1px solid rgba(255,238,248,0.07)",background:"rgba(255,238,248,0.03)",color:"rgba(255,238,248,0.28)",fontFamily:"'Plus Jakarta Sans',sans-serif",fontWeight:500,fontSize:14,cursor:"pointer"}}>
+        <button onClick={onClose} style={{width:"100%",padding:"14px",borderRadius:16,border:"1px solid rgba(255,238,248,0.07)",background:"rgba(255,238,248,0.03)",color:"rgba(255,238,248,0.34)",fontFamily:"'Plus Jakarta Sans',sans-serif",fontWeight:500,fontSize:14,cursor:"pointer"}}>
           {t.close}
         </button>
       </div>
@@ -310,11 +310,25 @@ interface IntimacyIndexProps {
   children?: React.ReactNode;
 }
 
+/** Motion tokens — one shared rhythm for every animation in this component. */
+const MOTION_DURATION = 380;
+const MOTION_EASE = "cubic-bezier(.22,1,.36,1)";
+
+function haptic(kind: "impact" | "success", style: "light"|"medium"|"heavy" = "medium") {
+  const wa = (window as unknown as { Telegram?: { WebApp?: {
+    HapticFeedback?: { impactOccurred:(s:string)=>void; notificationOccurred?:(s:string)=>void };
+  } } }).Telegram?.WebApp;
+  if (kind === "success") wa?.HapticFeedback?.notificationOccurred?.("success");
+  else wa?.HapticFeedback?.impactOccurred(style);
+}
+
 export default function IntimacyIndex({lang,refreshKey=0,index=0,children}:IntimacyIndexProps) {
   const [data,setData]=useState<IntimacyLocal>(()=>loadLocal());
   const [open,setOpen]=useState(false);       // false = big hero, true = compact header + categories
   const [modalOpen,setModalOpen]=useState(false);
   const [pulse,setPulse]=useState(false);
+  const prevLevelRef=useRef<string|null>(null);
+  const prevMaxedRef=useRef(false);
 
   useEffect(()=>{setData(loadLocal());},[refreshKey]);
   useEffect(()=>{
@@ -328,14 +342,23 @@ export default function IntimacyIndex({lang,refreshKey=0,index=0,children}:Intim
   const nextLvl=LEVELS[LEVELS.indexOf(lvl)+1]; const t=getT(lang);
   const rgb=lvl.color.match(/[\d.]+/g)?.slice(0,3).join(",")??`${PR},${PG},${PB}`;
 
+  // Strong haptic reward on level-up, and a distinct one when the ring fills to 100% of a level.
+  useEffect(()=>{
+    if (prevLevelRef.current !== null && prevLevelRef.current !== lvl.iconId) haptic("success");
+    prevLevelRef.current = lvl.iconId;
+    const maxed = prog >= 1 && !!nextLvl;
+    if (maxed && !prevMaxedRef.current) haptic("impact","heavy");
+    prevMaxedRef.current = maxed;
+  },[lvl.iconId, prog, nextLvl]);
+
   const toggle=useCallback(()=>{
     setOpen(o=>!o);
-    (window.Telegram?.WebApp as {HapticFeedback?:{impactOccurred:(s:string)=>void}})?.HapticFeedback?.impactOccurred("medium");
+    haptic("impact","medium");
   },[]);
   const openDetails=useCallback((e:React.MouseEvent)=>{
     e.stopPropagation();
     setModalOpen(true);
-    (window.Telegram?.WebApp as {HapticFeedback?:{impactOccurred:(s:string)=>void}})?.HapticFeedback?.impactOccurred("light");
+    haptic("impact","light");
   },[]);
 
   return (
@@ -355,8 +378,8 @@ export default function IntimacyIndex({lang,refreshKey=0,index=0,children}:Intim
         background:`linear-gradient(150deg,rgba(${rgb},0.17) 0%,rgba(${PR},${PG},${PB},0.06) 55%,rgba(12,6,10,0.98) 100%)`,
         border:`1px solid rgba(${rgb},0.35)`,
         boxShadow:pulse?`0 0 44px rgba(${rgb},0.45),0 0 88px rgba(${rgb},0.18)`:`0 0 28px rgba(${rgb},0.18),0 0 56px rgba(${PR},${PG},${PB},0.07)`,
-        animation:`fadeSlideUp .42s cubic-bezier(.22,1,.36,1) ${index*55}ms both`,
-        transition:"box-shadow 0.55s ease, padding .38s cubic-bezier(.22,1,.36,1)",
+        animation:`fadeSlideUp ${MOTION_DURATION}ms ${MOTION_EASE} ${index*55}ms both`,
+        transition:`box-shadow 0.55s ease, padding ${MOTION_DURATION}ms ${MOTION_EASE}`,
         padding: open ? "16px 16px 14px" : "22px 22px 20px",
       }}>
         {!open && <LevelWatermark nameRu={lvl.nameRu} nameEn={lvl.nameEn} lang={lang} iconId={lvl.iconId} color={lvl.color} />}
@@ -395,7 +418,7 @@ export default function IntimacyIndex({lang,refreshKey=0,index=0,children}:Intim
                 </div>
                 <div style={{flex:1,display:"flex",flexDirection:"column",gap:9,minWidth:0}}>
                   <div>
-                    <div style={{fontFamily:"'Plus Jakarta Sans',sans-serif",fontSize:10,color:"rgba(255,238,248,0.24)",letterSpacing:"0.07em",textTransform:"uppercase",marginBottom:3}}>
+                    <div style={{fontFamily:"'Plus Jakarta Sans',sans-serif",fontSize:10,color:"rgba(255,238,248,0.34)",letterSpacing:"0.07em",textTransform:"uppercase",marginBottom:3}}>
                       {nextLvl?t.progress:t.maxLevel}
                     </div>
                     {nextLvl && (
@@ -404,7 +427,7 @@ export default function IntimacyIndex({lang,refreshKey=0,index=0,children}:Intim
                         <span style={{fontFamily:"'Plus Jakarta Sans',sans-serif",fontWeight:700,fontSize:14,color:"rgba(255,238,248,0.82)"}}>{lang==="ru"?nextLvl.nameRu:nextLvl.nameEn}</span>
                       </div>
                     )}
-                    {nextLvl && <div style={{fontFamily:"'Plus Jakarta Sans',sans-serif",fontSize:11,color:"rgba(255,238,248,0.20)",marginTop:2}}>{data.score} / {nextLvl.min}</div>}
+                    {nextLvl && <div style={{fontFamily:"'Plus Jakarta Sans',sans-serif",fontSize:11,color:"rgba(255,238,248,0.34)",marginTop:2}}>{data.score} / {nextLvl.min}</div>}
                   </div>
                   {data.streakDays>0?(
                     <div style={{display:"flex",alignItems:"center",gap:6}}>
@@ -412,14 +435,14 @@ export default function IntimacyIndex({lang,refreshKey=0,index=0,children}:Intim
                       <span style={{fontFamily:"'Plus Jakarta Sans',sans-serif",fontWeight:700,fontSize:12,color:"rgba(255,185,60,0.92)"}}>{t.streak(data.streakDays)}</span>
                     </div>
                   ):(
-                    <div style={{fontFamily:"'Plus Jakarta Sans',sans-serif",fontSize:11,color:"rgba(255,238,248,0.20)",lineHeight:1.4}}>{t.noStreak}</div>
+                    <div style={{fontFamily:"'Plus Jakarta Sans',sans-serif",fontSize:11,color:"rgba(255,238,248,0.34)",lineHeight:1.4}}>{t.noStreak}</div>
                   )}
                 </div>
               </div>
 
               {/* Row 4: tap hint */}
               <div style={{display:"flex",alignItems:"center",justifyContent:"flex-end",gap:4}}>
-                <span style={{fontFamily:"'Plus Jakarta Sans',sans-serif",fontSize:10,color:"rgba(255,238,248,0.18)",letterSpacing:"0.05em"}}>{t.tapHint}</span>
+                <span style={{fontFamily:"'Plus Jakarta Sans',sans-serif",fontSize:10,color:"rgba(255,238,248,0.34)",letterSpacing:"0.05em"}}>{t.tapHint}</span>
                 <svg width={10} height={10} viewBox="0 0 24 24" fill="none" stroke={`rgba(${PR},${PG},${PB},0.32)`} strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" style={{transform:"rotate(90deg)"}}><polyline points="9 18 15 12 9 6"/></svg>
               </div>
             </>
@@ -439,7 +462,7 @@ export default function IntimacyIndex({lang,refreshKey=0,index=0,children}:Intim
         </button>
 
         {open && (
-          <div style={{ marginTop:14, display:"flex", flexDirection:"column", gap:9, position:"relative", zIndex:1, animation:"categoriesIn .32s cubic-bezier(.22,1,.36,1) both" }}>
+          <div style={{ marginTop:14, display:"flex", flexDirection:"column", gap:9, position:"relative", zIndex:1, animation:`categoriesIn ${MOTION_DURATION}ms ${MOTION_EASE} both` }}>
             {children}
           </div>
         )}

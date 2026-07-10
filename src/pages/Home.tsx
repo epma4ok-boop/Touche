@@ -4,6 +4,7 @@ import { GENDER_KEY } from "@/components/GenderSelect";
 import { UI, CATEGORIES_ORDER, LANG_CYCLE, type Lang, type Category } from "@/data/i18n";
 import IntimacyIndex from "@/components/IntimacyIndex";
 import SmokeBackground from "@/components/SmokeBackground";
+import { BRAND } from "@/theme/palette";
 
 declare global {
   interface Window {
@@ -59,7 +60,7 @@ function useTelegramTopInset(): number {
 }
 
 const BG = "#0d0610";
-const PR = 220, PG = 36, PB = 118;
+const PR = BRAND.r, PG = BRAND.g, PB = BRAND.b;
 const PINK      = `rgb(${PR},${PG},${PB})`;
 const PINK_GLOW = `drop-shadow(0 0 6px rgba(${PR},${PG},${PB},1)) drop-shadow(0 0 14px rgba(${PR},${PG},${PB},0.55))`;
 

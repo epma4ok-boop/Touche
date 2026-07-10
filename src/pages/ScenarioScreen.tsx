@@ -3,6 +3,7 @@ import { type Lang, UI } from "@/data/i18n";
 import { BOT_USERNAME } from "@/config";
 import HeartbeatCanvas from "@/components/HeartbeatCanvas";
 import SmokeBackground from "@/components/SmokeBackground";
+import { SMOKE_BY_CATEGORY } from "@/theme/palette";
 
 const BG = "#0d0610";
 const TEXT_P = "rgba(255,238,248,0.88)";
@@ -164,7 +165,7 @@ function NoPartner({ lang, onInvite, onBack }: { lang: Lang; onInvite: () => voi
   const topPadding = useTelegramTopInset();
   return (
     <div style={{ position: "fixed", inset: 0, background: BG, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "0 32px" }}>
-      <SmokeBackground />
+      <SmokeBackground tint={SMOKE_BY_CATEGORY.passion} />
       <button onClick={onBack} style={{ position: "absolute", top: topPadding, left: 20, background: "transparent", border: "none", cursor: "pointer", fontFamily: "'Plus Jakarta Sans','DM Sans',sans-serif", fontWeight: 500, fontSize: 15, color: TEXT_S, padding: "4px 0" }}>{t.back}</button>
       <div style={{ position: "absolute", top: "20%", left: "50%", transform: "translateX(-50%)", width: "60vw", height: "30vw", borderRadius: "50%", background: `radial-gradient(ellipse,rgba(${r},${g},${b},0.10) 0%,transparent 70%)`, pointerEvents: "none" }} />
       <div style={{ textAlign: "center", position: "relative" }}>
@@ -366,7 +367,7 @@ export default function ScenarioScreen({ lang, onBack }: ScenarioScreenProps) {
 
   return (
     <div style={{ position: "fixed", inset: 0, background: BG, display: "flex", flexDirection: "column", overflow: "hidden", opacity: mounted ? 1 : 0, transition: "opacity .32s ease" }}>
-      <SmokeBackground />
+      <SmokeBackground tint={SMOKE_BY_CATEGORY.passion} />
       <div style={{ position: "absolute", top: "-8%", left: "50%", transform: "translateX(-50%)", width: "70vw", height: "35vw", borderRadius: "50%", background: `radial-gradient(ellipse,rgba(${meta.r},${meta.g},${meta.b},0.10) 0%,transparent 70%)`, pointerEvents: "none", transition: "background .5s" }} />
       <div style={{ display: "flex", alignItems: "center", paddingTop: topPadding, paddingLeft: 20, paddingRight: 20, paddingBottom: 6, flexShrink: 0, position: "relative", zIndex: 10 }}>
         <button onClick={onBack} style={{ background: "transparent", border: "none", cursor: "pointer", fontFamily: "'Plus Jakarta Sans','DM Sans',sans-serif", fontWeight: 500, fontSize: 15, color: TEXT_S, padding: "4px 0", minWidth: 56 }}>{t.back}</button>

@@ -1,10 +1,12 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { loadLocal, getLevel, getLevelProgress, LEVELS, type IntimacyLocal, type LevelIconId } from "@/data/intimacy";
 import type { Lang } from "@/data/i18n";
+import { BRAND } from "@/theme/palette";
 
-/* ─── Palette — muted wine/ivory/gold, boutique rather than gamified ──── */
-const INK = "20,9,14";          // near-black plum, the base of every surface
-const WINE = "110,26,46";       // deep garnet, the app's own accent (kept subtle here)
+/* ─── Palette — shares the app's own brand accent so this card reads as ──
+   part of the same system as every other card, not a separate widget. ── */
+const INK = "16,7,12";          // matches the app's card surface color exactly
+const WINE = `${BRAND.r},${BRAND.g},${BRAND.b}`; // the app's own accent, reused
 const GOLD = "196,164,112";     // warm champagne-gold hairline accent
 const IVORY = "245,235,228";    // warm off-white for type
 
@@ -387,8 +389,8 @@ export default function IntimacyIndex({lang,refreshKey=0,index=0,children}:Intim
         }
       `}</style>
       <div style={{
-        width:"100%", borderRadius:24, position:"relative", overflow:"hidden",
-        background:`linear-gradient(165deg, rgba(${WINE},0.10) 0%, rgba(${INK},1) 45%, rgba(8,3,5,1) 100%)`,
+        width:"100%", borderRadius:20, position:"relative", overflow:"hidden",
+        background:`rgba(${INK},0.97)`,
         border:`1px solid rgba(${GOLD},${pulse?0.34:0.20})`,
         boxShadow: pulse ? `0 0 0 1px rgba(${GOLD},0.12), 0 18px 40px rgba(0,0,0,0.5)` : `0 14px 32px rgba(0,0,0,0.4)`,
         animation:`fadeSlideUp ${MOTION_DURATION}ms ${MOTION_EASE} ${index*55}ms both`,

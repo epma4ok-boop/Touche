@@ -17,7 +17,7 @@ export function getPoints(category: Category): number {
  * Visual identity id for a level — rendered as custom line-art (LevelGlyph),
  * never as an emoji. Keep in sync with LevelGlyph in IntimacyIndex.tsx.
  */
-export type LevelIconId = "ice" | "sprout" | "sun" | "flame" | "closeness" | "deepbond" | "onesoul";
+export type LevelIconId = "ice" | "sprout" | "sun" | "spark" | "closeness" | "deepbond" | "onesoul";
 
 export interface IntimacyLevel { min:number; max:number; iconId:LevelIconId; nameRu:string; nameEn:string; color:string; }
 // A muted, boutique-perfume palette — desaturated and warm rather than
@@ -26,7 +26,7 @@ export const LEVELS: IntimacyLevel[] = [
   { min:0,    max:99,       iconId:"ice",       nameRu:"Лёд",            nameEn:"Ice",          color:"rgba(178,196,214,0.9)"  },
   { min:100,  max:299,      iconId:"sprout",    nameRu:"Первые ростки",  nameEn:"First sparks", color:"rgba(178,196,168,0.9)"  },
   { min:300,  max:599,      iconId:"sun",       nameRu:"Тепло",          nameEn:"Warmth",       color:"rgba(214,181,132,0.92)" },
-  { min:600,  max:999,      iconId:"flame",     nameRu:"Искра",          nameEn:"Spark",        color:"rgba(206,140,104,0.92)" },
+  { min:600,  max:999,      iconId:"spark",     nameRu:"Искра",          nameEn:"Spark",        color:"rgba(206,140,104,0.92)" },
   { min:1000, max:1499,     iconId:"closeness", nameRu:"Близость",       nameEn:"Closeness",    color:"rgba(196,118,132,0.94)" },
   { min:1500, max:2499,     iconId:"deepbond",  nameRu:"Глубокая связь", nameEn:"Deep bond",    color:"rgba(158,80,98,0.96)"   },
   { min:2500, max:Infinity, iconId:"onesoul",   nameRu:"Единое целое",   nameEn:"One soul",     color:"rgba(196,168,200,0.96)" },

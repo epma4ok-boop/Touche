@@ -5,6 +5,9 @@ export type Lang = "ru" | "en" | "hi" | "pt" | "es";
   export const ONBOARDED_KEY = "touche_onboarded";
 
   export const LANG_CYCLE: Lang[] = ["ru", "en", "hi", "pt", "es"];
+  export const LANG_LOCALE: Record<Lang, string> = {
+    ru: "ru-RU", en: "en-US", hi: "hi-IN", pt: "pt-BR", es: "es-ES",
+  };
 
   export const CATEGORIES_ORDER: Category[] = ["compliments", "tenderness", "desire", "passion", "hard"];
 
@@ -13,11 +16,11 @@ export type Lang = "ru" | "en" | "hi" | "pt" | "es";
     accent: string;
     paid: boolean;
   }> = {
-    compliments: { r: 255, g: 165, b: 80,  accent: "#ffa550", paid: false },
-    tenderness:  { r: 240, g: 100, b: 150, accent: "#f06496", paid: false },
-    desire:      { r: 200, g: 60,  b: 130, accent: "#c83c82", paid: false },
-    passion:     { r: 190, g: 20,  b: 70,  accent: "#be1446", paid: true  },
-    hard:        { r: 140, g: 10,  b: 80,  accent: "#8c0a50", paid: true  },
+     compliments: { r: 214, g: 174, b: 120, accent: "#d6ae78", paid: false },
+     tenderness:  { r: 200, g: 139, b: 155, accent: "#c88b9b", paid: false },
+     desire:      { r: 188, g: 106, b: 120, accent: "#bc6a78", paid: false },
+     passion:     { r: 172, g: 80,  b: 105, accent: "#ac5069", paid: true  },
+     hard:        { r: 143, g: 60,  b: 96,  accent: "#8f3c60", paid: true  },
   };
 
   export const UI = {

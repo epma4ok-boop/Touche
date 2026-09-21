@@ -2,6 +2,7 @@ import { useEffect, useCallback, useState } from "react";
 import type { Gender } from "@/components/GenderSelect";
 import { GENDER_KEY } from "@/components/GenderSelect";
 import { UI, CATEGORIES_ORDER, LANG_CYCLE, type Lang, type Category } from "@/data/i18n";
+import type { AppMode } from "@/App";
 import IntimacyIndex from "@/components/IntimacyIndex";
 import SmokeBackground from "@/components/SmokeBackground";
 import { BRAND } from "@/theme/palette";
@@ -11,7 +12,7 @@ declare global {
     Telegram?: { WebApp: {
       ready: () => void; expand: () => void;
       viewportHeight?: number; viewportStableHeight?: number;
-      HapticFeedback?: { impactOccurred: (s: string) => void };
+       HapticFeedback?: { impactOccurred: (s: string) => void; notificationOccurred?: (s: string) => void };
       initDataUnsafe?: { user?: { username?: string; id?: number }; start_param?: string };
       initData?: string;
       openTelegramLink?: (url: string) => void;
@@ -27,11 +28,13 @@ interface HomeProps {
   lang: Lang;
   gender?: Gender;
   coupleId: string | null;
+  mode: AppMode;
   pendingRefUserId: number | null;
   onCategorySelect: (cat: Category) => void;
   onScenarioOpen: () => void;
   onLangSwitch: () => void;
   onGenderSwitch?: (g: Gender) => void;
+  onModeChange: (mode: AppMode) => void;
   onLinkCouple: (refUserId: number) => Promise<boolean>;
   onUnlinkCouple: () => void;
 }
@@ -100,22 +103,22 @@ function NeonIcon({ type }: { type: Category | "scenarios" | "invite" }) {
           <line x1="17" y1="15" x2="9" y2="15" />
         </svg>
       );
-    // Желание — пламя
+    // Желание — орбита
     case "desire":
       return (
         <svg {...attrs} viewBox="0 0 24 24">
-          <path d="M12 2c0 0-1.5 3-1.5 5.5C10.5 9.5 11 11 12 12c1-1 1.5-2.5 1.5-4.5 0 0 2 2.5 2 5 0 2-1 4-3.5 5.5C9.5 16.5 8 14.5 8 12.5c0-1.5.5-2.5.5-2.5S6 12.5 6 15.5C6 19 8.5 22 12 22s6-3 6-6.5C18 10 12 2 12 2z"
-            fill={`rgba(${PR},${PG},${PB},0.20)`} stroke={PINK} strokeWidth="1.6" />
+          <circle cx="12" cy="12" r="7" fill={`rgba(${PR},${PG},${PB},0.12)`} />
+          <circle cx="12" cy="12" r="3.1" fill={`rgba(${PR},${PG},${PB},0.24)`} stroke={PINK} strokeWidth="1.5" />
+          <path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2" />
         </svg>
       );
-    // Страсть — две сердца / пламя больше
+    // Страсть — переплетённые орбиты
     case "passion":
       return (
         <svg {...attrs} viewBox="0 0 24 24">
-          <path d="M12 22s-8-4.5-8-11.8A5.6 5.6 0 0 1 8.8 4.8C10.4 4.1 12 5 12 5s1.6-.9 3.2-.2A5.6 5.6 0 0 1 20 10.2C20 17.5 12 22 12 22z"
-            fill={`rgba(${PR},${PG},${PB},0.20)`} stroke={PINK} strokeWidth="1.6" />
-          <path d="M12 8.5c0 0 .8 1.2.8 2.2 0 .9-.8 1.8-.8 1.8s-.8-.9-.8-1.8c0-1 .8-2.2.8-2.2z"
-            fill={PINK} stroke="none" style={{ filter: PINK_GLOW }} />
+          <ellipse cx="10" cy="12" rx="7.5" ry="4.2" transform="rotate(-28 10 12)" fill={`rgba(${PR},${PG},${PB},0.10)`} />
+          <ellipse cx="14" cy="12" rx="7.5" ry="4.2" transform="rotate(28 14 12)" fill={`rgba(${PR},${PG},${PB},0.10)`} />
+          <circle cx="12" cy="12" r="2.5" fill={PINK} stroke="none" style={{ filter: PINK_GLOW }} />
         </svg>
       );
     // Хард — молния
@@ -285,6 +288,64 @@ const INVITE_MSG: Record<Lang, string> = {
   es: "Prueba Touché — una noche especial para dos 💕",
 };
 
+const MODE_LABELS: Record<Lang, {
+  solo: string; soloSub: string; together: string; togetherSub: string; connected: string;
+}> = {
+  ru: { solo: "Один", soloSub: "только категории", together: "Вместе", togetherSub: "индекс близости", connected: "пара подключена" },
+  en: { solo: "Solo", soloSub: "categories only", together: "Together", togetherSub: "intimacy index", connected: "pair connected" },
+  hi: { solo: "अकेले", soloSub: "केवल श्रेणियां", together: "साथ में", togetherSub: "निकटता सूचकांक", connected: "जोड़ी जुड़ी है" },
+  pt: { solo: "Sozinho", soloSub: "só categorias", together: "Juntos", togetherSub: "índice de intimidade", connected: "casal conectado" },
+  es: { solo: "Solo", soloSub: "solo categorías", together: "Juntos", togetherSub: "índice de intimidad", connected: "pareja conectada" },
+};
+
+function ModeSwitcher({ lang, mode, coupleId, onChange }: {
+  lang: Lang; mode: AppMode; coupleId: string | null; onChange: (mode: AppMode) => void;
+}) {
+  const labels = MODE_LABELS[lang];
+  return (
+    <div style={{
+      display: "grid", gridTemplateColumns: "1fr 1fr", gap: 4, padding: 4,
+      borderRadius: 18, background: "rgba(255,238,248,0.045)",
+      border: `1px solid rgba(${PR},${PG},${PB},0.18)`,
+    }}>
+      {(["solo", "together"] as AppMode[]).map((item) => {
+        const active = item === mode;
+        const title = item === "solo" ? labels.solo : labels.together;
+        const subtitle = item === "solo" ? labels.soloSub : labels.togetherSub;
+        return (
+          <button key={item} onClick={() => onChange(item)} style={{
+            minHeight: 56, border: `1px solid rgba(${PR},${PG},${PB},${active ? 0.48 : 0})`,
+            borderRadius: 14, cursor: "pointer", textAlign: "left",
+            padding: "8px 12px", background: active ? `rgba(${PR},${PG},${PB},0.14)` : "transparent",
+            boxShadow: active ? `0 8px 24px rgba(${PR},${PG},${PB},0.14)` : "none",
+            transition: "all .24s ease",
+          }}>
+            <div style={{
+              display: "flex", alignItems: "center", gap: 7,
+              fontFamily: "'Plus Jakarta Sans',sans-serif", fontWeight: 700, fontSize: 14,
+              color: active ? "rgba(255,238,248,0.96)" : "rgba(255,238,248,0.42)",
+            }}>
+              <span style={{
+                width: 7, height: 7, borderRadius: "50%",
+                background: active ? PINK : "rgba(255,238,248,0.18)",
+                boxShadow: active ? `0 0 10px rgba(${PR},${PG},${PB},0.8)` : "none",
+              }} />
+              {title}
+            </div>
+            <div style={{
+              marginTop: 3, paddingLeft: 14, fontFamily: "'Plus Jakarta Sans',sans-serif",
+              fontSize: 10, color: active ? `rgba(${PR},${PG},${PB},0.76)` : "rgba(255,238,248,0.25)",
+              letterSpacing: "0.02em",
+            }}>
+              {subtitle}{item === "together" && coupleId ? ` · ${labels.connected}` : ""}
+            </div>
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
 /* ─── Couple modal labels ──────────────────────────────────────── */
 const COUPLE_LABELS: Record<Lang, {
   titleLinked: string; titleConnect: string; titlePending: string;
@@ -442,7 +503,7 @@ const SUBSCRIPTION: Record<Lang, { title: string; features: string[]; price: str
   ru: {
     title: "Touché Premium",
     features: [
-      "🔥 «Страсть» и «Хард» — откровенные задания 18+",
+      "✦ «Страсть» и «Хард» — откровенные задания 18+",
       "🎭 ИИ-сценарии — уникальные ролевые истории",
       "♾️ Безлимитные задания каждый день",
       "⚡ Приоритетная генерация",
@@ -455,7 +516,7 @@ const SUBSCRIPTION: Record<Lang, { title: string; features: string[]; price: str
   en: {
     title: "Touché Premium",
     features: [
-      "🔥 Passion & Hard — explicit 18+ tasks",
+      "✦ Passion & Hard — explicit 18+ tasks",
       "🎭 AI scenarios — unique roleplay stories",
       "♾️ Unlimited tasks every day",
       "⚡ Priority generation",
@@ -468,7 +529,7 @@ const SUBSCRIPTION: Record<Lang, { title: string; features: string[]; price: str
   hi: {
     title: "Touché Premium",
     features: [
-      "🔥 जुनून और साहसिक श्रेणियां — 18+ कार्य",
+      "✦ जुनून और साहसिक श्रेणियां — 18+ कार्य",
       "🎭 AI रोलप्ले — अनोखी कहानियां",
       "♾️ हर दिन असीमित कार्य",
       "⚡ प्राथमिकता जनरेशन",
@@ -481,7 +542,7 @@ const SUBSCRIPTION: Record<Lang, { title: string; features: string[]; price: str
   pt: {
     title: "Touché Premium",
     features: [
-      "🔥 Paixão e Intenso — tarefas 18+",
+      "✦ Paixão e Intenso — tarefas 18+",
       "🎭 Cenários de IA — histórias únicas",
       "♾️ Tarefas ilimitadas todo dia",
       "⚡ Geração prioritária",
@@ -494,7 +555,7 @@ const SUBSCRIPTION: Record<Lang, { title: string; features: string[]; price: str
   es: {
     title: "Touché Premium",
     features: [
-      "🔥 Pasión e Intenso — tareas 18+",
+      "✦ Pasión e Intenso — tareas 18+",
       "🎭 Escenarios de IA — historias únicas",
       "♾️ Tareas ilimitadas cada día",
       "⚡ Generación prioritaria",
@@ -947,8 +1008,9 @@ function MenuPanel({ lang, gender, onGenderSwitch, onClose, onLangSwitch }: { la
 
 /* ─── Home ─────────────────────────────────────────────────────── */
 export default function Home({
-  lang, gender, coupleId, pendingRefUserId,
+  lang, gender, coupleId, mode, pendingRefUserId,
   onCategorySelect, onScenarioOpen, onLangSwitch, onGenderSwitch,
+  onModeChange,
   onLinkCouple, onUnlinkCouple,
 }: HomeProps) {
   const t = UI[lang];
@@ -1010,6 +1072,43 @@ export default function Home({
 
   const nextLang = LANG_CYCLE[(LANG_CYCLE.indexOf(lang) + 1) % LANG_CYCLE.length];
 
+  const togetherCards = (
+    <>
+      <Card
+        type="tenderness"
+        title={lang === "ru" ? "Нежность" : lang === "hi" ? "कोमलता" : lang === "pt" ? "Ternura" : lang === "es" ? "Ternura" : "Tenderness"}
+        sub={lang === "ru" ? "тёплые слова · прикосновения" : "warm words · gentle touch"}
+        onClick={() => onCategorySelect(Math.random() > 0.5 ? "compliments" : "tenderness")}
+        index={0}
+      />
+      <Card type="desire" title={t.catDesire} sub={t.catDesireSub} onClick={() => onCategorySelect("desire")} index={1} />
+      <Card
+        type="passion"
+        title={lang === "ru" ? "Страсть" : lang === "hi" ? "जुनून" : lang === "pt" ? "Paixão" : lang === "es" ? "Pasión" : "Passion"}
+        sub={lang === "ru" ? "пикантно · откровенно · 18+" : "spicy · explicit · 18+"}
+        onClick={() => onCategorySelect(Math.random() > 0.5 ? "passion" : "hard")}
+        index={2}
+      />
+      <Card type="scenarios" title={SCENARIO_LABELS[lang].title} sub={SCENARIO_LABELS[lang].sub} onClick={handleScenarioClick} index={3} />
+    </>
+  );
+
+  const soloCards = (
+    <>
+      <Card type="compliments" title={t.catCompliments} sub={t.catComplimentsSub} onClick={() => onCategorySelect("compliments")} index={0} />
+      <Card type="tenderness" title={t.catTenderness} sub={t.catTendernessSub} onClick={() => onCategorySelect("tenderness")} index={1} />
+      <Card type="desire" title={t.catDesire} sub={t.catDesireSub} onClick={() => onCategorySelect("desire")} index={2} />
+      <Card
+        type="passion"
+        title={t.catPassion}
+        sub={t.catPassionSub}
+        onClick={() => onCategorySelect("passion")}
+        index={3}
+      />
+      <Card type="hard" title={t.catHard} sub={t.catHardSub} onClick={() => onCategorySelect("hard")} index={4} />
+    </>
+  );
+
   return (
     <>
       <style>{GLOBAL_STYLES}</style>
@@ -1040,7 +1139,7 @@ export default function Home({
           {/* Right controls */}
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
             {/* Couple badge */}
-            <button onClick={() => { setShowCoupleModal(true); window.Telegram?.WebApp?.HapticFeedback?.impactOccurred("light"); }} style={{
+            {mode === "together" && <button onClick={() => { setShowCoupleModal(true); window.Telegram?.WebApp?.HapticFeedback?.impactOccurred("light"); }} style={{
               background: coupleId ? "rgba(255,238,248,0.05)" : "rgba(255,238,248,0.03)",
               border: `1px solid rgba(${PR},${PG},${PB},${coupleId ? 0.38 : 0.22})`,
               borderRadius: 20, padding: "5px 10px",
@@ -1054,7 +1153,7 @@ export default function Home({
                   {t.linked}
                 </span>
               )}
-            </button>
+            </button>}
 
             {/* Lang switcher */}
             <button onClick={onLangSwitch} style={{ background: "rgba(255,238,248,.06)", border: "1px solid rgba(255,238,248,.10)", borderRadius: 14, padding: "7px 10px", fontWeight: 500, fontSize: 10, letterSpacing: "0.10em", textTransform: "uppercase" as const, color: "rgba(255,238,248,0.44)", cursor: "pointer", fontFamily: "'Plus Jakarta Sans','DM Sans',sans-serif" }}>
@@ -1063,33 +1162,20 @@ export default function Home({
           </div>
         </div>
 
+        <div style={{ padding: "8px 14px 4px", position: "relative", zIndex: 1, flexShrink: 0 }}>
+          <ModeSwitcher lang={lang} mode={mode} coupleId={coupleId} onChange={onModeChange} />
+        </div>
+
         {/* ── List ── */}
         <div style={{ flex: 1, overflowY: "auto", overflowX: "hidden", padding: `10px 14px max(28px,env(safe-area-inset-bottom))`, display: "flex", flexDirection: "column", gap: 10, position: "relative", zIndex: 1, scrollbarWidth: "none" as const }}>
-          <IntimacyIndex lang={lang} refreshKey={intimacyKey} index={0}>
-            <Card
-              type="tenderness"
-              title={lang === "ru" ? "Нежность" : lang === "hi" ? "कोमलता" : lang === "pt" ? "Ternura" : lang === "es" ? "Ternura" : "Tenderness"}
-              sub={lang === "ru" ? "тёплые слова · прикосновения" : "warm words · gentle touch"}
-              onClick={() => onCategorySelect(Math.random() > 0.5 ? "compliments" : "tenderness")}
-              index={0}
-            />
-            <Card
-              type="desire"
-              title={t.catDesire}
-              sub={t.catDesireSub}
-              onClick={() => onCategorySelect("desire")}
-              index={1}
-            />
-            <Card
-              type="passion"
-              title={lang === "ru" ? "Страсть" : lang === "hi" ? "जुनून" : lang === "pt" ? "Paixão" : lang === "es" ? "Pasión" : "Passion"}
-              sub={lang === "ru" ? "пикантно · откровенно · 18+" : "spicy · explicit · 18+"}
-              onClick={() => onCategorySelect(Math.random() > 0.5 ? "passion" : "hard")}
-              index={2}
-            />
-            <Card type="scenarios" title={SCENARIO_LABELS[lang].title} sub={SCENARIO_LABELS[lang].sub} onClick={handleScenarioClick} index={3} />
-          </IntimacyIndex>
-          <Card type="invite" title={INVITE_LABELS[lang].title} sub={INVITE_LABELS[lang].sub} onClick={handleInvite} index={5} />
+          {mode === "together" ? (
+            <IntimacyIndex lang={lang} refreshKey={intimacyKey} index={0}>{togetherCards}</IntimacyIndex>
+          ) : (
+            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+              {soloCards}
+            </div>
+          )}
+          {mode === "together" && <Card type="invite" title={INVITE_LABELS[lang].title} sub={INVITE_LABELS[lang].sub} onClick={handleInvite} index={5} />}
         </div>
       </div>
 

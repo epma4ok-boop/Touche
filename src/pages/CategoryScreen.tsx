@@ -1,5 +1,6 @@
 import { useEffect, useCallback, useState, useRef } from "react";
 import type { Gender } from "@/components/GenderSelect";
+import type { AppMode } from "@/App";
 import HeartbeatCanvas from "@/components/HeartbeatCanvas";
 import { UI, CATEGORY_CONFIG, CATEGORIES_ORDER, type Lang, type Category } from "@/data/i18n";
 import { playReveal, playDismiss } from "@/hooks/useSensualSound";
@@ -12,21 +13,6 @@ const BG = "#0d0610";
 const TEXT_P = "rgba(255,238,248,0.88)";
 const TEXT_S = "rgba(255,238,248,0.44)";
 const TEXT_T = "rgba(255,238,248,0.22)";
-
-declare global {
-  interface Window {
-    Telegram?: { WebApp: {
-      HapticFeedback?: { impactOccurred: (s: string) => void; notificationOccurred: (s: string) => void };
-      initData?: string;
-      viewportHeight?: number; viewportStableHeight?: number;
-      onEvent?: (e: string, cb: () => void) => void;
-      offEvent?: (e: string, cb: () => void) => void;
-      openInvoice?: (url: string, cb: (s: string) => void) => void;
-      safeAreaInset?: { top: number; bottom: number; left: number; right: number };
-      contentSafeAreaInset?: { top: number; bottom: number; left: number; right: number };
-    } };
-  }
-}
 
 const HISTORY_KEY = "touche_history_v2";
 const FREE_LIMIT  = 3; // tasks per day per category
@@ -302,9 +288,9 @@ function HistoryPanel({ entries, open, onClose, accentRgb, lang }: {
 }
 
 // ── Main screen ───────────────────────────────────────────────────────────────
-interface Props { lang: Lang; gender?: import("@/components/GenderSelect").Gender; category: Category; onBack: () => void; onCategoryChange: (c: Category) => void; swipeDir: "left" | "right"; coupleId?: string | null; }
+interface Props { lang: Lang; gender?: import("@/components/GenderSelect").Gender; category: Category; onBack: () => void; onCategoryChange: (c: Category) => void; swipeDir: "left" | "right"; coupleId?: string | null; mode?: AppMode; }
 
-export default function CategoryScreen({ lang, gender, category, onBack, onCategoryChange, swipeDir, coupleId }: Props) {
+export default function CategoryScreen({ lang, gender, category, onBack, onCategoryChange, swipeDir, coupleId, mode = "solo" }: Props) {
   const cfg = CATEGORY_CONFIG[category]; const { r, g, b } = cfg; const t = UI[lang];
 
   const [mounted, setMounted] = useState(false);
@@ -368,7 +354,7 @@ export default function CategoryScreen({ lang, gender, category, onBack, onCateg
     if (isCasting) return;
     const tg = window.Telegram?.WebApp;
     if (remaining <= 0) {
-      tg?.HapticFeedback?.notificationOccurred("error");
+      tg?.HapticFeedback?.notificationOccurred?.("error");
       return;
     }
     tg?.HapticFeedback?.impactOccurred("medium");
@@ -393,7 +379,7 @@ export default function CategoryScreen({ lang, gender, category, onBack, onCateg
     setTaskText(picked);
     setTaskSource(src);
     setIsCasting(false);
-    tg?.HapticFeedback?.notificationOccurred("success");
+    tg?.HapticFeedback?.notificationOccurred?.("success");
 
     if (revealTimer.current) clearTimeout(revealTimer.current);
     revealTimer.current = setTimeout(() => setShowReveal(true), 80);
@@ -434,6 +420,34 @@ export default function CategoryScreen({ lang, gender, category, onBack, onCateg
           {t.history}
         </button>
       </div>
+
+      {mode === "together" && (
+        <div style={{
+          margin: "2px 20px 10px", padding: "9px 12px", borderRadius: 13,
+          display: "flex", alignItems: "center", gap: 9,
+          background: `linear-gradient(90deg, rgba(${r},${g},${b},0.13), rgba(255,238,248,0.035))`,
+          border: `1px solid rgba(${r},${g},${b},0.22)`,
+          position: "relative", zIndex: 10,
+        }}>
+          <span style={{
+            width: 8, height: 8, borderRadius: "50%", flexShrink: 0,
+            background: `rgb(${r},${g},${b})`,
+            boxShadow: `0 0 10px rgba(${r},${g},${b},0.72)`,
+          }} />
+          <span style={{
+            fontFamily: "'Plus Jakarta Sans',sans-serif", fontSize: 11, fontWeight: 600,
+            letterSpacing: "0.02em", color: TEXT_P,
+          }}>
+            {lang === "ru" ? "Совместное задание" : lang === "hi" ? "साथ में कार्य" : lang === "pt" ? "Tarefa a dois" : lang === "es" ? "Tarea compartida" : "Shared task"}
+          </span>
+          <span style={{
+            marginLeft: "auto", fontFamily: "'Plus Jakarta Sans',sans-serif", fontSize: 10,
+            color: `rgba(${r},${g},${b},0.72)`,
+          }}>
+            {lang === "ru" ? "индекс близости" : lang === "hi" ? "निकटता सूचकांक" : lang === "pt" ? "índice de intimidade" : lang === "es" ? "índice de intimidad" : "intimacy index"}
+          </span>
+        </div>
+      )}
 
       <CategoryHeader category={category} catLabel={catLabels[category]} catSub={catSubs[category]} />
 

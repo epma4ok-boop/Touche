@@ -21,7 +21,7 @@ const T = {
     maxLevel:"Высший уровень", history:"7 дней", noHistory:"Выполните первое задание вместе",
     close:"Закрыть", today:"сег.", yesterday:"вчера", pts:"баллов",
     decay:"−5% за пропуск дня (макс. 50 бал.)", tapHint:"нажмите, чтобы открыть категории",
-    collapseHint:"свернуть", detailsHint:"подробная статистика",
+     collapseHint:"свернуть", detailsHint:"подробная статистика", shared:"режим для двоих",
   },
   en: { title:"Intimacy Index", level:"Level",
     streak:(n:number)=>`${n} day${n===1?"":"s"} streak`,
@@ -30,7 +30,7 @@ const T = {
     maxLevel:"Highest level", history:"7 days", noHistory:"Complete your first task together",
     close:"Close", today:"today", yesterday:"yest.", pts:"pts",
     decay:"−5% per missed day (max 50 pts)", tapHint:"tap to open categories",
-    collapseHint:"collapse", detailsHint:"detailed stats",
+     collapseHint:"collapse", detailsHint:"detailed stats", shared:"for two",
   },
 };
 function getT(lang: Lang) { return T[lang==="ru"?"ru":"en"]; }
@@ -104,11 +104,11 @@ function LevelGlyph({ id, color, size=22, opacity=1 }:{ id:LevelIconId; color:st
           <line x1="6.5" y1="17.5" x2="4.4" y2="19.6"/>
         </svg>
       );
-    case "flame":
+    case "spark":
       return (
         <svg {...common}>
-          <path d="M12 2c0 0-1.5 3-1.5 5.5C10.5 9.5 11 11 12 12c1-1 1.5-2.5 1.5-4.5 0 0 2 2.5 2 5 0 2-1 4-3.5 5.5C9.5 16.5 8 14.5 8 12.5c0-1.5.5-2.5.5-2.5S6 12.5 6 15.5C6 19 8.5 22 12 22s6-3 6-6.5C18 10 12 2 12 2z"
-            fill={color} fillOpacity={0.12} />
+          <path d="M12 2.8l1.7 6.1 5.8 1.1-5.8 1.2-1.7 6-1.7-6-5.8-1.2 5.8-1.1z" fill={color} fillOpacity={0.12} />
+          <circle cx="12" cy="11.2" r="1.7" fill={color} stroke="none" />
         </svg>
       );
     case "closeness":
@@ -215,7 +215,7 @@ function HistoryChart({history}:{history:IntimacyLocal["history"]}) {
 function StatGlyph({ id, color, size=17 }:{ id:"streak"|"tasks"|"decay"; color:string; size?:number }) {
   const common = { width:size, height:size, viewBox:"0 0 24 24", fill:"none", stroke:color, strokeWidth:1.2, strokeLinecap:"round" as const, strokeLinejoin:"round" as const };
   if (id==="streak") return (
-    <svg {...common}><path d="M12 2c0 0-1.5 3-1.5 5.5C10.5 9.5 11 11 12 12c1-1 1.5-2.5 1.5-4.5 0 0 2 2.5 2 5 0 2-1 4-3.5 5.5C9.5 16.5 8 14.5 8 12.5c0-1.5.5-2.5.5-2.5S6 12.5 6 15.5C6 19 8.5 22 12 22s6-3 6-6.5C18 10 12 2 12 2z" fill={color} fillOpacity={0.12}/></svg>
+    <svg {...common}><circle cx="8" cy="12" r="3.2"/><circle cx="16" cy="12" r="3.2"/><path d="M10.7 10.3l2.6 3.4M13.3 10.3l-2.6 3.4"/></svg>
   );
   if (id==="tasks") return (
     <svg {...common}><circle cx="12" cy="12" r="9"/><polyline points="8 12.5 10.8 15 16 9.5"/></svg>
@@ -404,7 +404,13 @@ export default function IntimacyIndex({lang,refreshKey=0,index=0,children}:Intim
         <button onClick={toggle} style={{ all:"unset", display:"flex", flexDirection:"column", width:"100%", height: open?"auto":"100%", cursor:"pointer", position:"relative", zIndex:1 }}>
           {!open ? (
             <>
-              <span style={{fontFamily:SANS,fontSize:11,fontWeight:600,color:`rgba(${IVORY},0.34)`,letterSpacing:"0.20em",textTransform:"uppercase",marginBottom:"auto"}}>{t.title}</span>
+               <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",gap:12,marginBottom:"auto"}}>
+                 <span style={{fontFamily:SANS,fontSize:11,fontWeight:600,color:`rgba(${IVORY},0.34)`,letterSpacing:"0.20em",textTransform:"uppercase"}}>{t.title}</span>
+                 <span style={{display:"inline-flex",alignItems:"center",gap:6,fontFamily:SANS,fontSize:9,fontWeight:600,color:`rgba(${GOLD},0.78)`,letterSpacing:"0.12em",textTransform:"uppercase"}}>
+                   <span style={{width:5,height:5,borderRadius:"50%",background:`rgb(${GOLD})`,boxShadow:`0 0 8px rgba(${GOLD},0.7)`}} />
+                   {t.shared}
+                 </span>
+               </div>
 
               {/* centerpiece: quiet ring, serif score, italic level name — no glow */}
               <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:14,margin:"22px 0 24px"}}>

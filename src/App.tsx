@@ -11,8 +11,10 @@ import { useState, useCallback, useEffect } from "react";
   import { ACTIVE_SCENARIO_KEY, type ActiveScenario } from "@/pages/ScenarioScreen";
 
   type AppPhase = "splash" | "lang" | "onboarding" | "gender" | "home" | "category" | "scenario";
+  export type AppMode = "solo" | "together";
 
   const COUPLE_ID_KEY = "touche_couple_id";
+  const MODE_KEY = "touche_mode";
 
   function getSavedLang(): Lang | null {
     try {
@@ -48,6 +50,18 @@ import { useState, useCallback, useEffect } from "react";
 
   function removeCoupleId() {
     try { localStorage.removeItem(COUPLE_ID_KEY); } catch {}
+  }
+
+  function getSavedMode(hasCouple = false): AppMode {
+    try {
+      const v = localStorage.getItem(MODE_KEY);
+      if (v === "solo" || v === "together") return v;
+    } catch {}
+    return hasCouple ? "together" : "solo";
+  }
+
+  function saveMode(mode: AppMode) {
+    try { localStorage.setItem(MODE_KEY, mode); } catch {}
   }
 
   function saveActiveScenario(s: ActiveScenario) {
@@ -137,6 +151,7 @@ import { useState, useCallback, useEffect } from "react";
     const [ageGatePending, setAgeGatePending] = useState<{ action: () => void } | null>(null);
 
     const [coupleId, setCoupleId] = useState<string | null>(getCoupleId);
+    const [mode, setMode] = useState<AppMode>(() => getSavedMode(!!getCoupleId()));
     const [pendingRefUserId, setPendingRefUserId] = useState<number | null>(null);
 
     const requireAge = useCallback((action: () => void) => {
@@ -253,6 +268,8 @@ import { useState, useCallback, useEffect } from "react";
       if (id) {
         saveCoupleId(id);
         setCoupleId(id);
+        saveMode("together");
+        setMode("together");
         setPendingRefUserId(null);
         return true;
       }
@@ -262,6 +279,13 @@ import { useState, useCallback, useEffect } from "react";
     const handleUnlinkCouple = useCallback(() => {
       removeCoupleId();
       setCoupleId(null);
+      saveMode("solo");
+      setMode("solo");
+    }, []);
+
+    const handleModeChange = useCallback((nextMode: AppMode) => {
+      saveMode(nextMode);
+      setMode(nextMode);
     }, []);
 
     return (
@@ -274,6 +298,7 @@ import { useState, useCallback, useEffect } from "react";
           <Home
             lang={lang}
             coupleId={coupleId}
+             mode={mode}
             pendingRefUserId={pendingRefUserId}
             onCategorySelect={handleCategorySelectWithAgeCheck}
             onScenarioOpen={handleScenarioOpen}
@@ -283,6 +308,7 @@ import { useState, useCallback, useEffect } from "react";
               try { localStorage.setItem(GENDER_KEY, g); } catch {}
               setGender(g);
             }}
+             onModeChange={handleModeChange}
             onLinkCouple={handleLinkCouple}
             onUnlinkCouple={handleUnlinkCouple}
           />
@@ -297,6 +323,7 @@ import { useState, useCallback, useEffect } from "react";
             onCategoryChange={handleCategoryChange}
             swipeDir={swipeDir}
             coupleId={coupleId}
+            mode={mode}
           />
         )}
         {phase === "scenario"    && <ScenarioScreen lang={lang} onBack={handleBack} />}

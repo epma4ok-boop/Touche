@@ -291,11 +291,11 @@ const INVITE_MSG: Record<Lang, string> = {
 const MODE_LABELS: Record<Lang, {
   solo: string; soloSub: string; together: string; togetherSub: string; connected: string;
 }> = {
-  ru: { solo: "Один", soloSub: "только категории", together: "Вместе", togetherSub: "индекс близости", connected: "пара подключена" },
-  en: { solo: "Solo", soloSub: "categories only", together: "Together", togetherSub: "intimacy index", connected: "pair connected" },
-  hi: { solo: "अकेले", soloSub: "केवल श्रेणियां", together: "साथ में", togetherSub: "निकटता सूचकांक", connected: "जोड़ी जुड़ी है" },
-  pt: { solo: "Sozinho", soloSub: "só categorias", together: "Juntos", togetherSub: "índice de intimidade", connected: "casal conectado" },
-  es: { solo: "Solo", soloSub: "solo categorías", together: "Juntos", togetherSub: "índice de intimidad", connected: "pareja conectada" },
+  ru: { solo: "Личный режим", soloSub: "категории по настроению", together: "Вместе", togetherSub: "для двоих", connected: "пара подключена" },
+  en: { solo: "Personal", soloSub: "choose a mood", together: "Together", togetherSub: "for two", connected: "pair connected" },
+  hi: { solo: "व्यक्तिगत", soloSub: "मूड चुनें", together: "साथ में", togetherSub: "दो के लिए", connected: "जोड़ी जुड़ी है" },
+  pt: { solo: "Pessoal", soloSub: "escolha um clima", together: "Juntos", togetherSub: "para dois", connected: "casal conectado" },
+  es: { solo: "Personal", soloSub: "elige un estado", together: "Juntos", togetherSub: "para dos", connected: "pareja conectada" },
 };
 
 function ModeSwitcher({ lang, mode, coupleId, onChange }: {
@@ -449,21 +449,21 @@ const INSTRUCTIONS: Record<Lang, { title: string; steps: { icon: string; head: s
   ru: {
     title: "Как играть",
     steps: [
-      { icon: "🔗", head: "Создайте пару",         body: "Нажмите на иконку пары в правом углу — поделитесь ссылкой с партнёром. Когда он перейдёт, нажмите «Связать пару»." },
-      { icon: "💬", head: "Выберите категорию",    body: "От нежных комплиментов до откровенных игр — выбирайте по настроению." },
-      { icon: "✋", head: "Удерживайте кнопку",    body: "Сексолог-психолог внутри создаст уникальное задание специально для вас." },
-      { icon: "💕", head: "Выполните вместе",      body: "Следуйте заданию — и ваш вечер станет незабываемым." },
-      { icon: "🎭", head: "Попробуйте сценарии",   body: "ИИ придумает ролевую историю для двоих — у каждого своя роль." },
+      { icon: "01", head: "Создайте пару",         body: "Нажмите на иконку пары в правом углу — поделитесь ссылкой с партнёром. Когда он перейдёт, нажмите «Связать пару»." },
+      { icon: "02", head: "Выберите категорию",    body: "От нежных комплиментов до откровенных игр — выбирайте по настроению." },
+      { icon: "03", head: "Удерживайте кнопку",    body: "Приложение создаст уникальное задание специально для вас." },
+      { icon: "04", head: "Выполните вместе",      body: "Следуйте заданию — и ваш вечер станет незабываемым." },
+      { icon: "05", head: "Попробуйте сценарии",   body: "ИИ придумает ролевую историю для двоих — у каждого своя роль." },
     ],
   },
   en: {
     title: "How to play",
     steps: [
-      { icon: "🔗", head: "Create a pair",          body: "Tap the couple icon in the top right — share your link with your partner. When they open it, tap 'Connect pair'." },
-      { icon: "💬", head: "Choose a category",      body: "From gentle compliments to bold games — pick what suits your mood." },
-      { icon: "✋", head: "Hold the button",         body: "An AI sex therapist inside crafts a unique task just for you two." },
-      { icon: "💕", head: "Do it together",         body: "Follow the task — and your evening becomes unforgettable." },
-      { icon: "🎭", head: "Try scenarios",          body: "AI creates a roleplay story for two — each of you gets your own role." },
+      { icon: "01", head: "Create a pair",          body: "Tap the couple icon in the top right — share your link with your partner. When they open it, tap 'Connect pair'." },
+      { icon: "02", head: "Choose a category",      body: "From gentle compliments to bold games — pick what suits your mood." },
+      { icon: "03", head: "Hold the button",         body: "The app crafts a unique task just for you two." },
+      { icon: "04", head: "Do it together",         body: "Follow the task — and your evening becomes unforgettable." },
+      { icon: "05", head: "Try scenarios",          body: "AI creates a roleplay story for two — each of you gets your own role." },
     ],
   },
   hi: {
@@ -683,7 +683,7 @@ function CoupleModal({ lang, coupleId, pendingRefUserId, onLink, onUnlink, onClo
     return (
       <BottomSheet>
         <div style={{ textAlign: "center", marginBottom: 20 }}>
-          <div style={{ fontSize: 42, marginBottom: 10 }}>💑</div>
+          <div style={{ width: 42, height: 42, borderRadius: "50%", border: `1px solid rgba(${PR},${PG},${PB},.5)`, color: PINK, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 10px", fontSize: 12, fontWeight: 700 }}>2×</div>
           <div style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", fontWeight: 700, fontSize: 20, color: "rgba(255,238,248,0.95)", marginBottom: 6 }}>
             {hasPending ? lb.titlePending : lb.titleConnect}
           </div>
@@ -767,7 +767,7 @@ function ScenarioGate({ lang, onConnect, onSkip }: { lang: Lang; onConnect: () =
   return (
     <BottomSheet>
       <div style={{ textAlign: "center", marginBottom: 22 }}>
-        <div style={{ fontSize: 38, marginBottom: 10 }}>🎭</div>
+        <div style={{ width: 42, height: 42, borderRadius: 14, border: `1px solid rgba(${PR},${PG},${PB},.5)`, color: PINK, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 10px", fontSize: 12, fontWeight: 700 }}>SC</div>
         <div style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", fontWeight: 700, fontSize: 20, color: "rgba(255,238,248,0.95)", marginBottom: 8 }}>{t.title}</div>
         <div style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", fontSize: 13, color: "rgba(255,238,248,0.42)", lineHeight: 1.55 }}>{t.body}</div>
       </div>
@@ -830,7 +830,7 @@ function MenuPanel({ lang, gender, onGenderSwitch, onClose, onLangSwitch }: { la
                 border: `1.5px solid rgba(${PR},${PG},${PB},0.32)`,
                 boxShadow: `0 0 12px rgba(${PR},${PG},${PB},0.18)`,
                 display: "flex", alignItems: "center", justifyContent: "center",
-                fontSize: 17, flexShrink: 0,
+                fontSize: 11, fontWeight: 700, letterSpacing: "0.08em", flexShrink: 0,
               }}>{step.icon}</div>
               {i < instr.steps.length - 1 && (
                 <div style={{ width: 1.5, height: 20, background: `linear-gradient(to bottom,rgba(${PR},${PG},${PB},0.28),transparent)`, marginTop: 4 }} />
@@ -1074,22 +1074,12 @@ export default function Home({
 
   const togetherCards = (
     <>
-      <Card
-        type="tenderness"
-        title={lang === "ru" ? "Нежность" : lang === "hi" ? "कोमलता" : lang === "pt" ? "Ternura" : lang === "es" ? "Ternura" : "Tenderness"}
-        sub={lang === "ru" ? "тёплые слова · прикосновения" : "warm words · gentle touch"}
-        onClick={() => onCategorySelect(Math.random() > 0.5 ? "compliments" : "tenderness")}
-        index={0}
-      />
-      <Card type="desire" title={t.catDesire} sub={t.catDesireSub} onClick={() => onCategorySelect("desire")} index={1} />
-      <Card
-        type="passion"
-        title={lang === "ru" ? "Страсть" : lang === "hi" ? "जुनून" : lang === "pt" ? "Paixão" : lang === "es" ? "Pasión" : "Passion"}
-        sub={lang === "ru" ? "пикантно · откровенно · 18+" : "spicy · explicit · 18+"}
-        onClick={() => onCategorySelect(Math.random() > 0.5 ? "passion" : "hard")}
-        index={2}
-      />
-      <Card type="scenarios" title={SCENARIO_LABELS[lang].title} sub={SCENARIO_LABELS[lang].sub} onClick={handleScenarioClick} index={3} />
+      <Card type="compliments" title={t.catCompliments} sub={t.catComplimentsSub} onClick={() => onCategorySelect("compliments")} index={0} />
+      <Card type="tenderness" title={t.catTenderness} sub={t.catTendernessSub} onClick={() => onCategorySelect("tenderness")} index={1} />
+      <Card type="desire" title={t.catDesire} sub={t.catDesireSub} onClick={() => onCategorySelect("desire")} index={2} />
+      <Card type="passion" title={t.catPassion} sub={t.catPassionSub} onClick={() => onCategorySelect("passion")} index={3} />
+      <Card type="hard" title={t.catHard} sub={t.catHardSub} onClick={() => onCategorySelect("hard")} index={4} />
+      <Card type="scenarios" title={SCENARIO_LABELS[lang].title} sub={SCENARIO_LABELS[lang].sub} onClick={handleScenarioClick} index={5} />
     </>
   );
 
@@ -1168,13 +1158,10 @@ export default function Home({
 
         {/* ── List ── */}
         <div style={{ flex: 1, overflowY: "auto", overflowX: "hidden", padding: `10px 14px max(28px,env(safe-area-inset-bottom))`, display: "flex", flexDirection: "column", gap: 10, position: "relative", zIndex: 1, scrollbarWidth: "none" as const }}>
-          {mode === "together" ? (
-            <IntimacyIndex lang={lang} refreshKey={intimacyKey} index={0}>{togetherCards}</IntimacyIndex>
-          ) : (
-            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-              {soloCards}
-            </div>
-          )}
+          {mode === "together" && <IntimacyIndex lang={lang} refreshKey={intimacyKey} index={0} />}
+          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            {mode === "together" ? togetherCards : soloCards}
+          </div>
           {mode === "together" && <Card type="invite" title={INVITE_LABELS[lang].title} sub={INVITE_LABELS[lang].sub} onClick={handleInvite} index={5} />}
         </div>
       </div>

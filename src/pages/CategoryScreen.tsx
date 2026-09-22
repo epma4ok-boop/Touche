@@ -149,10 +149,10 @@ function wrapText(ctx: CanvasRenderingContext2D, text: string, maxWidth: number)
   return lines;
 }
 
-function TaskReveal({ text, color, visible, onDismiss, lang, catLabel, source, topPadding }: {
+function TaskReveal({ text, color, visible, onDismiss, onGenerateAgain, lang, catLabel, source, topPadding }: {
   text: string; color: { r: number; g: number; b: number };
   visible: boolean; onDismiss: () => void; lang: Lang; catLabel: string;
-  source?: "ai" | "fallback"; topPadding: string;
+  source?: "ai" | "fallback"; topPadding: string; onGenerateAgain: () => void;
 }) {
   const { r, g, b } = color; const t = UI[lang];
   const [textVisible, setTextVisible] = useState(false);
@@ -252,7 +252,10 @@ function TaskReveal({ text, color, visible, onDismiss, lang, catLabel, source, t
         )}
       </div>
       <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: `0 28px max(28px,env(safe-area-inset-bottom))`, opacity: textVisible ? 1 : 0, transform: textVisible ? "translateY(0)" : "translateY(12px)", transition: "opacity .5s ease .35s,transform .5s ease .35s", display: "flex", flexDirection: "column", gap: 10 }}>
-        <button onClick={handleShare} disabled={sharing} style={{ width: "100%", padding: "15px 8px", borderRadius: 18, background: "rgba(255,255,255,.10)", border: "1px solid rgba(255,255,255,.22)", cursor: sharing ? "default" : "pointer", fontFamily: "'Plus Jakarta Sans',sans-serif", fontWeight: 400, fontSize: 14, letterSpacing: "0.02em", color: "rgba(255,255,255,0.75)", backdropFilter: "blur(8px)", opacity: sharing ? 0.5 : 1 }}>{sharing ? "..." : t.share}</button>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+          <button onClick={onGenerateAgain} style={{ width: "100%", padding: "15px 8px", borderRadius: 18, background: "rgba(255,255,255,.10)", border: "1px solid rgba(255,255,255,.22)", cursor: "pointer", fontFamily: "'Plus Jakarta Sans',sans-serif", fontWeight: 400, fontSize: 13, color: "rgba(255,255,255,0.78)", backdropFilter: "blur(8px)" }}>{t.taskAgain}</button>
+          <button onClick={handleShare} disabled={sharing} style={{ width: "100%", padding: "15px 8px", borderRadius: 18, background: "rgba(255,255,255,.10)", border: "1px solid rgba(255,255,255,.22)", cursor: sharing ? "default" : "pointer", fontFamily: "'Plus Jakarta Sans',sans-serif", fontWeight: 400, fontSize: 13, color: "rgba(255,255,255,0.75)", backdropFilter: "blur(8px)", opacity: sharing ? 0.5 : 1 }}>{sharing ? "..." : t.share}</button>
+        </div>
         <button onClick={onDismiss} style={{ width: "100%", padding: "18px 8px", borderRadius: 18, background: "rgba(255,255,255,.18)", border: "1px solid rgba(255,255,255,.32)", cursor: "pointer", fontFamily: "'Plus Jakarta Sans',sans-serif", fontWeight: 500, fontSize: 16, letterSpacing: "0.02em", color: "#ffffff", backdropFilter: "blur(8px)" }}>{t.taskDone}</button>
       </div>
       <div style={{ position: "absolute", top: "-15%", right: "-20%", width: "55vw", height: "55vw", borderRadius: "50%", background: "rgba(255,255,255,.06)", pointerEvents: "none" }} />
@@ -438,13 +441,7 @@ export default function CategoryScreen({ lang, gender, category, onBack, onCateg
             fontFamily: "'Plus Jakarta Sans',sans-serif", fontSize: 11, fontWeight: 600,
             letterSpacing: "0.02em", color: TEXT_P,
           }}>
-            {lang === "ru" ? "Совместное задание" : lang === "hi" ? "साथ में कार्य" : lang === "pt" ? "Tarefa a dois" : lang === "es" ? "Tarea compartida" : "Shared task"}
-          </span>
-          <span style={{
-            marginLeft: "auto", fontFamily: "'Plus Jakarta Sans',sans-serif", fontSize: 10,
-            color: `rgba(${r},${g},${b},0.72)`,
-          }}>
-            {lang === "ru" ? "индекс близости" : lang === "hi" ? "निकटता सूचकांक" : lang === "pt" ? "índice de intimidade" : lang === "es" ? "índice de intimidad" : "intimacy index"}
+            {t.sharedTask}
           </span>
         </div>
       )}
@@ -471,14 +468,14 @@ export default function CategoryScreen({ lang, gender, category, onBack, onCateg
 
       <div style={{ flexShrink: 0, position: "relative", zIndex: 10, paddingBottom: 6 }}>
         <CategoryDots current={category} onDotPress={goToCategory} />
-        <p style={{ textAlign: "center", fontFamily: "'Plus Jakarta Sans',sans-serif", fontWeight: 400, fontSize: 11, letterSpacing: "0.16em", textTransform: "uppercase", color: TEXT_T, margin: "6px 0 0" }}>{t.swipeHint}</p>
+         <p style={{ textAlign: "center", fontFamily: "'Plus Jakarta Sans',sans-serif", fontWeight: 400, fontSize: 11, letterSpacing: "0.12em", textTransform: "uppercase", color: TEXT_T, margin: "6px 0 0" }}>{t.holdHint}</p>
       </div>
 
       <div style={{ display: "flex", justifyContent: "center", alignItems: "center", padding: `8px 20px max(16px,env(safe-area-inset-bottom))`, flexShrink: 0, position: "relative", zIndex: 10 }}>
         <span style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", fontWeight: 300, fontSize: 11, letterSpacing: "0.14em", textTransform: "uppercase", color: TEXT_T }}>touché</span>
       </div>
 
-      <TaskReveal text={taskText} color={cfg} visible={showReveal} onDismiss={handleDismiss} lang={lang} catLabel={catLabels[category]} source={taskSource} topPadding={topPadding} />
+       <TaskReveal text={taskText} color={cfg} visible={showReveal} onDismiss={handleDismiss} onGenerateAgain={() => { setShowReveal(false); setTimeout(handleHoldComplete, 120); }} lang={lang} catLabel={catLabels[category]} source={taskSource} topPadding={topPadding} />
       <HistoryPanel entries={history.filter(e => e.category === category)} open={historyOpen} onClose={() => setHistoryOpen(false)} accentRgb={cfg} lang={lang} />
     </div>
   );

@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { playHeartbeat } from "@/hooks/useSensualSound";
 
-interface Props { onDone: () => void; linkStatus?: "idle"|"linking"|"linked"|"error"; }
+interface Props { onDone: () => void; linkStatus?: "idle"|"linking"|"linked"|"error"; skipDelay?: boolean; }
 
 function ECGLine({ visible }: { visible: boolean }) {
   const ref = useRef<HTMLCanvasElement>(null);
@@ -57,7 +57,7 @@ function ECGLine({ visible }: { visible: boolean }) {
   return <canvas ref={ref} width={280} height={56} style={{width:280,height:56,opacity:visible?1:0,transition:"opacity .5s"}}/>;
 }
 
-export default function SplashScreen({ onDone, linkStatus="idle" }: Props) {
+export default function SplashScreen({ onDone, linkStatus="idle", skipDelay=false }: Props) {
   const [phase, setPhase] = useState<"enter"|"show"|"exit">("enter");
   const [ecgVisible, setEcgVisible] = useState(false);
   const doneCalled = useRef(false);
@@ -66,10 +66,10 @@ export default function SplashScreen({ onDone, linkStatus="idle" }: Props) {
     const t1 = setTimeout(()=>setPhase("show"), 60);
     const t2 = setTimeout(()=>{ playHeartbeat(false); setEcgVisible(true); }, 480);
     const isLinking = linkStatus==="linking";
-    const t3 = setTimeout(()=>setPhase("exit"),  isLinking ? 99999 : 3000);
-    const t4 = setTimeout(()=>{ if(!doneCalled.current){doneCalled.current=true;onDone();} }, isLinking ? 99999 : 3450);
+    const t3 = setTimeout(()=>setPhase("exit"),  isLinking ? 99999 : skipDelay ? 450 : 3000);
+    const t4 = setTimeout(()=>{ if(!doneCalled.current){doneCalled.current=true;onDone();} }, isLinking ? 99999 : skipDelay ? 700 : 3450);
     return ()=>{ clearTimeout(t1);clearTimeout(t2);clearTimeout(t3);clearTimeout(t4); };
-  }, []);
+  }, [skipDelay]);
 
   useEffect(() => {
     if ((linkStatus==="linked"||linkStatus==="error") && !doneCalled.current) {
@@ -83,7 +83,7 @@ export default function SplashScreen({ onDone, linkStatus="idle" }: Props) {
 
   const statusMsg =
     linkStatus==="linking" ? "Соединяем пару…" :
-    linkStatus==="linked"  ? "Пара соединена 💕" :
+    linkStatus==="linked"  ? "Пара соединена" :
     linkStatus==="error"   ? "Попробуй позже" : "";
 
   return (
@@ -134,7 +134,7 @@ export default function SplashScreen({ onDone, linkStatus="idle" }: Props) {
 
         {/* App name */}
         <div style={{textAlign:"center",zIndex:2}}>
-          <p style={{
+              <p style={{
             fontFamily:"'Plus Jakarta Sans',sans-serif",fontWeight:700,fontSize:44,
             letterSpacing:"-0.038em",color:"rgba(255,238,246,.97)",
             margin:0,lineHeight:1,
@@ -155,7 +155,7 @@ export default function SplashScreen({ onDone, linkStatus="idle" }: Props) {
               letterSpacing:"0.05em",
               color:linkStatus==="linked"?"rgba(220,140,170,.95)":"rgba(210,120,150,.60)",
               margin:0,transition:"color .4s",
-            }}>{statusMsg}</p>
+            }}>{statusMsg.replace(" 💕", "")}</p>
           ) : (
             <ECGLine visible={ecgVisible}/>
           )}

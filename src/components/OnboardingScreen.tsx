@@ -19,19 +19,24 @@ import { UI, type Lang } from "@/data/i18n";
           alignItems: "center",
           justifyContent: "center",
           padding: "32px 24px",
-          gap: "32px",
+          gap: "26px",
         }}
       >
         {/* Logo */}
         <div style={{ textAlign: "center" }}>
           <div
             style={{
-              fontSize: "72px",
-              lineHeight: 1,
-              marginBottom: "8px",
+              width: 64,
+              height: 64,
+              borderRadius: "50%",
+              border: "1px solid rgba(210,92,126,.58)",
+              background: "radial-gradient(circle, rgba(188,46,74,.24), rgba(188,46,74,.04) 68%)",
+              boxShadow: "0 0 28px rgba(188,46,74,.18)",
+              margin: "0 auto 16px",
+              position: "relative",
             }}
           >
-            💫
+            <span style={{ position: "absolute", left: "50%", top: "50%", width: 22, height: 22, border: "1px solid rgba(255,238,248,.8)", borderRadius: "50%", transform: "translate(-50%,-50%)" }} />
           </div>
           <div
             style={{

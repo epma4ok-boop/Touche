@@ -341,7 +341,7 @@ interface IntimacyIndexProps {
 
 export default function IntimacyIndex({lang,refreshKey=0,index=0,children}:IntimacyIndexProps) {
   const [data,setData]=useState<IntimacyLocal>(()=>loadLocal());
-  const [open,setOpen]=useState(false);       // false = big hero, true = compact header + categories
+  const [open,setOpen]=useState(true);        // compact secondary status card; details open in a modal
   const [modalOpen,setModalOpen]=useState(false);
   const [pulse,setPulse]=useState(false);
   const prevLevelRef=useRef<string|null>(null);
@@ -367,8 +367,8 @@ export default function IntimacyIndex({lang,refreshKey=0,index=0,children}:Intim
   },[lvl.iconId, prog, nextLvl]);
 
   const toggle=useCallback(()=>{
-    setOpen(o=>!o);
-    haptic("impact","medium");
+    setOpen(true);
+    haptic("impact","light");
   },[]);
   const openDetails=useCallback((e:React.MouseEvent)=>{
     e.stopPropagation();
@@ -395,13 +395,13 @@ export default function IntimacyIndex({lang,refreshKey=0,index=0,children}:Intim
         boxShadow: pulse ? `0 0 0 1px rgba(${GOLD},0.12), 0 18px 40px rgba(0,0,0,0.5)` : `0 14px 32px rgba(0,0,0,0.4)`,
         animation:`fadeSlideUp ${MOTION_DURATION}ms ${MOTION_EASE} ${index*55}ms both`,
         transition:`box-shadow 0.6s ease, border-color 0.6s ease, padding ${MOTION_DURATION}ms ${MOTION_EASE}, min-height ${MOTION_DURATION}ms ${MOTION_EASE}`,
-        padding: open ? "18px 18px 16px" : "30px 26px 26px",
-        minHeight: open ? "auto" : 300,
+         padding: "14px 16px",
+         minHeight: "auto",
       }}>
         {!open && <LevelWatermark nameRu={lvl.nameRu} nameEn={lvl.nameEn} lang={lang} iconId={lvl.iconId} color={lvl.color} />}
         <div style={{position:"absolute",top:0,left:"14%",right:"14%",height:1,background:`linear-gradient(90deg,transparent,rgba(${GOLD},0.32),transparent)`,pointerEvents:"none"}}/>
 
-        <button onClick={toggle} style={{ all:"unset", display:"flex", flexDirection:"column", width:"100%", height: open?"auto":"100%", cursor:"pointer", position:"relative", zIndex:1 }}>
+         <button onClick={toggle} style={{ all:"unset", display:"flex", flexDirection:"column", width:"100%", cursor:"pointer", position:"relative", zIndex:1 }}>
           {!open ? (
             <>
                <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",gap:12,marginBottom:"auto"}}>
@@ -462,16 +462,21 @@ export default function IntimacyIndex({lang,refreshKey=0,index=0,children}:Intim
               </div>
             </>
           ) : (
-            <div style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}>
-              <div style={{display:"flex",alignItems:"center",gap:10}}>
+            <div style={{display:"flex",alignItems:"center",gap:12}}>
+              <div style={{display:"flex",alignItems:"center",gap:8,minWidth:86}}>
                 <LevelGlyph id={lvl.iconId} color={lvl.color} size={16} opacity={0.85}/>
                 <span style={{fontFamily:SERIF,fontWeight:600,fontSize:22,color:`rgba(${IVORY},0.95)`}}>{score}</span>
-                <span style={{fontFamily:SERIF,fontStyle:"italic",fontWeight:600,fontSize:13,color:lvl.color}}>{lang==="ru"?lvl.nameRu:lvl.nameEn}</span>
               </div>
-              <span style={{fontFamily:SANS,fontSize:10,color:`rgba(${IVORY},0.32)`,display:"flex",alignItems:"center",gap:4}}>
-                {t.collapseHint}
-                <svg width={8} height={8} viewBox="0 0 24 24" fill="none" stroke={`rgba(${IVORY},0.4)`} strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
-              </span>
+              <div style={{flex:1,minWidth:0}}>
+                <div style={{fontFamily:SERIF,fontStyle:"italic",fontWeight:600,fontSize:14,color:lvl.color}}>{lang==="ru"?lvl.nameRu:lvl.nameEn}</div>
+                <div style={{height:3,borderRadius:99,background:`rgba(${IVORY},0.08)`,overflow:"hidden",marginTop:7}}>
+                  <div style={{height:"100%",width:`${Math.round(prog*100)}%`,background:`rgb(${GOLD})`,borderRadius:99}}/>
+                </div>
+              </div>
+              <div style={{textAlign:"right",flexShrink:0}}>
+                <div style={{fontFamily:SANS,fontSize:10,color:`rgba(${GOLD},0.82)`}}>{data.streakDays > 0 ? t.streak(data.streakDays) : t.noStreak}</div>
+                <span onClick={openDetails} role="button" aria-label={t.detailsHint} style={{fontFamily:SANS,fontSize:10,color:`rgba(${IVORY},0.40)`,textDecoration:"underline",textUnderlineOffset:3,cursor:"pointer"}}>{t.detailsHint}</span>
+              </div>
             </div>
           )}
         </button>

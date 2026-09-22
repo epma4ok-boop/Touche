@@ -4,7 +4,7 @@ import { useState, useCallback, useEffect } from "react";
   import ScenarioScreen from "@/pages/ScenarioScreen";
   import SplashScreen from "@/components/SplashScreen";
   import LanguageSelect from "@/components/LanguageSelect";
-  import GenderSelect, { type Gender, GENDER_KEY } from "@/components/GenderSelect";
+import { type Gender, GENDER_KEY } from "@/components/GenderSelect";
   import AgeGate, { isAgeConfirmed } from "@/components/AgeGate";
   import OnboardingScreen from "@/components/OnboardingScreen";
   import { LANG_KEY, ONBOARDED_KEY, CATEGORIES_ORDER, LANG_CYCLE, type Lang, type Category } from "@/data/i18n";
@@ -145,7 +145,7 @@ import { useState, useCallback, useEffect } from "react";
 
     const [phase, setPhase] = useState<AppPhase>("splash");
     const [lang, setLang] = useState<Lang>("ru");
-    const [gender, setGender] = useState<Gender>("female");
+  const [gender, setGender] = useState<Gender | undefined>(getSavedGender() ?? undefined);
     const [activeCategory, setActiveCategory] = useState<Category>("compliments");
     const [swipeDir, setSwipeDir] = useState<"left" | "right">("left");
     const [ageGatePending, setAgeGatePending] = useState<{ action: () => void } | null>(null);
@@ -197,12 +197,8 @@ import { useState, useCallback, useEffect } from "react";
 
       if (savedLang) {
         setLang(savedLang);
-        if (savedGender) {
-          setGender(savedGender);
-          setPhase("home");
-        } else {
-          setPhase("gender");
-        }
+        if (savedGender) setGender(savedGender);
+        setPhase("home");
       } else {
         setPhase("lang");
       }
@@ -211,16 +207,13 @@ import { useState, useCallback, useEffect } from "react";
     const handleLangSelect = useCallback((chosen: Lang) => {
       try { localStorage.setItem(LANG_KEY, chosen); } catch {}
       setLang(chosen);
-      if (!isOnboarded()) {
-        setPhase("onboarding");
-      } else {
-        setPhase("gender");
-      }
+      if (!isOnboarded()) setPhase("onboarding");
+      else setPhase("home");
     }, []);
 
     const handleOnboardingDone = useCallback(() => {
       markOnboarded();
-      setPhase("gender");
+      setPhase("home");
     }, []);
 
     const handleGenderSelect = useCallback((chosen: Gender) => {
@@ -290,10 +283,9 @@ import { useState, useCallback, useEffect } from "react";
 
     return (
       <>
-        {phase === "splash"      && <SplashScreen onDone={handleSplashDone} linkStatus="idle" />}
+        {phase === "splash"      && <SplashScreen onDone={handleSplashDone} linkStatus="idle" skipDelay={!!getSavedLang() && isOnboarded()} />}
         {phase === "lang"        && <LanguageSelect onSelect={handleLangSelect} />}
         {phase === "onboarding"  && <OnboardingScreen lang={lang} onDone={handleOnboardingDone} />}
-        {phase === "gender"      && <GenderSelect lang={lang} onSelect={handleGenderSelect} />}
         {phase === "home"        && (
           <Home
             lang={lang}

@@ -8,6 +8,9 @@
   --text-tertiary: rgba(255, 238, 248, 0.22);
   --border: rgba(255, 255, 255, 0.07);
   --divider: rgba(255, 255, 255, 0.05);
+  --accent-wine: #bc2e4a;
+  --accent-champagne: #c4a470;
+  --focus-ring: rgba(224, 146, 169, 0.82);
 }
 
 * {
@@ -29,6 +32,20 @@ body,
 
 body {
   font-family: 'Plus Jakarta Sans', 'DM Sans', sans-serif;
+}
+
+button:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 
 @keyframes smokeRise1 {

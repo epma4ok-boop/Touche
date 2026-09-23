@@ -26,19 +26,18 @@ function getInitData(): string {
 }
 
 type TaskResult = { task: string; taskId: string | null; remaining?: number; source?: "ai" | "fallback" };
-type TaskError = { kind: "unauthorized" | "subscription_required" | "limit_exceeded" | "rate_limited" | "unknown"; message?: string };
+type TaskError = { kind: "unauthorized" | "subscription_required" | "limit_exceeded" | "rate_limited" | "timeout" | "unknown"; message?: string };
 
 async function generateAITask(category: Category, lang: Lang, gender: Gender | undefined, mode: AppMode, coupleId: string | null): Promise<{ result?: TaskResult; error?: TaskError }> {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 25_000);
   try {
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 8000);
     const res = await fetch("/api/tasks/generate", {
       method: "POST",
       headers: { "Content-Type": "application/json", "x-telegram-init-data": getInitData() },
       body: JSON.stringify({ category, lang, gender, mode, coupleId }),
       signal: controller.signal,
     });
-    clearTimeout(timeout);
     if (!res.ok) {
       const body = await res.json().catch(() => ({}));
       const kind = res.status === 401 ? "unauthorized"
@@ -50,8 +49,10 @@ async function generateAITask(category: Category, lang: Lang, gender: Gender | u
     const data = await res.json();
     if (!data.task) return { error: { kind: "unknown" } };
     return { result: { task: data.task, taskId: data.taskId ?? null, remaining: data.remaining, source: data.source ?? "ai" } };
-  } catch {
-    return { error: { kind: "unknown" } };
+  } catch (error) {
+    return { error: { kind: error instanceof Error && error.name === "AbortError" ? "timeout" : "unknown" } };
+  } finally {
+    clearTimeout(timeout);
   }
 }
 
@@ -277,6 +278,7 @@ export default function CategoryScreen({ lang, gender, category, onBack, onCateg
   const [remaining, setRemaining] = useState<number | null>(null);
   const [taskId, setTaskId] = useState<string | null>(null);
   const [errorKind, setErrorKind] = useState<TaskError["kind"] | null>(null);
+  const [generatedErrorCode, setGeneratedErrorCode] = useState<string | null>(null);
   const [isCasting, setIsCasting] = useState(false);
   const [taskText, setTaskText] = useState("");
   const [taskSource, setTaskSource] = useState<"ai" | "fallback">("fallback");
@@ -294,6 +296,7 @@ export default function CategoryScreen({ lang, gender, category, onBack, onCateg
     limit_exceeded: lang === "ru" ? "Лимит на сегодня закончился." : "Today's limit is used.",
     rate_limited: lang === "ru" ? "Слишком много запросов. Попробуйте чуть позже." : "Too many requests. Try again shortly.",
     unauthorized: lang === "ru" ? "Откройте приложение из Telegram заново." : "Please reopen the app from Telegram.",
+    timeout: lang === "ru" ? "Сервер отвечает слишком долго. Попробуйте ещё раз." : "The server took too long. Please try again.",
     unknown: lang === "ru" ? "Не удалось получить задание. Попробуйте ещё раз." : "Could not get a task. Try again.",
   } as const;
 
@@ -340,9 +343,11 @@ export default function CategoryScreen({ lang, gender, category, onBack, onCateg
     setIsCasting(true);
     setHintText(t.tapping);
     setErrorKind(null);
+    setGeneratedErrorCode(null);
     const generated = await generateAITask(category, lang, gender, mode, coupleId ?? null);
     if (!generated.result) {
       setErrorKind(generated.error?.kind ?? "unknown");
+      setGeneratedErrorCode(generated.error?.message ?? null);
       setIsCasting(false);
       setHintText(t.hint);
       tg?.HapticFeedback?.notificationOccurred?.("error");
@@ -457,7 +462,7 @@ export default function CategoryScreen({ lang, gender, category, onBack, onCateg
             background: "rgba(22,10,20,.92)", border: `1px solid rgba(${r},${g},${b},.36)`,
             boxShadow: `0 14px 36px rgba(0,0,0,.28)`, textAlign: "center",
           }}>
-            <div style={{ color: TEXT_P, fontSize: 14, lineHeight: 1.45 }}>{errorCopy[errorKind]}</div>
+            <div style={{ color: TEXT_P, fontSize: 14, lineHeight: 1.45 }}>{errorCopy[errorKind]}{errorKind === "unknown" && generatedErrorCode ? ` (${generatedErrorCode})` : ""}</div>
             {errorKind === "subscription_required" && onUpgrade && (
               <button onClick={onUpgrade} style={{ marginTop: 12, minHeight: 44, padding: "10px 18px", borderRadius: 12, border: "none", background: `rgb(${r},${g},${b})`, color: "#fff", fontWeight: 700, cursor: "pointer" }}>
                 {lang === "ru" ? "Открыть Premium" : "Open Premium"}

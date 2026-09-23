@@ -3,7 +3,9 @@
 .pop-home * { box-sizing: border-box; }
 
 .pop-home {
-  background: var(--pop-paper) !important;
+  background: radial-gradient(ellipse 330px 260px at 92% 18%, rgba(255,160,167,.2),transparent 78%),
+              radial-gradient(ellipse 300px 300px at -20% 85%,rgba(120,24,61,.06),transparent 80%),
+              var(--pop-paper) !important;
   color: var(--pop-ink) !important;
   font-family: "DM Sans", sans-serif !important;
 }
@@ -59,15 +61,23 @@
 .pop-home-hero__orb {
   position: absolute; top: 30px; right: 4px; width: 70px; height: 70px;
   display: grid; place-items: center; border: 2px solid var(--pop-ink);
-  border-radius: 44% 56% 58% 42%; background: var(--pop-yellow);
-  transform: rotate(17deg); font: 700 38px "Space Grotesk", sans-serif;
+  border-radius: 44% 56% 58% 42%;
+  background: linear-gradient(140deg, #d44770, var(--pop-wine));
+  color: #fff; box-shadow: 5px 6px 0 rgba(120,24,61,.18);
+  transform: rotate(17deg); font: 700 43px/1 "Space Grotesk", sans-serif;
+  animation: pop-heart-beat 2.8s ease-in-out infinite;
+}
+@keyframes pop-heart-beat {
+  0%, 38%, 55%, 100% { transform: rotate(17deg) scale(1); }
+  45% { transform: rotate(17deg) scale(1.07); }
+  60% { transform: rotate(17deg) scale(1.035); }
 }
 .pop-home-hero h1 {
   margin: 17px 0 8px; max-width: 310px;
   font: 700 clamp(40px, 11vw, 52px)/.91 "Space Grotesk", sans-serif;
   letter-spacing: -.075em;
 }
-.pop-home-hero h1 span { color: var(--pop-coral); }
+.pop-home-hero h1 span { color: var(--pop-wine); }
 .pop-home-hero p { max-width: 280px; margin: 0; color: var(--pop-muted); font-size: 13px; line-height: 1.42; }
 .pop-home .pop-list > * { flex-shrink: 0; }
 
@@ -110,9 +120,9 @@
 .pop-home .pop-card:active { transform: translateY(2px) !important; box-shadow: none !important; }
 .pop-home .pop-card-compliments { background: var(--pop-yellow) !important; }
 .pop-home .pop-card-tenderness { background: var(--pop-blue) !important; color: #fff !important; }
-.pop-home .pop-card-desire { background: #fff !important; }
-.pop-home .pop-card-passion { background: var(--pop-coral) !important; color: #fff !important; }
-.pop-home .pop-card-hard { background: var(--pop-ink) !important; color: #fff !important; }
+.pop-home .pop-card-desire { background: var(--pop-blush) !important; }
+.pop-home .pop-card-passion { background: linear-gradient(145deg,#ff766c,#c22c63) !important; color: #fff !important; }
+.pop-home .pop-card-hard { background: var(--pop-plum) !important; color: #fff !important; }
 .pop-home .pop-card-scenarios,
 .pop-home .pop-card-invite { background: var(--pop-lime) !important; color: var(--pop-ink) !important; }
 .pop-home .pop-card > div:nth-child(-n+5) { display: none !important; }
@@ -155,6 +165,10 @@
 .pop-home .pop-card-hard::before { content: "05"; }
 .pop-home .pop-card-scenarios::before { content: "06 · FOR TWO"; }
 .pop-home .pop-card-invite::before { content: "SHARE"; }
+.pop-home .pop-card-desire::after {
+  content:"♡"; position:absolute; top:10px; right:13px; color:var(--pop-wine);
+  font:400 26px/1 "Space Grotesk",sans-serif; opacity:.5; pointer-events:none;
+}
 
 /* Sheets / dialogs */
 .pop-home ~ .pop-overlay, .pop-overlay {
@@ -206,6 +220,9 @@
   border: 2px solid var(--pop-ink) !important; box-shadow: 3px 3px 0 var(--pop-ink) !important;
 }
 .pop-menu-detail [style*="rgba(255, 238, 248"] { color: var(--pop-ink) !important; }
+@media (prefers-reduced-motion: reduce) {
+  .pop-home-hero__orb { animation: none; }
+}
 
 @media (max-width: 767px) {
   .pop-home .pop-header { padding-left: 14px !important; padding-right: 14px !important; }

@@ -68,7 +68,7 @@ function NoPartner({ lang, onInvite, onBack }: { lang: Lang; onInvite: () => voi
   const t = T[lang]; const top = useTelegramTopInset();
   return <main className="scenario-pop no-partner" style={{ paddingTop: top }}>
     <button className="pop-back" style={{ top }} onClick={onBack} data-testid="button-scenarios-back">{t.back}</button>
-    <div className="no-partner-art" aria-hidden="true"><span>2</span></div>
+    <div className="no-partner-art" aria-hidden="true"><span>♥</span></div>
     <div className="no-partner-copy"><span className="pop-eyebrow">{t.title}</span><h1>{t.noPartner}</h1><p>{t.noPartnerSub}</p><button className="pop-primary" onClick={onInvite} data-testid="button-invite-partner">{t.invite}<b>→</b></button></div>
   </main>;
 }
@@ -107,7 +107,7 @@ export default function ScenarioScreen({ lang, gender, onBack, onUpgrade }: Scen
   const tone = INTENSITY_META[intensity].tone;
   return <main className={`scenario-pop scenario-main ${tone}`} style={{ paddingTop: topPadding, opacity: mounted ? 1 : 0 }}>
     <header className="scenario-header"><button className="pop-back" onClick={onBack} data-testid="button-scenarios-back">{t.back}</button><div className="scenario-brand">Touch<em>é</em></div><span className="premium-tag">PREMIUM</span></header>
-    <section className="scenario-intro"><span className="pop-stamp">{SCENARIO_STAMP[lang]}</span><h1>{t.title}</h1><p>{t.sub}</p><div className="scenario-orb" aria-hidden="true">2</div></section>
+    <section className="scenario-intro"><span className="pop-stamp">{SCENARIO_STAMP[lang]}</span><h1>{t.title}</h1><p>{t.sub}</p><div className="scenario-orb" aria-hidden="true">♥</div></section>
     <IntensitySelector value={intensity} onChange={setIntensity} lang={lang} />
     {intensity !== "romantic" && <p className="adult-note" data-testid="text-adult-notice">{SCENARIO_COPY[lang].adult}</p>}
     <div className="heartbeat-stage"><HeartbeatCanvas onHoldComplete={handleHoldComplete} isCasting={isCasting} color={intensity === "romantic" ? { r: 255, g: 212, b: 93 } : intensity === "passion" ? { r: 255, g: 111, b: 97 } : { r: 62, g: 91, b: 255 }} hintText={hintText} holdDuration={2600} baseRScale={0.28} bgColor="#fffaf3" /></div>

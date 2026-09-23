@@ -10,11 +10,11 @@ import { BOT_USERNAME } from "@/config";
 import "./HomePop.css";
 
 const HERO_COPY: Record<Lang, { first: string; last: string; sub: string }> = {
-  ru: { first: "Поймайте", last: "свой вайб.", sub: "Выберите настроение — мы превратим его в один маленький момент для вас." },
-  en: { first: "Find", last: "your vibe.", sub: "Pick a mood. We'll turn it into a moment just for you." },
-  hi: { first: "अपना", last: "मूड चुनें.", sub: "एक मूड चुनें और इस पल को अपना बनाएं।" },
-  pt: { first: "Encontre", last: "seu clima.", sub: "Escolha um clima e transforme-o em um momento só seu." },
-  es: { first: "Encuentra", last: "tu vibra.", sub: "Elige un ánimo y conviértelo en un momento para ustedes." },
+  ru: { first: "Поймайте", last: "свой вайб.", sub: "Выберите настроение. Всё остальное — только между вами." },
+  en: { first: "Find", last: "your vibe.", sub: "Pick a mood. The rest stays between you two." },
+  hi: { first: "अपना", last: "मूड चुनें.", sub: "मूड चुनें। बाकी सब सिर्फ़ आप दोनों के बीच रहे।" },
+  pt: { first: "Encontre", last: "seu clima.", sub: "Escolha um clima. O resto fica só entre vocês." },
+  es: { first: "Encuentra", last: "tu vibra.", sub: "Elige un ánimo. Lo demás queda entre ustedes." },
 };
 
 declare global {
@@ -455,6 +455,7 @@ const MENU_LABELS: Record<Lang, { menu: string; instructions: string; subscripti
   pt: { menu: "Menu", instructions: "Como jogar", subscription: "Premium", language: "Idioma", about: "Sobre o app", gender: "Gênero", genderM: "Homem", genderF: "Mulher" },
   es: { menu: "Menú", instructions: "Cómo jugar", subscription: "Premium", language: "Idioma", about: "Sobre la app", gender: "Género", genderM: "Hombre", genderF: "Mujer" },
 };
+
 
 /* ─── Instructions content ─────────────────────────────────────── */
 const INSTRUCTIONS: Record<Lang, { title: string; steps: { icon: string; head: string; body: string }[] }> = {
@@ -1226,7 +1227,7 @@ export default function Home({
 
         <section className="pop-home-hero" aria-label={t.chooseNow}>
           <span className="pop-home-hero__stamp">{lang === "ru" ? "ДЛЯ ДВОИХ · 18+" : t.lockSub}</span>
-          <span className="pop-home-hero__orb" aria-hidden="true">2</span>
+          <span className="pop-home-hero__orb" aria-hidden="true">♥</span>
           <h1>{HERO_COPY[lang].first}<br /><span>{HERO_COPY[lang].last}</span></h1>
           <p>{HERO_COPY[lang].sub}</p>
         </section>

@@ -9,8 +9,11 @@
 
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { validateTelegramInitData } from "../couple/_auth.js";
+import { appDate } from "../limits.js";
 
-const BOT_TOKEN = process.env.BOT_TOKEN!;
+const BOT_TOKEN = process.env.BOT_TOKEN;
+const CATEGORIES = new Set(["compliments", "tenderness", "desire", "passion", "hard"]);
+const LANGS = new Set(["ru", "en", "hi", "pt", "es"]);
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   res.setHeader("Access-Control-Allow-Origin", "https://t.me");
@@ -20,11 +23,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
 
   const initData = req.headers["x-telegram-init-data"] as string;
+  if (!BOT_TOKEN) return res.status(503).json({ error: "service_unconfigured" });
   const caller = validateTelegramInitData(initData, BOT_TOKEN);
   if (!caller) return res.status(401).json({ error: "Unauthorized" });
 
   const { category, lang = "ru" } = req.body as { category: string; lang?: string };
-  if (!category) return res.status(400).json({ error: "category required" });
+  if (!CATEGORIES.has(category) || !LANGS.has(lang)) return res.status(400).json({ error: "invalid_product" });
 
   const isEn = lang === "en";
 
@@ -38,11 +42,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           ? "Three more AI-generated tasks in this category today"
           : "Три дополнительных ИИ-задания в этой категории сегодня",
         payload: JSON.stringify({
-          userId: caller.id,
+          version: 1, userId: caller.id,
           type: "bonus_tasks",
           category,
           count: 3,
-          date: new Date().toISOString().slice(0, 10),
+          date: appDate(),
         }),
         provider_token: "",
         currency: "XTR",

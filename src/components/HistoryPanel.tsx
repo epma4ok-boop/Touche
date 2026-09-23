@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import { UI, CATEGORY_CONFIG, LANG_LOCALE, type Lang, type Category } from "@/data/i18n";
+import "./SupportPop.css";
 
 export type HistoryEntry = {
   id: string;
@@ -61,8 +62,8 @@ export default function HistoryPanel({ entries, open, onClose, accentRgb, lang }
 
   return (
     <>
-      <div style={{ position:"absolute",inset:0,zIndex:20,background:"rgba(0,0,0,0.20)",opacity:open?1:0,pointerEvents:open?"auto":"none",transition:"opacity 0.35s",backdropFilter:open?"blur(4px)":"none" }} onClick={onClose} />
-      <div ref={panelRef} style={{ position:"absolute",bottom:0,left:0,right:0,zIndex:25,maxHeight:"72vh",borderRadius:"22px 22px 0 0",background:"rgba(255,252,248,0.99)",backdropFilter:"blur(32px)",borderTop:`1px solid rgba(${r},${g},${b},0.15)`,boxShadow:`0 -12px 50px rgba(0,0,0,0.08)`,transform:open?"translateY(0)":"translateY(110%)",transition:"transform 0.42s cubic-bezier(0.32,0.72,0,1)",display:"flex",flexDirection:"column" }}>
+      <div data-testid="history-backdrop" style={{ position:"absolute",inset:0,zIndex:20,background:"rgba(22,34,56,0.22)",opacity:open?1:0,pointerEvents:open?"auto":"none",transition:"opacity 0.35s",backdropFilter:open?"blur(4px)":"none" }} onClick={onClose} />
+      <div ref={panelRef} data-testid="panel-history" className="pop-panel" style={{ position:"absolute",bottom:0,left:0,right:0,zIndex:25,maxHeight:"72vh",borderRadius:"22px 22px 0 0",background:"var(--pop-paper)",borderTop:`2px solid rgba(${r},${g},${b},0.35)`,boxShadow:"0 -8px 0 rgba(255,111,97,.22)",transform:open?"translateY(0)":"translateY(110%)",transition:"transform 0.42s cubic-bezier(0.32,0.72,0,1)",display:"flex",flexDirection:"column" }}>
         <div style={{ display:"flex",justifyContent:"center",paddingTop:12,paddingBottom:4 }}>
           <div style={{ width:34,height:3,borderRadius:99,background:`rgba(${r},${g},${b},0.18)` }} />
         </div>
@@ -71,7 +72,7 @@ export default function HistoryPanel({ entries, open, onClose, accentRgb, lang }
             <span style={{ fontFamily:"'Plus Jakarta Sans','DM Sans',sans-serif",fontWeight:700,fontSize:20,color:"rgba(40,30,50,0.85)",letterSpacing:"-0.02em" }}>{t.history}</span>
             <span style={{ fontFamily:"'Plus Jakarta Sans','DM Sans',sans-serif",fontWeight:300,fontSize:11,color:`rgba(${r},${g},${b},0.55)`,letterSpacing:"0.10em",textTransform:"uppercase",marginLeft:10 }}>{t.historyCount(entries.length)}</span>
           </div>
-          <button onClick={onClose} style={{ background:"transparent",border:"none",cursor:"pointer",fontFamily:"'Plus Jakarta Sans','DM Sans',sans-serif",fontWeight:400,fontSize:12,letterSpacing:"0.10em",textTransform:"uppercase",color:"rgba(40,30,50,0.30)" }}>{t.panelClose}</button>
+          <button data-testid="button-history-close" onClick={onClose} style={{ background:"transparent",border:"none",cursor:"pointer",fontFamily:"'DM Sans',sans-serif",fontWeight:700,fontSize:12,letterSpacing:"0.10em",textTransform:"uppercase",color:"var(--pop-coral)" }}>{t.panelClose}</button>
         </div>
         <div style={{ overflowY:"auto",flex:1,paddingBottom:24 }}>
           {entries.length === 0 ? (

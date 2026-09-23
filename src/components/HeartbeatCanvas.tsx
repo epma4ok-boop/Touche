@@ -122,56 +122,61 @@ export default function HeartbeatCanvas({
       const beatPeriod = 60 / bpm;
       const t2 = now / 1000;
       const beatPhase = (t2 % beatPeriod) / beatPeriod;
-      const beatEnv = beatPhase < 0.09
-        ? beatPhase / 0.09
-        : Math.max(0, 1 - (beatPhase - 0.09) / 0.52);
+      const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      const beatEnv = reduceMotion ? 0 : beatPhase < 0.10
+        ? beatPhase / 0.10
+        : beatPhase < 0.20
+          ? 1 - (beatPhase - 0.10) / 0.10
+          : beatPhase < 0.29
+            ? (beatPhase - 0.20) / 0.09 * 0.65
+            : Math.max(0, 0.65 * (1 - (beatPhase - 0.29) / 0.18));
 
       if (burstRef.current > 0) burstRef.current = Math.max(0, burstRef.current - 0.04);
       const burst = burstRef.current;
 
       const baseR = Math.min(w, h) * baseRScale;
-      const ringCount = 6;
+      const ringCount = 4;
 
       for (let i = ringCount - 1; i >= 0; i--) {
         const ringPhase = i / ringCount;
-        const spreadPhase = ((t2 / beatPeriod - ringPhase) % 1 + 1) % 1;
+        const spreadPhase = reduceMotion ? 0.55 : ((t2 / beatPeriod - ringPhase) % 1 + 1) % 1;
         const maxRing = baseR + (i + 1) * (Math.min(w, h) * 0.090) + holdProgress * Math.min(w, h) * 0.065;
         const minRing = baseR * (0.75 - i * 0.04);
         const radius = minRing + spreadPhase * (maxRing - minRing);
 
         // ── Кольца: базовая непрозрачность увеличена для яркости ──
-        const baseAlpha = (1 - spreadPhase) * (0.68 + holdProgress * 0.42) * (1 + beatEnv * 0.60);
-        const alpha = Math.min(0.98, baseAlpha + burst * (1 - spreadPhase) * 0.65);
+        const baseAlpha = (1 - spreadPhase) * (0.38 + holdProgress * 0.28) * (1 + beatEnv * 0.30);
+        const alpha = Math.min(0.76, baseAlpha + burst * (1 - spreadPhase) * 0.40);
 
         ctx.beginPath();
         ctx.arc(cx, cy, radius, 0, Math.PI * 2);
         ctx.strokeStyle = `rgba(${r},${g},${b},${alpha})`;
-        ctx.lineWidth = (1.8 + holdProgress * 2.2 + beatEnv * 1.4) * (1 - i * 0.07);
+        ctx.lineWidth = (1.5 + holdProgress * 1.5 + beatEnv * 0.7) * (1 - i * 0.07);
         ctx.stroke();
       }
 
-      // ── Glow: базовая непрозрачность увеличена ──
-      const glowR = baseR * (0.9 + beatEnv * 0.22 + holdProgress * 0.38 + burst * 0.50);
-      const glow = ctx.createRadialGradient(cx, cy, 0, cx, cy, glowR);
-      const ga = 0.42 + holdProgress * 0.42 + beatEnv * 0.20 + burst * 0.40;
-      glow.addColorStop(0, `rgba(${r},${g},${b},${ga})`);
-      glow.addColorStop(0.5, `rgba(${r},${g},${b},${ga * 0.35})`);
-      glow.addColorStop(1, `rgba(${r},${g},${b},0)`);
-      ctx.fillStyle = glow;
+      // A double-beating heart replaces the old glowing dot. The pointer
+      // handlers still belong to the canvas wrapper, so holding works as before.
+      const pulse = reduceMotion ? 0 : beatEnv;
+      const heartSize = Math.min(w, h) * 0.23;
+      ctx.save();
+      ctx.translate(cx, cy - heartSize * 0.08);
+      ctx.scale(1 + pulse * 0.13 + holdProgress * 0.07 + burst * 0.12,
+                1 + pulse * 0.13 + holdProgress * 0.07 + burst * 0.12);
       ctx.beginPath();
-      ctx.arc(cx, cy, glowR, 0, Math.PI * 2);
+      ctx.moveTo(0, heartSize * 0.78);
+      ctx.bezierCurveTo(-heartSize * 0.86, heartSize * 0.26, -heartSize * 0.85, -heartSize * 0.55, -heartSize * 0.35, -heartSize * 0.55);
+      ctx.bezierCurveTo(-heartSize * 0.11, -heartSize * 0.55, 0, -heartSize * 0.38, 0, -heartSize * 0.27);
+      ctx.bezierCurveTo(0, -heartSize * 0.38, heartSize * 0.11, -heartSize * 0.55, heartSize * 0.35, -heartSize * 0.55);
+      ctx.bezierCurveTo(heartSize * 0.85, -heartSize * 0.55, heartSize * 0.86, heartSize * 0.26, 0, heartSize * 0.78);
+      ctx.closePath();
+      ctx.fillStyle = `rgb(${r},${g},${b})`;
+      ctx.strokeStyle = "#162238";
+      ctx.lineWidth = 2.5;
+      ctx.lineJoin = "round";
       ctx.fill();
-
-      // ── Центральная точка ──
-      const dotR = baseR * (0.28 + beatEnv * 0.09 + holdProgress * 0.11 + burst * 0.20);
-      const dotG = ctx.createRadialGradient(cx, cy, 0, cx, cy, dotR);
-      dotG.addColorStop(0, `rgba(${r},${g},${b},${Math.min(1, 0.92 + holdProgress * 0.08 + beatEnv * 0.10)})`);
-      dotG.addColorStop(0.6, `rgba(${r},${g},${b},${0.62 + holdProgress * 0.25})`);
-      dotG.addColorStop(1, `rgba(${r},${g},${b},0)`);
-      ctx.fillStyle = dotG;
-      ctx.beginPath();
-      ctx.arc(cx, cy, dotR, 0, Math.PI * 2);
-      ctx.fill();
+      ctx.stroke();
+      ctx.restore();
 
       if (holdActiveRef.current && holdProgress > 0 && holdProgress < 1) {
         const arcR = baseR * 0.52;
@@ -196,8 +201,8 @@ export default function HeartbeatCanvas({
         ctx.save();
         ctx.globalAlpha = hintAlpha;
         const fs = Math.min(26, Math.max(18, w * 0.057));
-        ctx.font = `600 ${fs}px 'Plus Jakarta Sans','DM Sans',sans-serif`;
-        ctx.fillStyle = `rgba(${r},${g},${b},1)`;
+        ctx.font = `700 ${fs}px 'Space Grotesk','DM Sans',sans-serif`;
+        ctx.fillStyle = "#162238";
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
         ctx.fillText(hintRef.current.toUpperCase(), cx, cy + Math.min(w, h) * 0.38);

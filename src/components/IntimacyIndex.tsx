@@ -1,17 +1,15 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { loadLocal, getLevel, getLevelProgress, LEVELS, type IntimacyLocal, type LevelIconId } from "@/data/intimacy";
 import type { Lang } from "@/data/i18n";
-import { BRAND } from "@/theme/palette";
 
 /* ─── Palette — shares the app's own brand accent so this card reads as ──
    part of the same system as every other card, not a separate widget. ── */
-const INK = "16,7,12";          // matches the app's card surface color exactly
-const WINE = `${BRAND.r},${BRAND.g},${BRAND.b}`; // the app's own accent, reused
-const GOLD = "196,164,112";     // warm champagne-gold hairline accent
-const IVORY = "245,235,228";    // warm off-white for type
+const INK = "255,250,243";      // shared paper surface
+const GOLD = "255,111,97";       // coral accent
+const IVORY = "22,34,56";        // ink for type
 
-const SERIF = "'Cormorant Garamond', 'Times New Roman', serif";
-const SANS = "'Plus Jakarta Sans', sans-serif";
+const SERIF = "'Space Grotesk', 'DM Sans', sans-serif";
+const SANS = "'DM Sans', sans-serif";
 
 const T = {
   ru: { title:"Индекс близости", level:"Уровень",
@@ -323,7 +321,7 @@ function IntimacyModal({lang,data,onClose}:{lang:Lang;data:IntimacyLocal;onClose
             })}
           </div>
         </div>
-        <button onClick={onClose} style={{width:"100%",padding:"14px",borderRadius:14,border:`1px solid rgba(${IVORY},0.08)`,background:`rgba(${IVORY},0.02)`,color:`rgba(${IVORY},0.34)`,fontFamily:SANS,fontWeight:500,fontSize:14,cursor:"pointer"}}>
+        <button data-testid="button-intimacy-close" onClick={onClose} style={{width:"100%",padding:"14px",borderRadius:14,border:`2px solid rgba(${IVORY},0.18)`,background:"transparent",color:`rgba(${IVORY},0.64)`,fontFamily:SANS,fontWeight:700,fontSize:14,cursor:"pointer"}}>
           {t.close}
         </button>
       </div>
@@ -401,7 +399,7 @@ export default function IntimacyIndex({lang,refreshKey=0,index=0,children}:Intim
         {!open && <LevelWatermark nameRu={lvl.nameRu} nameEn={lvl.nameEn} lang={lang} iconId={lvl.iconId} color={lvl.color} />}
         <div style={{position:"absolute",top:0,left:"14%",right:"14%",height:1,background:`linear-gradient(90deg,transparent,rgba(${GOLD},0.32),transparent)`,pointerEvents:"none"}}/>
 
-         <button onClick={toggle} style={{ all:"unset", display:"flex", flexDirection:"column", width:"100%", cursor:"pointer", position:"relative", zIndex:1 }}>
+         <button data-testid="button-intimacy-toggle" onClick={toggle} style={{ all:"unset", display:"flex", flexDirection:"column", width:"100%", cursor:"pointer", position:"relative", zIndex:1 }}>
           {!open ? (
             <>
                <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",gap:12,marginBottom:"auto"}}>

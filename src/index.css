@@ -9,7 +9,7 @@
   --text-tertiary: #81899a;
   --border: #162238;
   --divider: #e6dfd5;
-  --accent-wine: #ff6f61;
+  --accent-wine: #78183d;
   --accent-champagne: #ffd45d;
   --focus-ring: #3e5bff;
   --pop-ink: #162238;
@@ -19,6 +19,9 @@
   --pop-blue: #3e5bff;
   --pop-lime: #d8f36a;
   --pop-yellow: #ffd45d;
+  --pop-wine: #78183d;
+  --pop-blush: #ffe5e1;
+  --pop-plum: #291b36;
 }
 
 * {

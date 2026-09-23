@@ -120,13 +120,14 @@
   box-shadow: 4px 4px 0 var(--pop-ink) !important;
 }
 .pop-home .pop-card:active { transform: translateY(2px) !important; box-shadow: none !important; }
-.pop-home .pop-card-compliments { background: var(--pop-yellow) !important; }
-.pop-home .pop-card-tenderness { background: var(--pop-blue) !important; color: #fff !important; }
-.pop-home .pop-card-desire { background: var(--pop-blush) !important; }
-.pop-home .pop-card-passion { background: linear-gradient(145deg,#ff766c,#c22c63) !important; color: #fff !important; }
-.pop-home .pop-card-hard { background: var(--pop-plum) !important; color: #fff !important; }
-.pop-home .pop-card-scenarios,
-.pop-home .pop-card-invite { background: var(--pop-lime) !important; color: var(--pop-ink) !important; }
+.pop-home .pop-card-compliments { background: #fff2bd !important; }
+.pop-home .pop-card-tenderness { background: #e5e9ff !important; }
+.pop-home .pop-card-desire { background: #ffdfd3 !important; }
+.pop-home .pop-card-passion { background: #ffc4c3 !important; }
+.pop-home .pop-card-hard { background: #e5cbd9 !important; }
+.pop-home .pop-card-scenarios { background: #e4efba !important; }
+.pop-home .pop-card-invite { background: #ffe4d8 !important; }
+.pop-home .pop-card-pair { background: #e4efba !important; }
 .pop-home .pop-card > div:nth-child(-n+5) { display: none !important; }
 .pop-home .pop-card .icon-ring { display: none !important; }
 .pop-home .pop-card > div:last-child {
@@ -150,13 +151,7 @@
   position: absolute !important; right: 12px !important; bottom: 12px !important;
   stroke: currentColor !important; filter: none !important;
 }
-.pop-home .pop-card-tenderness > div:last-child > div:nth-child(2) > div,
-.pop-home .pop-card-passion > div:last-child > div:nth-child(2) > div,
-.pop-home .pop-card-hard > div:last-child > div:nth-child(2) > div { color: #fff !important; }
-.pop-home .pop-card-compliments > div:last-child > div:nth-child(2) > div,
-.pop-home .pop-card-desire > div:last-child > div:nth-child(2) > div,
-.pop-home .pop-card-scenarios > div:last-child > div:nth-child(2) > div,
-.pop-home .pop-card-invite > div:last-child > div:nth-child(2) > div { color: var(--pop-ink) !important; }
+.pop-home .pop-card > div:last-child > div:nth-child(2) > div { color: var(--pop-ink) !important; }
 .pop-home .pop-card::before {
   content: "01"; position: absolute; top: 14px; left: 14px;
   font: 600 10px "Space Grotesk", sans-serif; opacity: .6;
@@ -167,47 +162,57 @@
 .pop-home .pop-card-hard::before { content: "05"; }
 .pop-home .pop-card-scenarios::before { content: "06 · FOR TWO"; }
 .pop-home .pop-card-invite::before { content: "SHARE"; }
-.pop-home .pop-card-desire::after {
-  content:"♡"; position:absolute; top:10px; right:13px; color:var(--pop-wine);
-  font:400 26px/1 "Space Grotesk",sans-serif; opacity:.5; pointer-events:none;
-}
+.pop-home .pop-card-pair::before { content: "02 · TOGETHER"; }
 
-/* The original editorial photographs now belong to the five category tiles.
-   A dark lower scrim preserves legibility across all images and languages. */
-.pop-home .pop-tiles .pop-card:not(.pop-card-scenarios) {
-  min-height: 160px !important;
-  background: var(--pop-plum) !important;
-  color: #fff !important;
-}
-.pop-home .pop-tiles .pop-card:not(.pop-card-scenarios) > div:first-child {
+/* Illustrated tiles: one shared paper-and-ink language across every action. */
+.pop-home .pop-tiles .pop-card { min-height: 174px !important; }
+.pop-home .pop-card > div:first-child {
   display: block !important;
   inset: 0 !important;
   width: 100% !important;
-  background-size: cover !important;
-  background-position: center !important;
+  background-size: auto 112px !important;
+  background-position: center 18px !important;
+  background-repeat: no-repeat !important;
   opacity: 1 !important;
 }
-.pop-home .pop-tiles .pop-card:not(.pop-card-scenarios) > div:nth-child(2) {
+.pop-home .pop-card > div:nth-child(2) {
   display: block !important;
-  background: linear-gradient(180deg, rgba(21,9,26,.10) 0%, rgba(21,9,26,.2) 28%, rgba(21,9,26,.84) 72%, rgba(21,9,26,.97) 100%) !important;
+  background: linear-gradient(180deg,transparent 40%,rgba(255,250,243,.85) 79%,rgba(255,250,243,.96) 100%) !important;
 }
-.pop-home .pop-tiles .pop-card:not(.pop-card-scenarios) > div:last-child {
+.pop-home .pop-tiles .pop-card > div:last-child {
   align-items: flex-end !important;
-  min-height: 160px;
+  min-height: 174px;
   padding: 14px !important;
 }
-.pop-home .pop-tiles .pop-card:not(.pop-card-scenarios) > div:last-child > div:nth-child(2) > div:first-child {
+.pop-home .pop-tiles .pop-card > div:last-child > div:nth-child(2) > div:first-child {
   margin-top: 0 !important;
-  color: #fff !important;
-  font-size: 18px !important;
+  font-size: 17px !important;
 }
-.pop-home .pop-tiles .pop-card:not(.pop-card-scenarios) > div:last-child > div:nth-child(2) > div:last-child {
-  color: #fff !important;
-  opacity: .88 !important;
+.pop-home .pop-tiles .pop-card > div:last-child > div:nth-child(2) > div:last-child {
+  opacity: .8 !important;
 }
-.pop-home .pop-tiles .pop-card:not(.pop-card-scenarios) > div:last-child > svg { stroke: #fff !important; }
-.pop-home .pop-tiles .pop-card:not(.pop-card-scenarios)::before { z-index: 3; color: #fff; opacity: .9; text-shadow: 0 1px 6px #211326; }
-.pop-home .pop-tiles .pop-card-desire::after { z-index: 3; color: #fff; opacity: .88; }
+.pop-home .pop-card::before { z-index: 3; opacity: .75; }
+.pop-home .pop-card__remaining {
+  position: absolute; z-index: 4; top: 9px; right: 9px;
+  padding: 4px 6px; background: var(--pop-paper);
+  border: 1.5px solid var(--pop-ink); border-radius: 999px;
+  font: 700 10px/1.1 "Space Grotesk",sans-serif;
+  color: var(--pop-ink); box-shadow: 2px 2px 0 rgba(22,34,56,.12);
+}
+.pop-home .pop-card-invite, .pop-home .pop-card-pair { min-height: 114px !important; }
+.pop-home .pop-card-invite > div:first-child, .pop-home .pop-card-pair > div:first-child {
+  background-size: auto 105px !important; background-position: right 12px center !important;
+}
+.pop-home .pop-card-invite > div:nth-child(2), .pop-home .pop-card-pair > div:nth-child(2) {
+  background: linear-gradient(90deg,rgba(255,250,243,.94) 0%,rgba(255,250,243,.8) 58%,transparent 100%) !important;
+}
+.pop-home .pop-card-invite > div:last-child, .pop-home .pop-card-pair > div:last-child {
+  padding-top: 29px !important; padding-bottom: 12px !important;
+}
+.pop-home .pop-card-invite > div:last-child > div:nth-child(2),
+.pop-home .pop-card-pair > div:last-child > div:nth-child(2) { max-width: 70%; }
+.pop-home .pop-card-invite > div:last-child > div:nth-child(2) > div:first-child,
+.pop-home .pop-card-pair > div:last-child > div:nth-child(2) > div:first-child { margin-top: 0 !important; }
 
 /* Sheets / dialogs */
 .pop-home ~ .pop-overlay, .pop-overlay {

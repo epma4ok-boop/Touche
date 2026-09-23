@@ -78,18 +78,19 @@ const PR = BRAND.r, PG = BRAND.g, PB = BRAND.b;
 const PINK      = `rgb(${PR},${PG},${PB})`;
 const PINK_GLOW = `drop-shadow(0 0 6px rgba(${PR},${PG},${PB},1)) drop-shadow(0 0 14px rgba(${PR},${PG},${PB},0.55))`;
 
-const CAT_IMG: Record<Category | "scenarios" | "invite", string> = {
-  compliments: "/images/cat-compliments-tile.webp",
-  tenderness:  "/images/cat-tenderness-tile.webp",
-  desire:      "/images/cat-desire-tile.webp",
-  passion:     "/images/cat-passion-tile.webp",
-  hard:        "/images/cat-hard-tile.webp",
-  scenarios:   "/images/cat-scenarios.png",
-  invite:      "/images/cat-invite.png",
+const CAT_IMG: Record<Category | "scenarios" | "invite" | "pair", string> = {
+  compliments: "/images/cat-compliments-art.svg",
+  tenderness:  "/images/cat-tenderness-art.svg",
+  desire:      "/images/cat-desire-art.svg",
+  passion:     "/images/cat-passion-art.svg",
+  hard:        "/images/cat-hard-art.svg",
+  scenarios:   "/images/cat-scenarios-art.svg",
+  invite:      "/images/cat-invite-art.svg",
+  pair:        "/images/cat-pair-art.svg",
 };
 
 /* ─── NeonIcon ─────────────────────────────────────────────────── */
-function NeonIcon({ type }: { type: Category | "scenarios" | "invite" }) {
+function NeonIcon({ type }: { type: Category | "scenarios" | "invite" | "pair" }) {
   const attrs = {
     width: 26, height: 26, viewBox: "0 0 24 24", fill: "none",
     stroke: PINK, strokeWidth: 1.7,
@@ -167,10 +168,11 @@ function NeonIcon({ type }: { type: Category | "scenarios" | "invite" }) {
 
 /* ─── Card ─────────────────────────────────────────────────────── */
 function Card({
-  type, title, sub, onClick, index,
+  type, title, sub, onClick, index, remaining, remainingLabel,
 }: {
-  type: Category | "scenarios" | "invite";
+  type: Category | "scenarios" | "invite" | "pair";
   title: string; sub?: string; onClick: () => void; index: number;
+  remaining?: number | null; remainingLabel?: string;
 }) {
   const [pressed, setPressed] = useState(false);
   const [visible, setVisible] = useState(false);
@@ -215,6 +217,7 @@ function Card({
       <div style={{ position: "absolute", inset: 0, background: `linear-gradient(130deg,rgba(${PR},${PG},${PB},0.06) 0%,transparent 50%)` }} />
       <div style={{ position: "absolute", top: 0, left: "6%", right: "6%", height: 1, background: `linear-gradient(90deg,transparent,rgba(${PR},${PG},${PB},0.75),transparent)` }} />
       <div style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: 3, background: `linear-gradient(180deg,rgba(${PR},${PG},${PB},0.95),rgba(${PR},${PG},${PB},0.18))`, borderRadius: "20px 0 0 20px" }} />
+      {remaining !== undefined && <span className="pop-card__remaining" aria-label={`${remainingLabel}: ${remaining ?? "∞"}`}>{remainingLabel} {remaining ?? "∞"}</span>}
 
       <div style={{ position: "relative", zIndex: 2, display: "flex", alignItems: "center", width: "100%", padding: "0 15px 0 18px", gap: 13 }}>
         <div className="icon-ring" style={{
@@ -285,11 +288,19 @@ const SCENARIO_LABELS: Record<Lang, { title: string; sub: string }> = {
 };
 
 const INVITE_LABELS: Record<Lang, { title: string; sub: string }> = {
-  ru: { title: "Пригласи друга",       sub: "Поделись приложением с кем-то"    },
-  en: { title: "Invite a friend",      sub: "Share this app with someone"       },
-  hi: { title: "मित्र को आमंत्रित करें", sub: "किसी के साथ ऐप साझा करें"        },
-  pt: { title: "Convidar amigo",       sub: "Compartilhe o app com alguém"     },
-  es: { title: "Invitar amigo",        sub: "Comparte la app con alguien"       },
+  ru: { title: "Пригласи друга",       sub: "Новый друг: +3 в обычных, +1 в 18+ категориях" },
+  en: { title: "Invite a friend",      sub: "New friend joins: +3 free, +1 in each 18+ category" },
+  hi: { title: "मित्र को आमंत्रित करें", sub: "नया दोस्त जुड़े: +3 सामान्य, +1 हर 18+ श्रेणी में" },
+  pt: { title: "Convidar amigo",       sub: "Novo amigo: +3 grátis, +1 em cada 18+" },
+  es: { title: "Invitar amigo",        sub: "Amigo nuevo: +3 gratis y +1 en cada 18+" },
+};
+
+const PAIR_LABELS: Record<Lang, { title: string; sub: string }> = {
+  ru: { title: "Связать пару", sub: "Пригласить партнёра в совместный режим" },
+  en: { title: "Connect your pair", sub: "Invite your partner to play together" },
+  hi: { title: "जोड़ी जोड़ें", sub: "साथ खेलने के लिए साथी को बुलाएँ" },
+  pt: { title: "Conectar casal", sub: "Convide seu par para jogar junto" },
+  es: { title: "Vincular pareja", sub: "Invita a tu pareja para jugar juntos" },
 };
 
 const INVITE_MSG: Record<Lang, string> = {
@@ -1093,6 +1104,7 @@ export default function Home({
   const [showMenu, setShowMenu] = useState(false);
   const [intimacyKey, setIntimacyKey] = useState(0);
   const [showScenarioGate, setShowScenarioGate] = useState(false);
+  const [limits, setLimits] = useState<Partial<Record<Category, number | null>>>({});
   const topPx = useTelegramTopInset();
 
   useEffect(() => {
@@ -1116,13 +1128,40 @@ export default function Home({
   }, []);
 
   useEffect(() => {
-    if (pendingRefUserId && !coupleId) setShowCoupleModal(true);
-  }, [pendingRefUserId, coupleId]);
+    if (pendingRefUserId && !coupleId && mode === "together") setShowCoupleModal(true);
+  }, [pendingRefUserId, coupleId, mode]);
+
+  useEffect(() => {
+    let active = true;
+    const refresh = async () => {
+      const initData = window.Telegram?.WebApp?.initData;
+      if (!initData) return;
+      const results = await Promise.all(CATEGORIES_ORDER.map(async (category) => {
+        try {
+          const res = await fetch(`/api/limits?category=${category}`, { headers: { "x-telegram-init-data": initData } });
+          if (!res.ok) return [category, undefined] as const;
+          const data = await res.json();
+          return [category, data.isPremium ? null : Number(data.remaining)] as const;
+        } catch { return [category, undefined] as const; }
+      }));
+      if (active) setLimits(Object.fromEntries(results.filter(([, n]) => n === null || Number.isFinite(n))));
+    };
+    void refresh();
+    window.addEventListener("focus", refresh);
+    document.addEventListener("visibilitychange", refresh);
+    return () => {
+      active = false;
+      window.removeEventListener("focus", refresh);
+      document.removeEventListener("visibilitychange", refresh);
+    };
+  }, []);
 
   const handleInvite = useCallback(() => {
     const tg = window.Telegram?.WebApp;
     tg?.HapticFeedback?.impactOccurred("light");
-    const link = `https://t.me/${BOT_USERNAME}/Touche`;
+    const myId = tg?.initDataUnsafe?.user?.id;
+    if (!myId) return;
+    const link = `https://t.me/${BOT_USERNAME}/Touche?startapp=invite_${myId}`;
     const msg = INVITE_MSG[lang];
     tg?.openTelegramLink?.(`https://t.me/share/url?url=${encodeURIComponent(link)}&text=${encodeURIComponent(msg)}`);
   }, [lang]);
@@ -1144,31 +1183,36 @@ export default function Home({
   };
 
   const nextLang = LANG_CYCLE[(LANG_CYCLE.indexOf(lang) + 1) % LANG_CYCLE.length];
+  const cardLimit = (category: Category) => ({
+    remaining: limits[category],
+    remainingLabel: lang === "ru" ? "Осталось" : lang === "hi" ? "शेष" : lang === "pt" ? "Restam" : lang === "es" ? "Quedan" : "Left",
+  });
 
   const togetherCards = (
     <>
-      <Card type="compliments" title={t.catCompliments} sub={t.catComplimentsSub} onClick={() => onCategorySelect("compliments")} index={0} />
-      <Card type="tenderness" title={t.catTenderness} sub={t.catTendernessSub} onClick={() => onCategorySelect("tenderness")} index={1} />
-      <Card type="desire" title={t.catDesire} sub={t.catDesireSub} onClick={() => onCategorySelect("desire")} index={2} />
-      <Card type="passion" title={t.catPassion} sub={t.catPassionSub} onClick={() => onCategorySelect("passion")} index={3} />
-      <Card type="hard" title={t.catHard} sub={t.catHardSub} onClick={() => onCategorySelect("hard")} index={4} />
+      <Card type="compliments" title={t.catCompliments} sub={t.catComplimentsSub} onClick={() => onCategorySelect("compliments")} index={0} {...cardLimit("compliments")} />
+      <Card type="tenderness" title={t.catTenderness} sub={t.catTendernessSub} onClick={() => onCategorySelect("tenderness")} index={1} {...cardLimit("tenderness")} />
+      <Card type="desire" title={t.catDesire} sub={t.catDesireSub} onClick={() => onCategorySelect("desire")} index={2} {...cardLimit("desire")} />
+      <Card type="passion" title={t.catPassion} sub={t.catPassionSub} onClick={() => onCategorySelect("passion")} index={3} {...cardLimit("passion")} />
+      <Card type="hard" title={t.catHard} sub={t.catHardSub} onClick={() => onCategorySelect("hard")} index={4} {...cardLimit("hard")} />
       <Card type="scenarios" title={SCENARIO_LABELS[lang].title} sub={SCENARIO_LABELS[lang].sub} onClick={handleScenarioClick} index={5} />
     </>
   );
 
   const soloCards = (
     <>
-      <Card type="compliments" title={t.catCompliments} sub={t.catComplimentsSub} onClick={() => onCategorySelect("compliments")} index={0} />
-      <Card type="tenderness" title={t.catTenderness} sub={t.catTendernessSub} onClick={() => onCategorySelect("tenderness")} index={1} />
-      <Card type="desire" title={t.catDesire} sub={t.catDesireSub} onClick={() => onCategorySelect("desire")} index={2} />
+      <Card type="compliments" title={t.catCompliments} sub={t.catComplimentsSub} onClick={() => onCategorySelect("compliments")} index={0} {...cardLimit("compliments")} />
+      <Card type="tenderness" title={t.catTenderness} sub={t.catTendernessSub} onClick={() => onCategorySelect("tenderness")} index={1} {...cardLimit("tenderness")} />
+      <Card type="desire" title={t.catDesire} sub={t.catDesireSub} onClick={() => onCategorySelect("desire")} index={2} {...cardLimit("desire")} />
       <Card
         type="passion"
         title={t.catPassion}
         sub={t.catPassionSub}
         onClick={() => onCategorySelect("passion")}
         index={3}
+        {...cardLimit("passion")}
       />
-      <Card type="hard" title={t.catHard} sub={t.catHardSub} onClick={() => onCategorySelect("hard")} index={4} />
+      <Card type="hard" title={t.catHard} sub={t.catHardSub} onClick={() => onCategorySelect("hard")} index={4} {...cardLimit("hard")} />
     </>
   );
 
@@ -1242,7 +1286,9 @@ export default function Home({
           <div className="pop-tiles" style={{ display: "grid", gridTemplateColumns: "repeat(2,minmax(0,1fr))", gap: 10 }}>
             {mode === "together" ? togetherCards : soloCards}
           </div>
-          {mode === "together" && <Card type="invite" title={INVITE_LABELS[lang].title} sub={INVITE_LABELS[lang].sub} onClick={handleInvite} index={5} />}
+          {mode === "solo"
+            ? <Card type="invite" title={INVITE_LABELS[lang].title} sub={INVITE_LABELS[lang].sub} onClick={handleInvite} index={5} />
+            : <Card type="pair" title={coupleId ? t.linked : PAIR_LABELS[lang].title} sub={PAIR_LABELS[lang].sub} onClick={() => setShowCoupleModal(true)} index={6} />}
         </div>
       </div>
 

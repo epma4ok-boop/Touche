@@ -15,7 +15,13 @@
 .category-pop__orb {
   background-size: cover;
   background-position: center;
-  color: #fff;
-  text-shadow: 0 2px 8px rgba(22,10,28,.85);
+  background-color: var(--pop-blush);
   box-shadow: 4px 5px 0 rgba(120,24,61,.18);
+}
+.category-pop__remaining {
+  display: table; margin: 8px auto 10px; padding: 6px 12px;
+  border: 1.5px solid var(--pop-ink); border-radius: 999px;
+  background: #ffe4d8; color: var(--pop-ink);
+  font: 700 11px "Space Grotesk",sans-serif; letter-spacing: .02em;
+  text-transform: none;
 }

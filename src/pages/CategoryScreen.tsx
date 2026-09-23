@@ -43,6 +43,7 @@ async function generateAITask(
   gender: Gender | undefined,
   mode: AppMode,
   coupleId: string | null,
+  requestId: string,
 ): Promise<{ result?: TaskResult; error?: TaskError }> {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 25_000);
@@ -50,7 +51,7 @@ async function generateAITask(
     const response = await fetch("/api/tasks/generate", {
       method: "POST",
       headers: { "Content-Type": "application/json", "x-telegram-init-data": getInitData() },
-      body: JSON.stringify({ category, lang, gender, mode, coupleId }),
+      body: JSON.stringify({ category, lang, gender, mode, coupleId, requestId }),
       signal: controller.signal,
     });
     if (!response.ok) {
@@ -198,6 +199,7 @@ export default function CategoryScreen({ lang, gender, category, onBack, onCateg
   const [mounted, setMounted] = useState(false);
   const [history, setHistory] = useState<HistoryEntry[]>(loadHistory);
   const [remaining, setRemaining] = useState<number | null>(null);
+  const [isPremium, setIsPremium] = useState(false);
   const [taskId, setTaskId] = useState<string | null>(null);
   const [taskText, setTaskText] = useState("");
   const [taskSource, setTaskSource] = useState<"ai" | "fallback">("fallback");
@@ -209,6 +211,7 @@ export default function CategoryScreen({ lang, gender, category, onBack, onCateg
   const [viewportHeight, setViewportHeight] = useState<number | null>(null);
   const touchStart = useRef({ x: 0, y: 0 });
   const revealTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const requestIdRef = useRef<string | null>(null);
   const index = CATEGORIES_ORDER.indexOf(category);
   const label = categoryLabel(category, t);
   const sub = categorySub(category, t);
@@ -234,6 +237,26 @@ export default function CategoryScreen({ lang, gender, category, onBack, onCateg
     return () => { tg?.offEvent?.("viewportChanged", update); clearTimeout(timer); };
   }, [category]);
 
+  useEffect(() => {
+    let active = true;
+    const refresh = async () => {
+      const initData = getInitData();
+      if (!initData) return;
+      try {
+        const res = await fetch(`/api/limits?category=${category}`, { headers: { "x-telegram-init-data": initData } });
+        if (!res.ok) return;
+        const data = await res.json();
+        if (active) {
+          setIsPremium(data.isPremium === true);
+          setRemaining(data.isPremium ? null : Number(data.remaining));
+        }
+      } catch { /* keep the last known count when offline */ }
+    };
+    void refresh();
+    window.addEventListener("focus", refresh);
+    return () => { active = false; window.removeEventListener("focus", refresh); };
+  }, [category]);
+
   const goToCategory = useCallback((next: Category) => {
     window.Telegram?.WebApp?.HapticFeedback?.impactOccurred("light");
     onCategoryChange(next);
@@ -254,11 +277,19 @@ export default function CategoryScreen({ lang, gender, category, onBack, onCateg
     const tg = window.Telegram?.WebApp;
     tg?.HapticFeedback?.impactOccurred("medium");
     setIsCasting(true); setErrorKind(null); setGeneratedErrorCode(null);
-    const generated = await generateAITask(category, lang, gender, mode, coupleId ?? null);
+    const requestKey = `touche_pending_task_${tg?.initDataUnsafe?.user?.id ?? "unknown"}_${mode}_${category}`;
+    if (!requestIdRef.current) {
+      try { requestIdRef.current = sessionStorage.getItem(requestKey); } catch { /* storage unavailable */ }
+      if (!requestIdRef.current) requestIdRef.current = crypto.randomUUID();
+      try { sessionStorage.setItem(requestKey, requestIdRef.current); } catch { /* retry still works in this view */ }
+    }
+    const generated = await generateAITask(category, lang, gender, mode, coupleId ?? null, requestIdRef.current);
     if (!generated.result) {
       setErrorKind(generated.error?.kind ?? "unknown"); setGeneratedErrorCode(generated.error?.message ?? null);
       setIsCasting(false); tg?.HapticFeedback?.notificationOccurred?.("error"); return;
     }
+    requestIdRef.current = null;
+    try { sessionStorage.removeItem(requestKey); } catch { /* storage unavailable */ }
     const picked = generated.result.task;
     if (typeof generated.result.remaining === "number") setRemaining(generated.result.remaining);
     const entry: HistoryEntry = { id: `${Date.now()}-${Math.random()}`, text: picked, category, date: new Date().toISOString() };
@@ -295,7 +326,7 @@ export default function CategoryScreen({ lang, gender, category, onBack, onCateg
       <div className="category-pop__content">
         <section className="category-pop__hero">
           <span className="category-pop__stamp">{mode === "together" ? t.sharedTask : `18+ · ${t.lockSub}`}</span>
-           <div className="category-pop__orb" style={{ backgroundImage: `linear-gradient(rgba(31,10,27,.18),rgba(31,10,27,.58)),url(/images/cat-${category}-tile.webp)` }} aria-hidden="true">{String(index + 1).padStart(2, "0")}</div>
+           <div className="category-pop__orb" style={{ backgroundImage: `url(/images/cat-${category}-art.svg)` }} aria-hidden="true" />
           <p className="category-pop__eyebrow">{categorySub(category, t)}</p>
           <h1 data-testid="text-category-title">{label}</h1>
            <p className="category-pop__description">{({
@@ -305,7 +336,7 @@ export default function CategoryScreen({ lang, gender, category, onBack, onCateg
         </section>
          {sensitive && <div className="category-pop__warning" role="note">18+ · {t.lockSub}</div>}
          {mode === "together" && <div className="category-pop__mode"><span className="category-pop__mode-dot" style={{ background: `rgb(${popColor.r},${popColor.g},${popColor.b})` }} /><strong>{t.sharedTask}</strong><small>{coupleId ? t.linked : t.appSub}</small></div>}
-        {remaining !== null && <div className="category-pop__remaining" data-testid="status-remaining">{t.remaining(remaining)}</div>}
+        {(remaining !== null || isPremium) && <div className="category-pop__remaining" data-testid="status-remaining">{isPremium ? (lang === "ru" ? "Задания без ограничений" : "Unlimited tasks") : t.remaining(remaining!)}</div>}
         <section className="category-pop__generator">
            <div className="category-pop__generator-head"><span>{t.hint}</span><b>{String(index + 1).padStart(2, "0")} / {String(CATEGORIES_ORDER.length).padStart(2, "0")}</b></div>
           <div className="category-pop__heartbeat">

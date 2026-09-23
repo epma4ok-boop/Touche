@@ -3,9 +3,11 @@
 // Body: { category, lang, gender? }
 
 import type { VercelRequest, VercelResponse } from "@vercel/node";
+import { randomUUID } from "crypto";
 import { createClient } from "@supabase/supabase-js";
 import { validateTelegramInitData } from "../couple/_auth.js";
-import { appDate, FREE_LIMIT } from "../limits.js";
+import { appDate } from "../limits.js";
+import { claimFriendInvite } from "../referrals/_claim.js";
 import { TASKS_RU } from "../../src/data/tasks-ru.js";
 import { TASKS_EN } from "../../src/data/tasks-en.js";
 import { TASKS_HI } from "../../src/data/tasks-hi.js";
@@ -20,7 +22,6 @@ const CATEGORIES = new Set(["compliments", "tenderness", "desire", "passion", "h
 const LANGS = new Set(["ru", "en", "hi", "pt", "es"]);
 const GENDERS = new Set(["male", "female"]);
 const MODES = new Set(["solo", "together"]);
-const PAID = new Set(["passion", "hard"]);
 const supabase = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!);
 
 type StaticPool = Record<string, string[]>;
@@ -173,7 +174,8 @@ function matchesRequestedLanguage(text: string, lang: string): boolean {
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== "POST") return res.status(405).json({ error: "method_not_allowed" });
   if (!BOT_TOKEN) return res.status(503).json({ error: "service_unconfigured" });
-  const caller = validateTelegramInitData(req.headers["x-telegram-init-data"] as string | undefined, BOT_TOKEN);
+  const initData = req.headers["x-telegram-init-data"] as string | undefined;
+  const caller = validateTelegramInitData(initData, BOT_TOKEN);
   if (!caller) return res.status(401).json({ error: "unauthorized" });
 
   const body = req.body ?? {};
@@ -184,27 +186,22 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const coupleId = typeof body.coupleId === "string" ? body.coupleId : null;
   if (!CATEGORIES.has(category)) return res.status(400).json({ error: "invalid_category" });
   if (!LANGS.has(lang) || !GENDERS.has(gender) || !MODES.has(mode)) return res.status(400).json({ error: "invalid_generation_options" });
+  if (body.requestId !== undefined && (typeof body.requestId !== "string" || !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(body.requestId))) {
+    return res.status(400).json({ error: "invalid_request_id" });
+  }
+  const requestId = body.requestId ?? randomUUID();
+  try {
+    await claimFriendInvite(supabase, initData!, caller.id);
+  } catch {
+    return res.status(500).json({ error: "referral_claim_failed" });
+  }
 
-  let couple: { user_a_id: number; user_b_id: number } | null = null;
   if (mode === "together") {
     if (!coupleId) return res.status(400).json({ error: "couple_id_required" });
     const { data } = await supabase.from("couples").select("user_a_id,user_b_id").eq("id", coupleId).maybeSingle();
     if (!data || (data.user_a_id !== caller.id && data.user_b_id !== caller.id)) return res.status(403).json({ error: "couple_access_denied" });
-    couple = data;
   }
   const premium = caller.id === OWNER_ID || !!(await supabase.from("user_subscriptions").select("expires_at").eq("user_id", caller.id).gt("expires_at", new Date().toISOString()).maybeSingle()).data;
-  if (PAID.has(category) && !premium) return res.status(403).json({ error: "subscription_required", remaining: 0, isPremium: false });
-
-  let remaining: number | null = null;
-  if (!premium) {
-    const { data: consumed, error } = await supabase.rpc("consume_daily_limit", {
-      p_user_id: caller.id, p_category: category, p_date: appDate(), p_limit: FREE_LIMIT,
-    });
-    if (error) return res.status(500).json({ error: "limit_consume_failed" });
-    const result = typeof consumed === "number" ? { remaining: consumed } : consumed ?? {};
-    if (result.allowed === false || result.ok === false) return res.status(403).json({ error: "limit_exceeded", remaining: 0, isPremium: false });
-    remaining = Number.isFinite(Number(result.remaining)) ? Number(result.remaining) : null;
-  }
 
   let task = getFallback(category, lang);
   let source: "ai" | "fallback" = "fallback";
@@ -238,14 +235,16 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
   }
 
-  const { data: saved, error: saveError } = await supabase.from("generated_tasks").insert({
-    user_id: caller.id,
-    couple_id: coupleId,
-    category,
-    mode,
-    task_text: task,
-    points: ({ compliments: 10, tenderness: 15, desire: 25, passion: 40, hard: 50 } as Record<string, number>)[category],
-  }).select("id").single();
+  const { data: saved, error: saveError } = await supabase.rpc("create_task_with_allowance", {
+    p_user_id: caller.id, p_couple_id: mode === "together" ? coupleId : null,
+    p_category: category, p_mode: mode, p_task_text: task,
+    p_points: ({ compliments: 10, tenderness: 15, desire: 25, passion: 40, hard: 50 } as Record<string, number>)[category],
+    p_source: source, p_request_id: requestId, p_date: appDate(), p_premium: premium,
+  });
   if (saveError) return res.status(500).json({ error: "task_save_failed" });
-  return res.status(200).json({ ok: true, task, taskId: saved.id, source, remaining, isPremium: premium });
+  if (saved?.ok !== true) return res.status(403).json({ error: saved?.error ?? "limit_exceeded", remaining: 0, isPremium: false });
+  return res.status(200).json({
+    ok: true, task: saved.task, taskId: saved.taskId,
+    source: saved.source, remaining: saved.remaining, isPremium: premium,
+  });
 }

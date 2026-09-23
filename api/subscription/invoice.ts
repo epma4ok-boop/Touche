@@ -8,7 +8,8 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { validateTelegramInitData } from "../couple/_auth.js";
 
-const BOT_TOKEN = process.env.BOT_TOKEN!;
+const BOT_TOKEN = process.env.BOT_TOKEN;
+const LANGS = new Set(["ru", "en", "hi", "pt", "es"]);
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   res.setHeader("Access-Control-Allow-Origin", "https://t.me");
@@ -18,10 +19,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
 
   const initData = req.headers["x-telegram-init-data"] as string;
+  if (!BOT_TOKEN) return res.status(503).json({ error: "service_unconfigured" });
   const caller = validateTelegramInitData(initData, BOT_TOKEN);
   if (!caller) return res.status(401).json({ error: "Unauthorized" });
 
   const { lang = "ru" } = req.body as { lang?: string };
+  if (!LANGS.has(lang)) return res.status(400).json({ error: "invalid_product" });
   const isEn = lang === "en";
 
   try {
@@ -31,9 +34,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       body: JSON.stringify({
         title: isEn ? "Touché Premium — 1 month" : "Touché Premium — 1 месяц",
         description: isEn
-          ? "Passion, Hard & AI Scenarios unlocked. 1 AI-generated task per day in every category."
-          : "Страсть, Хард и ИИ-сценарии. 1 уникальное задание в день во всех категориях.",
-        payload: JSON.stringify({ userId: caller.id, type: "subscription", months: 1 }),
+          ? "Passion, Hard & AI Scenarios unlocked, with unlimited daily tasks."
+          : "Страсть, Хард и ИИ-сценарии, без дневного лимита заданий.",
+        payload: JSON.stringify({ version: 1, userId: caller.id, type: "subscription", months: 1 }),
         provider_token: "",
         currency: "XTR",
         prices: [{ label: isEn ? "1 month" : "1 месяц", amount: 199 }],

@@ -193,11 +193,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   let task = getFallback(category, lang);
   let source: "ai" | "fallback" = "fallback";
   if (DEEPSEEK_API_KEY) {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 12_000);
     try {
       const systemPrompt = `${getPrompt(category, lang)}\n\n${getGenderLine(lang, gender)}`;
       const aiRes = await fetch(DEEPSEEK_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${DEEPSEEK_API_KEY}` },
+        signal: controller.signal,
         body: JSON.stringify({ model: "deepseek-chat", messages: [
           { role: "system", content: systemPrompt },
           { role: "user", content: lang === "ru" ? "Сгенерируй одно задание." : "Generate one task." },
@@ -214,6 +217,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       }
     } catch {
       // The validated server fallback is used when AI is unavailable.
+    } finally {
+      clearTimeout(timeout);
     }
   }
 

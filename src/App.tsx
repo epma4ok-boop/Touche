@@ -216,6 +216,18 @@ export default function App() {
       } catch {}
     }, []);
 
+    useEffect(() => {
+      const tg = window.Telegram?.WebApp;
+      if (!/^invite_[1-9][0-9]*$/.test(tg?.initDataUnsafe?.start_param ?? "") || !tg?.initData) return;
+      // The server checks Telegram's signed start_param; client state never grants credits.
+      fetch("/api/referrals/claim", {
+        method: "POST",
+        headers: { "x-telegram-init-data": tg.initData },
+      }).then((res) => {
+        if (!res.ok) console.error("Could not claim friend invitation", res.status);
+      }).catch((error) => console.error("Could not claim friend invitation", error));
+    }, []);
+
     const handleSplashDone = useCallback(async () => {
       const tg = window.Telegram?.WebApp;
       const savedLang = getSavedLang();

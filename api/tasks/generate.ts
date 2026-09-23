@@ -154,6 +154,22 @@ function getPrompt(category: string, lang: string): string {
   return PROMPTS[category]?.[lang] ?? PROMPTS[category]?.["en"] ?? PROMPTS["compliments"]["en"];
 }
 
+const LANGUAGE_INSTRUCTIONS: Record<string, string> = {
+  ru: "Ответь только по-русски. В тексте задания используй кириллицу.",
+  en: "Write the entire task in English only. Do not use Russian or Cyrillic letters.",
+  hi: "पूरा उत्तर केवल हिन्दी में, देवनागरी लिपि में लिखें।",
+  pt: "Escreva a tarefa inteira apenas em português. Não use russo ou inglês.",
+  es: "Escribe toda la tarea solo en español. No uses ruso ni inglés.",
+};
+
+function matchesRequestedLanguage(text: string, lang: string): boolean {
+  const hasCyrillic = /[\u0400-\u052f]/u.test(text);
+  const hasDevanagari = /[\u0900-\u097f]/u.test(text);
+  if (lang === "ru") return hasCyrillic && !hasDevanagari;
+  if (lang === "hi") return hasDevanagari && !hasCyrillic;
+  return !hasCyrillic && !hasDevanagari;
+}
+
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== "POST") return res.status(405).json({ error: "method_not_allowed" });
   if (!BOT_TOKEN) return res.status(503).json({ error: "service_unconfigured" });
@@ -196,21 +212,21 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 12_000);
     try {
-      const systemPrompt = `${getPrompt(category, lang)}\n\n${getGenderLine(lang, gender)}`;
+      const systemPrompt = `${getPrompt(category, lang)}\n\n${getGenderLine(lang, gender)}\n\n${LANGUAGE_INSTRUCTIONS[lang]}`;
       const aiRes = await fetch(DEEPSEEK_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${DEEPSEEK_API_KEY}` },
         signal: controller.signal,
         body: JSON.stringify({ model: "deepseek-chat", messages: [
           { role: "system", content: systemPrompt },
-          { role: "user", content: lang === "ru" ? "Сгенерируй одно задание." : "Generate one task." },
+          { role: "user", content: LANGUAGE_INSTRUCTIONS[lang] },
         ], max_tokens: 160, temperature: 1.1 }),
       });
       if (aiRes.ok) {
         const data = await aiRes.json();
         const candidate = String(data.choices?.[0]?.message?.content ?? "").replace(/^["']|["']$/g, "").replace(/^\d+\.\s*/, "").trim();
         const forbidden = ["я рекомендую", "тебе стоит", "можешь попробовать", "выдыхает", "дыши в", "посмотри в глаза", "отстранись"];
-        if (candidate.length >= 15 && candidate.length <= 350 && !forbidden.some(f => candidate.toLowerCase().includes(f))) {
+        if (candidate.length >= 15 && candidate.length <= 350 && matchesRequestedLanguage(candidate, lang) && !forbidden.some(f => candidate.toLowerCase().includes(f))) {
           task = candidate;
           source = "ai";
         }

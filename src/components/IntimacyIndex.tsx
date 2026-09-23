@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from "react";
+import { createPortal } from "react-dom";
 import { loadLocal, getLevel, getLevelProgress, LEVELS, type IntimacyLocal, type LevelIconId } from "@/data/intimacy";
 import type { Lang } from "@/data/i18n";
 
@@ -227,32 +228,40 @@ function IntimacyModal({lang,data,onClose}:{lang:Lang;data:IntimacyLocal;onClose
   const t=getT(lang); const lvl=getLevel(data.score); const prog=getLevelProgress(data.score);
   const nextLvl=LEVELS[LEVELS.indexOf(lvl)+1]; const score=useCountUp(data.score);
   const [mounted,setMounted]=useState(false);
-  useEffect(()=>{requestAnimationFrame(()=>setMounted(true));},[]);
+  const backRef = useRef<HTMLButtonElement>(null);
+  useEffect(()=>{
+    const frame = requestAnimationFrame(()=>{setMounted(true);backRef.current?.focus();});
+    const onKeyDown = (event: KeyboardEvent) => { if (event.key === "Escape") onClose(); };
+    document.addEventListener("keydown", onKeyDown);
+    return () => { cancelAnimationFrame(frame); document.removeEventListener("keydown", onKeyDown); };
+  },[onClose]);
   const today=new Date().toISOString().slice(0,10);
   const yest=(()=>{const d=new Date();d.setDate(d.getDate()-1);return d.toISOString().slice(0,10);})();
-  return (
-    <div style={{position:"fixed",inset:0,zIndex:900,display:"flex",flexDirection:"column",justifyContent:"flex-end"}}>
-      <div onClick={onClose} style={{position:"absolute",inset:0,background:"rgba(0,0,0,0.72)",backdropFilter:"blur(8px)"}}/>
-      <div style={{position:"relative",zIndex:1,background:`linear-gradient(180deg,rgba(${INK},1) 0%,rgba(10,4,7,1) 100%)`,
+  return createPortal(
+    <div className="intimacy-modal" role="dialog" aria-modal="true" aria-label={t.title} style={{position:"fixed",inset:0,zIndex:900,display:"flex",flexDirection:"column",justifyContent:"flex-end"}}>
+      <div onClick={onClose} style={{position:"absolute",inset:0,background:"rgba(22,34,56,0.58)",backdropFilter:"blur(8px)"}}/>
+      <div className="intimacy-modal__panel" style={{position:"relative",zIndex:1,background:"#fffaf3",
         borderRadius:"28px 28px 0 0",padding:`0 22px max(34px,env(safe-area-inset-bottom))`,
-        border:`1px solid rgba(${GOLD},0.16)`,borderBottom:"none",
-        boxShadow:`0 -16px 48px rgba(0,0,0,0.45)`,
+         border:"2px solid #162238",borderBottom:"none",
+         boxShadow:"0 -12px 0 rgba(111,18,52,.25)",
         transform:mounted?"translateY(0)":"translateY(100%)",
         transition:`transform ${MOTION_DURATION}ms ${MOTION_EASE}`,maxHeight:"92dvh",overflowY:"auto"}}>
-        <div style={{display:"flex",justifyContent:"center",padding:"14px 0 6px"}}>
-          <div style={{width:36,height:3,borderRadius:99,background:`rgba(${IVORY},0.14)`}}/>
+         <div className="intimacy-modal__nav" style={{position:"sticky",top:0,zIndex:5,display:"flex",alignItems:"center",justifyContent:"space-between",padding:"13px 0 12px",background:"#fffaf3",borderBottom:"1px solid rgba(22,34,56,.12)",marginBottom:12}}>
+           <button ref={backRef} data-testid="button-intimacy-back" onClick={onClose} type="button" style={{background:"none",border:0,color:"#162238",fontFamily:SANS,fontWeight:700,fontSize:14,cursor:"pointer",padding:"8px 8px 8px 0"}}>← {lang==="ru"?"Назад":lang==="hi"?"वापस":lang==="pt"?"Voltar":lang==="es"?"Volver":"Back"}</button>
+           <span style={{fontFamily:SANS,fontWeight:700,fontSize:13,color:"#162238"}}>{t.title}</span>
+           <button onClick={onClose} type="button" aria-label={t.close} style={{width:34,height:34,borderRadius:"50%",border:"1px solid #162238",background:"#dafa70",fontSize:20,lineHeight:1,cursor:"pointer",color:"#162238"}}>×</button>
         </div>
         <div style={{display:"flex",alignItems:"center",gap:20,marginBottom:22,paddingTop:8}}>
           <div style={{position:"relative",flexShrink:0}}>
-            <Ring progress={prog} color={lvl.color} size={88}/>
+             <Ring progress={prog} color="#78183d" size={88}/>
             <div style={{position:"absolute",inset:0,display:"flex",alignItems:"center",justifyContent:"center"}}>
-              <LevelGlyph id={lvl.iconId} color={lvl.color} size={28} opacity={0.85}/>
+               <LevelGlyph id={lvl.iconId} color="#78183d" size={28} opacity={0.85}/>
             </div>
           </div>
           <div style={{flex:1}}>
             <div style={{fontFamily:SERIF,fontWeight:600,fontSize:46,color:`rgba(${IVORY},0.95)`,lineHeight:1,letterSpacing:"-0.01em"}}>{score}</div>
-            <div style={{fontFamily:SANS,fontSize:10,color:`rgba(${IVORY},0.32)`,marginTop:4,letterSpacing:"0.12em",textTransform:"uppercase"}}>{t.title}</div>
-            <div style={{fontFamily:SERIF,fontStyle:"italic",fontWeight:600,fontSize:17,color:lvl.color,marginTop:6}}>
+             <div style={{fontFamily:SANS,fontSize:10,color:`rgba(${IVORY},0.68)`,marginTop:4,letterSpacing:"0.12em",textTransform:"uppercase"}}>{t.title}</div>
+             <div style={{fontFamily:SERIF,fontStyle:"italic",fontWeight:600,fontSize:17,color:"#78183d",marginTop:6}}>
               {t.level}: {lang==="ru"?lvl.nameRu:lvl.nameEn}
             </div>
           </div>
@@ -266,37 +275,37 @@ function IntimacyModal({lang,data,onClose}:{lang:Lang;data:IntimacyLocal;onClose
           ))}
         </div>
         <div style={{marginBottom:16,padding:"10px 14px",borderRadius:14,background:`rgba(${IVORY},0.02)`,border:`1px solid rgba(${IVORY},0.06)`,display:"flex",alignItems:"center",gap:10}}>
-          <StatGlyph id="decay" color={`rgba(${IVORY},0.34)`} size={15}/>
-          <span style={{fontFamily:SANS,fontSize:12,color:`rgba(${IVORY},0.34)`,lineHeight:1.4}}>{t.decay}</span>
+           <StatGlyph id="decay" color={`rgba(${IVORY},0.62)`} size={15}/>
+           <span style={{fontFamily:SANS,fontSize:12,color:`rgba(${IVORY},0.72)`,lineHeight:1.4}}>{t.decay}</span>
         </div>
         <div style={{marginBottom:20}}>
           <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}}>
-            <span style={{fontFamily:SANS,fontSize:11,color:`rgba(${IVORY},0.34)`,letterSpacing:"0.08em",textTransform:"uppercase"}}>{nextLvl?t.progress:t.maxLevel}</span>
-            {nextLvl&&<span style={{fontFamily:SERIF,fontStyle:"italic",fontSize:14,color:lvl.color,display:"flex",alignItems:"center",gap:5}}><LevelGlyph id={nextLvl.iconId} color={lvl.color} size={14}/> {lang==="ru"?nextLvl.nameRu:nextLvl.nameEn}</span>}
+             <span style={{fontFamily:SANS,fontSize:11,color:`rgba(${IVORY},0.72)`,letterSpacing:"0.08em",textTransform:"uppercase"}}>{nextLvl?t.progress:t.maxLevel}</span>
+             {nextLvl&&<span style={{fontFamily:SERIF,fontStyle:"italic",fontSize:14,color:"#78183d",display:"flex",alignItems:"center",gap:5}}><LevelGlyph id={nextLvl.iconId} color="#78183d" size={14}/> {lang==="ru"?nextLvl.nameRu:nextLvl.nameEn}</span>}
           </div>
           <div style={{height:2,borderRadius:99,background:`rgba(${IVORY},0.08)`,overflow:"hidden"}}>
             <div style={{height:"100%",borderRadius:99,width:`${Math.round(prog*100)}%`,background:`rgb(${GOLD})`,transition:`width 1.1s ${MOTION_EASE}`}}/>
           </div>
           {nextLvl&&<div style={{display:"flex",justifyContent:"space-between",marginTop:5}}>
-            <span style={{fontFamily:SANS,fontSize:10,color:`rgba(${IVORY},0.30)`}}>{data.score}</span>
-            <span style={{fontFamily:SANS,fontSize:10,color:`rgba(${IVORY},0.30)`}}>{nextLvl.min}</span>
+             <span style={{fontFamily:SANS,fontSize:10,color:`rgba(${IVORY},0.65)`}}>{data.score}</span>
+             <span style={{fontFamily:SANS,fontSize:10,color:`rgba(${IVORY},0.65)`}}>{nextLvl.min}</span>
           </div>}
         </div>
         {data.history.length>0&&(
           <div style={{marginBottom:18}}>
-            <div style={{fontFamily:SANS,fontSize:11,color:`rgba(${IVORY},0.34)`,letterSpacing:"0.08em",textTransform:"uppercase",marginBottom:10}}>{t.history}</div>
+             <div style={{fontFamily:SANS,fontSize:11,color:`rgba(${IVORY},0.7)`,letterSpacing:"0.08em",textTransform:"uppercase",marginBottom:10}}>{t.history}</div>
             <HistoryChart history={data.history}/>
           </div>
         )}
         <div style={{marginBottom:18}}>
           {data.history.length===0
-            ?<div style={{textAlign:"center",padding:"22px 0",fontFamily:SANS,fontSize:13,color:`rgba(${IVORY},0.28)`}}>{t.noHistory}</div>
+             ?<div style={{textAlign:"center",padding:"22px 0",fontFamily:SANS,fontSize:13,color:`rgba(${IVORY},0.72)`}}>{t.noHistory}</div>
             :<div style={{display:"flex",flexDirection:"column",gap:7}}>
               {[...data.history].reverse().slice(0,5).map((h,i)=>{
                 const label=h.date===today?t.today:h.date===yest?t.yesterday:h.date.slice(5).replace("-",".");
                 return (
                   <div key={i} style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"10px 14px",borderRadius:12,background:`rgba(${IVORY},0.02)`,border:`1px solid rgba(${IVORY},0.06)`}}>
-                    <span style={{fontFamily:SANS,fontSize:12,color:`rgba(${IVORY},0.38)`}}>{label}</span>
+                     <span style={{fontFamily:SANS,fontSize:12,color:`rgba(${IVORY},0.68)`}}>{label}</span>
                     <span style={{fontFamily:SERIF,fontWeight:600,fontSize:15,color:`rgb(${GOLD})`}}>+{h.points} {t.pts}</span>
                   </div>
                 );
@@ -305,17 +314,17 @@ function IntimacyModal({lang,data,onClose}:{lang:Lang;data:IntimacyLocal;onClose
           }
         </div>
         <div style={{marginBottom:20}}>
-          <div style={{fontFamily:SANS,fontSize:11,color:`rgba(${IVORY},0.34)`,letterSpacing:"0.08em",textTransform:"uppercase",marginBottom:10}}>{lang==="ru"?"Уровни":"Levels"}</div>
+           <div style={{fontFamily:SANS,fontSize:11,color:`rgba(${IVORY},0.72)`,letterSpacing:"0.08em",textTransform:"uppercase",marginBottom:10}}>{lang==="ru"?"Уровни":"Levels"}</div>
           <div style={{display:"flex",flexDirection:"column",gap:4}}>
             {LEVELS.map((l,i)=>{
               const active=getLevel(data.score)===l;
               return (
                 <div key={i} style={{display:"flex",alignItems:"center",gap:12,padding:"9px 14px",borderRadius:11,background:active?`rgba(${GOLD},0.08)`:"transparent",border:`1px solid ${active?`rgba(${GOLD},0.22)`:"transparent"}`,transition:`all ${MOTION_DURATION}ms`}}>
-                  <div style={{width:22,display:"flex",justifyContent:"center"}}><LevelGlyph id={l.iconId} color={active?l.color:`rgba(${IVORY},0.28)`} size={16}/></div>
+                   <div style={{width:22,display:"flex",justifyContent:"center"}}><LevelGlyph id={l.iconId} color={active?"#78183d":`rgba(${IVORY},0.62)`} size={16}/></div>
                   <div style={{flex:1}}>
-                    <span style={{fontFamily:active?SERIF:SANS,fontStyle:active?"italic":"normal",fontWeight:active?600:400,fontSize:14,color:active?l.color:`rgba(${IVORY},0.36)`}}>{lang==="ru"?l.nameRu:l.nameEn}</span>
+                     <span style={{fontFamily:active?SERIF:SANS,fontStyle:active?"italic":"normal",fontWeight:active?600:500,fontSize:14,color:active?"#78183d":`rgba(${IVORY},0.72)`}}>{lang==="ru"?l.nameRu:l.nameEn}</span>
                   </div>
-                  <span style={{fontFamily:SANS,fontSize:11,color:`rgba(${IVORY},0.22)`}}>{l.max===Infinity?`${l.min}+`:`${l.min}–${l.max}`}</span>
+                   <span style={{fontFamily:SANS,fontSize:11,color:`rgba(${IVORY},0.62)`}}>{l.max===Infinity?`${l.min}+`:`${l.min}–${l.max}`}</span>
                 </div>
               );
             })}
@@ -325,7 +334,7 @@ function IntimacyModal({lang,data,onClose}:{lang:Lang;data:IntimacyLocal;onClose
           {t.close}
         </button>
       </div>
-    </div>
+    </div>, document.body
   );
 }
 
@@ -445,9 +454,9 @@ export default function IntimacyIndex({lang,refreshKey=0,index=0,children}:Intim
                     <span style={{fontFamily:SANS,fontWeight:500,fontSize:11,color:`rgba(${GOLD},0.85)`}}>{t.streak(data.streakDays)}</span>
                   </div>
                 ):(
-                  <span style={{fontFamily:SANS,fontSize:11,color:`rgba(${IVORY},0.22)`}}>{t.noStreak}</span>
+                   <span style={{fontFamily:SANS,fontSize:11,color:`rgba(${IVORY},0.72)`}}>{t.noStreak}</span>
                 )}
-                <span onClick={openDetails} role="button" aria-label={t.detailsHint} style={{
+                 <span onClick={openDetails} onKeyDown={event=>{if(event.key==="Enter"||event.key===" "){event.preventDefault();event.stopPropagation();setModalOpen(true);}}} role="button" tabIndex={0} aria-label={t.detailsHint} style={{
                   fontFamily:SANS,fontSize:10,color:`rgba(${IVORY},0.30)`,letterSpacing:"0.06em",
                   textDecoration:"underline",textUnderlineOffset:3,textDecorationColor:`rgba(${IVORY},0.16)`,cursor:"pointer",
                 }}>
@@ -462,18 +471,18 @@ export default function IntimacyIndex({lang,refreshKey=0,index=0,children}:Intim
           ) : (
             <div style={{display:"flex",alignItems:"center",gap:12}}>
               <div style={{display:"flex",alignItems:"center",gap:8,minWidth:86}}>
-                <LevelGlyph id={lvl.iconId} color={lvl.color} size={16} opacity={0.85}/>
+                 <LevelGlyph id={lvl.iconId} color="#78183d" size={16} opacity={0.85}/>
                 <span style={{fontFamily:SERIF,fontWeight:600,fontSize:22,color:`rgba(${IVORY},0.95)`}}>{score}</span>
               </div>
               <div style={{flex:1,minWidth:0}}>
-                <div style={{fontFamily:SERIF,fontStyle:"italic",fontWeight:600,fontSize:14,color:lvl.color}}>{lang==="ru"?lvl.nameRu:lvl.nameEn}</div>
+                 <div style={{fontFamily:SERIF,fontStyle:"italic",fontWeight:600,fontSize:14,color:"#78183d"}}>{lang==="ru"?lvl.nameRu:lvl.nameEn}</div>
                 <div style={{height:3,borderRadius:99,background:`rgba(${IVORY},0.08)`,overflow:"hidden",marginTop:7}}>
                   <div style={{height:"100%",width:`${Math.round(prog*100)}%`,background:`rgb(${GOLD})`,borderRadius:99}}/>
                 </div>
               </div>
               <div style={{textAlign:"right",flexShrink:0}}>
-                <div style={{fontFamily:SANS,fontSize:10,color:`rgba(${GOLD},0.82)`}}>{data.streakDays > 0 ? t.streak(data.streakDays) : t.noStreak}</div>
-                <span onClick={openDetails} role="button" aria-label={t.detailsHint} style={{fontFamily:SANS,fontSize:10,color:`rgba(${IVORY},0.40)`,textDecoration:"underline",textUnderlineOffset:3,cursor:"pointer"}}>{t.detailsHint}</span>
+                 <div style={{fontFamily:SANS,fontSize:10,color:"#78183d"}}>{data.streakDays > 0 ? t.streak(data.streakDays) : t.noStreak}</div>
+                 <span onClick={openDetails} onKeyDown={event=>{if(event.key==="Enter"||event.key===" "){event.preventDefault();event.stopPropagation();setModalOpen(true);}}} role="button" tabIndex={0} aria-label={t.detailsHint} style={{fontFamily:SANS,fontSize:10,color:"#78183d",fontWeight:700,textDecoration:"underline",textUnderlineOffset:3,cursor:"pointer"}}>{t.detailsHint}</span>
               </div>
             </div>
           )}

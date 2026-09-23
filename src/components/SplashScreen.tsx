@@ -25,8 +25,8 @@ export default function SplashScreen({ onDone, linkStatus="idle", skipDelay=fals
   const status=linkStatus==="linking"?"Connecting your pair…":linkStatus==="linked"?"Pair connected":linkStatus==="error"?"Try again later":"";
   return <div className="pop-screen" data-testid="screen-splash" style={{ display:"grid", placeItems:"center" }}>
     <div className="pop-screen__inner pop-fade" data-mounted={phase!=="enter"} style={{ textAlign:"center", padding:"24px" }}>
-      <div style={{ margin:"0 auto 18px", width:84, height:84, display:"grid", placeItems:"center", border:"2px solid var(--pop-ink)", borderRadius:"42% 58% 56% 44%", background:"var(--pop-yellow)", transform:"rotate(12deg)", boxShadow:"5px 5px 0 var(--pop-ink)" }}>
-        <span style={{ font:"700 42px Space Grotesk", transform:"rotate(-12deg)" }}>2</span>
+      <div className="pop-heart-mark" style={{ margin:"0 auto 18px", width:84, height:84, display:"grid", placeItems:"center", border:"2px solid var(--pop-ink)", borderRadius:"42% 58% 56% 44%", transform:"rotate(12deg)" }} aria-hidden="true">
+        <span style={{ fontSize:47, transform:"rotate(-12deg)", lineHeight:1 }}>♥</span>
       </div>
       <div className="pop-brand" style={{ fontSize:44 }} data-testid="text-splash-brand">Touché<em>.</em></div>
       <div style={{ marginTop:9, fontSize:10, letterSpacing:".3em", textTransform:"uppercase", color:"var(--pop-muted)" }}>for two</div>

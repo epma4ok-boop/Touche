@@ -27,4 +27,16 @@
 .pop-choice strong { display: block; font-size: 17px; }.pop-choice small { display: block; margin-top: 3px; color: var(--pop-muted); font-size: 11px; }
 .pop-fade { opacity: 0; transform: translateY(14px); transition: opacity .45s ease, transform .45s ease; }
 .pop-fade[data-mounted="true"] { opacity: 1; transform: translateY(0); }
+.pop-heart-mark {
+  background: linear-gradient(145deg,#d44770,var(--pop-wine));
+  color: #fff;
+  box-shadow: 5px 5px 0 rgba(120,24,61,.22);
+  animation: pop-mark-beat 2.8s ease-in-out infinite;
+}
+@keyframes pop-mark-beat {
+  0%,38%,55%,100% { transform:rotate(12deg) scale(1); }
+  45% { transform:rotate(12deg) scale(1.07); }
+  60% { transform:rotate(12deg) scale(1.035); }
+}
+@media (prefers-reduced-motion: reduce) { .pop-heart-mark { animation:none; } }
 @media (max-height: 700px) { .pop-title { font-size: 40px; } }

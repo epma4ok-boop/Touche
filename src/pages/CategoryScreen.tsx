@@ -73,12 +73,13 @@ async function generateAITask(
 }
 
 function useTelegramTopInset(): string {
-  const [top, setTop] = useState(0);
+  const [top, setTop] = useState(() => window.Telegram?.WebApp ? 96 : 0);
   useEffect(() => {
     const tg = window.Telegram?.WebApp as any;
     const update = () => {
-      const total = (tg?.contentSafeAreaInset?.top ?? 0) + (tg?.safeAreaInset?.top ?? 0);
-      if (total > 10) setTop(total + 8);
+      const c = tg?.contentSafeAreaInset?.top ?? 0;
+      const s = tg?.safeAreaInset?.top ?? 0;
+      setTop(tg ? Math.max(96, s + 72, c + s + 16) : 0);
     };
     update();
     tg?.onEvent?.("safeAreaChanged", update);
@@ -294,7 +295,7 @@ export default function CategoryScreen({ lang, gender, category, onBack, onCateg
       <div className="category-pop__content">
         <section className="category-pop__hero">
           <span className="category-pop__stamp">{mode === "together" ? t.sharedTask : `18+ · ${t.lockSub}`}</span>
-           <div className="category-pop__orb" style={{ background: `rgb(${popColor.r},${popColor.g},${popColor.b})` }} aria-hidden="true">{String(index + 1).padStart(2, "0")}</div>
+           <div className="category-pop__orb" style={{ backgroundImage: `linear-gradient(rgba(31,10,27,.18),rgba(31,10,27,.58)),url(/images/cat-${category}-tile.webp)` }} aria-hidden="true">{String(index + 1).padStart(2, "0")}</div>
           <p className="category-pop__eyebrow">{categorySub(category, t)}</p>
           <h1 data-testid="text-category-title">{label}</h1>
            <p className="category-pop__description">{({

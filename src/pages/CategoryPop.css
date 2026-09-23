@@ -12,3 +12,10 @@
 .category-pop__eyebrow,.category-pop__remaining { color:var(--pop-wine); }
 .category-pop__warning { border-color:var(--pop-wine); background:var(--pop-blush); color:var(--pop-wine); }
 .task-reveal { background:linear-gradient(155deg,#ffd8c8 0%,#f69d9f 60%,#e8708e 100%); }
+.category-pop__orb {
+  background-size: cover;
+  background-position: center;
+  color: #fff;
+  text-shadow: 0 2px 8px rgba(22,10,28,.85);
+  box-shadow: 4px 5px 0 rgba(120,24,61,.18);
+}

@@ -24,12 +24,13 @@ function getCoupleId() { try { return localStorage.getItem(COUPLE_KEY); } catch 
 function getInitData() { return (window as any).Telegram?.WebApp?.initData ?? ""; }
 
 function useTelegramTopInset() {
-  const [topPx, setTopPx] = useState(0);
+  const [topPx, setTopPx] = useState(() => (window as any).Telegram?.WebApp ? 96 : 0);
   useEffect(() => {
     const tg = (window as any).Telegram?.WebApp;
     const compute = () => {
-      const value = (tg?.contentSafeAreaInset?.top ?? 0) + (tg?.safeAreaInset?.top ?? 0);
-      if (value > 10) setTopPx(value + 10);
+      const c = tg?.contentSafeAreaInset?.top ?? 0;
+      const s = tg?.safeAreaInset?.top ?? 0;
+      setTopPx(tg ? Math.max(96, s + 72, c + s + 16) : 0);
     };
     compute(); tg?.onEvent?.("safeAreaChanged", compute); tg?.onEvent?.("contentSafeAreaInsetChanged", compute);
     const timer = setTimeout(compute, 800);

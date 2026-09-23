@@ -51,14 +51,14 @@ interface HomeProps {
 }
 
 function useTelegramTopInset(): number {
-  const [topPx, setTopPx] = useState(44);
+  const [topPx, setTopPx] = useState(() => window.Telegram?.WebApp ? 96 : 18);
   useEffect(() => {
     const tg = window.Telegram?.WebApp as any;
     function compute() {
       const c = tg?.contentSafeAreaInset?.top ?? 0;
       const s = tg?.safeAreaInset?.top ?? 0;
-      const total = c + s;
-      setTopPx(total > 10 ? total + 10 : 44);
+      // Telegram's "Close" control can cover the top even when insets report zero.
+      setTopPx(tg ? Math.max(96, s + 72, c + s + 16) : 18);
     }
     compute();
     tg?.onEvent?.("safeAreaChanged", compute);
@@ -79,11 +79,11 @@ const PINK      = `rgb(${PR},${PG},${PB})`;
 const PINK_GLOW = `drop-shadow(0 0 6px rgba(${PR},${PG},${PB},1)) drop-shadow(0 0 14px rgba(${PR},${PG},${PB},0.55))`;
 
 const CAT_IMG: Record<Category | "scenarios" | "invite", string> = {
-  compliments: "/images/cat-compliments.png",
-  tenderness:  "/images/cat-tenderness.png",
-  desire:      "/images/cat-desire.png",
-  passion:     "/images/cat-passion.png",
-  hard:        "/images/cat-hard.png",
+  compliments: "/images/cat-compliments-tile.webp",
+  tenderness:  "/images/cat-tenderness-tile.webp",
+  desire:      "/images/cat-desire-tile.webp",
+  passion:     "/images/cat-passion-tile.webp",
+  hard:        "/images/cat-hard-tile.webp",
   scenarios:   "/images/cat-scenarios.png",
   invite:      "/images/cat-invite.png",
 };
@@ -1190,7 +1190,7 @@ export default function Home({
         {/* ── Header ── */}
         <div className="pop-header" style={{ paddingTop: topPx, paddingLeft: 20, paddingRight: 20, paddingBottom: 4, display: "flex", alignItems: "center", justifyContent: "space-between", position: "relative", zIndex: 1, flexShrink: 0 }}>
           {/* Hamburger */}
-          <button onClick={() => { setShowMenu(true); window.Telegram?.WebApp?.HapticFeedback?.impactOccurred("light"); }} style={{ width: 38, height: 38, borderRadius: 12, background: "rgba(255,238,248,0.05)", border: `1px solid rgba(${PR},${PG},${PB},0.22)`, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 4.5, cursor: "pointer", flexShrink: 0, padding: 0, animation: "menuBtnPulse 4s ease-in-out 2s infinite" }}>
+          <button aria-label={lang === "ru" ? "Открыть меню" : "Open menu"} onClick={() => { setShowMenu(true); window.Telegram?.WebApp?.HapticFeedback?.impactOccurred("light"); }} style={{ width: 38, height: 38, borderRadius: 12, background: "rgba(255,238,248,0.05)", border: `1px solid rgba(${PR},${PG},${PB},0.22)`, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 4.5, cursor: "pointer", flexShrink: 0, padding: 0, animation: "menuBtnPulse 4s ease-in-out 2s infinite" }}>
             {[0,1,2].map(i => <div key={i} style={{ width: i===1?12:16, height: 1.5, borderRadius: 99, background: `rgba(${PR},${PG},${PB},0.80)` }} />)}
           </button>
 

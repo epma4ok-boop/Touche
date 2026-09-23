@@ -1,5 +1,6 @@
 import { useState, useCallback, useEffect } from "react";
 import { type Lang, UI } from "@/data/i18n";
+import type { Gender } from "@/components/GenderSelect";
 import { BOT_USERNAME } from "@/config";
 import HeartbeatCanvas from "@/components/HeartbeatCanvas";
 import SmokeBackground from "@/components/SmokeBackground";
@@ -34,6 +35,7 @@ function clearActiveScenario() { try { localStorage.removeItem(ACTIVE_SCENARIO_K
 
 type Intensity = "romantic" | "passion" | "hard";
 type Phase     = "idle" | "revealed" | "no_partner";
+type ErrorKind = "subscription_required" | "rate_limited" | "unknown";
 
 function getCoupleId() { try { return localStorage.getItem(COUPLE_KEY); } catch { return null; } }
 function getInitData(): string { return (window as any).Telegram?.WebApp?.initData ?? ""; }
@@ -263,10 +265,20 @@ function TheatricalOrbit({ intensity }: { intensity: Intensity }) {
   );
 }
 
-/* ── Main screen ─────────────────────────────────────────────────────────────*/
-interface ScenarioScreenProps { lang: Lang; onBack: () => void; }
+const SCENARIO_COPY: Record<Lang, {
+  adult: string; subscription: string; rate: string; unknown: string; upgrade: string; dismiss: string;
+}> = {
+  ru: { adult: "18+ контент. Выбирайте только то, что комфортно обоим.", subscription: "Сценарии доступны в Premium.", rate: "Слишком много запросов. Попробуйте позже.", unknown: "Не удалось создать сценарий. Попробуйте ещё раз.", upgrade: "Открыть Premium", dismiss: "Понятно" },
+  en: { adult: "18+ content. Choose only what feels comfortable for both.", subscription: "Scenarios are available in Premium.", rate: "Too many requests. Try again later.", unknown: "Could not create a scenario. Try again.", upgrade: "Open Premium", dismiss: "Dismiss" },
+  hi: { adult: "18+ सामग्री। केवल वही चुनें जिसमें दोनों सहज हों।", subscription: "दृश्य Premium में उपलब्ध हैं।", rate: "बहुत अधिक अनुरोध। बाद में प्रयास करें।", unknown: "दृश्य नहीं बन सका। फिर प्रयास करें।", upgrade: "Premium खोलें", dismiss: "समझ गया" },
+  pt: { adult: "Conteúdo 18+. Escolham apenas o que for confortável para os dois.", subscription: "Cenários estão disponíveis no Premium.", rate: "Muitas solicitações. Tente mais tarde.", unknown: "Não foi possível criar o cenário. Tente novamente.", upgrade: "Abrir Premium", dismiss: "Entendi" },
+  es: { adult: "Contenido 18+. Elijan solo lo que sea cómodo para ambos.", subscription: "Los escenarios están disponibles en Premium.", rate: "Demasiadas solicitudes. Inténtalo más tarde.", unknown: "No se pudo crear el escenario. Inténtalo de nuevo.", upgrade: "Abrir Premium", dismiss: "Entendido" },
+};
 
-export default function ScenarioScreen({ lang, onBack }: ScenarioScreenProps) {
+/* ── Main screen ─────────────────────────────────────────────────────────────*/
+interface ScenarioScreenProps { lang: Lang; gender?: Gender; onBack: () => void; onUpgrade?: () => Promise<boolean>; }
+
+export default function ScenarioScreen({ lang, gender, onBack, onUpgrade }: ScenarioScreenProps) {
   const [phase, setPhase]         = useState<Phase>(() => getCoupleId() ? "idle" : "no_partner");
   const [intensity, setIntensity] = useState<Intensity>("passion");
   const [isCasting, setIsCasting] = useState(false);
@@ -278,6 +290,7 @@ export default function ScenarioScreen({ lang, onBack }: ScenarioScreenProps) {
   const [revealIntensity, setRevealIntensity] = useState<Intensity>("passion");
   const [notified,        setNotified]        = useState(false);
   const [isMissed,        setIsMissed]        = useState(false);
+  const [errorKind,       setErrorKind]       = useState<ErrorKind | null>(null);
 
   const t          = T[lang];
   const meta       = INTENSITY_META[intensity];
@@ -330,9 +343,15 @@ export default function ScenarioScreen({ lang, onBack }: ScenarioScreenProps) {
       const res = await fetch("/api/scenario/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json", "x-telegram-init-data": getInitData() },
-        body: JSON.stringify({ coupleId, lang, intensity }),
+        body: JSON.stringify({ coupleId, lang, intensity, gender }),
       });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        if (res.status === 403 && body.error === "subscription_required") setErrorKind("subscription_required");
+        else if (res.status === 429) setErrorKind("rate_limited");
+        else setErrorKind("unknown");
+        return;
+      }
       const data = await res.json();
       const title    = data.title  ?? "";
       const roleText = data.roleA  ?? "";
@@ -342,21 +361,11 @@ export default function ScenarioScreen({ lang, onBack }: ScenarioScreenProps) {
       saveActiveScenario({ sessionId: data.sessionId ?? "", role: "a", roleText, title, intensity, notified: isNotified });
       setPhase("revealed");
     } catch {
-      const fallbacks: Record<Lang, Record<Intensity, { title: string; role: string }>> = {
-        ru: { romantic: { title: "Детектив и свидетель", role: "Задавай партнёру личные вопросы. Только слова." }, passion: { title: "Фотограф и модель", role: "Снимай партнёра, не касаясь. Ищи красоту." }, hard: { title: "Хозяин и слуга", role: "Отдавай конкретные смелые приказы. Без объяснений." } },
-        en: { romantic: { title: "Detective & Witness", role: "Ask personal questions. No touching — words only." }, passion: { title: "Photographer & Model", role: "Photograph without touching. Find beauty." }, hard: { title: "Master & Servant", role: "Give bold commands. No explanations." } },
-        hi: { romantic: { title: "जासूस और गवाह", role: "व्यक्तिगत सवाल पूछें। केवल शब्द।" }, passion: { title: "फोटोग्राफर और मॉडल", role: "बिना छुए फोटो खींचें। सुंदरता खोजें।" }, hard: { title: "स्वामी और सेवक", role: "साहसी आदेश दें। कोई स्पष्टीकरण नहीं।" } },
-        pt: { romantic: { title: "Detetive e Testemunha", role: "Faça perguntas pessoais. Apenas palavras." }, passion: { title: "Fotógrafo e Modelo", role: "Fotografe sem tocar. Encontre beleza." }, hard: { title: "Mestre e Servo", role: "Dê ordens ousadas. Sem explicações." } },
-        es: { romantic: { title: "Detective y Testigo", role: "Haz preguntas personales. Solo palabras." }, passion: { title: "Fotógrafo y Modelo", role: "Fotografía sin tocar. Encuentra belleza." }, hard: { title: "Amo y Sirviente", role: "Da órdenes atrevidas. Sin explicaciones." } },
-      };
-      const chosen = fallbacks[lang]?.[intensity];
-      setRevealTitle(chosen.title); setRevealRoleText(chosen.role); setRevealIntensity(intensity); setNotified(false);
-      saveActiveScenario({ sessionId: "", role: "a", roleText: chosen.role, title: chosen.title, intensity, notified: false });
-      setPhase("revealed");
+      setErrorKind("unknown");
     } finally {
       setIsCasting(false); setHintText(T[lang].holdHint);
     }
-  }, [isCasting, lang, intensity]);
+  }, [isCasting, lang, intensity, gender]);
 
   const handleCardBack = useCallback(() => { setPhase("idle"); }, []);
   const handleComplete = useCallback(() => {
@@ -372,7 +381,7 @@ export default function ScenarioScreen({ lang, onBack }: ScenarioScreenProps) {
       <div style={{ display: "flex", alignItems: "center", paddingTop: topPadding, paddingLeft: 20, paddingRight: 20, paddingBottom: 6, flexShrink: 0, position: "relative", zIndex: 10 }}>
         <button onClick={onBack} style={{ background: "transparent", border: "none", cursor: "pointer", fontFamily: "'Plus Jakarta Sans','DM Sans',sans-serif", fontWeight: 500, fontSize: 15, color: TEXT_S, padding: "4px 0", minWidth: 56 }}>{t.back}</button>
         <div style={{ flex: 1 }} />
-        <span style={{ fontFamily: "'Plus Jakarta Sans','DM Sans',sans-serif", fontWeight: 500, fontSize: 10, letterSpacing: "0.14em", textTransform: "uppercase", color: `rgba(${meta.r},${meta.g},${meta.b},0.70)`, background: `rgba(${meta.r},${meta.g},${meta.b},0.10)`, border: `1px solid rgba(${meta.r},${meta.g},${meta.b},0.22)`, borderRadius: 20, padding: "3px 9px" }}>free ✦</span>
+        <span style={{ fontFamily: "'Plus Jakarta Sans','DM Sans',sans-serif", fontWeight: 500, fontSize: 10, letterSpacing: "0.14em", textTransform: "uppercase", color: `rgba(${meta.r},${meta.g},${meta.b},0.70)`, background: `rgba(${meta.r},${meta.g},${meta.b},0.10)`, border: `1px solid rgba(${meta.r},${meta.g},${meta.b},0.22)`, borderRadius: 20, padding: "3px 9px" }}>premium ✦</span>
         <div style={{ minWidth: 56 }} />
       </div>
       <div style={{ flexShrink: 0, position: "relative", height: 64, overflow: "hidden", borderBottom: `0.5px solid rgba(${meta.r},${meta.g},${meta.b},0.18)`, transition: "border-color .5s" }}>
@@ -385,6 +394,11 @@ export default function ScenarioScreen({ lang, onBack }: ScenarioScreenProps) {
         </div>
       </div>
       <IntensitySelector value={intensity} onChange={setIntensity} lang={lang} />
+      {intensity !== "romantic" && (
+        <div style={{ margin: "5px 18px 0", padding: "8px 12px", borderRadius: 12, background: `rgba(${meta.r},${meta.g},${meta.b},.10)`, border: `1px solid rgba(${meta.r},${meta.g},${meta.b},.20)`, color: `rgba(255,238,248,.62)`, fontSize: 11, lineHeight: 1.4, textAlign: "center", position: "relative", zIndex: 10 }}>
+          {SCENARIO_COPY[lang].adult}
+        </div>
+      )}
       <div style={{ flex: 1, position: "relative", minHeight: 0 }}>
         <HeartbeatCanvas onHoldComplete={handleHoldComplete} isCasting={isCasting} color={canvasColor} hintText={hintText} holdDuration={2600} baseRScale={0.28} bgColor={BG} />
         <TheatricalOrbit intensity={intensity} />
@@ -392,6 +406,17 @@ export default function ScenarioScreen({ lang, onBack }: ScenarioScreenProps) {
       <div style={{ flexShrink: 0, padding: `8px 20px max(20px,env(safe-area-inset-bottom))`, textAlign: "center", position: "relative", zIndex: 10 }}>
         <span style={{ fontFamily: "'Plus Jakarta Sans','DM Sans',sans-serif", fontWeight: 300, fontSize: 11, letterSpacing: "0.14em", textTransform: "uppercase", color: TEXT_T }}>touché</span>
       </div>
+      {errorKind && (
+        <div role="alert" style={{ position: "absolute", left: 22, right: 22, bottom: 70, zIndex: 20, padding: "16px 18px", borderRadius: 18, background: "rgba(22,10,20,.95)", border: `1px solid rgba(${meta.r},${meta.g},${meta.b},.38)`, textAlign: "center" }}>
+          <div style={{ color: TEXT_P, fontSize: 14, lineHeight: 1.45 }}>
+            {errorKind === "subscription_required" ? SCENARIO_COPY[lang].subscription : errorKind === "rate_limited" ? SCENARIO_COPY[lang].rate : SCENARIO_COPY[lang].unknown}
+          </div>
+          {errorKind === "subscription_required" && onUpgrade && (
+            <button onClick={onUpgrade} style={{ marginTop: 12, minHeight: 44, padding: "10px 18px", borderRadius: 12, border: "none", background: `rgb(${meta.r},${meta.g},${meta.b})`, color: "#fff", fontWeight: 700 }}>{SCENARIO_COPY[lang].upgrade}</button>
+          )}
+          <button onClick={() => setErrorKind(null)} style={{ display: "block", margin: "9px auto 0", minHeight: 36, border: "none", background: "transparent", color: TEXT_S }}>{SCENARIO_COPY[lang].dismiss}</button>
+        </div>
+      )}
       {phase === "revealed" && (
         <RoleCard title={revealTitle} roleText={revealRoleText} intensity={revealIntensity} lang={lang} notified={notified} onComplete={handleComplete} onHideCard={handleCardBack} isMissed={isMissed} topPadding={topPadding} />
       )}

@@ -4,7 +4,6 @@ import type { AppMode } from "@/App";
 import HeartbeatCanvas from "@/components/HeartbeatCanvas";
 import { UI, CATEGORY_CONFIG, CATEGORIES_ORDER, type Lang, type Category } from "@/data/i18n";
 import { playReveal, playDismiss } from "@/hooks/useSensualSound";
-import { TASKS_RU, TASKS_EN } from "@/data/tasks";
 import { addLocalPoints } from "@/data/intimacy";
 import SmokeBackground from "@/components/SmokeBackground";
 import { SMOKE_BY_CATEGORY, SMOKE_DEFAULT } from "@/theme/palette";
@@ -15,11 +14,8 @@ const TEXT_S = "rgba(255,238,248,0.44)";
 const TEXT_T = "rgba(255,238,248,0.22)";
 
 const HISTORY_KEY = "touche_history_v2";
-const FREE_LIMIT  = 3; // tasks per day per category
-
 type HistoryEntry = { id: string; text: string; category: Category; date: string };
 
-function getTodayStr() { return new Date().toISOString().slice(0, 10); }
 function loadHistory(): HistoryEntry[]  { try { const v = localStorage.getItem(HISTORY_KEY); if (v) return JSON.parse(v); } catch {} return []; }
 function saveHistory(h: HistoryEntry[]) { try { localStorage.setItem(HISTORY_KEY, JSON.stringify(h)); } catch {} }
 
@@ -29,54 +25,34 @@ function getInitData(): string {
   return window.Telegram?.WebApp?.initData ?? "";
 }
 
-async function fetchServerRemaining(category: Category): Promise<{ remaining: number; locked: boolean } | null> {
-  try {
-    const res = await fetch(`/api/limits?category=${category}`, {
-      headers: { "x-telegram-init-data": getInitData() },
-    });
-    if (!res.ok) return null;
-    const d = await res.json();
-    return { remaining: d.remaining ?? 0, locked: d.locked ?? false };
-  } catch {
-    return null;
-  }
-}
+type TaskResult = { task: string; taskId: string | null; remaining?: number; source?: "ai" | "fallback" };
+type TaskError = { kind: "unauthorized" | "subscription_required" | "limit_exceeded" | "rate_limited" | "unknown"; message?: string };
 
-async function consumeServerLimit(category: Category): Promise<boolean> {
-  try {
-    const res = await fetch("/api/limits", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", "x-telegram-init-data": getInitData() },
-      body: JSON.stringify({ category }),
-    });
-    return res.ok;
-  } catch {
-    return true;
-  }
-}
-
-async function generateAITask(category: Category, lang: Lang, gender?: Gender): Promise<string | null> {
+async function generateAITask(category: Category, lang: Lang, gender: Gender | undefined, mode: AppMode, coupleId: string | null): Promise<{ result?: TaskResult; error?: TaskError }> {
   try {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 8000);
     const res = await fetch("/api/tasks/generate", {
       method: "POST",
       headers: { "Content-Type": "application/json", "x-telegram-init-data": getInitData() },
-      body: JSON.stringify({ category, lang, gender }),
+      body: JSON.stringify({ category, lang, gender, mode, coupleId }),
       signal: controller.signal,
     });
     clearTimeout(timeout);
-    if (!res.ok) return null;
+    if (!res.ok) {
+      const body = await res.json().catch(() => ({}));
+      const kind = res.status === 401 ? "unauthorized"
+        : res.status === 403 && body.error === "subscription_required" ? "subscription_required"
+        : res.status === 403 && body.error === "limit_exceeded" ? "limit_exceeded"
+        : res.status === 429 ? "rate_limited" : "unknown";
+      return { error: { kind, message: body.message ?? body.error } };
+    }
     const data = await res.json();
-    return data.task ?? null;
+    if (!data.task) return { error: { kind: "unknown" } };
+    return { result: { task: data.task, taskId: data.taskId ?? null, remaining: data.remaining, source: data.source ?? "ai" } };
   } catch {
-    return null;
+    return { error: { kind: "unknown" } };
   }
-}
-
-function pickStaticTask(category: Category, lang: Lang): string {
-  const pool = (lang === "ru" ? TASKS_RU : TASKS_EN)[category] ?? [];
-  return pool[Math.floor(Math.random() * pool.length)] ?? (lang === "ru" ? "Обними партнёра." : "Hug your partner.");
 }
 
 function useTelegramTopInset(): string {
@@ -291,14 +267,16 @@ function HistoryPanel({ entries, open, onClose, accentRgb, lang }: {
 }
 
 // ── Main screen ───────────────────────────────────────────────────────────────
-interface Props { lang: Lang; gender?: import("@/components/GenderSelect").Gender; category: Category; onBack: () => void; onCategoryChange: (c: Category) => void; swipeDir: "left" | "right"; coupleId?: string | null; mode?: AppMode; }
+interface Props { lang: Lang; gender?: import("@/components/GenderSelect").Gender; category: Category; onBack: () => void; onCategoryChange: (c: Category) => void; swipeDir: "left" | "right"; coupleId?: string | null; mode?: AppMode; onUpgrade?: () => Promise<boolean>; }
 
-export default function CategoryScreen({ lang, gender, category, onBack, onCategoryChange, swipeDir, coupleId, mode = "solo" }: Props) {
+export default function CategoryScreen({ lang, gender, category, onBack, onCategoryChange, swipeDir, coupleId, mode = "solo", onUpgrade }: Props) {
   const cfg = CATEGORY_CONFIG[category]; const { r, g, b } = cfg; const t = UI[lang];
 
   const [mounted, setMounted] = useState(false);
   const [history, setHistory] = useState<HistoryEntry[]>(loadHistory);
-  const [remaining, setRemaining] = useState<number>(FREE_LIMIT);
+  const [remaining, setRemaining] = useState<number | null>(null);
+  const [taskId, setTaskId] = useState<string | null>(null);
+  const [errorKind, setErrorKind] = useState<TaskError["kind"] | null>(null);
   const [isCasting, setIsCasting] = useState(false);
   const [taskText, setTaskText] = useState("");
   const [taskSource, setTaskSource] = useState<"ai" | "fallback">("fallback");
@@ -311,6 +289,13 @@ export default function CategoryScreen({ lang, gender, category, onBack, onCateg
   const touchStartX = useRef(0); const touchStartY = useRef(0); const swipeLocked = useRef(false);
   const revealTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const catIdx = CATEGORIES_ORDER.indexOf(category);
+  const errorCopy = {
+    subscription_required: lang === "ru" ? "Эта категория доступна в Premium." : "This category is available in Premium.",
+    limit_exceeded: lang === "ru" ? "Лимит на сегодня закончился." : "Today's limit is used.",
+    rate_limited: lang === "ru" ? "Слишком много запросов. Попробуйте чуть позже." : "Too many requests. Try again shortly.",
+    unauthorized: lang === "ru" ? "Откройте приложение из Telegram заново." : "Please reopen the app from Telegram.",
+    unknown: lang === "ru" ? "Не удалось получить задание. Попробуйте ещё раз." : "Could not get a task. Try again.",
+  } as const;
 
   useEffect(() => {
     requestAnimationFrame(() => setMounted(true));
@@ -320,11 +305,6 @@ export default function CategoryScreen({ lang, gender, category, onBack, onCateg
     updateVh();
     tg?.onEvent?.("viewportChanged", updateVh);
     const tm = setTimeout(updateVh, 500);
-
-    // Fetch remaining from server (all categories are free)
-    fetchServerRemaining(category).then((limitsData) => {
-      if (limitsData !== null) setRemaining(limitsData.remaining);
-    });
 
     return () => { tg?.offEvent?.("viewportChanged", updateVh); clearTimeout(tm); };
   }, [category]);
@@ -356,23 +336,22 @@ export default function CategoryScreen({ lang, gender, category, onBack, onCateg
   const handleHoldComplete = useCallback(async () => {
     if (isCasting) return;
     const tg = window.Telegram?.WebApp;
-    if (remaining <= 0) {
-      tg?.HapticFeedback?.notificationOccurred?.("error");
-      return;
-    }
     tg?.HapticFeedback?.impactOccurred("medium");
     setIsCasting(true);
     setHintText(t.tapping);
-
-    const [aiTask] = await Promise.all([
-      generateAITask(category, lang, gender),
-      consumeServerLimit(category),
-    ]);
-
-    const picked = aiTask ?? pickStaticTask(category, lang);
-    const src: "ai" | "fallback" = aiTask ? "ai" : "fallback";
-
-    setRemaining(prev => Math.max(0, prev - 1));
+    setErrorKind(null);
+    const generated = await generateAITask(category, lang, gender, mode, coupleId ?? null);
+    if (!generated.result) {
+      setErrorKind(generated.error?.kind ?? "unknown");
+      setIsCasting(false);
+      setHintText(t.hint);
+      tg?.HapticFeedback?.notificationOccurred?.("error");
+      return;
+    }
+    const picked = generated.result.task;
+    const src: "ai" | "fallback" = generated.result.source ?? "ai";
+    setTaskId(generated.result.taskId);
+    if (typeof generated.result.remaining === "number") setRemaining(generated.result.remaining);
 
     const newEntry: HistoryEntry = { id: `${Date.now()}-${Math.random()}`, text: picked, category, date: new Date().toISOString() };
     const newHistory = [...history, newEntry];
@@ -386,22 +365,24 @@ export default function CategoryScreen({ lang, gender, category, onBack, onCateg
 
     if (revealTimer.current) clearTimeout(revealTimer.current);
     revealTimer.current = setTimeout(() => setShowReveal(true), 80);
-  }, [isCasting, remaining, category, lang, history, t]);
+  }, [isCasting, category, lang, gender, mode, coupleId, history, t]);
 
   const handleDismiss = useCallback(() => {
-    addLocalPoints(category);
-    window.dispatchEvent(new CustomEvent("touche-intimacy-updated"));
-    if (coupleId) {
+    if (mode === "together" && coupleId && taskId) {
       const initData = window.Telegram?.WebApp?.initData ?? "";
       fetch("/api/couple/intimacy?action=complete", {
         method: "POST",
         headers: { "Content-Type": "application/json", "x-telegram-init-data": initData },
-        body: JSON.stringify({ category }),
+        body: JSON.stringify({ task_id: taskId }),
+      }).then((response) => {
+        if (!response.ok) return;
+        addLocalPoints(category);
+        window.dispatchEvent(new CustomEvent("touche-intimacy-updated"));
       }).catch(() => {});
     }
     setShowReveal(false);
     setTimeout(() => { setTaskText(""); setHintText(t.hint); }, 400);
-  }, [category, coupleId, t.hint]);
+  }, [category, coupleId, mode, taskId, t.hint]);
 
   const enterX = swipeDir === "left" ? 60 : -60;
   const height = vh ? `${vh}px` : "100dvh";
@@ -447,8 +428,13 @@ export default function CategoryScreen({ lang, gender, category, onBack, onCateg
       )}
 
       <CategoryHeader category={category} catLabel={catLabels[category]} catSub={catSubs[category]} />
+      {(category === "passion" || category === "hard") && (
+        <div style={{ margin: "7px 20px 0", padding: "8px 12px", borderRadius: 12, background: `rgba(${r},${g},${b},.09)`, border: `1px solid rgba(${r},${g},${b},.20)`, color: `rgba(255,238,248,.58)`, fontSize: 11, lineHeight: 1.4, textAlign: "center", position: "relative", zIndex: 10 }}>
+          {lang === "ru" ? "18+ контент · выбирайте только то, что комфортно обоим" : "18+ content · choose only what feels comfortable for both"}
+        </div>
+      )}
 
-      {remaining > 0 && (
+      {remaining !== null && remaining > 0 && (
         <div style={{ textAlign: "center", flexShrink: 0, position: "relative", zIndex: 10, paddingTop: 4 }}>
           <span style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", fontWeight: 300, fontSize: 11, letterSpacing: "0.10em", textTransform: "uppercase", color: `rgba(${r},${g},${b},.48)` }}>{t.remaining(remaining)}</span>
         </div>
@@ -464,6 +450,24 @@ export default function CategoryScreen({ lang, gender, category, onBack, onCateg
           baseRScale={0.28}
           bgColor={BG}
         />
+        {errorKind && (
+          <div role="alert" style={{
+            position: "absolute", left: 22, right: 22, bottom: 24, zIndex: 12,
+            padding: "16px 18px", borderRadius: 18,
+            background: "rgba(22,10,20,.92)", border: `1px solid rgba(${r},${g},${b},.36)`,
+            boxShadow: `0 14px 36px rgba(0,0,0,.28)`, textAlign: "center",
+          }}>
+            <div style={{ color: TEXT_P, fontSize: 14, lineHeight: 1.45 }}>{errorCopy[errorKind]}</div>
+            {errorKind === "subscription_required" && onUpgrade && (
+              <button onClick={onUpgrade} style={{ marginTop: 12, minHeight: 44, padding: "10px 18px", borderRadius: 12, border: "none", background: `rgb(${r},${g},${b})`, color: "#fff", fontWeight: 700, cursor: "pointer" }}>
+                {lang === "ru" ? "Открыть Premium" : "Open Premium"}
+              </button>
+            )}
+            <button onClick={() => setErrorKind(null)} style={{ display: "block", margin: "10px auto 0", border: "none", background: "transparent", color: TEXT_S, minHeight: 36, cursor: "pointer" }}>
+              {lang === "ru" ? "Понятно" : "Dismiss"}
+            </button>
+          </div>
+        )}
       </div>
 
       <div style={{ flexShrink: 0, position: "relative", zIndex: 10, paddingBottom: 6 }}>

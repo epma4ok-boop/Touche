@@ -6,6 +6,7 @@ import type { AppMode } from "@/App";
 import IntimacyIndex from "@/components/IntimacyIndex";
 import SmokeBackground from "@/components/SmokeBackground";
 import { BRAND } from "@/theme/palette";
+import { BOT_USERNAME } from "@/config";
 
 declare global {
   interface Window {
@@ -36,7 +37,8 @@ interface HomeProps {
   onGenderSwitch?: (g: Gender) => void;
   onModeChange: (mode: AppMode) => void;
   onLinkCouple: (refUserId: number) => Promise<boolean>;
-  onUnlinkCouple: () => void;
+  onUnlinkCouple: () => Promise<boolean>;
+  onSubscribe: () => Promise<boolean>;
 }
 
 function useTelegramTopInset(): number {
@@ -648,20 +650,20 @@ function CoupleModal({ lang, coupleId, pendingRefUserId, onLink, onUnlink, onClo
   coupleId: string | null;
   pendingRefUserId: number | null;
   onLink: (refUserId: number) => Promise<boolean>;
-  onUnlink: () => void;
+  onUnlink: () => Promise<boolean>;
   onClose: () => void;
 }) {
   const lb = COUPLE_LABELS[lang];
   const [confirm, setConfirm] = useState(false);
   const [linking, setLinking] = useState(false);
+  const [unlinking, setUnlinking] = useState(false);
+  const [error, setError] = useState("");
 
   const myId = window.Telegram?.WebApp?.initDataUnsafe?.user?.id;
-  const BOT = "ToucheCoupleBot";
-
   function handleShareMyLink() {
     const tg = window.Telegram?.WebApp;
     if (!myId) return;
-    const link = `https://t.me/${BOT}/Touche?startapp=ref_${myId}`;
+    const link = `https://t.me/${BOT_USERNAME}/Touche?startapp=ref_${myId}`;
     const msg = lang === "ru"
       ? "Открой по ссылке и свяжи нашу пару в Touché 💕"
       : "Open this link and connect our pair in Touché 💕";
@@ -672,9 +674,11 @@ function CoupleModal({ lang, coupleId, pendingRefUserId, onLink, onUnlink, onClo
   async function handleConnect() {
     if (!pendingRefUserId) return;
     setLinking(true);
+    setError("");
     const ok = await onLink(pendingRefUserId);
     setLinking(false);
     if (ok) onClose();
+    else setError(lang === "ru" ? "Не удалось связать пару. Попробуйте ещё раз." : "Could not connect the pair. Try again.");
   }
 
   /* ── No pair ── */
@@ -700,6 +704,7 @@ function CoupleModal({ lang, coupleId, pendingRefUserId, onLink, onUnlink, onClo
             <PrimaryBtn onClick={handleConnect}>
               {linking ? "..." : lb.connectNow}
             </PrimaryBtn>
+            {error && <div role="alert" style={{ color: "rgba(255,150,170,.9)", fontSize: 12, textAlign: "center" }}>{error}</div>}
             <GhostBtn onClick={onClose}>{lb.cancel}</GhostBtn>
           </div>
         ) : (
@@ -745,7 +750,15 @@ function CoupleModal({ lang, coupleId, pendingRefUserId, onLink, onUnlink, onClo
       ) : (
         <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
           <div style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", textAlign: "center", fontSize: 12, color: "rgba(255,238,248,0.40)", marginBottom: 4 }}>{lb.irreversible}</div>
-          <PrimaryBtn onClick={() => { onUnlink(); onClose(); }}>{lb.unlinkConfirm}</PrimaryBtn>
+          <PrimaryBtn onClick={async () => {
+            setUnlinking(true);
+            setError("");
+            const ok = await onUnlink();
+            setUnlinking(false);
+            if (ok) onClose();
+            else setError(lang === "ru" ? "Не удалось отвязать пару. Попробуйте ещё раз." : "Could not unlink the pair. Try again.");
+          }}>{unlinking ? "..." : lb.unlinkConfirm}</PrimaryBtn>
+          {error && <div role="alert" style={{ color: "rgba(255,150,170,.9)", fontSize: 12, textAlign: "center" }}>{error}</div>}
           <GhostBtn onClick={() => setConfirm(false)}>{lb.cancel}</GhostBtn>
         </div>
       )}
@@ -782,11 +795,38 @@ function ScenarioGate({ lang, onConnect, onSkip }: { lang: Lang; onConnect: () =
 /* ─── MenuPanel ────────────────────────────────────────────────── */
 type MenuSection = "main" | "instructions" | "subscription";
 
-function MenuPanel({ lang, gender, onGenderSwitch, onClose, onLangSwitch }: { lang: Lang; gender?: Gender; onGenderSwitch?: (g: Gender) => void; onClose: () => void; onLangSwitch: () => void }) {
+function MenuPanel({ lang, gender, onGenderSwitch, onClose, onLangSwitch, onSubscribe }: {
+  lang: Lang; gender?: Gender; onGenderSwitch?: (g: Gender) => void;
+  onClose: () => void; onLangSwitch: () => void; onSubscribe: () => Promise<boolean>;
+}) {
   const [section, setSection] = useState<MenuSection>("main");
   const ml = MENU_LABELS[lang];
   const instr = INSTRUCTIONS[lang];
   const sub = SUBSCRIPTION[lang];
+  const [subState, setSubState] = useState<"loading" | "active" | "idle" | "error">("loading");
+  const [subExpires, setSubExpires] = useState<string | null>(null);
+  const [subError, setSubError] = useState("");
+
+  const refreshSubscription = useCallback(() => {
+    let cancelled = false;
+    setSubState("loading");
+    fetch("/api/subscription/status", {
+      headers: { "x-telegram-init-data": window.Telegram?.WebApp?.initData ?? "" },
+    }).then(async (res) => {
+      if (!res.ok) throw new Error("status");
+      return res.json();
+    }).then((data) => {
+      if (!cancelled) {
+        setSubState(data.active ? "active" : "idle");
+        setSubExpires(data.expiresAt ?? null);
+      }
+    }).catch(() => { if (!cancelled) setSubState("idle"); });
+    return () => { cancelled = true; };
+  }, []);
+
+  useEffect(() => {
+    if (section === "subscription") return refreshSubscription();
+  }, [section, refreshSubscription]);
 
   const rowStyle: React.CSSProperties = {
     display: "flex", alignItems: "center", justifyContent: "space-between",
@@ -873,13 +913,29 @@ function MenuPanel({ lang, gender, onGenderSwitch, onClose, onLangSwitch }: { la
           }}>{f}</div>
         ))}
       </div>
-      <button style={{
+      <button onClick={async () => {
+        setSubState("loading");
+        setSubError("");
+        const ok = await onSubscribe();
+        if (!ok) {
+          setSubState("error");
+          setSubError(lang === "ru" ? "Не удалось открыть оплату. Попробуйте ещё раз." : "Could not open payment. Try again.");
+        } else {
+          window.setTimeout(refreshSubscription, 1500);
+        }
+      }} disabled={subState === "loading" || subState === "active"} style={{
         width: "100%", padding: "17px", borderRadius: 18, border: "none",
         background: `linear-gradient(135deg,rgba(${PR},${PG},${PB},0.95),rgba(150,20,80,0.90))`,
         color: "rgba(255,238,248,0.97)",
         fontFamily: "'Plus Jakarta Sans',sans-serif", fontWeight: 700, fontSize: 16,
         cursor: "pointer", boxShadow: `0 4px 24px rgba(${PR},${PG},${PB},0.45)`,
-      }}>{sub.cta}</button>
+      }}>{subState === "loading" ? "…" : subState === "active" ? (lang === "ru" ? "Premium активен" : "Premium active") : sub.cta}</button>
+      {subExpires && subState === "active" && (
+        <div style={{ textAlign: "center", color: `rgba(${PR},${PG},${PB},.72)`, fontSize: 11, marginTop: 8 }}>
+          {new Date(subExpires).toLocaleDateString(lang === "ru" ? "ru-RU" : "en-US")}
+        </div>
+      )}
+      {subError && <div role="alert" style={{ textAlign: "center", color: "rgba(255,150,170,.9)", fontSize: 12, marginTop: 8 }}>{subError}</div>}
     </BottomSheet>
   );
 
@@ -1011,7 +1067,7 @@ export default function Home({
   lang, gender, coupleId, mode, pendingRefUserId,
   onCategorySelect, onScenarioOpen, onLangSwitch, onGenderSwitch,
   onModeChange,
-  onLinkCouple, onUnlinkCouple,
+  onLinkCouple, onUnlinkCouple, onSubscribe,
 }: HomeProps) {
   const t = UI[lang];
   const [mounted, setMounted] = useState(false);
@@ -1049,7 +1105,7 @@ export default function Home({
   const handleInvite = useCallback(() => {
     const tg = window.Telegram?.WebApp;
     tg?.HapticFeedback?.impactOccurred("light");
-    const link = "https://t.me/ToucheCoupleBot/Touche";
+    const link = `https://t.me/${BOT_USERNAME}/Touche`;
     const msg = INVITE_MSG[lang];
     tg?.openTelegramLink?.(`https://t.me/share/url?url=${encodeURIComponent(link)}&text=${encodeURIComponent(msg)}`);
   }, [lang]);
@@ -1189,7 +1245,7 @@ export default function Home({
       )}
 
       {showMenu && (
-        <MenuPanel lang={lang} gender={gender} onGenderSwitch={onGenderSwitch} onClose={() => setShowMenu(false)} onLangSwitch={() => { onLangSwitch(); setShowMenu(false); }} />
+        <MenuPanel lang={lang} gender={gender} onGenderSwitch={onGenderSwitch} onClose={() => setShowMenu(false)} onLangSwitch={() => { onLangSwitch(); setShowMenu(false); }} onSubscribe={onSubscribe} />
       )}
     </>
   );

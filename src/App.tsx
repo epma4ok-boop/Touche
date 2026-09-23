@@ -1,72 +1,82 @@
 import { useState, useCallback, useEffect } from "react";
-  import Home from "@/pages/Home";
-  import CategoryScreen from "@/pages/CategoryScreen";
-  import ScenarioScreen from "@/pages/ScenarioScreen";
-  import SplashScreen from "@/components/SplashScreen";
-  import LanguageSelect from "@/components/LanguageSelect";
+import Home from "@/pages/Home";
+import CategoryScreen from "@/pages/CategoryScreen";
+import ScenarioScreen from "@/pages/ScenarioScreen";
+import SplashScreen from "@/components/SplashScreen";
+import LanguageSelect from "@/components/LanguageSelect";
 import { type Gender, GENDER_KEY } from "@/components/GenderSelect";
-  import AgeGate, { isAgeConfirmed } from "@/components/AgeGate";
-  import OnboardingScreen from "@/components/OnboardingScreen";
-  import { LANG_KEY, ONBOARDED_KEY, CATEGORIES_ORDER, LANG_CYCLE, type Lang, type Category } from "@/data/i18n";
-  import { ACTIVE_SCENARIO_KEY, type ActiveScenario } from "@/pages/ScenarioScreen";
+import OnboardingScreen from "@/components/OnboardingScreen";
+import { LANG_KEY, ONBOARDED_KEY, CATEGORIES_ORDER, LANG_CYCLE, type Lang, type Category } from "@/data/i18n";
+import { ACTIVE_SCENARIO_KEY, type ActiveScenario } from "@/pages/ScenarioScreen";
 
-  type AppPhase = "splash" | "lang" | "onboarding" | "gender" | "home" | "category" | "scenario";
-  export type AppMode = "solo" | "together";
+type AppPhase = "splash" | "lang" | "onboarding" | "gender" | "home" | "category" | "scenario";
+export type AppMode = "solo" | "together";
 
-  const COUPLE_ID_KEY = "touche_couple_id";
-  const MODE_KEY = "touche_mode";
+const COUPLE_ID_KEY = "touche_couple_id";
+const MODE_KEY = "touche_mode";
+const USER_ID_KEY = "touche_user_id";
+const HISTORY_KEY = "touche_history_v2";
 
-  function getSavedLang(): Lang | null {
+function getSavedLang(): Lang | null {
     try {
       const v = localStorage.getItem(LANG_KEY);
       if (v === "ru" || v === "en" || v === "hi" || v === "pt" || v === "es") return v as Lang;
     } catch {}
     return null;
-  }
+}
 
-  function getSavedGender(): Gender | null {
+function getSavedGender(): Gender | null {
     try {
       const v = localStorage.getItem(GENDER_KEY);
       if (v === "male" || v === "female") return v as Gender;
     } catch {}
     return null;
-  }
+}
 
-  function isOnboarded(): boolean {
+function isOnboarded(): boolean {
     try { return !!localStorage.getItem(ONBOARDED_KEY); } catch { return false; }
-  }
+}
 
-  function markOnboarded() {
+function markOnboarded() {
     try { localStorage.setItem(ONBOARDED_KEY, "1"); } catch {}
-  }
+}
 
-  function getCoupleId(): string | null {
+function getCoupleId(): string | null {
     try { return localStorage.getItem(COUPLE_ID_KEY); } catch { return null; }
-  }
+}
 
-  function saveCoupleId(id: string) {
+function saveCoupleId(id: string) {
     try { localStorage.setItem(COUPLE_ID_KEY, id); } catch {}
-  }
+}
 
-  function removeCoupleId() {
+function removeCoupleId() {
     try { localStorage.removeItem(COUPLE_ID_KEY); } catch {}
-  }
+}
 
-  function getSavedMode(hasCouple = false): AppMode {
+function getSavedMode(hasCouple = false): AppMode {
     try {
       const v = localStorage.getItem(MODE_KEY);
       if (v === "solo" || v === "together") return v;
     } catch {}
     return hasCouple ? "together" : "solo";
-  }
+}
 
-  function saveMode(mode: AppMode) {
+function saveMode(mode: AppMode) {
     try { localStorage.setItem(MODE_KEY, mode); } catch {}
-  }
+}
 
-  function saveActiveScenario(s: ActiveScenario) {
+function saveActiveScenario(s: ActiveScenario) {
     try { localStorage.setItem(ACTIVE_SCENARIO_KEY, JSON.stringify(s)); } catch {}
-  }
+}
+
+function clearUserScopedData() {
+  try {
+    localStorage.removeItem(COUPLE_ID_KEY);
+    localStorage.removeItem(MODE_KEY);
+    localStorage.removeItem(ACTIVE_SCENARIO_KEY);
+    localStorage.removeItem(HISTORY_KEY);
+  } catch {}
+}
 
   async function tryFetchPendingScenario(): Promise<ActiveScenario | null> {
     try {
@@ -84,7 +94,7 @@ import { type Gender, GENDER_KEY } from "@/components/GenderSelect";
         role: "b",
         roleText: data.roleText,
         title: data.title,
-        intensity: "passion",
+        intensity: data.intensity ?? "passion",
         notified: false,
       };
     } catch {
@@ -106,7 +116,7 @@ import { type Gender, GENDER_KEY } from "@/components/GenderSelect";
         role: data.role,
         roleText: data.roleText,
         title: data.title,
-        intensity: "passion",
+        intensity: data.intensity ?? "passion",
         notified: false,
       };
     } catch {
@@ -114,7 +124,7 @@ import { type Gender, GENDER_KEY } from "@/components/GenderSelect";
     }
   }
 
-  export async function apiLinkCouple(refUserId: number): Promise<string | null> {
+export async function apiLinkCouple(refUserId: number): Promise<string | null> {
     try {
       const initData = window.Telegram?.WebApp?.initData;
       if (!initData) return null;
@@ -132,9 +142,49 @@ import { type Gender, GENDER_KEY } from "@/components/GenderSelect";
     } catch {
       return null;
     }
-  }
+}
 
-  export default function App() {
+async function apiUnlinkCouple(): Promise<boolean> {
+  const initData = window.Telegram?.WebApp?.initData;
+  if (!initData) return false;
+  try {
+    const res = await fetch("/api/couple/link", {
+      method: "DELETE",
+      headers: { "x-telegram-init-data": initData },
+    });
+    return res.ok;
+  } catch {
+    return false;
+  }
+}
+
+export async function apiSubscribe(lang: Lang): Promise<boolean> {
+  const initData = window.Telegram?.WebApp?.initData;
+  if (!initData) return false;
+  try {
+    const res = await fetch("/api/subscription/invoice", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "x-telegram-init-data": initData },
+      body: JSON.stringify({ lang }),
+    });
+    if (!res.ok) return false;
+    const { invoiceLink } = await res.json();
+    if (!invoiceLink) return false;
+    const tg = window.Telegram?.WebApp as any;
+    if (typeof tg?.openInvoice === "function") {
+      return await new Promise<boolean>((resolve) => {
+        tg.openInvoice(invoiceLink, (status: string) => resolve(status === "paid"));
+      });
+    } else {
+      tg?.openTelegramLink?.(invoiceLink);
+      return true;
+    }
+  } catch {
+    return false;
+  }
+}
+
+export default function App() {
     useEffect(() => {
       const tg = window.Telegram?.WebApp;
       if (tg) {
@@ -148,15 +198,22 @@ import { type Gender, GENDER_KEY } from "@/components/GenderSelect";
   const [gender, setGender] = useState<Gender | undefined>(getSavedGender() ?? undefined);
     const [activeCategory, setActiveCategory] = useState<Category>("compliments");
     const [swipeDir, setSwipeDir] = useState<"left" | "right">("left");
-    const [ageGatePending, setAgeGatePending] = useState<{ action: () => void } | null>(null);
-
     const [coupleId, setCoupleId] = useState<string | null>(getCoupleId);
     const [mode, setMode] = useState<AppMode>(() => getSavedMode(!!getCoupleId()));
     const [pendingRefUserId, setPendingRefUserId] = useState<number | null>(null);
 
-    const requireAge = useCallback((action: () => void) => {
-      if (isAgeConfirmed()) { action(); return; }
-      setAgeGatePending({ action });
+    useEffect(() => {
+      const telegramUserId = window.Telegram?.WebApp?.initDataUnsafe?.user?.id;
+      if (!telegramUserId) return;
+      try {
+        const previous = localStorage.getItem(USER_ID_KEY);
+        if (previous && previous !== String(telegramUserId)) {
+          clearUserScopedData();
+          setCoupleId(null);
+          setMode("solo");
+        }
+        localStorage.setItem(USER_ID_KEY, String(telegramUserId));
+      } catch {}
     }, []);
 
     const handleSplashDone = useCallback(async () => {
@@ -238,14 +295,10 @@ import { type Gender, GENDER_KEY } from "@/components/GenderSelect";
     }, [activeCategory]);
 
     const handleCategorySelectWithAgeCheck = useCallback((cat: Category) => {
-      const needsAge = cat === "passion" || cat === "hard";
-      if (needsAge) requireAge(() => handleCategorySelect(cat));
-      else handleCategorySelect(cat);
-    }, [handleCategorySelect, requireAge]);
+      handleCategorySelect(cat);
+    }, [handleCategorySelect]);
 
-    const handleScenarioOpen = useCallback(() => {
-      requireAge(() => setPhase("scenario"));
-    }, [requireAge]);
+    const handleScenarioOpen = useCallback(() => setPhase("scenario"), []);
 
     const handleBack = useCallback(() => setPhase("home"), []);
 
@@ -269,11 +322,14 @@ import { type Gender, GENDER_KEY } from "@/components/GenderSelect";
       return false;
     }, []);
 
-    const handleUnlinkCouple = useCallback(() => {
+    const handleUnlinkCouple = useCallback(async (): Promise<boolean> => {
+      const ok = await apiUnlinkCouple();
+      if (!ok) return false;
       removeCoupleId();
       setCoupleId(null);
       saveMode("solo");
       setMode("solo");
+      return true;
     }, []);
 
     const handleModeChange = useCallback((nextMode: AppMode) => {
@@ -302,7 +358,8 @@ import { type Gender, GENDER_KEY } from "@/components/GenderSelect";
             }}
              onModeChange={handleModeChange}
             onLinkCouple={handleLinkCouple}
-            onUnlinkCouple={handleUnlinkCouple}
+             onUnlinkCouple={handleUnlinkCouple}
+             onSubscribe={() => apiSubscribe(lang)}
           />
         )}
         {phase === "category"    && (
@@ -315,18 +372,11 @@ import { type Gender, GENDER_KEY } from "@/components/GenderSelect";
             onCategoryChange={handleCategoryChange}
             swipeDir={swipeDir}
             coupleId={coupleId}
-            mode={mode}
+             mode={mode}
+             onUpgrade={() => apiSubscribe(lang)}
           />
         )}
-        {phase === "scenario"    && <ScenarioScreen lang={lang} onBack={handleBack} />}
-
-        {ageGatePending && (
-          <AgeGate
-            lang={lang}
-            onConfirm={() => { const a = ageGatePending.action; setAgeGatePending(null); a(); }}
-            onCancel={() => setAgeGatePending(null)}
-          />
-        )}
+        {phase === "scenario"    && <ScenarioScreen lang={lang} gender={gender} onBack={handleBack} onUpgrade={() => apiSubscribe(lang)} />}
       </>
     );
   }

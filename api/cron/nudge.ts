@@ -5,6 +5,7 @@
 
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { createClient } from "@supabase/supabase-js";
+import { appDate } from "../limits.js";
 
 const sb = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!);
 const BOT=process.env.BOT_TOKEN!, CRON_SECRET=process.env.CRON_SECRET??"";
@@ -42,25 +43,16 @@ async function runExpiry(appUrl:string){
 }
 
 async function runDecay(){
-  const td=new Date().toISOString().slice(0,10);
-  const yd=(()=>{const d=new Date();d.setDate(d.getDate()-1);return d.toISOString().slice(0,10);})();
-  const{data:inactive}=await sb.from("couples").select("id,intimacy_score").not("user_b_id","is",null).lt("last_active_date",yd);
-  if(!inactive?.length)return 0;
-  let n=0;
-  for(const c of inactive){
-    const score=c.intimacy_score??0;if(score===0)continue;
-    const penalty=Math.min(50,Math.floor(score*0.05));const newScore=Math.max(0,score-penalty);
-    await sb.from("couples").update({intimacy_score:newScore}).eq("id",c.id);
-    await sb.from("intimacy_history").upsert({couple_id:c.id,date:td,points_gained:0,points_lost:penalty,total_score:newScore,tasks_completed:0},{onConflict:"couple_id,date",ignoreDuplicates:false});
-    n++;
-  }
-  return n;
+  const { data, error } = await sb.rpc("apply_intimacy_decay", { p_date: appDate() });
+  if (error) throw error;
+  return Number(data ?? 0);
 }
 
 export default async function handler(req:VercelRequest,res:VercelResponse){
-  if(CRON_SECRET&&req.headers.authorization!==`Bearer ${CRON_SECRET}`)return res.status(401).json({error:"Unauthorized"});
+  if(!CRON_SECRET||req.headers.authorization!==`Bearer ${CRON_SECRET}`)return res.status(401).json({error:"Unauthorized"});
   if(req.method!=="GET"&&req.method!=="POST")return res.status(405).json({error:"Method not allowed"});
-  const appUrl=process.env.APP_URL!;
+  const appUrl=process.env.APP_URL;
+  if(!BOT||!appUrl)return res.status(503).json({error:"service_unconfigured"});
   const[nudged,reminded,decayed]=await Promise.all([runNudge(appUrl),runExpiry(appUrl),runDecay()]);
   return res.status(200).json({ok:true,nudged,reminded,decayed});
 }

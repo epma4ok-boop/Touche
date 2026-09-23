@@ -7,6 +7,15 @@ import IntimacyIndex from "@/components/IntimacyIndex";
 import SmokeBackground from "@/components/SmokeBackground";
 import { BRAND } from "@/theme/palette";
 import { BOT_USERNAME } from "@/config";
+import "./HomePop.css";
+
+const HERO_COPY: Record<Lang, { first: string; last: string; sub: string }> = {
+  ru: { first: "Поймайте", last: "свой вайб.", sub: "Выберите настроение — мы превратим его в один маленький момент для вас." },
+  en: { first: "Find", last: "your vibe.", sub: "Pick a mood. We'll turn it into a moment just for you." },
+  hi: { first: "अपना", last: "मूड चुनें.", sub: "एक मूड चुनें और इस पल को अपना बनाएं।" },
+  pt: { first: "Encontre", last: "seu clima.", sub: "Escolha um clima e transforme-o em um momento só seu." },
+  es: { first: "Encuentra", last: "tu vibra.", sub: "Elige un ánimo y conviértelo en un momento para ustedes." },
+};
 
 declare global {
   interface Window {
@@ -173,6 +182,7 @@ function Card({
 
   return (
     <button
+      className={`pop-card pop-card-${type}`}
       onClick={onClick}
       onPointerDown={() => { setPressed(true); window.Telegram?.WebApp?.HapticFeedback?.impactOccurred("light"); }}
       onPointerUp={() => setPressed(false)}
@@ -283,11 +293,11 @@ const INVITE_LABELS: Record<Lang, { title: string; sub: string }> = {
 };
 
 const INVITE_MSG: Record<Lang, string> = {
-  ru: "Попробуй Touché — нежный вечер для двоих 💕",
-  en: "Try Touché — a tender evening for two 💕",
-  hi: "Touché आज़माएं — दो के लिए एक कोमल शाम 💕",
-  pt: "Experimente Touché — uma noite especial para dois 💕",
-  es: "Prueba Touché — una noche especial para dos 💕",
+  ru: "Попробуй Touché — нежный вечер для двоих",
+  en: "Try Touché — a tender evening for two",
+  hi: "Touché आज़माएं — दो के लिए एक कोमल शाम",
+  pt: "Experimente Touché — uma noite especial para dois",
+  es: "Prueba Touché — una noche especial para dos",
 };
 
 const MODE_LABELS: Record<Lang, {
@@ -305,10 +315,10 @@ function ModeSwitcher({ lang, mode, coupleId, onChange }: {
 }) {
   const labels = MODE_LABELS[lang];
   return (
-    <div style={{
+    <div className="pop-mode" style={{
       display: "grid", gridTemplateColumns: "1fr 1fr", gap: 4, padding: 4,
-      borderRadius: 18, background: "rgba(255,238,248,0.045)",
-      border: `1px solid rgba(${PR},${PG},${PB},0.18)`,
+      borderRadius: 18, background: "#f0e9df",
+      border: "none",
     }}>
       {(["solo", "together"] as AppMode[]).map((item) => {
         const active = item === mode;
@@ -316,27 +326,27 @@ function ModeSwitcher({ lang, mode, coupleId, onChange }: {
         const subtitle = item === "solo" ? labels.soloSub : labels.togetherSub;
         return (
           <button key={item} onClick={() => onChange(item)} style={{
-            minHeight: 56, border: `1px solid rgba(${PR},${PG},${PB},${active ? 0.48 : 0})`,
+            minHeight: 56, border: "none",
             borderRadius: 14, cursor: "pointer", textAlign: "left",
-            padding: "8px 12px", background: active ? `rgba(${PR},${PG},${PB},0.14)` : "transparent",
-            boxShadow: active ? `0 8px 24px rgba(${PR},${PG},${PB},0.14)` : "none",
+            padding: "8px 12px", background: active ? "#fffaf3" : "transparent",
+            boxShadow: active ? "0 3px 0 rgba(22,34,56,.10)" : "none",
             transition: "all .24s ease",
           }}>
             <div style={{
               display: "flex", alignItems: "center", gap: 7,
               fontFamily: "'Plus Jakarta Sans',sans-serif", fontWeight: 700, fontSize: 14,
-              color: active ? "rgba(255,238,248,0.96)" : "rgba(255,238,248,0.42)",
+              color: active ? "#162238" : "#667085",
             }}>
               <span style={{
                 width: 7, height: 7, borderRadius: "50%",
-                background: active ? PINK : "rgba(255,238,248,0.18)",
-                boxShadow: active ? `0 0 10px rgba(${PR},${PG},${PB},0.8)` : "none",
+                background: active ? "#ff6f61" : "#aab0bb",
+                boxShadow: "none",
               }} />
               {title}
             </div>
             <div style={{
               marginTop: 3, paddingLeft: 14, fontFamily: "'Plus Jakarta Sans',sans-serif",
-              fontSize: 10, color: active ? `rgba(${PR},${PG},${PB},0.76)` : "rgba(255,238,248,0.25)",
+              fontSize: 10, color: "#667085",
               letterSpacing: "0.02em",
             }}>
               {subtitle}{item === "together" && coupleId ? ` · ${labels.connected}` : ""}
@@ -471,31 +481,31 @@ const INSTRUCTIONS: Record<Lang, { title: string; steps: { icon: string; head: s
   hi: {
     title: "कैसे खेलें",
     steps: [
-      { icon: "🔗", head: "जोड़ी बनाएं",             body: "ऊपर जोड़ी आइकन दबाएं — साथी को लिंक भेजें। खोलने पर 'जोड़ी जोड़ें' दबाएं।" },
-      { icon: "💬", head: "श्रेणी चुनें",            body: "कोमल तारीफ से साहसिक खेल तक — मूड के अनुसार चुनें।" },
+      { icon: "01", head: "जोड़ी बनाएं",             body: "ऊपर जोड़ी आइकन दबाएं — साथी को लिंक भेजें। खोलने पर 'जोड़ी जोड़ें' दबाएं।" },
+      { icon: "02", head: "श्रेणी चुनें",            body: "कोमल तारीफ से साहसिक खेल तक — मूड के अनुसार चुनें।" },
       { icon: "✋", head: "बटन दबाए रखें",           body: "AI सेक्सोलॉजिस्ट आपके लिए अनोखा कार्य बनाएगा।" },
-      { icon: "💕", head: "साथ पूरा करें",           body: "कार्य का पालन करें — शाम यादगार बन जाएगी।" },
-      { icon: "🎭", head: "परिदृश्य आज़माएं",        body: "AI दोनों के लिए रोलप्ले कहानी बनाएगा।" },
+      { icon: "04", head: "साथ पूरा करें",           body: "कार्य का पालन करें — शाम यादगार बन जाएगी।" },
+      { icon: "05", head: "परिदृश्य आज़माएं",        body: "AI दोनों के लिए रोलप्ले कहानी बनाएगा।" },
     ],
   },
   pt: {
     title: "Como jogar",
     steps: [
-      { icon: "🔗", head: "Crie um casal",           body: "Toque no ícone do casal — compartilhe o link com seu parceiro. Quando ele abrir, toque em 'Conectar casal'." },
-      { icon: "💬", head: "Escolha uma categoria",   body: "De elogios gentis a jogos ousados — escolha conforme o humor." },
+      { icon: "01", head: "Crie um casal",           body: "Toque no ícone do casal — compartilhe o link com seu parceiro. Quando ele abrir, toque em 'Conectar casal'." },
+      { icon: "02", head: "Escolha uma categoria",   body: "De elogios gentis a jogos ousados — escolha conforme o humor." },
       { icon: "✋", head: "Segure o botão",          body: "Um sexólogo de IA cria uma tarefa única para vocês dois." },
-      { icon: "💕", head: "Façam juntos",            body: "Sigam a tarefa — e a noite será inesquecível." },
-      { icon: "🎭", head: "Tente cenários",          body: "A IA cria uma história de roleplay — cada um com seu papel." },
+      { icon: "04", head: "Façam juntos",            body: "Sigam a tarefa — e a noite será inesquecível." },
+      { icon: "05", head: "Tente cenários",          body: "A IA cria uma história de roleplay — cada um com seu papel." },
     ],
   },
   es: {
     title: "Cómo jugar",
     steps: [
-      { icon: "🔗", head: "Crea una pareja",         body: "Toca el ícono de pareja — comparte el enlace. Al abrirlo, toca 'Conectar pareja'." },
-      { icon: "💬", head: "Elige una categoría",     body: "Desde piropos tiernos a juegos atrevidos — según tu humor." },
+      { icon: "01", head: "Crea una pareja",         body: "Toca el ícono de pareja — comparte el enlace. Al abrirlo, toca 'Conectar pareja'." },
+      { icon: "02", head: "Elige una categoría",     body: "Desde piropos tiernos a juegos atrevidos — según tu humor." },
       { icon: "✋", head: "Mantén el botón",         body: "Un sexólogo de IA crea una tarea única para los dos." },
-      { icon: "💕", head: "Hazlo juntos",            body: "Sigue la tarea — y la noche será inolvidable." },
-      { icon: "🎭", head: "Prueba escenarios",       body: "La IA crea una historia de roleplay — cada uno con su rol." },
+      { icon: "04", head: "Hazlo juntos",            body: "Sigue la tarea — y la noche será inolvidable." },
+      { icon: "05", head: "Prueba escenarios",       body: "La IA crea una historia de roleplay — cada uno con su rol." },
     ],
   },
 };
@@ -506,10 +516,10 @@ const SUBSCRIPTION: Record<Lang, { title: string; features: string[]; price: str
     title: "Touché Premium",
     features: [
       "✦ «Страсть» и «Хард» — откровенные задания 18+",
-      "🎭 ИИ-сценарии — уникальные ролевые истории",
+      "ИИ-сценарии — уникальные ролевые истории",
       "♾️ Безлимитные задания каждый день",
       "⚡ Приоритетная генерация",
-      "💫 Новые категории первыми",
+      "Новые категории первыми",
     ],
     price: "199 Stars / месяц",
     note: "≈ 260 ₽ · отмена в любой момент",
@@ -519,10 +529,10 @@ const SUBSCRIPTION: Record<Lang, { title: string; features: string[]; price: str
     title: "Touché Premium",
     features: [
       "✦ Passion & Hard — explicit 18+ tasks",
-      "🎭 AI scenarios — unique roleplay stories",
+      "AI scenarios — unique roleplay stories",
       "♾️ Unlimited tasks every day",
       "⚡ Priority generation",
-      "💫 Exclusive new categories first",
+      "Exclusive new categories first",
     ],
     price: "199 Stars / month",
     note: "≈ $2.60 · cancel anytime",
@@ -532,10 +542,10 @@ const SUBSCRIPTION: Record<Lang, { title: string; features: string[]; price: str
     title: "Touché Premium",
     features: [
       "✦ जुनून और साहसिक श्रेणियां — 18+ कार्य",
-      "🎭 AI रोलप्ले — अनोखी कहानियां",
+      "AI रोलप्ले — अनोखी कहानियां",
       "♾️ हर दिन असीमित कार्य",
       "⚡ प्राथमिकता जनरेशन",
-      "💫 नई श्रेणियां पहले",
+      "नई श्रेणियां पहले",
     ],
     price: "199 Stars / माह",
     note: "≈ ₹220 · कभी भी रद्द करें",
@@ -545,10 +555,10 @@ const SUBSCRIPTION: Record<Lang, { title: string; features: string[]; price: str
     title: "Touché Premium",
     features: [
       "✦ Paixão e Intenso — tarefas 18+",
-      "🎭 Cenários de IA — histórias únicas",
+      "Cenários de IA — histórias únicas",
       "♾️ Tarefas ilimitadas todo dia",
       "⚡ Geração prioritária",
-      "💫 Novas categorias primeiro",
+      "Novas categorias primeiro",
     ],
     price: "199 Stars / mês",
     note: "≈ R$15 · cancele quando quiser",
@@ -558,10 +568,10 @@ const SUBSCRIPTION: Record<Lang, { title: string; features: string[]; price: str
     title: "Touché Premium",
     features: [
       "✦ Pasión e Intenso — tareas 18+",
-      "🎭 Escenarios de IA — historias únicas",
+      "Escenarios de IA — historias únicas",
       "♾️ Tareas ilimitadas cada día",
       "⚡ Generación prioritaria",
-      "💫 Nuevas categorías primero",
+      "Nuevas categorías primero",
     ],
     price: "199 Stars / mes",
     note: "≈ $2.60 · cancela cuando quieras",
@@ -596,12 +606,12 @@ const GLOBAL_STYLES = `
 /* ─── BottomSheet wrapper ──────────────────────────────────────── */
 function BottomSheet({ children }: { children: React.ReactNode }) {
   return (
-    <div style={{
+    <div className="pop-overlay" style={{
       position: "fixed", inset: 0, zIndex: 60,
       display: "flex", alignItems: "flex-end", justifyContent: "center",
       pointerEvents: "none",
     }}>
-      <div style={{
+      <div className="pop-sheet" style={{
         pointerEvents: "auto",
         width: "100%", maxWidth: 480,
         background: "linear-gradient(160deg,#1a0814 0%,#110710 100%)",
@@ -622,7 +632,7 @@ function BottomSheet({ children }: { children: React.ReactNode }) {
 /* ─── PrimaryBtn / SecondaryBtn ────────────────────────────────── */
 function PrimaryBtn({ onClick, children }: { onClick: () => void; children: React.ReactNode }) {
   return (
-    <button onClick={onClick} style={{
+    <button className="pop-primary" onClick={onClick} style={{
       width: "100%", padding: "15px", borderRadius: 16, border: "none",
       background: `linear-gradient(135deg,rgba(${PR},${PG},${PB},0.95),rgba(150,20,80,0.90))`,
       color: "rgba(255,238,248,0.97)",
@@ -633,7 +643,7 @@ function PrimaryBtn({ onClick, children }: { onClick: () => void; children: Reac
 }
 function GhostBtn({ onClick, children, danger }: { onClick: () => void; children: React.ReactNode; danger?: boolean }) {
   return (
-    <button onClick={onClick} style={{
+    <button className="pop-secondary" onClick={onClick} style={{
       width: "100%", padding: "15px", borderRadius: 16,
       border: `1px solid ${danger ? `rgba(${PR},${PG},${PB},0.40)` : "rgba(255,238,248,0.08)"}`,
       background: danger ? `rgba(${PR},${PG},${PB},0.08)` : "rgba(255,238,248,0.04)",
@@ -665,8 +675,8 @@ function CoupleModal({ lang, coupleId, pendingRefUserId, onLink, onUnlink, onClo
     if (!myId) return;
     const link = `https://t.me/${BOT_USERNAME}/Touche?startapp=ref_${myId}`;
     const msg = lang === "ru"
-      ? "Открой по ссылке и свяжи нашу пару в Touché 💕"
-      : "Open this link and connect our pair in Touché 💕";
+      ? "Открой по ссылке и свяжи нашу пару в Touché"
+      : "Open this link and connect our pair in Touché";
     tg?.openTelegramLink?.(`https://t.me/share/url?url=${encodeURIComponent(link)}&text=${encodeURIComponent(msg)}`);
     onClose();
   }
@@ -853,6 +863,7 @@ function MenuPanel({ lang, gender, onGenderSwitch, onClose, onLangSwitch, onSubs
 
   if (section === "instructions") return (
     <BottomSheet>
+      <div className="pop-menu-detail">
       {backBtn}
       <div style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", fontWeight: 700, fontSize: 22, color: "rgba(255,238,248,0.95)", marginBottom: 22, textAlign: "center" }}>{instr.title}</div>
 
@@ -887,11 +898,13 @@ function MenuPanel({ lang, gender, onGenderSwitch, onClose, onLangSwitch, onSubs
           </div>
         ))}
       </div>
+      </div>
     </BottomSheet>
   );
 
   if (section === "subscription") return (
     <BottomSheet>
+      <div className="pop-menu-detail pop-menu-subscription">
       {backBtn}
       <div style={{ textAlign: "center", marginBottom: 20 }}>
         <div style={{ display: "flex", justifyContent: "center", marginBottom: 14 }}>
@@ -913,7 +926,7 @@ function MenuPanel({ lang, gender, onGenderSwitch, onClose, onLangSwitch, onSubs
           }}>{f}</div>
         ))}
       </div>
-      <button onClick={async () => {
+      <button className="pop-menu-subscribe" onClick={async () => {
         setSubState("loading");
         setSubError("");
         const ok = await onSubscribe();
@@ -936,13 +949,15 @@ function MenuPanel({ lang, gender, onGenderSwitch, onClose, onLangSwitch, onSubs
         </div>
       )}
       {subError && <div role="alert" style={{ textAlign: "center", color: "rgba(255,150,170,.9)", fontSize: 12, marginTop: 8 }}>{subError}</div>}
+      </div>
     </BottomSheet>
   );
 
   return (
     <BottomSheet>
+      <div className="pop-menu-main">
       {/* ── Hero banner ── */}
-      <div style={{
+      <div className="pop-menu-hero" style={{
         width: "calc(100% + 48px)", margin: "-4px -24px 18px",
         height: 140, position: "relative", overflow: "hidden",
         borderRadius: "20px 20px 0 0",
@@ -958,7 +973,7 @@ function MenuPanel({ lang, gender, onGenderSwitch, onClose, onLangSwitch, onSubs
 
       {/* ── Two big visual cards: Instructions + Premium ── */}
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 10 }}>
-        <button onClick={() => setSection("instructions")} style={{
+        <button className="pop-menu-card pop-menu-card--instructions" onClick={() => setSection("instructions")} style={{
           position: "relative", height: 130, borderRadius: 20, overflow: "hidden",
           border: `1px solid rgba(${PR},${PG},${PB},0.22)`, cursor: "pointer", padding: 0, background: "none",
           backgroundImage: "url('/images/menu-about.png')", backgroundSize: "cover", backgroundPosition: "center",
@@ -972,7 +987,7 @@ function MenuPanel({ lang, gender, onGenderSwitch, onClose, onLangSwitch, onSubs
           </div>
         </button>
 
-        <button onClick={() => setSection("subscription")} style={{
+        <button className="pop-menu-card pop-menu-card--premium" onClick={() => setSection("subscription")} style={{
           position: "relative", height: 130, borderRadius: 20, overflow: "hidden",
           border: `1.5px solid rgba(${PR},${PG},${PB},0.42)`, cursor: "pointer", padding: 0, background: "none",
           backgroundImage: "url('/images/menu-premium.png')", backgroundSize: "cover", backgroundPosition: "center",
@@ -992,7 +1007,7 @@ function MenuPanel({ lang, gender, onGenderSwitch, onClose, onLangSwitch, onSubs
       </div>
 
       {/* ── Gender selector ── */}
-      <div style={{
+      <div className="pop-menu-gender" style={{
         padding: "12px 16px", borderRadius: 16, marginBottom: 8,
         background: `rgba(${PR},${PG},${PB},0.06)`, border: `1px solid rgba(${PR},${PG},${PB},0.16)`,
         display: "flex", alignItems: "center", justifyContent: "space-between",
@@ -1020,7 +1035,7 @@ function MenuPanel({ lang, gender, onGenderSwitch, onClose, onLangSwitch, onSubs
 
       {/* ── Bottom mini-grid: Language + About ── */}
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 14 }}>
-        <button onClick={() => { onLangSwitch(); onClose(); }} style={{
+        <button className="pop-menu-small" onClick={() => { onLangSwitch(); onClose(); }} style={{
           padding: "14px 10px", borderRadius: 16,
           border: `1px solid rgba(${PR},${PG},${PB},0.16)`,
           background: `rgba(${PR},${PG},${PB},0.06)`, cursor: "pointer",
@@ -1035,7 +1050,7 @@ function MenuPanel({ lang, gender, onGenderSwitch, onClose, onLangSwitch, onSubs
           <span style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", fontWeight: 700, fontSize: 11, color: `rgba(${PR},${PG},${PB},0.80)`, letterSpacing: "0.10em" }}>{LANG_ABBREV[lang]}</span>
         </button>
 
-        <button onClick={onClose} style={{
+        <button className="pop-menu-small" onClick={onClose} style={{
           padding: "14px 10px", borderRadius: 16,
           border: `1px solid rgba(${PR},${PG},${PB},0.16)`,
           background: `rgba(${PR},${PG},${PB},0.06)`, cursor: "pointer",
@@ -1058,6 +1073,7 @@ function MenuPanel({ lang, gender, onGenderSwitch, onClose, onLangSwitch, onSubs
       }}>
         {lang === "ru" ? "Закрыть" : "Close"}
       </button>
+      </div>
     </BottomSheet>
   );
 }
@@ -1159,7 +1175,7 @@ export default function Home({
     <>
       <style>{GLOBAL_STYLES}</style>
 
-      <div style={{
+      <div className="pop-home" style={{
         position: "fixed", inset: 0, background: BG,
         display: "flex", flexDirection: "column",
         overflow: "hidden",
@@ -1171,7 +1187,7 @@ export default function Home({
         <div style={{ position: "absolute", top: -140, left: "50%", transform: "translateX(-50%)", width: 560, height: 500, borderRadius: "50%", background: `radial-gradient(circle,rgba(${PR},${PG},${PB},0.08) 0%,transparent 68%)`, pointerEvents: "none", zIndex: 0 }} />
 
         {/* ── Header ── */}
-        <div style={{ paddingTop: topPx, paddingLeft: 20, paddingRight: 20, paddingBottom: 4, display: "flex", alignItems: "center", justifyContent: "space-between", position: "relative", zIndex: 1, flexShrink: 0 }}>
+        <div className="pop-header" style={{ paddingTop: topPx, paddingLeft: 20, paddingRight: 20, paddingBottom: 4, display: "flex", alignItems: "center", justifyContent: "space-between", position: "relative", zIndex: 1, flexShrink: 0 }}>
           {/* Hamburger */}
           <button onClick={() => { setShowMenu(true); window.Telegram?.WebApp?.HapticFeedback?.impactOccurred("light"); }} style={{ width: 38, height: 38, borderRadius: 12, background: "rgba(255,238,248,0.05)", border: `1px solid rgba(${PR},${PG},${PB},0.22)`, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 4.5, cursor: "pointer", flexShrink: 0, padding: 0, animation: "menuBtnPulse 4s ease-in-out 2s infinite" }}>
             {[0,1,2].map(i => <div key={i} style={{ width: i===1?12:16, height: 1.5, borderRadius: 99, background: `rgba(${PR},${PG},${PB},0.80)` }} />)}
@@ -1208,14 +1224,21 @@ export default function Home({
           </div>
         </div>
 
-        <div style={{ padding: "8px 14px 4px", position: "relative", zIndex: 1, flexShrink: 0 }}>
+        <section className="pop-home-hero" aria-label={t.chooseNow}>
+          <span className="pop-home-hero__stamp">{lang === "ru" ? "ДЛЯ ДВОИХ · 18+" : t.lockSub}</span>
+          <span className="pop-home-hero__orb" aria-hidden="true">2</span>
+          <h1>{HERO_COPY[lang].first}<br /><span>{HERO_COPY[lang].last}</span></h1>
+          <p>{HERO_COPY[lang].sub}</p>
+        </section>
+
+        <div className="pop-mode-wrap" style={{ padding: "8px 14px 4px", position: "relative", zIndex: 1, flexShrink: 0 }}>
           <ModeSwitcher lang={lang} mode={mode} coupleId={coupleId} onChange={onModeChange} />
         </div>
 
         {/* ── List ── */}
-        <div style={{ flex: 1, overflowY: "auto", overflowX: "hidden", padding: `10px 14px max(28px,env(safe-area-inset-bottom))`, display: "flex", flexDirection: "column", gap: 10, position: "relative", zIndex: 1, scrollbarWidth: "none" as const }}>
+        <div className="pop-list" style={{ flex: 1, overflowY: "auto", overflowX: "hidden", padding: `10px 14px max(28px,env(safe-area-inset-bottom))`, display: "flex", flexDirection: "column", gap: 10, position: "relative", zIndex: 1, scrollbarWidth: "none" as const }}>
           {mode === "together" && <IntimacyIndex lang={lang} refreshKey={intimacyKey} index={0} />}
-          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+          <div className="pop-tiles" style={{ display: "grid", gridTemplateColumns: "repeat(2,minmax(0,1fr))", gap: 10 }}>
             {mode === "together" ? togetherCards : soloCards}
           </div>
           {mode === "together" && <Card type="invite" title={INVITE_LABELS[lang].title} sub={INVITE_LABELS[lang].sub} onClick={handleInvite} index={5} />}

@@ -1,0 +1,225 @@
+/* Touché light pop: ink, paper and five unapologetic tiles. */
+.pop-home,
+.pop-home * { box-sizing: border-box; }
+
+.pop-home {
+  background: var(--pop-paper) !important;
+  color: var(--pop-ink) !important;
+  font-family: "DM Sans", sans-serif !important;
+}
+.pop-home::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  opacity: .34;
+  background-image: radial-gradient(var(--pop-coral) .7px, transparent .7px);
+  background-size: 14px 14px;
+  mask-image: linear-gradient(to bottom, #000, transparent 72%);
+}
+.pop-home > div:first-child,
+.pop-home > div:nth-child(2) { display: none !important; }
+.pop-home button { font-family: inherit !important; color: var(--pop-ink); }
+.pop-home > div:nth-child(2) { background: transparent !important; }
+
+/* Header */
+.pop-home .pop-header {
+  padding: max(18px, env(safe-area-inset-top)) 18px 4px !important;
+}
+.pop-home .pop-header button {
+  background: transparent !important;
+  border-color: transparent !important;
+  color: var(--pop-ink) !important;
+  box-shadow: none !important;
+}
+.pop-home .pop-header button div {
+  background: var(--pop-ink) !important;
+}
+.pop-home .pop-header button svg { stroke: var(--pop-ink) !important; }
+.pop-home .pop-header > div {
+  color: var(--pop-ink) !important;
+  text-shadow: none !important;
+  font-family: "Space Grotesk", sans-serif !important;
+  font-size: 25px !important;
+  letter-spacing: -.08em;
+}
+.pop-home > div[style*="paddingTop"] > div::first-letter { color: var(--pop-ink); }
+
+/* The approved light-pop first impression, kept above the scrollable tiles. */
+.pop-home-hero {
+  position: relative; z-index: 1; flex-shrink: 0;
+  width: min(100% - 36px, 524px); margin: 0 auto; padding: 7px 0 12px;
+}
+.pop-home-hero__stamp {
+  display: inline-flex; padding: 6px 10px; border: 2px solid var(--pop-ink);
+  border-radius: 999px; background: var(--pop-lime);
+  font-size: 10px; font-weight: 700; letter-spacing: .08em;
+  transform: rotate(-3deg);
+}
+.pop-home-hero__orb {
+  position: absolute; top: 30px; right: 4px; width: 70px; height: 70px;
+  display: grid; place-items: center; border: 2px solid var(--pop-ink);
+  border-radius: 44% 56% 58% 42%; background: var(--pop-yellow);
+  transform: rotate(17deg); font: 700 38px "Space Grotesk", sans-serif;
+}
+.pop-home-hero h1 {
+  margin: 17px 0 8px; max-width: 310px;
+  font: 700 clamp(40px, 11vw, 52px)/.91 "Space Grotesk", sans-serif;
+  letter-spacing: -.075em;
+}
+.pop-home-hero h1 span { color: var(--pop-coral); }
+.pop-home-hero p { max-width: 280px; margin: 0; color: var(--pop-muted); font-size: 13px; line-height: 1.42; }
+.pop-home .pop-list > * { flex-shrink: 0; }
+
+/* Mode switch */
+.pop-home .pop-mode {
+  background: #f0e9df !important;
+  border: 0 !important;
+  border-radius: 16px !important;
+  padding: 5px !important;
+  gap: 7px !important;
+}
+.pop-home .pop-mode button {
+  min-height: 58px !important;
+  border: 0 !important;
+  border-radius: 12px !important;
+  color: var(--pop-muted) !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+.pop-home .pop-mode button[style*="rgba(255"] {
+  color: var(--pop-ink) !important;
+}
+
+/* Category tiles. Inline styles intentionally remain for motion/haptics. */
+.pop-home .pop-card {
+  min-height: 112px !important;
+  border: 2px solid var(--pop-ink) !important;
+  border-radius: 18px !important;
+  background: #fff !important;
+  color: var(--pop-ink) !important;
+  box-shadow: none !important;
+  transition: transform .16s ease, box-shadow .16s ease !important;
+}
+.pop-home .pop-tiles { display: grid !important; grid-template-columns: repeat(2, minmax(0,1fr)) !important; gap: 10px !important; }
+.pop-home .pop-tiles .pop-card { width: 100% !important; min-width: 0; }
+.pop-home .pop-card:hover {
+  transform: translate(-2px, -2px) !important;
+  box-shadow: 4px 4px 0 var(--pop-ink) !important;
+}
+.pop-home .pop-card:active { transform: translateY(2px) !important; box-shadow: none !important; }
+.pop-home .pop-card-compliments { background: var(--pop-yellow) !important; }
+.pop-home .pop-card-tenderness { background: var(--pop-blue) !important; color: #fff !important; }
+.pop-home .pop-card-desire { background: #fff !important; }
+.pop-home .pop-card-passion { background: var(--pop-coral) !important; color: #fff !important; }
+.pop-home .pop-card-hard { background: var(--pop-ink) !important; color: #fff !important; }
+.pop-home .pop-card-scenarios,
+.pop-home .pop-card-invite { background: var(--pop-lime) !important; color: var(--pop-ink) !important; }
+.pop-home .pop-card > div:nth-child(-n+5) { display: none !important; }
+.pop-home .pop-card .icon-ring { display: none !important; }
+.pop-home .pop-card > div:last-child {
+  display: flex !important; padding: 14px !important; gap: 0 !important;
+}
+.pop-home .pop-card > div:last-child > div:nth-child(2) {
+  display: block !important; padding: 0 !important;
+}
+.pop-home .pop-card > div:last-child > div:nth-child(2) > div:first-child {
+  font-family: "Space Grotesk", sans-serif !important;
+  font-size: 20px !important; font-weight: 700 !important;
+  color: inherit !important; text-shadow: none !important;
+  margin-top: 27px !important;
+  white-space: normal !important; overflow: visible !important; text-overflow: clip !important;
+}
+.pop-home .pop-card > div:last-child > div:nth-child(2) > div:last-child {
+  font-size: 11px !important; color: inherit !important; opacity: .72;
+  white-space: normal !important; overflow: visible !important; text-overflow: clip !important;
+}
+.pop-home .pop-card > div:last-child > svg {
+  position: absolute !important; right: 12px !important; bottom: 12px !important;
+  stroke: currentColor !important; filter: none !important;
+}
+.pop-home .pop-card-tenderness > div:last-child > div:nth-child(2) > div,
+.pop-home .pop-card-passion > div:last-child > div:nth-child(2) > div,
+.pop-home .pop-card-hard > div:last-child > div:nth-child(2) > div { color: #fff !important; }
+.pop-home .pop-card-compliments > div:last-child > div:nth-child(2) > div,
+.pop-home .pop-card-desire > div:last-child > div:nth-child(2) > div,
+.pop-home .pop-card-scenarios > div:last-child > div:nth-child(2) > div,
+.pop-home .pop-card-invite > div:last-child > div:nth-child(2) > div { color: var(--pop-ink) !important; }
+.pop-home .pop-card::before {
+  content: "01"; position: absolute; top: 14px; left: 14px;
+  font: 600 10px "Space Grotesk", sans-serif; opacity: .6;
+}
+.pop-home .pop-card-tenderness::before { content: "02"; }
+.pop-home .pop-card-desire::before { content: "03"; }
+.pop-home .pop-card-passion::before { content: "04"; }
+.pop-home .pop-card-hard::before { content: "05"; }
+.pop-home .pop-card-scenarios::before { content: "06 · FOR TWO"; }
+.pop-home .pop-card-invite::before { content: "SHARE"; }
+
+/* Sheets / dialogs */
+.pop-home ~ .pop-overlay, .pop-overlay {
+  background: rgba(22, 34, 56, .26) !important;
+  backdrop-filter: blur(2px);
+}
+.pop-sheet {
+  background: var(--pop-paper) !important;
+  color: var(--pop-ink) !important;
+  border: 2px solid var(--pop-ink) !important;
+  border-bottom: 0 !important;
+  border-radius: 24px 24px 0 0 !important;
+  box-shadow: 0 -8px 0 rgba(255,111,97,.35) !important;
+  padding: 11px 20px 28px !important;
+}
+.pop-sheet button { color: var(--pop-ink) !important; }
+.pop-sheet .pop-primary {
+  background: var(--pop-coral) !important; color: #fff !important;
+  border: 2px solid var(--pop-ink) !important; box-shadow: none !important;
+}
+.pop-sheet .pop-secondary {
+  background: transparent !important; border: 2px solid var(--pop-ink) !important;
+}
+.pop-sheet [role="alert"] { color: #b53f48 !important; }
+.pop-sheet [style*="color: rgba(255, 238, 248"] { color: var(--pop-ink) !important; }
+.pop-sheet .pop-primary { color: #fff !important; }
+.pop-menu-main *, .pop-menu-detail * { color: var(--pop-ink) !important; text-shadow: none !important; filter: none !important; }
+.pop-menu-main .pop-menu-hero {
+  height: 108px !important; background-image: none !important; background: var(--pop-yellow) !important;
+  border: 2px solid var(--pop-ink); border-radius: 17px !important;
+}
+.pop-menu-main .pop-menu-hero > div:first-child,
+.pop-menu-main .pop-menu-card > div:first-child { display: none !important; }
+.pop-menu-main .pop-menu-hero > div:last-child { bottom: 15px !important; }
+.pop-menu-main .pop-menu-hero > div:last-child > div:last-child { letter-spacing: .1em !important; }
+.pop-menu-main .pop-menu-card {
+  border: 2px solid var(--pop-ink) !important; border-radius: 17px !important;
+  background-image: none !important; box-shadow: 3px 3px 0 var(--pop-ink) !important;
+}
+.pop-menu-main .pop-menu-card--instructions { background: var(--pop-lime) !important; }
+.pop-menu-main .pop-menu-card--premium { background: var(--pop-coral) !important; }
+.pop-menu-main .pop-menu-card svg { stroke: var(--pop-ink) !important; }
+.pop-menu-main .pop-menu-gender,
+.pop-menu-main .pop-menu-small { background: #fff !important; border: 2px solid var(--pop-ink) !important; }
+.pop-menu-main .pop-menu-gender button { color: var(--pop-ink) !important; border-color: var(--pop-ink) !important; }
+.pop-menu-main > button:last-child { background: transparent !important; border: 0 !important; }
+.pop-menu-detail .pop-menu-subscribe {
+  background: var(--pop-coral) !important; color: #fff !important;
+  border: 2px solid var(--pop-ink) !important; box-shadow: 3px 3px 0 var(--pop-ink) !important;
+}
+.pop-menu-detail [style*="rgba(255, 238, 248"] { color: var(--pop-ink) !important; }
+
+@media (max-width: 767px) {
+  .pop-home .pop-header { padding-left: 14px !important; padding-right: 14px !important; }
+  .pop-home .pop-mode-wrap { padding: 8px 14px 4px !important; }
+  .pop-home .pop-card { min-height: 104px !important; }
+}
+@media (max-height: 720px) {
+  .pop-home-hero { padding-bottom: 5px; }
+  .pop-home-hero h1 { font-size: 39px; margin: 12px 0 5px; }
+  .pop-home-hero p { font-size: 12px; }
+  .pop-home .pop-card { min-height: 92px !important; }
+}
+@media (min-width: 768px) {
+  .pop-home .pop-header { max-width: 560px; margin: 0 auto; width: 100%; }
+  .pop-home .pop-mode-wrap { max-width: 560px; margin: 0 auto; width: 100%; }
+  .pop-home .pop-list { max-width: 560px; margin: 0 auto; width: 100%; }
+}

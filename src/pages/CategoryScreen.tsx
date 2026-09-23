@@ -1,25 +1,34 @@
-import { useEffect, useCallback, useState, useRef } from "react";
+import { useCallback, useEffect, useRef, useState, type TouchEvent } from "react";
 import type { Gender } from "@/components/GenderSelect";
 import type { AppMode } from "@/App";
 import HeartbeatCanvas from "@/components/HeartbeatCanvas";
 import { UI, CATEGORY_CONFIG, CATEGORIES_ORDER, type Lang, type Category } from "@/data/i18n";
-import { playReveal, playDismiss } from "@/hooks/useSensualSound";
+import { playReveal } from "@/hooks/useSensualSound";
 import { addLocalPoints } from "@/data/intimacy";
-import SmokeBackground from "@/components/SmokeBackground";
-import { SMOKE_BY_CATEGORY, SMOKE_DEFAULT } from "@/theme/palette";
-
-const BG = "#0d0610";
-const TEXT_P = "rgba(255,238,248,0.88)";
-const TEXT_S = "rgba(255,238,248,0.44)";
-const TEXT_T = "rgba(255,238,248,0.22)";
+import HistoryPanel, { type HistoryEntry } from "@/components/HistoryPanel";
+import "./CategoryPop.css";
 
 const HISTORY_KEY = "touche_history_v2";
-type HistoryEntry = { id: string; text: string; category: Category; date: string };
+const FALLBACK_INK = "#162238";
+const POP_COLORS: Record<Category, { r: number; g: number; b: number }> = {
+  compliments: { r: 255, g: 212, b: 93 },
+  tenderness: { r: 62, g: 91, b: 255 },
+  desire: { r: 255, g: 111, b: 97 },
+  passion: { r: 255, g: 111, b: 97 },
+  hard: { r: 22, g: 34, b: 56 },
+};
 
-function loadHistory(): HistoryEntry[]  { try { const v = localStorage.getItem(HISTORY_KEY); if (v) return JSON.parse(v); } catch {} return []; }
-function saveHistory(h: HistoryEntry[]) { try { localStorage.setItem(HISTORY_KEY, JSON.stringify(h)); } catch {} }
+function loadHistory(): HistoryEntry[] {
+  try {
+    const value = localStorage.getItem(HISTORY_KEY);
+    if (value) return JSON.parse(value) as HistoryEntry[];
+  } catch { /* storage can be unavailable in Telegram previews */ }
+  return [];
+}
 
-// ── Server helpers ────────────────────────────────────────────────────────────
+function saveHistory(history: HistoryEntry[]) {
+  try { localStorage.setItem(HISTORY_KEY, JSON.stringify(history)); } catch { /* ignore */ }
+}
 
 function getInitData(): string {
   return window.Telegram?.WebApp?.initData ?? "";
@@ -28,27 +37,34 @@ function getInitData(): string {
 type TaskResult = { task: string; taskId: string | null; remaining?: number; source?: "ai" | "fallback" };
 type TaskError = { kind: "unauthorized" | "subscription_required" | "limit_exceeded" | "rate_limited" | "timeout" | "unknown"; message?: string };
 
-async function generateAITask(category: Category, lang: Lang, gender: Gender | undefined, mode: AppMode, coupleId: string | null): Promise<{ result?: TaskResult; error?: TaskError }> {
+async function generateAITask(
+  category: Category,
+  lang: Lang,
+  gender: Gender | undefined,
+  mode: AppMode,
+  coupleId: string | null,
+): Promise<{ result?: TaskResult; error?: TaskError }> {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 25_000);
   try {
-    const res = await fetch("/api/tasks/generate", {
+    const response = await fetch("/api/tasks/generate", {
       method: "POST",
       headers: { "Content-Type": "application/json", "x-telegram-init-data": getInitData() },
       body: JSON.stringify({ category, lang, gender, mode, coupleId }),
       signal: controller.signal,
     });
-    if (!res.ok) {
-      const body = await res.json().catch(() => ({}));
-      const kind = res.status === 401 ? "unauthorized"
-        : res.status === 403 && body.error === "subscription_required" ? "subscription_required"
-        : res.status === 403 && body.error === "limit_exceeded" ? "limit_exceeded"
-        : res.status === 429 ? "rate_limited" : "unknown";
+    if (!response.ok) {
+      const body = await response.json().catch(() => ({}));
+      const kind = response.status === 401 ? "unauthorized"
+        : response.status === 403 && body.error === "subscription_required" ? "subscription_required"
+        : response.status === 403 && body.error === "limit_exceeded" ? "limit_exceeded"
+        : response.status === 429 ? "rate_limited" : "unknown";
       return { error: { kind, message: body.message ?? body.error } };
     }
-    const data = await res.json();
-    if (!data.task) return { error: { kind: "unknown" } };
-    return { result: { task: data.task, taskId: data.taskId ?? null, remaining: data.remaining, source: data.source ?? "ai" } };
+    const data = await response.json();
+    return data.task
+      ? { result: { task: data.task, taskId: data.taskId ?? null, remaining: data.remaining, source: data.source ?? "ai" } }
+      : { error: { kind: "unknown" } };
   } catch (error) {
     return { error: { kind: error instanceof Error && error.name === "AbortError" ? "timeout" : "unknown" } };
   } finally {
@@ -57,435 +73,254 @@ async function generateAITask(category: Category, lang: Lang, gender: Gender | u
 }
 
 function useTelegramTopInset(): string {
-  const [topPx, setTopPx] = useState<number>(0);
+  const [top, setTop] = useState(0);
   useEffect(() => {
     const tg = window.Telegram?.WebApp as any;
-    function compute() {
-      const content = tg?.contentSafeAreaInset?.top ?? 0;
-      const safe    = tg?.safeAreaInset?.top ?? 0;
-      const total   = content + safe;
-      if (total > 10) setTopPx(total + 10);
-    }
-    compute();
-    tg?.onEvent?.("safeAreaChanged", compute);
-    tg?.onEvent?.("contentSafeAreaInsetChanged", compute);
-    const tm = setTimeout(compute, 800);
+    const update = () => {
+      const total = (tg?.contentSafeAreaInset?.top ?? 0) + (tg?.safeAreaInset?.top ?? 0);
+      if (total > 10) setTop(total + 8);
+    };
+    update();
+    tg?.onEvent?.("safeAreaChanged", update);
+    tg?.onEvent?.("contentSafeAreaInsetChanged", update);
+    const timer = setTimeout(update, 700);
     return () => {
-      tg?.offEvent?.("safeAreaChanged", compute);
-      tg?.offEvent?.("contentSafeAreaInsetChanged", compute);
-      clearTimeout(tm);
+      tg?.offEvent?.("safeAreaChanged", update);
+      tg?.offEvent?.("contentSafeAreaInsetChanged", update);
+      clearTimeout(timer);
     };
   }, []);
-  return topPx > 0 ? `${topPx}px` : "max(80px, env(safe-area-inset-top))";
+  return top > 0 ? `${top}px` : "max(64px, env(safe-area-inset-top))";
 }
 
-// ── Sub-components ────────────────────────────────────────────────────────────
-
-function CategoryHeader({ category, catLabel, catSub }: { category: Category; catLabel: string; catSub: string }) {
-  const { r, g, b } = CATEGORY_CONFIG[category];
-  const imgSrc = `/images/cat-${category}.png`;
-  return (
-    <div style={{ flexShrink: 0, position: "relative", height: 72, overflow: "hidden", borderBottom: `0.5px solid rgba(${r},${g},${b},0.20)` }}>
-      <div style={{ position: "absolute", inset: 0, backgroundImage: `url(${imgSrc})`, backgroundSize: "cover", backgroundPosition: "center 30%", opacity: 0.22, filter: "saturate(1.5) brightness(0.85)" }} />
-      <div style={{ position: "absolute", inset: 0, background: `radial-gradient(ellipse at 80% 50%, rgba(${r},${g},${b},0.25) 0%, transparent 65%), radial-gradient(ellipse at 20% 50%, rgba(${r},${g},${b},0.12) 0%, transparent 60%)` }} />
-      <div style={{ position: "absolute", inset: 0, background: `linear-gradient(90deg, ${BG}cc 0%, ${BG}88 40%, transparent 100%)` }} />
-      <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 1, background: `linear-gradient(90deg, transparent 0%, rgba(${r},${g},${b},0.55) 50%, transparent 100%)` }} />
-      <div style={{ position: "relative", zIndex: 2, height: "100%", display: "flex", flexDirection: "column", justifyContent: "center", padding: "0 24px" }}>
-        <div style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", fontWeight: 700, fontSize: 20, letterSpacing: "-0.02em", color: TEXT_P, lineHeight: 1.2 }}>{catLabel}</div>
-        <div style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", fontWeight: 300, fontSize: 11, letterSpacing: "0.14em", textTransform: "uppercase", color: `rgba(${r},${g},${b},0.65)`, marginTop: 4 }}>{catSub}</div>
-      </div>
-    </div>
-  );
+function categoryLabel(category: Category, t: typeof UI["en"]): string {
+  return ({
+    compliments: t.catCompliments,
+    tenderness: t.catTenderness,
+    desire: t.catDesire,
+    passion: t.catPassion,
+    hard: t.catHard,
+  })[category];
 }
 
-function CategoryDots({ current, onDotPress }: { current: Category; onDotPress: (c: Category) => void }) {
-  return (
-    <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 10 }}>
-      {CATEGORIES_ORDER.map(cat => {
-        const cfg = CATEGORY_CONFIG[cat]; const active = cat === current;
-        return (
-          <button key={cat} onClick={() => onDotPress(cat)} style={{ background: "none", border: "none", padding: "8px 4px", cursor: "pointer", display: "flex", alignItems: "center" }}>
-            <div style={{ width: active ? 24 : 7, height: 4, borderRadius: 99, background: active ? `rgb(${cfg.r},${cfg.g},${cfg.b})` : "rgba(255,238,248,0.18)", boxShadow: active ? `0 0 10px rgba(${cfg.r},${cfg.g},${cfg.b},.55)` : "none", transition: "all .35s cubic-bezier(.32,.72,0,1)" }} />
-          </button>
-        );
-      })}
-    </div>
-  );
+function categorySub(category: Category, t: typeof UI["en"]): string {
+  return ({
+    compliments: t.catComplimentsSub,
+    tenderness: t.catTendernessSub,
+    desire: t.catDesireSub,
+    passion: t.catPassionSub,
+    hard: t.catHardSub,
+  })[category];
 }
 
 function wrapText(ctx: CanvasRenderingContext2D, text: string, maxWidth: number): string[] {
-  const words = text.split(" ");
   const lines: string[] = [];
-  let current = words[0] ?? "";
-  for (let i = 1; i < words.length; i++) {
-    const test = current + " " + words[i];
-    if (ctx.measureText(test).width > maxWidth) { lines.push(current); current = words[i]; }
-    else current = test;
-  }
-  if (current) lines.push(current);
+  let line = "";
+  text.split(" ").forEach((word) => {
+    const next = line ? `${line} ${word}` : word;
+    if (line && ctx.measureText(next).width > maxWidth) { lines.push(line); line = word; }
+    else line = next;
+  });
+  if (line) lines.push(line);
   return lines;
 }
 
-function TaskReveal({ text, color, visible, onDismiss, onGenerateAgain, lang, catLabel, source, topPadding }: {
-  text: string; color: { r: number; g: number; b: number };
-  visible: boolean; onDismiss: () => void; lang: Lang; catLabel: string;
-  source?: "ai" | "fallback"; topPadding: string; onGenerateAgain: () => void;
+function TaskReveal({ text, color, visible, onDismiss, onGenerateAgain, lang, catLabel, source }: {
+  text: string; color: { r: number; g: number; b: number }; visible: boolean;
+  onDismiss: () => void; onGenerateAgain: () => void; lang: Lang; catLabel: string; source?: "ai" | "fallback";
 }) {
-  const { r, g, b } = color; const t = UI[lang];
-  const [textVisible, setTextVisible] = useState(false);
+  const t = UI[lang];
   const [sharing, setSharing] = useState(false);
-  useEffect(() => {
-    if (visible) { const tm = setTimeout(() => setTextVisible(true), 220); return () => clearTimeout(tm); }
-    else setTextVisible(false);
-  }, [visible]);
   useEffect(() => { if (visible) playReveal(); }, [visible]);
-
-  const handleShare = useCallback(async () => {
+  const share = useCallback(async () => {
     if (sharing || !text) return;
     setSharing(true);
     try {
-      const SIZE = 1080;
+      const size = 1080;
       const canvas = document.createElement("canvas");
-      canvas.width = SIZE; canvas.height = SIZE;
+      canvas.width = size; canvas.height = size;
       const ctx = canvas.getContext("2d");
       if (!ctx) return;
-
-      // Background
-      ctx.fillStyle = "#0d0610";
-      ctx.fillRect(0, 0, SIZE, SIZE);
-
-      // Glow
-      const grad = ctx.createRadialGradient(SIZE / 2, SIZE * 0.44, 0, SIZE / 2, SIZE * 0.44, 560);
-      grad.addColorStop(0, `rgba(${r},${g},${b},0.45)`);
-      grad.addColorStop(0.6, `rgba(${r},${g},${b},0.12)`);
-      grad.addColorStop(1, "transparent");
-      ctx.fillStyle = grad;
-      ctx.fillRect(0, 0, SIZE, SIZE);
-
-      // Border rect
-      ctx.strokeStyle = `rgba(${r},${g},${b},0.25)`;
-      ctx.lineWidth = 2;
-      ctx.strokeRect(48, 48, SIZE - 96, SIZE - 96);
-
-      // Category label
-      ctx.fillStyle = `rgba(${r},${g},${b},0.72)`;
-      ctx.font = "400 30px -apple-system, 'Helvetica Neue', Arial, sans-serif";
-      ctx.textAlign = "center";
-      ctx.fillText(catLabel.toUpperCase(), SIZE / 2, 170);
-
-      // Divider line
-      ctx.beginPath();
-      ctx.strokeStyle = `rgba(${r},${g},${b},0.30)`;
-      ctx.lineWidth = 1;
-      ctx.moveTo(SIZE / 2 - 60, 195); ctx.lineTo(SIZE / 2 + 60, 195);
-      ctx.stroke();
-
-      // Task text — word wrap at 64px bold
-      ctx.fillStyle = "rgba(255,238,248,0.96)";
-      ctx.font = "700 64px -apple-system, 'Helvetica Neue', Arial, sans-serif";
-      const lines = wrapText(ctx, text, 900);
-      const lineH = 82;
-      const totalH = lines.length * lineH;
-      const startY = (SIZE - totalH) / 2 + 24;
-      lines.forEach((line, i) => { ctx.fillText(line, SIZE / 2, startY + i * lineH); });
-
-      // Brand
-      ctx.fillStyle = "rgba(255,238,248,0.20)";
-      ctx.font = "300 28px -apple-system, 'Helvetica Neue', Arial, sans-serif";
-      ctx.fillText("touché", SIZE / 2, 960);
-
-      await new Promise<void>((resolve) => {
-        canvas.toBlob(async (blob) => {
-          if (!blob) { resolve(); return; }
-          const file = new File([blob], "touche-task.png", { type: "image/png" });
-          try {
-            if (navigator.share && (navigator as any).canShare?.({ files: [file] })) {
-              await navigator.share({ files: [file], title: "Touché" });
-            } else {
-              const url = URL.createObjectURL(blob);
-              const a = document.createElement("a");
-              a.href = url; a.download = "touche-task.png";
-              document.body.appendChild(a); a.click(); document.body.removeChild(a);
-              setTimeout(() => URL.revokeObjectURL(url), 1000);
-            }
-          } catch { /* user cancelled or share failed */ }
-          resolve();
-        }, "image/png");
-      });
-    } catch { /* ignore */ } finally { setSharing(false); }
-  }, [text, r, g, b, catLabel, sharing]);
-
+      ctx.fillStyle = "#fffaf3"; ctx.fillRect(0, 0, size, size);
+      ctx.strokeStyle = FALLBACK_INK; ctx.lineWidth = 5; ctx.strokeRect(48, 48, size - 96, size - 96);
+      ctx.fillStyle = `rgb(${color.r},${color.g},${color.b})`; ctx.fillRect(48, 48, 230, 18);
+      ctx.fillStyle = FALLBACK_INK; ctx.textAlign = "center";
+      ctx.font = "700 32px sans-serif"; ctx.fillText(catLabel.toUpperCase(), size / 2, 180);
+      ctx.font = "700 64px sans-serif";
+      const lines = wrapText(ctx, text, 850);
+      const lineHeight = 84;
+      lines.forEach((line, index) => ctx.fillText(line, size / 2, (size - lines.length * lineHeight) / 2 + index * lineHeight));
+      ctx.fillStyle = `rgb(${color.r},${color.g},${color.b})`;
+      ctx.font = "700 30px sans-serif"; ctx.fillText("touché", size / 2, 970);
+      await new Promise<void>((resolve) => canvas.toBlob(async (blob) => {
+        if (!blob) { resolve(); return; }
+        const file = new File([blob], "touche-task.png", { type: "image/png" });
+        try {
+          if (navigator.share && (navigator as any).canShare?.({ files: [file] })) await navigator.share({ files: [file], title: "Touché" });
+          else {
+            const url = URL.createObjectURL(blob); const link = document.createElement("a");
+            link.href = url; link.download = "touche-task.png"; document.body.appendChild(link); link.click(); link.remove();
+            setTimeout(() => URL.revokeObjectURL(url), 1000);
+          }
+        } catch { /* sharing was cancelled */ }
+        resolve();
+      }, "image/png"));
+    } catch { /* keep the task usable when image sharing is unavailable */ }
+    finally { setSharing(false); }
+  }, [catLabel, color, sharing, text]);
   return (
-    <div style={{ position: "absolute", inset: 0, zIndex: 30, background: `rgba(${r},${g},${b},.96)`, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: `32px 28px max(32px,env(safe-area-inset-bottom))`, opacity: visible ? 1 : 0, pointerEvents: visible ? "auto" : "none", transition: "opacity .38s cubic-bezier(.22,1,.36,1)", backdropFilter: "blur(2px)" }}>
-      <div style={{ position: "absolute", top: 0, left: 0, right: 0, display: "flex", justifyContent: "center", paddingTop: topPadding, opacity: textVisible ? 1 : 0, transform: textVisible ? "translateY(0)" : "translateY(-8px)", transition: "opacity .5s ease .1s,transform .5s ease .1s" }}>
-        <span style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", fontWeight: 400, fontSize: 11, letterSpacing: "0.22em", textTransform: "uppercase", color: "rgba(255,255,255,.55)" }}>{catLabel}</span>
-      </div>
-      <div style={{ opacity: textVisible ? 1 : 0, transform: textVisible ? "translateY(0)" : "translateY(28px)", transition: "opacity .6s cubic-bezier(.16,1,.3,1) .18s,transform .6s cubic-bezier(.16,1,.3,1) .18s", textAlign: "center", width: "100%" }}>
-        <p style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", fontWeight: 600, fontSize: text.length > 240 ? "clamp(16px,4.5vw,20px)" : text.length > 160 ? "clamp(19px,5.5vw,28px)" : "clamp(22px,6.5vw,34px)", color: "#ffffff", lineHeight: 1.5, letterSpacing: "-0.01em", margin: 0, textShadow: "0 2px 24px rgba(0,0,0,.20)", maxHeight: "60dvh", overflowY: "auto" }}>{text}</p>
-        {source === "ai" && (
-          <div style={{ marginTop: 12, display: "inline-flex", padding: "3px 10px", borderRadius: 20, border: "1px solid rgba(255,255,255,.22)" }}>
-            <span style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", fontWeight: 300, fontSize: 9, letterSpacing: "0.16em", textTransform: "uppercase", color: "rgba(255,255,255,.40)" }}>✦ ai</span>
-          </div>
-        )}
-      </div>
-      <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: `0 28px max(28px,env(safe-area-inset-bottom))`, opacity: textVisible ? 1 : 0, transform: textVisible ? "translateY(0)" : "translateY(12px)", transition: "opacity .5s ease .35s,transform .5s ease .35s", display: "flex", flexDirection: "column", gap: 10 }}>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
-          <button onClick={onGenerateAgain} style={{ width: "100%", padding: "15px 8px", borderRadius: 18, background: "rgba(255,255,255,.10)", border: "1px solid rgba(255,255,255,.22)", cursor: "pointer", fontFamily: "'Plus Jakarta Sans',sans-serif", fontWeight: 400, fontSize: 13, color: "rgba(255,255,255,0.78)", backdropFilter: "blur(8px)" }}>{t.taskAgain}</button>
-          <button onClick={handleShare} disabled={sharing} style={{ width: "100%", padding: "15px 8px", borderRadius: 18, background: "rgba(255,255,255,.10)", border: "1px solid rgba(255,255,255,.22)", cursor: sharing ? "default" : "pointer", fontFamily: "'Plus Jakarta Sans',sans-serif", fontWeight: 400, fontSize: 13, color: "rgba(255,255,255,0.75)", backdropFilter: "blur(8px)", opacity: sharing ? 0.5 : 1 }}>{sharing ? "..." : t.share}</button>
-        </div>
-        <button onClick={onDismiss} style={{ width: "100%", padding: "18px 8px", borderRadius: 18, background: "rgba(255,255,255,.18)", border: "1px solid rgba(255,255,255,.32)", cursor: "pointer", fontFamily: "'Plus Jakarta Sans',sans-serif", fontWeight: 500, fontSize: 16, letterSpacing: "0.02em", color: "#ffffff", backdropFilter: "blur(8px)" }}>{t.taskDone}</button>
-      </div>
-      <div style={{ position: "absolute", top: "-15%", right: "-20%", width: "55vw", height: "55vw", borderRadius: "50%", background: "rgba(255,255,255,.06)", pointerEvents: "none" }} />
-      <div style={{ position: "absolute", bottom: "-10%", left: "-18%", width: "45vw", height: "45vw", borderRadius: "50%", background: "rgba(255,255,255,.05)", pointerEvents: "none" }} />
-    </div>
-  );
-}
-
-// ── History Panel ─────────────────────────────────────────────────────────────
-function HistoryPanel({ entries, open, onClose, accentRgb, lang }: {
-  entries: HistoryEntry[]; open: boolean; onClose: () => void;
-  accentRgb: { r: number; g: number; b: number }; lang: Lang;
-}) {
-  const { r, g, b } = accentRgb; const t = UI[lang];
-  if (!open) return null;
-  return (
-    <div style={{ position: "absolute", inset: 0, background: "rgba(10,4,16,.75)", display: "flex", alignItems: "flex-end", zIndex: 30, backdropFilter: "blur(6px)" }} onClick={onClose}>
-      <div onClick={e => e.stopPropagation()} style={{ width: "100%", background: "#160d14", borderRadius: "24px 24px 0 0", borderTop: `1px solid rgba(${r},${g},${b},.22)`, padding: `24px 20px max(24px,env(safe-area-inset-bottom))`, maxHeight: "70dvh", overflowY: "auto" }}>
-        <p style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", fontWeight: 600, fontSize: 16, color: TEXT_P, margin: "0 0 16px", letterSpacing: "-0.01em" }}>{t.history} · {t.historyCount(entries.length)}</p>
-        {entries.length === 0
-          ? <p style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", fontWeight: 300, fontSize: 13, color: TEXT_S, textAlign: "center", padding: "20px 0" }}>{t.historyEmpty}</p>
-          : [...entries].reverse().map(e => (
-            <div key={e.id} style={{ padding: "12px 0", borderBottom: `0.5px solid rgba(255,255,255,0.06)` }}>
-              <p style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", fontSize: 13, color: TEXT_P, margin: 0, lineHeight: 1.5 }}>{e.text}</p>
-              <p style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", fontWeight: 300, fontSize: 10, color: `rgba(${r},${g},${b},.55)`, margin: "4px 0 0", letterSpacing: "0.08em" }}>{new Date(e.date).toLocaleDateString(lang === "ru" ? "ru-RU" : lang === "hi" ? "hi-IN" : lang === "pt" ? "pt-BR" : lang === "es" ? "es-ES" : "en-US", { month: "short", day: "numeric" })}</p>
-            </div>
-          ))
-        }
-        <button onClick={onClose} style={{ marginTop: 16, width: "100%", padding: "12px", background: "transparent", border: `1px solid rgba(${r},${g},${b},.22)`, borderRadius: 12, cursor: "pointer", fontFamily: "'Plus Jakarta Sans',sans-serif", fontWeight: 300, fontSize: 11, letterSpacing: "0.14em", textTransform: "uppercase", color: `rgba(${r},${g},${b},.60)` }}>{t.panelClose}</button>
+    <div className={`task-reveal ${visible ? "is-visible" : ""}`} aria-hidden={!visible}>
+      <div className="task-reveal__rule" style={{ background: `rgb(${color.r},${color.g},${color.b})` }} />
+      <span className="task-reveal__label">{catLabel}</span>
+      <p className="task-reveal__text">{text}</p>
+      {source === "ai" && <span className="task-reveal__source">AI prompt</span>}
+      <div className="task-reveal__actions">
+        <button data-testid="button-task-again" onClick={onGenerateAgain}>{t.taskAgain}</button>
+        <button data-testid="button-share-task" onClick={share} disabled={sharing}>{sharing ? "..." : t.share}</button>
+        <button className="task-reveal__done" data-testid="button-task-done" onClick={onDismiss}>{t.taskDone}</button>
       </div>
     </div>
   );
 }
 
-// ── Main screen ───────────────────────────────────────────────────────────────
-interface Props { lang: Lang; gender?: import("@/components/GenderSelect").Gender; category: Category; onBack: () => void; onCategoryChange: (c: Category) => void; swipeDir: "left" | "right"; coupleId?: string | null; mode?: AppMode; onUpgrade?: () => Promise<boolean>; }
+interface Props {
+  lang: Lang; gender?: Gender; category: Category; onBack: () => void;
+  onCategoryChange: (category: Category) => void; swipeDir: "left" | "right";
+  coupleId?: string | null; mode?: AppMode; onUpgrade?: () => Promise<boolean>;
+}
 
 export default function CategoryScreen({ lang, gender, category, onBack, onCategoryChange, swipeDir, coupleId, mode = "solo", onUpgrade }: Props) {
-  const cfg = CATEGORY_CONFIG[category]; const { r, g, b } = cfg; const t = UI[lang];
-
+  const cfg = CATEGORY_CONFIG[category];
+  const popColor = POP_COLORS[category];
+  const t = UI[lang];
+  const topPadding = useTelegramTopInset();
   const [mounted, setMounted] = useState(false);
   const [history, setHistory] = useState<HistoryEntry[]>(loadHistory);
   const [remaining, setRemaining] = useState<number | null>(null);
   const [taskId, setTaskId] = useState<string | null>(null);
-  const [errorKind, setErrorKind] = useState<TaskError["kind"] | null>(null);
-  const [generatedErrorCode, setGeneratedErrorCode] = useState<string | null>(null);
-  const [isCasting, setIsCasting] = useState(false);
   const [taskText, setTaskText] = useState("");
   const [taskSource, setTaskSource] = useState<"ai" | "fallback">("fallback");
+  const [isCasting, setIsCasting] = useState(false);
   const [showReveal, setShowReveal] = useState(false);
-  const [hintText, setHintText] = useState(t.hint);
   const [historyOpen, setHistoryOpen] = useState(false);
-  const [vh, setVh] = useState<number | null>(null);
-  const topPadding = useTelegramTopInset();
-
-  const touchStartX = useRef(0); const touchStartY = useRef(0); const swipeLocked = useRef(false);
+  const [errorKind, setErrorKind] = useState<TaskError["kind"] | null>(null);
+  const [generatedErrorCode, setGeneratedErrorCode] = useState<string | null>(null);
+  const [viewportHeight, setViewportHeight] = useState<number | null>(null);
+  const touchStart = useRef({ x: 0, y: 0 });
   const revealTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const catIdx = CATEGORIES_ORDER.indexOf(category);
-  const errorCopy = {
+  const index = CATEGORIES_ORDER.indexOf(category);
+  const label = categoryLabel(category, t);
+  const sub = categorySub(category, t);
+  const sensitive = category === "passion" || category === "hard";
+  const errorCopy: Record<TaskError["kind"], string> = {
     subscription_required: lang === "ru" ? "Эта категория доступна в Premium." : "This category is available in Premium.",
     limit_exceeded: lang === "ru" ? "Лимит на сегодня закончился." : "Today's limit is used.",
     rate_limited: lang === "ru" ? "Слишком много запросов. Попробуйте чуть позже." : "Too many requests. Try again shortly.",
     unauthorized: lang === "ru" ? "Откройте приложение из Telegram заново." : "Please reopen the app from Telegram.",
     timeout: lang === "ru" ? "Сервер отвечает слишком долго. Попробуйте ещё раз." : "The server took too long. Please try again.",
     unknown: lang === "ru" ? "Не удалось получить задание. Попробуйте ещё раз." : "Could not get a task. Try again.",
-  } as const;
+  };
 
   useEffect(() => {
     requestAnimationFrame(() => setMounted(true));
-
     const tg = window.Telegram?.WebApp;
-    function updateVh() { const h = tg?.viewportStableHeight ?? tg?.viewportHeight; if (h && h > 100) setVh(h); }
-    updateVh();
-    tg?.onEvent?.("viewportChanged", updateVh);
-    const tm = setTimeout(updateVh, 500);
-
-    return () => { tg?.offEvent?.("viewportChanged", updateVh); clearTimeout(tm); };
+    const update = () => {
+      const height = tg?.viewportStableHeight ?? tg?.viewportHeight;
+      if (height && height > 100) setViewportHeight(height);
+    };
+    update(); tg?.onEvent?.("viewportChanged", update);
+    const timer = setTimeout(update, 500);
+    return () => { tg?.offEvent?.("viewportChanged", update); clearTimeout(timer); };
   }, [category]);
 
-  const catLabels: Record<Category, string> = { compliments: t.catCompliments, tenderness: t.catTenderness, desire: t.catDesire, passion: t.catPassion, hard: t.catHard };
-  const catSubs:   Record<Category, string> = { compliments: t.catComplimentsSub, tenderness: t.catTendernessSub, desire: t.catDesireSub, passion: t.catPassionSub, hard: t.catHardSub };
-
-  const goToCategory = useCallback((cat: Category) => {
+  const goToCategory = useCallback((next: Category) => {
     window.Telegram?.WebApp?.HapticFeedback?.impactOccurred("light");
-    onCategoryChange(cat);
+    onCategoryChange(next);
   }, [onCategoryChange]);
-
-  const handleTouchStart = useCallback((e: React.TouchEvent) => {
-    touchStartX.current = e.touches[0].clientX;
-    touchStartY.current = e.touches[0].clientY;
-    swipeLocked.current = false;
+  const onTouchStart = useCallback((event: TouchEvent) => {
+    touchStart.current = { x: event.touches[0].clientX, y: event.touches[0].clientY };
   }, []);
-
-  const handleTouchEnd = useCallback((e: React.TouchEvent) => {
-    if (swipeLocked.current) return;
-    const dx = e.changedTouches[0].clientX - touchStartX.current;
-    const dy = e.changedTouches[0].clientY - touchStartY.current;
+  const onTouchEnd = useCallback((event: TouchEvent) => {
+    const dx = event.changedTouches[0].clientX - touchStart.current.x;
+    const dy = event.changedTouches[0].clientY - touchStart.current.y;
     if (Math.abs(dx) < 50 || Math.abs(dy) > Math.abs(dx) * .9) return;
-    swipeLocked.current = true;
-    if (dx < 0 && catIdx < CATEGORIES_ORDER.length - 1) goToCategory(CATEGORIES_ORDER[catIdx + 1]);
-    else if (dx > 0 && catIdx > 0) goToCategory(CATEGORIES_ORDER[catIdx - 1]);
-  }, [catIdx, goToCategory]);
+    if (dx < 0 && index < CATEGORIES_ORDER.length - 1) goToCategory(CATEGORIES_ORDER[index + 1]);
+    if (dx > 0 && index > 0) goToCategory(CATEGORIES_ORDER[index - 1]);
+  }, [goToCategory, index]);
 
-  const handleHoldComplete = useCallback(async () => {
+  const generate = useCallback(async () => {
     if (isCasting) return;
     const tg = window.Telegram?.WebApp;
     tg?.HapticFeedback?.impactOccurred("medium");
-    setIsCasting(true);
-    setHintText(t.tapping);
-    setErrorKind(null);
-    setGeneratedErrorCode(null);
+    setIsCasting(true); setErrorKind(null); setGeneratedErrorCode(null);
     const generated = await generateAITask(category, lang, gender, mode, coupleId ?? null);
     if (!generated.result) {
-      setErrorKind(generated.error?.kind ?? "unknown");
-      setGeneratedErrorCode(generated.error?.message ?? null);
-      setIsCasting(false);
-      setHintText(t.hint);
-      tg?.HapticFeedback?.notificationOccurred?.("error");
-      return;
+      setErrorKind(generated.error?.kind ?? "unknown"); setGeneratedErrorCode(generated.error?.message ?? null);
+      setIsCasting(false); tg?.HapticFeedback?.notificationOccurred?.("error"); return;
     }
     const picked = generated.result.task;
-    const src: "ai" | "fallback" = generated.result.source ?? "ai";
-    setTaskId(generated.result.taskId);
     if (typeof generated.result.remaining === "number") setRemaining(generated.result.remaining);
-
-    const newEntry: HistoryEntry = { id: `${Date.now()}-${Math.random()}`, text: picked, category, date: new Date().toISOString() };
-    const newHistory = [...history, newEntry];
-    saveHistory(newHistory);
-    setHistory(newHistory);
-
-    setTaskText(picked);
-    setTaskSource(src);
-    setIsCasting(false);
+    const entry: HistoryEntry = { id: `${Date.now()}-${Math.random()}`, text: picked, category, date: new Date().toISOString() };
+    const nextHistory = [...history, entry]; saveHistory(nextHistory); setHistory(nextHistory);
+    setTaskId(generated.result.taskId); setTaskText(picked); setTaskSource(generated.result.source ?? "ai"); setIsCasting(false);
     tg?.HapticFeedback?.notificationOccurred?.("success");
-
     if (revealTimer.current) clearTimeout(revealTimer.current);
     revealTimer.current = setTimeout(() => setShowReveal(true), 80);
-  }, [isCasting, category, lang, gender, mode, coupleId, history, t]);
+  }, [category, coupleId, gender, history, isCasting, lang, mode]);
 
-  const handleDismiss = useCallback(() => {
+  const dismiss = useCallback(() => {
     if (mode === "together" && coupleId && taskId) {
-      const initData = window.Telegram?.WebApp?.initData ?? "";
       fetch("/api/couple/intimacy?action=complete", {
         method: "POST",
-        headers: { "Content-Type": "application/json", "x-telegram-init-data": initData },
+        headers: { "Content-Type": "application/json", "x-telegram-init-data": getInitData() },
         body: JSON.stringify({ task_id: taskId }),
       }).then((response) => {
-        if (!response.ok) return;
-        addLocalPoints(category);
-        window.dispatchEvent(new CustomEvent("touche-intimacy-updated"));
+        if (response.ok) { addLocalPoints(category); window.dispatchEvent(new CustomEvent("touche-intimacy-updated")); }
       }).catch(() => {});
     }
     setShowReveal(false);
-    setTimeout(() => { setTaskText(""); setHintText(t.hint); }, 400);
-  }, [category, coupleId, mode, taskId, t.hint]);
+    setTimeout(() => setTaskText(""), 400);
+  }, [category, coupleId, mode, taskId]);
 
+  const height = viewportHeight ? `${viewportHeight}px` : "100dvh";
   const enterX = swipeDir === "left" ? 60 : -60;
-  const height = vh ? `${vh}px` : "100dvh";
-
   return (
-    <div
-      onTouchStart={handleTouchStart}
-      onTouchEnd={handleTouchEnd}
-      style={{ position: "fixed", inset: 0, background: BG, display: "flex", flexDirection: "column", overflow: "hidden", height, opacity: mounted ? 1 : 0, transform: mounted ? "translateX(0)" : `translateX(${enterX}px)`, transition: mounted ? "opacity .32s ease,transform .38s cubic-bezier(.22,1,.36,1)" : "none" }}
-    >
-      <SmokeBackground tint={SMOKE_BY_CATEGORY[category] ?? SMOKE_DEFAULT} />
-      {/* Top bar */}
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", paddingTop: topPadding, paddingLeft: 20, paddingRight: 20, paddingBottom: 6, flexShrink: 0, position: "relative", zIndex: 10 }}>
-        <button onClick={onBack} style={{ background: "transparent", border: "none", cursor: "pointer", fontFamily: "'Plus Jakarta Sans',sans-serif", fontWeight: 400, fontSize: 14, letterSpacing: "0.01em", color: TEXT_S, padding: "4px 0", minWidth: 56 }}>
-          {t.backLabel}
-        </button>
-        <div style={{ flex: 1 }} />
-        <button onClick={() => setHistoryOpen(true)} style={{ background: "transparent", border: "none", cursor: "pointer", fontFamily: "'Plus Jakarta Sans',sans-serif", fontWeight: 400, fontSize: 14, color: TEXT_S, padding: "4px 0", minWidth: 56, textAlign: "right" }}>
-          {t.history}
-        </button>
-      </div>
-
-      {mode === "together" && (
-        <div style={{
-          margin: "2px 20px 10px", padding: "9px 12px", borderRadius: 13,
-          display: "flex", alignItems: "center", gap: 9,
-          background: `linear-gradient(90deg, rgba(${r},${g},${b},0.13), rgba(255,238,248,0.035))`,
-          border: `1px solid rgba(${r},${g},${b},0.22)`,
-          position: "relative", zIndex: 10,
-        }}>
-          <span style={{
-            width: 8, height: 8, borderRadius: "50%", flexShrink: 0,
-            background: `rgb(${r},${g},${b})`,
-            boxShadow: `0 0 10px rgba(${r},${g},${b},0.72)`,
-          }} />
-          <span style={{
-            fontFamily: "'Plus Jakarta Sans',sans-serif", fontSize: 11, fontWeight: 600,
-            letterSpacing: "0.02em", color: TEXT_P,
-          }}>
-            {t.sharedTask}
-          </span>
-        </div>
-      )}
-
-      <CategoryHeader category={category} catLabel={catLabels[category]} catSub={catSubs[category]} />
-      {(category === "passion" || category === "hard") && (
-        <div style={{ margin: "7px 20px 0", padding: "8px 12px", borderRadius: 12, background: `rgba(${r},${g},${b},.09)`, border: `1px solid rgba(${r},${g},${b},.20)`, color: `rgba(255,238,248,.58)`, fontSize: 11, lineHeight: 1.4, textAlign: "center", position: "relative", zIndex: 10 }}>
-          {lang === "ru" ? "18+ контент · выбирайте только то, что комфортно обоим" : "18+ content · choose only what feels comfortable for both"}
-        </div>
-      )}
-
-      {remaining !== null && remaining > 0 && (
-        <div style={{ textAlign: "center", flexShrink: 0, position: "relative", zIndex: 10, paddingTop: 4 }}>
-          <span style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", fontWeight: 300, fontSize: 11, letterSpacing: "0.10em", textTransform: "uppercase", color: `rgba(${r},${g},${b},.48)` }}>{t.remaining(remaining)}</span>
-        </div>
-      )}
-
-      <div style={{ flex: 1, position: "relative", minHeight: 0 }}>
-        <HeartbeatCanvas
-          onHoldComplete={handleHoldComplete}
-          isCasting={isCasting}
-          color={cfg}
-          hintText={hintText}
-          holdDuration={2600}
-          baseRScale={0.28}
-          bgColor={BG}
-        />
-        {errorKind && (
-          <div role="alert" style={{
-            position: "absolute", left: 22, right: 22, bottom: 24, zIndex: 12,
-            padding: "16px 18px", borderRadius: 18,
-            background: "rgba(22,10,20,.92)", border: `1px solid rgba(${r},${g},${b},.36)`,
-            boxShadow: `0 14px 36px rgba(0,0,0,.28)`, textAlign: "center",
-          }}>
-            <div style={{ color: TEXT_P, fontSize: 14, lineHeight: 1.45 }}>{errorCopy[errorKind]}{errorKind === "unknown" && generatedErrorCode ? ` (${generatedErrorCode})` : ""}</div>
-            {errorKind === "subscription_required" && onUpgrade && (
-              <button onClick={onUpgrade} style={{ marginTop: 12, minHeight: 44, padding: "10px 18px", borderRadius: 12, border: "none", background: `rgb(${r},${g},${b})`, color: "#fff", fontWeight: 700, cursor: "pointer" }}>
-                {lang === "ru" ? "Открыть Premium" : "Open Premium"}
-              </button>
-            )}
-            <button onClick={() => setErrorKind(null)} style={{ display: "block", margin: "10px auto 0", border: "none", background: "transparent", color: TEXT_S, minHeight: 36, cursor: "pointer" }}>
-              {lang === "ru" ? "Понятно" : "Dismiss"}
-            </button>
+    <main className="category-pop" style={{ height, opacity: mounted ? 1 : 0, transform: mounted ? "translateX(0)" : `translateX(${enterX}px)` }} onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
+      <header className="category-pop__top" style={{ paddingTop: topPadding }}>
+        <button data-testid="button-category-back" className="category-pop__menu" onClick={onBack} aria-label={t.backLabel}><span /><span /><span /></button>
+        <div className="category-pop__logo">Touch<em>é</em></div>
+        <button data-testid="button-open-history" className="category-pop__history" onClick={() => setHistoryOpen(true)}>{t.history}</button>
+      </header>
+      <div className="category-pop__content">
+        <section className="category-pop__hero">
+          <span className="category-pop__stamp">{mode === "together" ? t.sharedTask : `18+ · ${t.lockSub}`}</span>
+           <div className="category-pop__orb" style={{ background: `rgb(${popColor.r},${popColor.g},${popColor.b})` }} aria-hidden="true">{String(index + 1).padStart(2, "0")}</div>
+          <p className="category-pop__eyebrow">{categorySub(category, t)}</p>
+          <h1 data-testid="text-category-title">{label}</h1>
+           <p className="category-pop__description">{({
+             compliments: t.catComplimentsDesc, tenderness: t.catTendernessDesc,
+             desire: t.catDesireDesc, passion: t.catPassionDesc, hard: t.catHardDesc,
+           })[category]}</p>
+        </section>
+         {sensitive && <div className="category-pop__warning" role="note">18+ · {t.lockSub}</div>}
+         {mode === "together" && <div className="category-pop__mode"><span className="category-pop__mode-dot" style={{ background: `rgb(${popColor.r},${popColor.g},${popColor.b})` }} /><strong>{t.sharedTask}</strong><small>{coupleId ? t.linked : t.appSub}</small></div>}
+        {remaining !== null && <div className="category-pop__remaining" data-testid="status-remaining">{t.remaining(remaining)}</div>}
+        <section className="category-pop__generator">
+           <div className="category-pop__generator-head"><span>{t.hint}</span><b>{String(index + 1).padStart(2, "0")} / {String(CATEGORIES_ORDER.length).padStart(2, "0")}</b></div>
+          <div className="category-pop__heartbeat">
+             <HeartbeatCanvas onHoldComplete={generate} isCasting={isCasting} color={popColor} hintText={isCasting ? t.tapping : t.hint} holdDuration={2600} baseRScale={0.28} bgColor="#fffaf3" />
           </div>
-        )}
+          {errorKind && <div className="category-pop__error" role="alert" data-testid="status-task-error"><strong>{errorCopy[errorKind]}</strong>{errorKind === "unknown" && generatedErrorCode && <small>{generatedErrorCode}</small>}{errorKind === "subscription_required" && onUpgrade && <button data-testid="button-open-premium" onClick={() => void onUpgrade()}>{lang === "ru" ? "Открыть Premium" : "Open Premium"}</button>}<button onClick={() => setErrorKind(null)}>{lang === "ru" ? "Понятно" : "Dismiss"}</button></div>}
+        </section>
+        <div className="category-pop__dots" aria-label="Categories">
+           {CATEGORIES_ORDER.map((item) => <button key={item} data-testid={`button-category-${item}`} className={item === category ? "active" : ""} onClick={() => goToCategory(item)} style={{ background: item === category ? `rgb(${POP_COLORS[item].r},${POP_COLORS[item].g},${POP_COLORS[item].b})` : undefined }} aria-label={categoryLabel(item, t)} />)}
+        </div>
+        <p className="category-pop__hold-label">{t.holdHint}</p>
+         {sensitive && onUpgrade && <button className="category-pop__premium" data-testid="button-premium-category" onClick={() => void onUpgrade()}><span>P</span><strong>Touché Premium</strong><small>{t.subTagline}</small><b>→</b></button>}
+         <footer className="category-pop__footer"><strong>Touché</strong><span>{t.appSub}</span></footer>
       </div>
-
-      <div style={{ flexShrink: 0, position: "relative", zIndex: 10, paddingBottom: 6 }}>
-        <CategoryDots current={category} onDotPress={goToCategory} />
-         <p style={{ textAlign: "center", fontFamily: "'Plus Jakarta Sans',sans-serif", fontWeight: 400, fontSize: 11, letterSpacing: "0.12em", textTransform: "uppercase", color: TEXT_T, margin: "6px 0 0" }}>{t.holdHint}</p>
-      </div>
-
-      <div style={{ display: "flex", justifyContent: "center", alignItems: "center", padding: `8px 20px max(16px,env(safe-area-inset-bottom))`, flexShrink: 0, position: "relative", zIndex: 10 }}>
-        <span style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", fontWeight: 300, fontSize: 11, letterSpacing: "0.14em", textTransform: "uppercase", color: TEXT_T }}>touché</span>
-      </div>
-
-       <TaskReveal text={taskText} color={cfg} visible={showReveal} onDismiss={handleDismiss} onGenerateAgain={() => { setShowReveal(false); setTimeout(handleHoldComplete, 120); }} lang={lang} catLabel={catLabels[category]} source={taskSource} topPadding={topPadding} />
-      <HistoryPanel entries={history.filter(e => e.category === category)} open={historyOpen} onClose={() => setHistoryOpen(false)} accentRgb={cfg} lang={lang} />
-    </div>
+      <TaskReveal text={taskText} color={cfg} visible={showReveal} onDismiss={dismiss} onGenerateAgain={() => { setShowReveal(false); setTimeout(generate, 120); }} lang={lang} catLabel={label} source={taskSource} />
+      <HistoryPanel entries={history.filter((entry) => entry.category === category)} open={historyOpen} onClose={() => setHistoryOpen(false)} accentRgb={cfg} lang={lang} />
+    </main>
   );
 }

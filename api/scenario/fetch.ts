@@ -42,11 +42,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     const { data: session, error } = await supabase
       .from("scenario_sessions")
-      .select("id, pulled_by, title, role_a_text, role_b_text, lang")
+      .select("id, couple_id, pulled_by, title, role_a_text, role_b_text, lang, intensity")
       .eq("id", sessionId)
       .single();
 
     if (error || !session) return res.status(404).json({ error: "Session not found" });
+    const { data: sessionCouple } = await supabase.from("couples").select("user_a_id,user_b_id").eq("id", session.couple_id).maybeSingle();
+    if (!sessionCouple || (sessionCouple.user_a_id !== caller.id && sessionCouple.user_b_id !== caller.id)) {
+      return res.status(403).json({ error: "couple_access_denied" });
+    }
 
     const isRoleA = session.pulled_by === caller.id;
     return res.status(200).json({
@@ -56,6 +60,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       roleText: isRoleA ? session.role_a_text : session.role_b_text,
       role: isRoleA ? "a" : "b",
       lang: session.lang,
+      intensity: session.intensity,
     });
   }
 
@@ -63,12 +68,17 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (type === "pending") {
     const coupleId = req.query.coupleId as string;
     if (!coupleId) return res.status(400).json({ error: "Missing coupleId" });
+    const { data: couple } = await supabase.from("couples").select("user_a_id,user_b_id").eq("id", coupleId).maybeSingle();
+    if (!couple || (couple.user_a_id !== caller.id && couple.user_b_id !== caller.id)) {
+      return res.status(403).json({ error: "couple_access_denied" });
+    }
+    const partnerId = couple.user_a_id === caller.id ? couple.user_b_id : couple.user_a_id;
 
     const { data: session, error } = await supabase
       .from("scenario_sessions")
-      .select("id, pulled_by, title, role_b_text, lang")
+      .select("id, pulled_by, title, role_b_text, lang, intensity")
       .eq("couple_id", coupleId)
-      .neq("pulled_by", caller.id)
+      .eq("pulled_by", partnerId)
       .eq("pending_for_b", true)
       .order("created_at", { ascending: false })
       .limit(1)
@@ -80,7 +90,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     await supabase
       .from("scenario_sessions")
       .update({ pending_for_b: false, notified_at: new Date().toISOString() })
-      .eq("id", session.id);
+      .eq("id", session.id)
+      .eq("pending_for_b", true);
 
     return res.status(200).json({
       pending: true,
@@ -89,6 +100,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       roleText: session.role_b_text,
       role: "b",
       lang: session.lang,
+      intensity: session.intensity,
     });
   }
 

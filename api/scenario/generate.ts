@@ -7,16 +7,29 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { createClient } from "@supabase/supabase-js";
 import { validateTelegramInitData } from "../couple/_auth.js";
+import { appDate } from "../limits.js";
 
 const DEEPSEEK_API_KEY = process.env.DEEPSEEK_API_KEY!;
 const DEEPSEEK_URL = "https://api.deepseek.com/v1/chat/completions";
 const BOT_TOKEN = process.env.BOT_TOKEN!;
 const APP_URL = process.env.APP_URL!;
+const OWNER_ID = Number(process.env.OWNER_TELEGRAM_ID || 0);
+const LANGS = new Set(["ru", "en", "hi", "pt", "es"]);
+const INTENSITIES = new Set(["romantic", "passion", "hard"]);
+const GENDERS = new Set(["male", "female"]);
 
 const supabase = createClient(
   process.env.SUPABASE_URL!,
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
+
+function escapeHtml(value: string): string {
+  return value.replace(/[&<>"']/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[char] ?? char));
+}
+
+function cleanText(value: unknown, max: number): string {
+  return String(value ?? "").replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g, "").trim().slice(0, max);
+}
 
 // ─── Фолбэки разделены по полу инициатора (role_a) ────────────────────────
 
@@ -292,7 +305,20 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     gender?: string;
   };
 
-  if (!coupleId) return res.status(400).json({ error: "coupleId required" });
+  if (!coupleId || !/^[0-9a-f-]{16,}$/i.test(coupleId)) return res.status(400).json({ error: "invalid_couple_id" });
+  if (!LANGS.has(lang) || !INTENSITIES.has(intensity) || !GENDERS.has(gender)) return res.status(400).json({ error: "invalid_generation_options" });
+
+  const { data: couple } = await supabase.from("couples").select("user_a_id,user_b_id").eq("id", coupleId).maybeSingle();
+  if (!couple || (couple.user_a_id !== caller.id && couple.user_b_id !== caller.id)) {
+    return res.status(403).json({ error: "couple_access_denied" });
+  }
+  const premium = caller.id === OWNER_ID || !!(await supabase.from("user_subscriptions").select("expires_at").eq("user_id", caller.id).gt("expires_at", new Date().toISOString()).maybeSingle()).data;
+  if (!premium) return res.status(403).json({ error: "subscription_required" });
+  const { data: allowance, error: allowanceError } = await supabase.rpc("consume_daily_limit", {
+    p_user_id: caller.id, p_category: "scenarios", p_date: appDate(), p_limit: 3,
+  });
+  if (allowanceError) return res.status(500).json({ error: "scenario_limit_failed" });
+  if (allowance?.allowed === false || allowance?.ok === false) return res.status(429).json({ error: "rate_limited" });
 
   let generated: FallbackEntry;
   let source: "ai" | "fallback" = "ai";
@@ -323,9 +349,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const parsed = JSON.parse(raw);
     if (parsed?.title && parsed?.role_a && parsed?.role_b) {
       generated = {
-        title: String(parsed.title),
-        role_a: String(parsed.role_a),
-        role_b: String(parsed.role_b),
+        title: cleanText(parsed.title, 100),
+        role_a: cleanText(parsed.role_a, 1200),
+        role_b: cleanText(parsed.role_b, 1200),
       };
     } else {
       throw new Error("Unexpected AI response shape");
@@ -335,22 +361,17 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     generated = getFallback(intensity, lang, gender);
   }
 
-  const { data: couple } = await supabase
-    .from("couples")
-    .select("user_a_id, user_b_id")
-    .eq("id", coupleId)
-    .single();
-
   const partnerTgId: number | null = couple
     ? (couple.user_a_id === caller.id ? couple.user_b_id : couple.user_a_id)
     : null;
 
-  const { data: session } = await supabase
+  const { data: session, error: sessionError } = await supabase
     .from("scenario_sessions")
     .insert({
       couple_id: coupleId,
       pulled_by: caller.id,
       lang,
+      intensity,
       title: generated.title,
       role_a_text: generated.role_a,
       role_b_text: generated.role_b,
@@ -359,10 +380,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     })
     .select("id")
     .single();
+  if (sessionError || !session?.id) {
+    return res.status(500).json({ error: "scenario_save_failed" });
+  }
 
   let notified = false;
   if (partnerTgId && session?.id) {
-    notified = await notifyPartner(partnerTgId, generated.title, session.id, lang);
+    notified = await notifyPartner(partnerTgId, escapeHtml(generated.title), session.id, lang);
     if (notified) {
       await supabase
         .from("scenario_sessions")

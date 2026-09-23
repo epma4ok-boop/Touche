@@ -3,7 +3,9 @@
 // Body: { category, lang, gender? }
 
 import type { VercelRequest, VercelResponse } from "@vercel/node";
+import { createClient } from "@supabase/supabase-js";
 import { validateTelegramInitData } from "../couple/_auth.js";
+import { appDate, FREE_LIMIT } from "../limits.js";
 import { TASKS_RU } from "../../src/data/tasks-ru.js";
 import { TASKS_EN } from "../../src/data/tasks-en.js";
 import { TASKS_HI } from "../../src/data/tasks-hi.js";
@@ -12,6 +14,14 @@ import { TASKS_ES } from "../../src/data/tasks-es.js";
 
 const DEEPSEEK_API_KEY = process.env.DEEPSEEK_API_KEY!;
 const DEEPSEEK_URL = "https://api.deepseek.com/v1/chat/completions";
+const BOT_TOKEN = process.env.BOT_TOKEN;
+const OWNER_ID = Number(process.env.OWNER_TELEGRAM_ID || 0);
+const CATEGORIES = new Set(["compliments", "tenderness", "desire", "passion", "hard"]);
+const LANGS = new Set(["ru", "en", "hi", "pt", "es"]);
+const GENDERS = new Set(["male", "female"]);
+const MODES = new Set(["solo", "together"]);
+const PAID = new Set(["passion", "hard"]);
+const supabase = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!);
 
 type StaticPool = Record<string, string[]>;
 
@@ -145,64 +155,76 @@ function getPrompt(category: string, lang: string): string {
 }
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
+  if (req.method !== "POST") return res.status(405).json({ error: "method_not_allowed" });
+  if (!BOT_TOKEN) return res.status(503).json({ error: "service_unconfigured" });
+  const caller = validateTelegramInitData(req.headers["x-telegram-init-data"] as string | undefined, BOT_TOKEN);
+  if (!caller) return res.status(401).json({ error: "unauthorized" });
 
-  const initData = req.headers["x-telegram-init-data"] as string | undefined;
-  if (!initData) return res.status(401).json({ error: "Missing init data" });
+  const body = req.body ?? {};
+  const category = String(body.category ?? "");
+  const lang = String(body.lang ?? "en");
+  const gender = String(body.gender ?? "male");
+  const mode = String(body.mode ?? "solo");
+  const coupleId = typeof body.coupleId === "string" ? body.coupleId : null;
+  if (!CATEGORIES.has(category)) return res.status(400).json({ error: "invalid_category" });
+  if (!LANGS.has(lang) || !GENDERS.has(gender) || !MODES.has(mode)) return res.status(400).json({ error: "invalid_generation_options" });
 
-  const ok = validateTelegramInitData(initData, process.env.BOT_TOKEN!);
-  if (!ok) return res.status(403).json({ error: "Invalid init data" });
-
-  const { category = "compliments", lang = "en", gender = "male" } = req.body ?? {};
-
-  if (!DEEPSEEK_API_KEY) {
-    return res.json({ task: getFallback(category, lang) });
+  let couple: { user_a_id: number; user_b_id: number } | null = null;
+  if (mode === "together") {
+    if (!coupleId) return res.status(400).json({ error: "couple_id_required" });
+    const { data } = await supabase.from("couples").select("user_a_id,user_b_id").eq("id", coupleId).maybeSingle();
+    if (!data || (data.user_a_id !== caller.id && data.user_b_id !== caller.id)) return res.status(403).json({ error: "couple_access_denied" });
+    couple = data;
   }
+  const premium = caller.id === OWNER_ID || !!(await supabase.from("user_subscriptions").select("expires_at").eq("user_id", caller.id).gt("expires_at", new Date().toISOString()).maybeSingle()).data;
+  if (PAID.has(category) && !premium) return res.status(403).json({ error: "subscription_required", remaining: 0, isPremium: false });
 
-  try {
-    const systemPrompt = `${getPrompt(category, lang)}\n\n${getGenderLine(lang, gender)}`;
-    const userMessage = lang === "ru" ? "Сгенерируй одно задание." : "Generate one task.";
-
-    const aiRes = await fetch(DEEPSEEK_URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${DEEPSEEK_API_KEY}`,
-      },
-      body: JSON.stringify({
-        model: "deepseek-chat",
-        messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: userMessage },
-        ],
-        max_tokens: 160,
-        temperature: 1.1,
-      }),
+  let remaining: number | null = null;
+  if (!premium) {
+    const { data: consumed, error } = await supabase.rpc("consume_daily_limit", {
+      p_user_id: caller.id, p_category: category, p_date: appDate(), p_limit: FREE_LIMIT,
     });
-
-    if (!aiRes.ok) {
-      return res.json({ task: getFallback(category, lang) });
-    }
-
-    const data = await aiRes.json();
-    let task: string = data.choices?.[0]?.message?.content?.trim() ?? "";
-
-    task = task.replace(/^["']|["']$/g, "").trim();
-    task = task.replace(/^\d+\.\s*/, "");
-
-    const forbidden = [
-      "я рекомендую", "тебе стоит", "можешь попробовать",
-      "выдыхает", "дыши в", "посмотри в глаза", "отстранись",
-      "я хочу", "давай я", "я буду", "попробуй",
-    ];
-    const hasForbidden = forbidden.some(f => task.toLowerCase().includes(f));
-
-    if (!task || task.length < 15 || task.length > 350 || hasForbidden) {
-      return res.json({ task: getFallback(category, lang) });
-    }
-
-    return res.json({ task });
-  } catch {
-    return res.json({ task: getFallback(category, lang) });
+    if (error) return res.status(500).json({ error: "limit_consume_failed" });
+    const result = typeof consumed === "number" ? { remaining: consumed } : consumed ?? {};
+    if (result.allowed === false || result.ok === false) return res.status(403).json({ error: "limit_exceeded", remaining: 0, isPremium: false });
+    remaining = Number.isFinite(Number(result.remaining)) ? Number(result.remaining) : null;
   }
+
+  let task = getFallback(category, lang);
+  let source: "ai" | "fallback" = "fallback";
+  if (DEEPSEEK_API_KEY) {
+    try {
+      const systemPrompt = `${getPrompt(category, lang)}\n\n${getGenderLine(lang, gender)}`;
+      const aiRes = await fetch(DEEPSEEK_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${DEEPSEEK_API_KEY}` },
+        body: JSON.stringify({ model: "deepseek-chat", messages: [
+          { role: "system", content: systemPrompt },
+          { role: "user", content: lang === "ru" ? "Сгенерируй одно задание." : "Generate one task." },
+        ], max_tokens: 160, temperature: 1.1 }),
+      });
+      if (aiRes.ok) {
+        const data = await aiRes.json();
+        const candidate = String(data.choices?.[0]?.message?.content ?? "").replace(/^["']|["']$/g, "").replace(/^\d+\.\s*/, "").trim();
+        const forbidden = ["я рекомендую", "тебе стоит", "можешь попробовать", "выдыхает", "дыши в", "посмотри в глаза", "отстранись"];
+        if (candidate.length >= 15 && candidate.length <= 350 && !forbidden.some(f => candidate.toLowerCase().includes(f))) {
+          task = candidate;
+          source = "ai";
+        }
+      }
+    } catch {
+      // The validated server fallback is used when AI is unavailable.
+    }
+  }
+
+  const { data: saved, error: saveError } = await supabase.from("generated_tasks").insert({
+    user_id: caller.id,
+    couple_id: coupleId,
+    category,
+    mode,
+    task_text: task,
+    points: ({ compliments: 10, tenderness: 15, desire: 25, passion: 40, hard: 50 } as Record<string, number>)[category],
+  }).select("id").single();
+  if (saveError) return res.status(500).json({ error: "task_save_failed" });
+  return res.status(200).json({ ok: true, task, taskId: saved.id, source, remaining, isPremium: premium });
 }

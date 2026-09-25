@@ -56,7 +56,8 @@ function removeCoupleId() {
 function getSavedMode(hasCouple = false): AppMode {
     try {
       const v = localStorage.getItem(MODE_KEY);
-      if (v === "solo" || v === "together") return v;
+      if (v === "solo") return "solo";
+      if (v === "together" && hasCouple) return "together";
     } catch {}
     return hasCouple ? "together" : "solo";
 }

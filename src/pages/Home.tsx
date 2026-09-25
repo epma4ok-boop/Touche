@@ -381,7 +381,7 @@ const COUPLE_LABELS: Record<Lang, {
     titleConnect:  "Подключить пару",
     titlePending:  "Партнёр приглашает",
     subLinked:     "Вы связаны с партнёром",
-    subConnect:    "Поделитесь ссылкой — партнёр перейдёт и свяжет пару здесь",
+    subConnect:    "Совместный режим работает только после связи с партнёром. Поделитесь ссылкой, чтобы связать пару; если не хотите — оставайтесь в личном режиме.",
     subPending:    "Кто-то открыл приложение по вашей ссылке",
     id:            "ID пары",
     unlink:        "Отвязать пару",
@@ -397,7 +397,7 @@ const COUPLE_LABELS: Record<Lang, {
     titleConnect:  "Connect a pair",
     titlePending:  "Partner invites you",
     subLinked:     "You are linked with a partner",
-    subConnect:    "Share your link — your partner opens it and connects here",
+    subConnect:    "Together mode works only after your partner connects. Share your link to link your pair; otherwise, stay in Personal mode.",
     subPending:    "Someone opened the app via your link",
     id:            "Pair ID",
     unlink:        "Unlink pair",
@@ -413,7 +413,7 @@ const COUPLE_LABELS: Record<Lang, {
     titleConnect:  "जोड़ी जोड़ें",
     titlePending:  "साथी आमंत्रित करता है",
     subLinked:     "आप साथी से जुड़े हैं",
-    subConnect:    "अपना लिंक साझा करें — साथी खोलेगा और यहाँ जुड़ेगा",
+    subConnect:    "साथ वाला मोड तभी चलेगा जब आपका साथी जुड़ जाएगा। जोड़ी जोड़ने के लिए लिंक साझा करें; नहीं तो व्यक्तिगत मोड में रहें।",
     subPending:    "किसी ने आपके लिंक से ऐप खोला",
     id:            "जोड़ी ID",
     unlink:        "जोड़ी हटाएं",
@@ -429,7 +429,7 @@ const COUPLE_LABELS: Record<Lang, {
     titleConnect:  "Conectar casal",
     titlePending:  "Parceiro convida",
     subLinked:     "Você está conectado com um parceiro",
-    subConnect:    "Compartilhe seu link — o parceiro abre e conecta aqui",
+    subConnect:    "O modo Juntos só funciona depois que seu parceiro se conectar. Compartilhe seu link para conectar o casal; se preferir não conectar, continue no modo Pessoal.",
     subPending:    "Alguém abriu o app pelo seu link",
     id:            "ID do casal",
     unlink:        "Desvincular casal",
@@ -445,7 +445,7 @@ const COUPLE_LABELS: Record<Lang, {
     titleConnect:  "Conectar pareja",
     titlePending:  "Tu pareja te invita",
     subLinked:     "Estás vinculado con tu pareja",
-    subConnect:    "Comparte tu enlace — tu pareja lo abre y se conecta aquí",
+    subConnect:    "El modo Juntos solo funciona cuando tu pareja se conecta. Comparte tu enlace para vincularse; si no, sigue en el modo Personal.",
     subPending:    "Alguien abrió la app con tu enlace",
     id:            "ID de la pareja",
     unlink:        "Desvincular pareja",
@@ -1128,8 +1128,17 @@ export default function Home({
   }, []);
 
   useEffect(() => {
-    if (pendingRefUserId && !coupleId && mode === "together") setShowCoupleModal(true);
-  }, [pendingRefUserId, coupleId, mode]);
+    if (pendingRefUserId && !coupleId) setShowCoupleModal(true);
+  }, [pendingRefUserId, coupleId]);
+
+  const handleModeSelection = useCallback((nextMode: AppMode) => {
+    if (nextMode === "together" && !coupleId) {
+      setShowCoupleModal(true);
+      window.Telegram?.WebApp?.HapticFeedback?.impactOccurred("light");
+      return;
+    }
+    onModeChange(nextMode);
+  }, [coupleId, onModeChange]);
 
   useEffect(() => {
     let active = true;
@@ -1277,7 +1286,7 @@ export default function Home({
         </section>
 
         <div className="pop-mode-wrap" style={{ padding: "8px 14px 4px", position: "relative", zIndex: 1, flexShrink: 0 }}>
-          <ModeSwitcher lang={lang} mode={mode} coupleId={coupleId} onChange={onModeChange} />
+          <ModeSwitcher lang={lang} mode={mode} coupleId={coupleId} onChange={handleModeSelection} />
         </div>
 
         {/* ── List ── */}

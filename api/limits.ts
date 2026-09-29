@@ -39,16 +39,19 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const premium = await isPremium(caller.id);
   if (premium) return res.status(200).json({ ok: true, remaining: null, unlimited: true, isPremium: true, date });
 
-  const [{ data, error }, { data: credits, error: creditsError }] = await Promise.all([
+  const [{ data, error }, { data: credits, error: creditsError }, { data: paidCredits, error: paidCreditsError }] = await Promise.all([
     sb.from("user_daily_limits").select("count,bonus").eq("user_id", caller.id).eq("category", category).eq("date", date).maybeSingle(),
     sb.from("referral_task_credits").select("balance").eq("user_id", caller.id).eq("category", category).maybeSingle(),
+    sb.from("premium_task_credits").select("balance").eq("user_id", caller.id).eq("category", category).maybeSingle(),
   ]);
-  if (error || creditsError) return res.status(500).json({ error: "limits_read_failed" });
+  if (error || creditsError || paidCreditsError) return res.status(500).json({ error: "limits_read_failed" });
   const used = Number(data?.count ?? 0), bonus = Number(data?.bonus ?? 0);
   const creditBalance = Number(credits?.balance ?? 0);
+  const premiumTaskCredits = Number(paidCredits?.balance ?? 0);
   const base = PAID.has(category) ? 0 : FREE_LIMIT + bonus;
   return res.status(200).json({
-    ok: true, remaining: Math.max(0, base - used) + creditBalance,
-    used, bonus, credits: creditBalance, total: base + creditBalance, isPremium: false, date,
+    ok: true, remaining: Math.max(0, base - used) + creditBalance + premiumTaskCredits,
+    used, bonus, credits: creditBalance, premiumTaskCredits,
+    total: base + creditBalance + premiumTaskCredits, isPremium: false, date,
   });
 }

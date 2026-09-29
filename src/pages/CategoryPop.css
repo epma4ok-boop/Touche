@@ -25,3 +25,20 @@
   font: 700 11px "Space Grotesk",sans-serif; letter-spacing: .02em;
   text-transform: none;
 }
+.category-paywall-backdrop{position:fixed;inset:0;z-index:60;display:grid;place-items:center;padding:20px;background:rgba(22,34,56,.56);backdrop-filter:blur(5px)}
+.category-paywall{width:min(100%,420px);padding:20px;border:2px solid var(--pop-ink);border-radius:22px;background:var(--pop-paper);box-shadow:7px 8px 0 rgba(120,24,61,.28);color:var(--pop-ink)}
+.category-paywall__topline{display:flex;align-items:center;justify-content:space-between;color:var(--pop-wine);font:700 10px "Space Grotesk",sans-serif;letter-spacing:.12em;text-transform:uppercase}
+.category-paywall__topline button{width:34px;height:34px;border:1.5px solid var(--pop-ink);border-radius:50%;background:transparent;color:var(--pop-ink);font-size:22px;line-height:1;cursor:pointer}
+.category-paywall__topline button:disabled{opacity:.5;cursor:default}
+.category-paywall h2{margin:5px 0 6px;font:700 clamp(25px,7vw,33px)/1 "Space Grotesk",sans-serif;letter-spacing:-.06em}
+.category-paywall>p{margin:0 0 16px;color:var(--pop-muted);font-size:13px;line-height:1.45}
+.category-paywall__offer{display:flex;flex-direction:column;gap:5px;width:100%;margin-top:9px;padding:14px;border:2px solid var(--pop-ink);border-radius:15px;text-align:left;cursor:pointer;transition:transform .15s ease,box-shadow .15s ease}
+.category-paywall__offer:hover:not(:disabled){transform:translateY(-1px);box-shadow:3px 4px 0 rgba(22,34,56,.14)}
+.category-paywall__offer:disabled{opacity:.62;cursor:wait}
+.category-paywall__offer strong{font:700 15px "Space Grotesk",sans-serif}
+.category-paywall__offer small{font-size:11px;line-height:1.4}
+.category-paywall__offer--premium{background:var(--pop-ink);color:#fff}
+.category-paywall__offer--premium small{color:#d5d9e1}
+.category-paywall__offer--single{background:#d8f36a;color:var(--pop-ink)}
+.category-paywall__notice{margin-top:12px;padding:10px 11px;border:1px solid rgba(22,34,56,.2);border-radius:11px;background:#fff;color:var(--pop-ink);font-size:11px;line-height:1.4}
+@media (max-height:600px){.category-paywall{padding:15px}.category-paywall__offer{padding:10px}.category-paywall>p{margin-bottom:10px}}

@@ -19,6 +19,7 @@ const DEEPSEEK_URL = "https://api.deepseek.com/v1/chat/completions";
 const BOT_TOKEN = process.env.BOT_TOKEN;
 const OWNER_ID = Number(process.env.OWNER_TELEGRAM_ID || 0);
 const CATEGORIES = new Set(["compliments", "tenderness", "desire", "passion", "hard"]);
+const PAID_CATEGORIES = new Set(["passion", "hard"]);
 const LANGS = new Set(["ru", "en", "hi", "pt", "es"]);
 const GENDERS = new Set(["male", "female"]);
 const MODES = new Set(["solo", "together"]);
@@ -202,6 +203,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     if (!data || (data.user_a_id !== caller.id && data.user_b_id !== caller.id)) return res.status(403).json({ error: "couple_access_denied" });
   }
   const premium = caller.id === OWNER_ID || !!(await supabase.from("user_subscriptions").select("expires_at").eq("user_id", caller.id).gt("expires_at", new Date().toISOString()).maybeSingle()).data;
+  if (!premium && PAID_CATEGORIES.has(category)) {
+    const [{ data: referralCredit, error: referralError }, { data: paidCredit, error: paidCreditError }] = await Promise.all([
+      supabase.from("referral_task_credits").select("balance").eq("user_id", caller.id).eq("category", category).maybeSingle(),
+      supabase.from("premium_task_credits").select("balance").eq("user_id", caller.id).eq("category", category).maybeSingle(),
+    ]);
+    if (referralError || paidCreditError) return res.status(500).json({ error: "premium_credits_read_failed" });
+    const credits = Number(referralCredit?.balance ?? 0) + Number(paidCredit?.balance ?? 0);
+    if (credits < 1) return res.status(403).json({ error: "subscription_required" });
+  }
 
   let task = getFallback(category, lang);
   let source: "ai" | "fallback" = "fallback";

@@ -185,6 +185,31 @@ export async function apiSubscribe(lang: Lang): Promise<boolean> {
   }
 }
 
+export async function apiBuyPremiumTask(category: Category, lang: Lang): Promise<boolean> {
+  const initData = window.Telegram?.WebApp?.initData;
+  if (!initData) return false;
+  try {
+    const res = await fetch("/api/payments/invoice", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "x-telegram-init-data": initData },
+      body: JSON.stringify({ product: "premium_task", category, lang }),
+    });
+    if (!res.ok) return false;
+    const { invoiceLink } = await res.json();
+    if (!invoiceLink) return false;
+    const tg = window.Telegram?.WebApp as any;
+    if (typeof tg?.openInvoice === "function") {
+      return await new Promise<boolean>((resolve) => {
+        tg.openInvoice(invoiceLink, (status: string) => resolve(status === "paid"));
+      });
+    }
+    tg?.openTelegramLink?.(invoiceLink);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 export default function App() {
     useEffect(() => {
       const tg = window.Telegram?.WebApp;
@@ -387,6 +412,7 @@ export default function App() {
             coupleId={coupleId}
              mode={mode}
              onUpgrade={() => apiSubscribe(lang)}
+             onBuyPremiumTask={(category) => apiBuyPremiumTask(category, lang)}
           />
         )}
         {phase === "scenario"    && <ScenarioScreen lang={lang} gender={gender} onBack={handleBack} onUpgrade={() => apiSubscribe(lang)} />}

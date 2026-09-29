@@ -99,12 +99,16 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const isBonus = payload?.type === "bonus_tasks"
       && ["compliments", "tenderness", "desire", "passion", "hard"].includes(payload?.category)
       && payload?.count === 3;
+    const isPremiumTask = payload?.type === "premium_task"
+      && ["passion", "hard"].includes(payload?.category)
+      && payload?.count === 1;
+    const expectedAmount = isSubscription ? 199 : isPremiumTask ? 20 : 10;
     const valid = payload?.version === 1
       && Number.isSafeInteger(payload.userId)
       && payload.userId === Number(update.pre_checkout_query.from?.id)
       && update.pre_checkout_query.currency === "XTR"
-      && Number(update.pre_checkout_query.total_amount) === (isSubscription ? 199 : 10)
-      && (isSubscription || isBonus);
+      && Number(update.pre_checkout_query.total_amount) === expectedAmount
+      && (isSubscription || isBonus || isPremiumTask);
     await tgPost("answerPreCheckoutQuery", {
       pre_checkout_query_id: update.pre_checkout_query.id,
       ok: valid,
@@ -124,6 +128,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     const userId = payload.userId;
     const chargeId = String(payment.telegram_payment_charge_id ?? "");
+    const isPremiumTask = payload.type === "premium_task"
+      && ["passion", "hard"].includes(payload.category ?? "")
+      && payload.count === 1;
+    const expectedAmount = payload.type === "subscription" ? 199 : isPremiumTask ? 20 : 10;
     const validPayload = payload.version === 1
       && Number.isSafeInteger(userId)
       && userId === chatId
@@ -135,9 +143,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           && payload.count === 3
           && /^\d{4}-\d{2}-\d{2}$/.test(payload.date ?? "")
         )
+        || isPremiumTask
       )
       && payment.currency === "XTR"
-      && Number(payment.total_amount) === (payload.type === "subscription" ? 199 : 10)
+      && Number(payment.total_amount) === expectedAmount
       && chargeId.length > 0;
     if (!validPayload) return res.status(400).json({ error: "invalid_payment" });
     const payerId = Number(userId);
@@ -169,10 +178,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         }
       );
     } else if (payload.type === "bonus_tasks") {
-      const category = payload.category ?? "compliments";
       const count    = payload.count ?? 3;
       await sendMessage(chatId,
         `✨ <b>+${escapeHtml(String(count))} задания добавлено!</b>\n\nВозвращайся в приложение — они уже ждут тебя 💕`
+      );
+    } else if (payload.type === "premium_task") {
+      const category = payload.category === "passion" ? "Страсть" : "Хард";
+      await sendMessage(chatId,
+        `✨ <b>Премиум-задание куплено!</b>\n\nДля категории «${escapeHtml(category)}» добавлен один доступ. Вернись в Touché и получи задание 💕`
       );
     }
 

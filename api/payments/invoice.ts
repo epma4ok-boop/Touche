@@ -1,8 +1,8 @@
 // api/payments/invoice.ts
 // POST /api/payments/invoice
-// Creates a Telegram Stars invoice for buying +3 extra tasks (10 Stars).
+// Creates a Telegram Stars invoice for +3 regular tasks or one premium task.
 //
-// Body: { category: string }
+// Body: { category: string, lang?: string, product?: "bonus_tasks" | "premium_task" }
 // Headers: x-telegram-init-data
 //
 // Response: { invoiceLink: string }
@@ -13,6 +13,7 @@ import { appDate } from "../limits.js";
 
 const BOT_TOKEN = process.env.BOT_TOKEN;
 const CATEGORIES = new Set(["compliments", "tenderness", "desire", "passion", "hard"]);
+const PREMIUM_CATEGORIES = new Set(["passion", "hard"]);
 const LANGS = new Set(["ru", "en", "hi", "pt", "es"]);
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
@@ -27,30 +28,54 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const caller = validateTelegramInitData(initData, BOT_TOKEN);
   if (!caller) return res.status(401).json({ error: "Unauthorized" });
 
-  const { category, lang = "ru" } = req.body as { category: string; lang?: string };
-  if (!CATEGORIES.has(category) || !LANGS.has(lang)) return res.status(400).json({ error: "invalid_product" });
+  const body = req.body ?? {};
+  const category = String(body.category ?? "");
+  const lang = String(body.lang ?? "ru");
+  const product = String(body.product ?? "bonus_tasks");
+  if (!["bonus_tasks", "premium_task"].includes(product)) {
+    return res.status(400).json({ error: "invalid_product" });
+  }
+  const isPremiumTask = product === "premium_task";
+  if (!CATEGORIES.has(category) || !LANGS.has(lang) || (isPremiumTask && !PREMIUM_CATEGORIES.has(category))) {
+    return res.status(400).json({ error: "invalid_product" });
+  }
 
   const isEn = lang === "en";
+  const amount = isPremiumTask ? 20 : 10;
+  const premiumCategoryLabel = category === "passion"
+    ? (isEn ? "Passion" : "Страсть")
+    : (isEn ? "Hard" : "Хард");
 
   try {
     const r = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/createInvoiceLink`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        title:       isEn ? "+3 extra tasks"     : "+3 задания",
-        description: isEn
-          ? "Three more AI-generated tasks in this category today"
-          : "Три дополнительных ИИ-задания в этой категории сегодня",
+        title: isPremiumTask
+          ? (isEn ? "One premium task" : "Одно премиум-задание")
+          : (isEn ? "+3 extra tasks" : "+3 задания"),
+        description: isPremiumTask
+          ? (isEn
+            ? `One AI-generated task in ${premiumCategoryLabel}`
+            : `Одно ИИ-задание в категории «${premiumCategoryLabel}»`)
+          : (isEn
+            ? "Three more AI-generated tasks in this category today"
+            : "Три дополнительных ИИ-задания в этой категории сегодня"),
         payload: JSON.stringify({
           version: 1, userId: caller.id,
-          type: "bonus_tasks",
+          type: product,
           category,
-          count: 3,
-          date: appDate(),
+          count: isPremiumTask ? 1 : 3,
+          ...(!isPremiumTask ? { date: appDate() } : {}),
         }),
         provider_token: "",
         currency: "XTR",
-        prices: [{ label: isEn ? "+3 tasks" : "+3 задания", amount: 10 }],
+        prices: [{
+          label: isPremiumTask
+            ? (isEn ? "One premium task" : "Одно премиум-задание")
+            : (isEn ? "+3 tasks" : "+3 задания"),
+          amount,
+        }],
       }),
     });
 

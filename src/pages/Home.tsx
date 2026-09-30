@@ -1,7 +1,7 @@
 import { useEffect, useCallback, useState } from "react";
 import type { Gender } from "@/components/GenderSelect";
 import { GENDER_KEY } from "@/components/GenderSelect";
-import { UI, CATEGORIES_ORDER, LANG_CYCLE, type Lang, type Category } from "@/data/i18n";
+import { UI, CATEGORIES_ORDER, type Lang, type Category } from "@/data/i18n";
 import type { AppMode } from "@/App";
 import IntimacyIndex from "@/components/IntimacyIndex";
 import SmokeBackground from "@/components/SmokeBackground";
@@ -42,7 +42,7 @@ interface HomeProps {
   pendingRefUserId: number | null;
   onCategorySelect: (cat: Category) => void;
   onScenarioOpen: () => void;
-  onLangSwitch: () => void;
+  onLanguageOpen: () => void;
   onGenderSwitch?: (g: Gender) => void;
   onModeChange: (mode: AppMode) => void;
   onLinkCouple: (refUserId: number) => Promise<boolean>;
@@ -817,9 +817,9 @@ function ScenarioGate({ lang, onConnect, onSkip }: { lang: Lang; onConnect: () =
 /* ─── MenuPanel ────────────────────────────────────────────────── */
 type MenuSection = "main" | "instructions" | "subscription";
 
-function MenuPanel({ lang, gender, onGenderSwitch, onClose, onLangSwitch, onSubscribe }: {
+function MenuPanel({ lang, gender, onGenderSwitch, onClose, onLanguageOpen, onSubscribe }: {
   lang: Lang; gender?: Gender; onGenderSwitch?: (g: Gender) => void;
-  onClose: () => void; onLangSwitch: () => void; onSubscribe: () => Promise<boolean>;
+  onClose: () => void; onLanguageOpen: () => void; onSubscribe: () => Promise<boolean>;
 }) {
   const [section, setSection] = useState<MenuSection>("main");
   const ml = MENU_LABELS[lang];
@@ -1047,12 +1047,19 @@ function MenuPanel({ lang, gender, onGenderSwitch, onClose, onLangSwitch, onSubs
 
       {/* ── Bottom mini-grid: Language + About ── */}
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 14 }}>
-        <button className="pop-menu-small" onClick={() => { onLangSwitch(); onClose(); }} style={{
+        <button
+          className="pop-menu-small"
+          type="button"
+          onClick={() => { onLanguageOpen(); onClose(); }}
+          data-testid="button-language-menu"
+          aria-label={`${ml.language}: ${LANG_ABBREV[lang]}`}
+          style={{
           padding: "14px 10px", borderRadius: 16,
           border: `1px solid rgba(${PR},${PG},${PB},0.16)`,
           background: `rgba(${PR},${PG},${PB},0.06)`, cursor: "pointer",
           display: "flex", flexDirection: "column", alignItems: "center", gap: 5,
-        }}>
+        }}
+        >
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={PINK} strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" style={{ filter: PINK_GLOW }}>
             <circle cx="12" cy="12" r="10"/>
             <line x1="2" y1="12" x2="22" y2="12"/>
@@ -1093,7 +1100,7 @@ function MenuPanel({ lang, gender, onGenderSwitch, onClose, onLangSwitch, onSubs
 /* ─── Home ─────────────────────────────────────────────────────── */
 export default function Home({
   lang, gender, coupleId, mode, pendingRefUserId,
-  onCategorySelect, onScenarioOpen, onLangSwitch, onGenderSwitch,
+  onCategorySelect, onScenarioOpen, onLanguageOpen, onGenderSwitch,
   onModeChange,
   onLinkCouple, onUnlinkCouple, onSubscribe,
 }: HomeProps) {
@@ -1191,7 +1198,6 @@ export default function Home({
     desire: t.catDesireSub, passion: t.catPassionSub, hard: t.catHardSub,
   };
 
-  const nextLang = LANG_CYCLE[(LANG_CYCLE.indexOf(lang) + 1) % LANG_CYCLE.length];
   const cardLimit = (category: Category) => ({
     remaining: limits[category],
     remainingLabel: lang === "ru" ? "Осталось" : lang === "hi" ? "शेष" : lang === "pt" ? "Restam" : lang === "es" ? "Quedan" : "Left",
@@ -1272,8 +1278,14 @@ export default function Home({
             </button>}
 
             {/* Lang switcher */}
-            <button onClick={onLangSwitch} style={{ background: "rgba(255,238,248,.06)", border: "1px solid rgba(255,238,248,.10)", borderRadius: 14, padding: "7px 10px", fontWeight: 500, fontSize: 10, letterSpacing: "0.10em", textTransform: "uppercase" as const, color: "rgba(255,238,248,0.44)", cursor: "pointer", fontFamily: "'Plus Jakarta Sans','DM Sans',sans-serif" }}>
-              {LANG_ABBREV[nextLang]}
+            <button
+              type="button"
+              onClick={onLanguageOpen}
+              aria-label={`${MENU_LABELS[lang].language}: ${LANG_ABBREV[lang]}`}
+              data-testid="button-language-open"
+              style={{ background: "rgba(255,238,248,.06)", border: "1px solid rgba(255,238,248,.10)", borderRadius: 14, padding: "7px 10px", fontWeight: 500, fontSize: 10, letterSpacing: "0.10em", textTransform: "uppercase" as const, color: "rgba(255,238,248,0.44)", cursor: "pointer", fontFamily: "'Plus Jakarta Sans','DM Sans',sans-serif" }}
+            >
+              {LANG_ABBREV[lang]}⌄
             </button>
           </div>
         </div>
@@ -1324,7 +1336,7 @@ export default function Home({
       )}
 
       {showMenu && (
-        <MenuPanel lang={lang} gender={gender} onGenderSwitch={onGenderSwitch} onClose={() => setShowMenu(false)} onLangSwitch={() => { onLangSwitch(); setShowMenu(false); }} onSubscribe={onSubscribe} />
+        <MenuPanel lang={lang} gender={gender} onGenderSwitch={onGenderSwitch} onClose={() => setShowMenu(false)} onLanguageOpen={() => { onLanguageOpen(); setShowMenu(false); }} onSubscribe={onSubscribe} />
       )}
     </>
   );

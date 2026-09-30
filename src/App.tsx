@@ -6,7 +6,7 @@ import SplashScreen from "@/components/SplashScreen";
 import LanguageSelect from "@/components/LanguageSelect";
 import { type Gender, GENDER_KEY } from "@/components/GenderSelect";
 import OnboardingScreen from "@/components/OnboardingScreen";
-import { LANG_KEY, ONBOARDED_KEY, CATEGORIES_ORDER, LANG_CYCLE, type Lang, type Category } from "@/data/i18n";
+import { LANG_KEY, ONBOARDED_KEY, CATEGORIES_ORDER, type Lang, type Category } from "@/data/i18n";
 import { ACTIVE_SCENARIO_KEY, type ActiveScenario } from "@/pages/ScenarioScreen";
 
 type AppPhase = "splash" | "lang" | "onboarding" | "gender" | "home" | "category" | "scenario";
@@ -317,12 +317,8 @@ export default function App() {
       setPhase("home");
     }, []);
 
-    const handleLangSwitch = useCallback(() => {
-      const idx = LANG_CYCLE.indexOf(lang);
-      const next = LANG_CYCLE[(idx + 1) % LANG_CYCLE.length];
-      try { localStorage.setItem(LANG_KEY, next); } catch {}
-      setLang(next);
-    }, [lang]);
+    const handleLanguageOpen = useCallback(() => setPhase("lang"), []);
+    const handleLanguageCancel = useCallback(() => setPhase("home"), []);
 
     const handleCategorySelect = useCallback((cat: Category) => {
       const curIdx = CATEGORIES_ORDER.indexOf(activeCategory);
@@ -378,7 +374,13 @@ export default function App() {
     return (
       <>
         {phase === "splash"      && <SplashScreen onDone={handleSplashDone} linkStatus="idle" skipDelay={!!getSavedLang() && isOnboarded()} />}
-        {phase === "lang"        && <LanguageSelect onSelect={handleLangSelect} />}
+        {phase === "lang"        && (
+          <LanguageSelect
+            currentLang={getSavedLang() ?? undefined}
+            onSelect={handleLangSelect}
+            onCancel={getSavedLang() ? handleLanguageCancel : undefined}
+          />
+        )}
         {phase === "onboarding"  && <OnboardingScreen lang={lang} onDone={handleOnboardingDone} />}
         {phase === "home"        && (
           <Home
@@ -388,7 +390,7 @@ export default function App() {
             pendingRefUserId={pendingRefUserId}
             onCategorySelect={handleCategorySelectWithAgeCheck}
             onScenarioOpen={handleScenarioOpen}
-            onLangSwitch={handleLangSwitch}
+            onLanguageOpen={handleLanguageOpen}
             gender={gender}
             onGenderSwitch={(g) => {
               try { localStorage.setItem(GENDER_KEY, g); } catch {}

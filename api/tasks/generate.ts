@@ -14,11 +14,12 @@ import { TASKS_HI } from "../../src/data/tasks-hi.js";
 import { TASKS_PT } from "../../src/data/tasks-pt.js";
 import { TASKS_ES } from "../../src/data/tasks-es.js";
 import { getTaskQualityRules, isTaskTextWellFormed } from "../../src/data/task-quality.js";
+import { OWNER_TELEGRAM_ID } from "../../src/config.js";
 
 const DEEPSEEK_API_KEY = process.env.DEEPSEEK_API_KEY!;
 const DEEPSEEK_URL = "https://api.deepseek.com/v1/chat/completions";
 const BOT_TOKEN = process.env.BOT_TOKEN;
-const OWNER_ID = Number(process.env.OWNER_TELEGRAM_ID || 0);
+const OWNER_ID = OWNER_TELEGRAM_ID;
 const CATEGORIES = new Set(["compliments", "tenderness", "desire", "passion", "hard"]);
 const PAID_CATEGORIES = new Set(["passion", "hard"]);
 const LANGS = new Set(["ru", "en", "hi", "pt", "es"]);

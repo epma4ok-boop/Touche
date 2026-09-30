@@ -8,12 +8,13 @@ import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { createClient } from "@supabase/supabase-js";
 import { validateTelegramInitData } from "../couple/_auth.js";
 import { appDate } from "../limits.js";
+import { OWNER_TELEGRAM_ID } from "../../src/config.js";
 
 const DEEPSEEK_API_KEY = process.env.DEEPSEEK_API_KEY!;
 const DEEPSEEK_URL = "https://api.deepseek.com/v1/chat/completions";
 const BOT_TOKEN = process.env.BOT_TOKEN!;
 const APP_URL = process.env.APP_URL!;
-const OWNER_ID = Number(process.env.OWNER_TELEGRAM_ID || 0);
+const OWNER_ID = OWNER_TELEGRAM_ID;
 const LANGS = new Set(["ru", "en", "hi", "pt", "es"]);
 const INTENSITIES = new Set(["romantic", "passion", "hard"]);
 const GENDERS = new Set(["male", "female"]);
@@ -312,13 +313,16 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (!couple || (couple.user_a_id !== caller.id && couple.user_b_id !== caller.id)) {
     return res.status(403).json({ error: "couple_access_denied" });
   }
-  const premium = caller.id === OWNER_ID || !!(await supabase.from("user_subscriptions").select("expires_at").eq("user_id", caller.id).gt("expires_at", new Date().toISOString()).maybeSingle()).data;
+  const isOwner = caller.id === OWNER_ID;
+  const premium = isOwner || !!(await supabase.from("user_subscriptions").select("expires_at").eq("user_id", caller.id).gt("expires_at", new Date().toISOString()).maybeSingle()).data;
   if (!premium) return res.status(403).json({ error: "subscription_required" });
-  const { data: allowance, error: allowanceError } = await supabase.rpc("consume_daily_limit", {
-    p_user_id: caller.id, p_category: "scenarios", p_date: appDate(), p_limit: 3,
-  });
-  if (allowanceError) return res.status(500).json({ error: "scenario_limit_failed" });
-  if (allowance?.allowed === false || allowance?.ok === false) return res.status(429).json({ error: "rate_limited" });
+  if (!isOwner) {
+    const { data: allowance, error: allowanceError } = await supabase.rpc("consume_daily_limit", {
+      p_user_id: caller.id, p_category: "scenarios", p_date: appDate(), p_limit: 3,
+    });
+    if (allowanceError) return res.status(500).json({ error: "scenario_limit_failed" });
+    if (allowance?.allowed === false || allowance?.ok === false) return res.status(429).json({ error: "rate_limited" });
+  }
 
   let generated: FallbackEntry;
   let source: "ai" | "fallback" = "ai";

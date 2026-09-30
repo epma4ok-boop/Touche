@@ -13,6 +13,7 @@ import { TASKS_EN } from "../../src/data/tasks-en.js";
 import { TASKS_HI } from "../../src/data/tasks-hi.js";
 import { TASKS_PT } from "../../src/data/tasks-pt.js";
 import { TASKS_ES } from "../../src/data/tasks-es.js";
+import { getTaskQualityRules, isTaskTextWellFormed } from "../../src/data/task-quality.js";
 
 const DEEPSEEK_API_KEY = process.env.DEEPSEEK_API_KEY!;
 const DEEPSEEK_URL = "https://api.deepseek.com/v1/chat/completions";
@@ -38,30 +39,32 @@ const STATIC_POOLS: Record<string, StaticPool> = {
 function getFallback(cat: string, lang: string): string {
   const pool = STATIC_POOLS[lang] ?? STATIC_POOLS["en"];
   const list = (pool as StaticPool)[cat] ?? (pool as StaticPool)["compliments"];
-  return list[Math.floor(Math.random() * list.length)];
+  const wellFormed = list.filter(task => isTaskTextWellFormed(task, lang));
+  const candidates = wellFormed.length > 0 ? wellFormed : list;
+  return candidates[Math.floor(Math.random() * candidates.length)];
 }
 
 function getGenderLine(lang: string, gender: string): string {
   const map: Record<string, Record<string, string>> = {
     ru: {
-      male: "Пользователь — мужчина, партнёр — женщина. Используй 'ты' для пользователя, 'она/её/ей' для партнёрши. Глаголы мужского рода.",
-      female: "Пользователь — женщина, партнёр — мужчина. Используй 'ты' для пользователя, 'он/его/ему' для партнёра. Глаголы женского рода.",
+      male: "Пользователь — мужчина, партнёрша — женщина. Обращайся к пользователю на «ты»; партнёршу называй однозначно. Сохраняй эти роли до конца задания.",
+      female: "Пользователь — женщина, партнёр — мужчина. Обращайся к пользователю на «ты»; партнёра называй однозначно. Сохраняй эти роли до конца задания.",
     },
     en: {
-      male: "User is male, partner is female. Use 'you' for user, 'she/her' for partner. Male verbs.",
-      female: "User is female, partner is male. Use 'you' for user, 'he/him' for partner. Female verbs.",
+      male: "User is male and partner is female. Address the user as 'you' and refer to the partner consistently as she/her. Do not switch roles.",
+      female: "User is female and partner is male. Address the user as 'you' and refer to the partner consistently as he/him. Do not switch roles.",
     },
     hi: {
-      male: "उपयोगकर्ता पुरुष है, पार्टनर महिला है।",
-      female: "उपयोगकर्ता महिला है, पार्टनर पुरुष है।",
+      male: "उपयोगकर्ता पुरुष है और साथी महिला है। भूमिकाएँ पूरे कार्य में स्थिर रखें।",
+      female: "उपयोगकर्ता महिला है और साथी पुरुष है। भूमिकाएँ पूरे कार्य में स्थिर रखें।",
     },
     pt: {
-      male: "Usuário é homem, parceira é mulher. Use 'você' e 'ela/dela'.",
-      female: "Usuária é mulher, parceiro é homem. Use 'você' e 'ele/dele'.",
+      male: "O usuário é homem e a parceira é mulher. Trate o usuário por 'você', refira-se à parceira de forma consistente e não troque os papéis.",
+      female: "A usuária é mulher e o parceiro é homem. Trate a usuária por 'você', refira-se ao parceiro de forma consistente e não troque os papéis.",
     },
     es: {
-      male: "El usuario es hombre, la pareja es mujer. Usa 'tú' y 'ella/su'.",
-      female: "La usuaria es mujer, la pareja es hombre. Usa 'tú' y 'él/su'.",
+      male: "El usuario es hombre y su pareja es mujer. Háblale de tú, refiérete a ella de forma consistente y no cambies los papeles.",
+      female: "La usuaria es mujer y su pareja es hombre. Háblale de tú, refiérete a él de forma consistente y no cambies los papeles.",
     },
   };
   return map[lang]?.[gender] ?? map["en"]["male"];
@@ -153,7 +156,10 @@ Your task: come up with ONE new, original task within this category. Do not copy
 };
 
 function getPrompt(category: string, lang: string): string {
-  return PROMPTS[category]?.[lang] ?? PROMPTS[category]?.["en"] ?? PROMPTS["compliments"]["en"];
+  const prompt = PROMPTS[category]?.[lang] ?? PROMPTS[category]?.["en"] ?? PROMPTS["compliments"]["en"];
+  return prompt
+    .replace(/Одно действие/gu, "Одно завершённое задание из 1–3 связанных шагов")
+    .replace(/One action/gu, "One complete task with 1–3 connected steps");
 }
 
 const LANGUAGE_INSTRUCTIONS: Record<string, string> = {
@@ -219,7 +225,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 12_000);
     try {
-      const systemPrompt = `${getPrompt(category, lang)}\n\n${getGenderLine(lang, gender)}\n\n${LANGUAGE_INSTRUCTIONS[lang]}`;
+        const systemPrompt = `${getPrompt(category, lang)}\n\n${getGenderLine(lang, gender)}\n\n${getTaskQualityRules(lang)}\n\n${LANGUAGE_INSTRUCTIONS[lang]}`;
       const aiRes = await fetch(DEEPSEEK_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${DEEPSEEK_API_KEY}` },
@@ -227,13 +233,16 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         body: JSON.stringify({ model: "deepseek-chat", messages: [
           { role: "system", content: systemPrompt },
           { role: "user", content: LANGUAGE_INSTRUCTIONS[lang] },
-        ], max_tokens: 160, temperature: 1.1 }),
+        ], max_tokens: 160, temperature: 0.8 }),
       });
       if (aiRes.ok) {
         const data = await aiRes.json();
         const candidate = String(data.choices?.[0]?.message?.content ?? "").replace(/^["']|["']$/g, "").replace(/^\d+\.\s*/, "").trim();
         const forbidden = ["я рекомендую", "тебе стоит", "можешь попробовать", "выдыхает", "дыши в", "посмотри в глаза", "отстранись"];
-        if (candidate.length >= 15 && candidate.length <= 350 && matchesRequestedLanguage(candidate, lang) && !forbidden.some(f => candidate.toLowerCase().includes(f))) {
+        if (candidate.length >= 15 && candidate.length <= 350
+          && matchesRequestedLanguage(candidate, lang)
+          && isTaskTextWellFormed(candidate, lang)
+          && !forbidden.some(f => candidate.toLowerCase().includes(f))) {
           task = candidate;
           source = "ai";
         }

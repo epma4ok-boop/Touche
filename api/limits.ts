@@ -1,6 +1,7 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { createClient } from "@supabase/supabase-js";
 import { validateTelegramInitData } from "./couple/_auth.js";
+import { OWNER_TELEGRAM_ID } from "../src/config.js";
 
 const sb = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!);
 const BOT_TOKEN = process.env.BOT_TOKEN;
@@ -8,7 +9,7 @@ export const FREE_LIMIT = 3;
 const APP_TIMEZONE = process.env.APP_TIMEZONE || "Europe/Moscow";
 const CATEGORIES = new Set(["compliments", "tenderness", "desire", "passion", "hard"]);
 const PAID = new Set(["passion", "hard"]);
-const OWNER_ID = Number(process.env.OWNER_TELEGRAM_ID || 0);
+const OWNER_ID = OWNER_TELEGRAM_ID;
 
 export function appDate(date = new Date()): string {
   return new Intl.DateTimeFormat("en-CA", { timeZone: APP_TIMEZONE, year: "numeric", month: "2-digit", day: "2-digit" }).format(date);

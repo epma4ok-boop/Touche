@@ -123,38 +123,138 @@ What you cannot do: sex, oral sex, penetration.
 Your task: come up with ONE new, original task within this category. Do not copy examples verbatim, create your own variations. One action, up to 200 characters. Only the task text, no quotes, no explanations.`,
   },
   passion: {
-    ru: `Ты генератор заданий для категории "СТРАСТЬ" — секс красиво, чувственно, без пошлости.
+    ru: `Ты генератор одного задания для категории «СТРАСТЬ» — чувственный секс без пошлости.
 
-Суть: яркий, чувственный секс, снятый красиво или прожитый глубоко. Только задания для гетеро пар (Мужчина + Женщина). Учитывай человеческую физиологию и логику происходящего.
-Что можно: разные позы, оральный секс (девушка делает минет, мужчина делает кунилингус), смена темпа, зеркало, наушники с музыкой, массаж с хэппи-эндом, лёд + оральный, взбитые сливки + оральный, фото/видео голого тела (красиво), съёмка секса для коллекции, массажное масло, съедобные трусы, мастурбация партнеру, совместное принятие душа и тд. Должно идти вместе с сексом, либо заканчиваться сексом (Классическим, Оральным, Мастурбацией).
-Чего нельзя: пошлость, грубость, подчинение, съёмка в упор.
+Суть: взаимное удовольствие, близость и ясная реакция друг на друга. Только для гетеро пар (мужчина + женщина); соблюдай физиологию и выполнимый порядок.
+Выбери одну основную идею: подходящая поза, смена темпа, взаимные ласки, оральная или ручная стимуляция, спокойное сообщение о желаниях. Не собирай из этих вариантов длинную цепочку.
+Не добавляй музыку, съёмку, свечи, игрушки или другие предметы по умолчанию. Если в задании есть оргазм, обычно завершай задание на нём: не добавляй автоматически следующий сексуальный акт.
+Чего нельзя: пошлость, грубость, принуждение и съёмка.
 
-Твоя задача: придумать ОДНО новое, оригинальное задание в рамках этой категории. Не копируй примеры дословно, а создавай свои варианты. Одно действие, до 200 символов. Только текст задания, без кавычек, без пояснений.`,
-    en: `You are a task generator for the "PASSION" category — sex beautifully, sensually, without vulgarity.
+Твоя задача: придумать ОДНО новое, конкретное задание до 200 символов. Не копируй примеры дословно. Только текст задания, без кавычек и пояснений.`,
+    en: `You generate one task for the "PASSION" category: sensual sex without vulgarity.
 
-The essence: bright, sensual sex, filmed beautifully or lived deeply. Only for heterosexual couples (Man + Woman). Consider human physiology and the logic of what is happening.
-What you can do: different positions, oral sex (girl gives a blowjob, man performs cunnilingus), tempo changes, mirror, headphones with music, massage with a happy ending, ice + oral, whipped cream + oral, photo/video of naked body (beautifully), filming sex for a personal collection, massage oil, edible underwear, mutual masturbation, showering together, etc. Must accompany sex or end with sex (classic, oral, or mutual masturbation).
-What you cannot do: vulgarity, rudeness, submission, close-up shooting.
+Focus on mutual pleasure, closeness, and responding to each other. For heterosexual couples (man + woman); keep the actions physically possible and in a clear order.
+Choose one central idea: a suitable position, a change of pace, mutual touch, oral or manual stimulation, or clearly sharing a desire. Do not turn these into a long sequence.
+Do not add music, recording, candles, toys, or other props by default. If the task includes an orgasm, usually end the task there; do not automatically add another sexual act afterward.
+Do not include vulgarity, roughness, coercion, or filming.
 
-Your task: come up with ONE new, original task within this category. Do not copy examples verbatim, create your own variations. One action, up to 200 characters. Only the task text, no quotes, no explanations.`,
+Create ONE new, specific task of up to 200 characters. Do not copy examples verbatim. Return only the task text, without quotes or explanations.`,
   },
   hard: {
-    ru: `Ты генератор заданий для категории "ХАРД" — секс для тех, кому надоело однообразие и хочется новых экспериментов в сексе.
+    ru: `Ты генератор одного задания для категории «ХАРД» — интенсивные эксперименты с ясным взаимным согласием.
 
-Суть: яркий или грязный или необычный секс, секс с подчинением или ролевая игра. Только задания для гетеро пар (Мужчина + Женщина). Учитывай человеческую физиологию и логику происходящего.
-Что можно: подчинение на время, команды, связывание (шарф, ремень), маска на глаза, наручники, лёгкая плетка, грязный оральный (девушка садится на лицо мужчине, командовать, дать в рот девушке), минет с окончанием в рот девушке, глубокий минет в исполнении девушки, контроль во время минета/кунилингуса, съёмка домашнего порно, съёмка порно от первого лица, съёмка + подчинение, массаж + секс одновременно, шлепки во время секса, ролевая игра, томление перед оргазмом.
-Чего нельзя: Мужчина садится на лицо девушки, кончить в рот мужчины.
-Условия: Действия должны быть логичными, соответствовать физиологии в сексе для гетеросексуальных пар.
-Твоя задача: придумать ОДНО новое, оригинальное задание в рамках этой категории. Не копируй примеры дословно, а создавай свои варианты. Одно действие, до 200 символов. Только текст задания, без кавычек, без пояснений.`,
-    en: `You are a task generator for the "HARD" category — sex for those tired of routine who want new experiments.
+Суть: смена инициативы, контроль в оговорённых пределах, новые ощущения или томление. Только для гетеро пар (мужчина + женщина); соблюдай физиологию и выполнимый порядок.
+Можно предложить короткую согласованную команду, добровольное удерживание, лёгкое воздействие или задержку оргазма. Всегда оставляй возможность сразу остановиться; не предлагай «делать что угодно» или подчиняться без вопросов.
+Это не ролевая игра и не сценарий: не придумывай персонажей, сюжет, реплики или роли. Не добавляй повязку на глаза, музыку, камеру или реквизит по умолчанию; используй не больше одного предмета, только если он необходим для основной идеи.
+Чего нельзя: мужчина садится на лицо женщины; эякуляция в рот мужчины.
 
-The essence: intense, kinky, or unusual sex, sex with submission or roleplay. Only for heterosexual couples (Man + Woman). Consider human physiology and the logic of what is happening.
-What you can do: submission for a set time, commands, binding (scarf, belt), blindfold, handcuffs, light whip, dirty oral (girl sits on man's face, giving commands, putting it in the girl's mouth), blowjob with finish in the girl's mouth, deep throat performed by the girl, control during blowjob/cunnilingus, filming homemade porn, first-person POV filming, filming + submission, massage + sex simultaneously, spanking during sex, roleplay, orgasm denial.
-What you cannot do: man sits on the girl's face, finish in the man's mouth.
-Conditions: Actions must be logical and match the physiology of sex for heterosexual couples.
-Your task: come up with ONE new, original task within this category. Do not copy examples verbatim, create your own variations. One action, up to 200 characters. Only the task text, no quotes, no explanations.`,
+Придумай ОДНО новое, конкретное задание до 200 символов. Только текст задания, без кавычек и пояснений.`,
+    en: `You generate one task for the "HARD" category: intense experimentation with clear mutual consent.
+
+Focus on changing initiative, agreed control, new sensations, or anticipation. For heterosexual couples (man + woman); keep actions physically possible and in a clear order.
+You may suggest a brief agreed command, voluntary restraint, light impact, or delaying orgasm. Always leave a clear way to stop immediately; never say to do anything without limits or obey without question.
+This is not roleplay or a scenario: do not invent characters, a plot, dialogue, or assigned roles. Do not add blindfolds, music, cameras, or props by default; use at most one item, and only if essential to the central idea.
+Do not suggest a man sitting on a woman's face or ejaculation in a man's mouth.
+
+Create ONE new, specific task of up to 200 characters. Return only the task text, without quotes or explanations.`,
   },
 };
+
+const VARIATION_FOCI: Record<string, { ru: string[]; en: string[] }> = {
+  compliments: {
+    ru: [
+      "поблагодарить за одну конкретную недавнюю мелочь",
+      "короткий голосовой комплимент без подарков и реквизита",
+      "тёплая отсылка к общему воспоминанию",
+      "спонтанный знак внимания, который не требует покупки",
+    ],
+    en: [
+      "thank your partner for one specific recent small thing",
+      "a short spoken compliment without gifts or props",
+      "a warm reference to a shared memory",
+      "a spontaneous small gesture that requires no purchase",
+    ],
+  },
+  tenderness: {
+    ru: [
+      "короткое успокаивающее прикосновение без эротического продолжения",
+      "объятие или забота о руках без реквизита",
+      "мягкий массаж одной конкретной зоны",
+      "спокойный совместный момент с одним понятным жестом заботы",
+    ],
+    en: [
+      "a brief comforting touch without erotic escalation",
+      "a hug or gentle hand care without props",
+      "a gentle massage focused on one specific area",
+      "a calm shared moment with one clear gesture of care",
+    ],
+  },
+  desire: {
+    ru: [
+      "игривое предвкушение через одежду, без проникновения",
+      "прямое шёпотом сказанное желание",
+      "чувственное, но не откровенное раскрытие тела без реквизита",
+      "поцелуи и ласки, которые останавливаются до секса",
+    ],
+    en: [
+      "playful anticipation through clothing, without penetration",
+      "a direct desire whispered aloud",
+      "a sensual but non-explicit reveal without props",
+      "kissing and caressing that stop before sex",
+    ],
+  },
+  passion: {
+    ru: [
+      "одна смена темпа и пауза, без фоновой музыки",
+      "взаимные прикосновения и реакция друг на друга, без реквизита",
+      "одна подходящая поза или угол, без длинной последовательности",
+      "партнёры по очереди выбирают одно действие",
+      "завершить задание оргазмом, без автоматического продолжения после него",
+      "внимание к одному желанию партнёра, без камеры и съёмки",
+    ],
+    en: [
+      "one change of pace and a pause, without background music",
+      "mutual touch and responding to each other, without props",
+      "one suitable position or angle, not a long sequence",
+      "partners take turns choosing one action",
+      "end the task with orgasm, with no automatic continuation afterward",
+      "focus on one partner's stated desire, without cameras or recording",
+    ],
+  },
+  hard: {
+    ru: [
+      "согласованные команды и ясная возможность сказать «стоп», без персонажей",
+      "временный контроль с заранее оговорёнными границами, без повязки",
+      "интенсивность за счёт темпа и ожидания, без музыки и реквизита",
+      "один простой вид лёгкого воздействия только после явного согласия",
+      "согласованное удерживание, которое можно сразу прекратить, без повязки",
+      "короткая задержка оргазма, без автоматического продолжения после него",
+    ],
+    en: [
+      "agreed commands and a clear way to say stop, without characters",
+      "temporary control with agreed boundaries, without a blindfold",
+      "intensity through pace and anticipation, without music or props",
+      "one simple form of light impact only after explicit agreement",
+      "agreed restraint that can be stopped immediately, without a blindfold",
+      "brief orgasm delay, with no automatic continuation afterward",
+    ],
+  },
+};
+
+function getVariationInstruction(category: string, lang: string, requestId: string): string {
+  const focuses = VARIATION_FOCI[category];
+  if (!focuses) return "";
+
+  const options = lang === "ru" ? focuses.ru : focuses.en;
+  let hash = 0;
+  for (let i = 0; i < requestId.length; i += 1) {
+    hash = (Math.imul(hash, 31) + requestId.charCodeAt(i)) >>> 0;
+  }
+  const focus = options[hash % options.length];
+  return lang === "ru"
+    ? `Акцент разнообразия для этого задания: ${focus}. Сделай его центральным, не складывай в задание остальные варианты.`
+    : `Variation focus for this task: ${focus}. Make it central; do not stack in the other options.`;
+}
 
 function getPrompt(category: string, lang: string): string {
   const prompt = PROMPTS[category]?.[lang] ?? PROMPTS[category]?.["en"] ?? PROMPTS["compliments"]["en"];
@@ -197,7 +297,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (body.requestId !== undefined && (typeof body.requestId !== "string" || !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(body.requestId))) {
     return res.status(400).json({ error: "invalid_request_id" });
   }
-  const requestId = body.requestId ?? randomUUID();
+  const requestId: string = body.requestId ?? randomUUID();
   try {
     await claimFriendInvite(supabase, initData!, caller.id);
   } catch {
@@ -226,7 +326,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 12_000);
     try {
-        const systemPrompt = `${getPrompt(category, lang)}\n\n${getGenderLine(lang, gender)}\n\n${getTaskQualityRules(lang)}\n\n${LANGUAGE_INSTRUCTIONS[lang]}`;
+        const systemPrompt = `${getPrompt(category, lang)}\n\n${getVariationInstruction(category, lang, requestId)}\n\n${getGenderLine(lang, gender)}\n\n${getTaskQualityRules(lang)}\n\n${LANGUAGE_INSTRUCTIONS[lang]}`;
       const aiRes = await fetch(DEEPSEEK_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${DEEPSEEK_API_KEY}` },
@@ -234,7 +334,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         body: JSON.stringify({ model: "deepseek-chat", messages: [
           { role: "system", content: systemPrompt },
           { role: "user", content: LANGUAGE_INSTRUCTIONS[lang] },
-        ], max_tokens: 160, temperature: 0.8 }),
+        ], max_tokens: 160, temperature: 0.95 }),
       });
       if (aiRes.ok) {
         const data = await aiRes.json();

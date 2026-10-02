@@ -1,7 +1,7 @@
 import { useState, useCallback, useEffect } from "react";
 import { type Lang } from "@/data/i18n";
 import type { Gender } from "@/components/GenderSelect";
-import { BOT_USERNAME } from "@/config";
+import { BOT_USERNAME, TELEGRAM_MINI_APP_SHORT_NAME } from "@/config";
 import HeartbeatCanvas from "@/components/HeartbeatCanvas";
 import "./ScenarioPop.css";
 
@@ -97,7 +97,7 @@ export default function ScenarioScreen({ lang, gender, onBack, onUpgrade }: Scen
   const t = T[lang]; const topPadding = useTelegramTopInset();
   useEffect(() => { requestAnimationFrame(() => setMounted(true)); const saved = getActiveScenario(); if (saved) { setRevealTitle(saved.title); setRevealRoleText(saved.roleText); setRevealIntensity(saved.intensity ?? "passion"); setNotified(saved.notified); setIntensity(saved.intensity ?? "passion"); setIsMissed(saved.role === "b"); setPhase("revealed"); } }, []);
   useEffect(() => setHintText(T[lang].holdHint), [lang]);
-  const handleInvite = useCallback(() => { const tg = (window as any).Telegram?.WebApp; const userId = tg?.initDataUnsafe?.user?.id; if (userId && tg?.openTelegramLink) { const msg = lang === "ru" ? "Присоединяйся ко мне в Touché — сценарии для пар" : lang === "hi" ? "Touché में शामिल हों — जोड़ों के लिए दृश्य" : lang === "pt" ? "Junte-se a mim no Touché — cenários para casais" : lang === "es" ? "Únete a mí en Touché — escenarios para parejas" : "Join me on Touché — scenarios for couples"; const link = `https://t.me/${BOT_USERNAME}/Touche?startapp=ref_${userId}`; tg.openTelegramLink(`https://t.me/share/url?url=${encodeURIComponent(link)}&text=${encodeURIComponent(msg)}`); } }, [lang]);
+   const handleInvite = useCallback(() => { const tg = (window as any).Telegram?.WebApp; const userId = tg?.initDataUnsafe?.user?.id; if (userId && tg?.openTelegramLink) { const msg = lang === "ru" ? "Присоединяйся ко мне в Touché — сценарии для пар" : lang === "hi" ? "Touché में शामिल हों — जोड़ों के लिए दृश्य" : lang === "pt" ? "Junte-se a mim no Touché — cenários para casais" : lang === "es" ? "Únete a mí en Touché — escenarios para parejas" : "Join me on Touché — scenarios for couples"; const link = `https://t.me/${BOT_USERNAME}/${TELEGRAM_MINI_APP_SHORT_NAME}?startapp=ref_${userId}`; tg.openTelegramLink(`https://t.me/share/url?url=${encodeURIComponent(link)}&text=${encodeURIComponent(msg)}`); } }, [lang]);
   const handleHoldComplete = useCallback(async () => {
     if (isCasting) return; const coupleId = getCoupleId(); if (!coupleId) { setPhase("no_partner"); return; }
     const tg = (window as any).Telegram?.WebApp; tg?.HapticFeedback?.impactOccurred("medium"); setIsCasting(true); setHintText(T[lang].casting);

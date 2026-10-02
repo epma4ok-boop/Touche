@@ -6,7 +6,7 @@ import type { AppMode } from "@/App";
 import IntimacyIndex from "@/components/IntimacyIndex";
 import SmokeBackground from "@/components/SmokeBackground";
 import { BRAND } from "@/theme/palette";
-import { BOT_USERNAME } from "@/config";
+import { BOT_USERNAME, TELEGRAM_MINI_APP_SHORT_NAME } from "@/config";
 import "./HomePop.css";
 
 const HERO_COPY: Record<Lang, { first: string; last: string; sub: string }> = {
@@ -685,7 +685,7 @@ function CoupleModal({ lang, coupleId, pendingRefUserId, onLink, onUnlink, onClo
   function handleShareMyLink() {
     const tg = window.Telegram?.WebApp;
     if (!myId) return;
-    const link = `https://t.me/${BOT_USERNAME}/Touche?startapp=ref_${myId}`;
+    const link = `https://t.me/${BOT_USERNAME}/${TELEGRAM_MINI_APP_SHORT_NAME}?startapp=ref_${myId}`;
     const msg = lang === "ru"
       ? "Открой по ссылке и свяжи нашу пару в Touché"
       : "Open this link and connect our pair in Touché";
@@ -1135,7 +1135,7 @@ export default function Home({
   }, []);
 
   useEffect(() => {
-    if (pendingRefUserId && !coupleId) setShowCoupleModal(true);
+    if (pendingRefUserId) setShowCoupleModal(true);
   }, [pendingRefUserId, coupleId]);
 
   const handleModeSelection = useCallback((nextMode: AppMode) => {
@@ -1177,7 +1177,7 @@ export default function Home({
     tg?.HapticFeedback?.impactOccurred("light");
     const myId = tg?.initDataUnsafe?.user?.id;
     if (!myId) return;
-    const link = `https://t.me/${BOT_USERNAME}/Touche?startapp=invite_${myId}`;
+    const link = `https://t.me/${BOT_USERNAME}/${TELEGRAM_MINI_APP_SHORT_NAME}?startapp=invite_${myId}`;
     const msg = INVITE_MSG[lang];
     tg?.openTelegramLink?.(`https://t.me/share/url?url=${encodeURIComponent(link)}&text=${encodeURIComponent(msg)}`);
   }, [lang]);

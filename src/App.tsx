@@ -17,6 +17,14 @@ const MODE_KEY = "touche_mode";
 const USER_ID_KEY = "touche_user_id";
 const HISTORY_KEY = "touche_history_v2";
 
+function getTelegramStartParam(): string {
+  const fromInitData = window.Telegram?.WebApp?.initDataUnsafe?.start_param;
+  if (typeof fromInitData === "string" && fromInitData) return fromInitData;
+
+  const params = new URLSearchParams(window.location.search);
+  return params.get("tgWebAppStartParam") ?? params.get("startapp") ?? "";
+}
+
 function getSavedLang(): Lang | null {
     try {
       const v = localStorage.getItem(LANG_KEY);
@@ -145,6 +153,22 @@ export async function apiLinkCouple(refUserId: number): Promise<string | null> {
     }
 }
 
+async function apiFetchCoupleId(): Promise<string | null | undefined> {
+  const initData = window.Telegram?.WebApp?.initData;
+  if (!initData) return undefined;
+  try {
+    const res = await fetch("/api/couple/link", {
+      headers: { "x-telegram-init-data": initData },
+    });
+    if (!res.ok) return undefined;
+    const data = await res.json();
+    if (data.coupleId === null) return null;
+    return typeof data.coupleId === "string" ? data.coupleId : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
 async function apiUnlinkCouple(): Promise<boolean> {
   const initData = window.Telegram?.WebApp?.initData;
   if (!initData) return false;
@@ -243,6 +267,43 @@ export default function App() {
     }, []);
 
     useEffect(() => {
+      let active = true;
+      const refreshCouple = async () => {
+        const serverCoupleId = await apiFetchCoupleId();
+        if (!active || serverCoupleId === undefined) return;
+
+        if (serverCoupleId) {
+          saveCoupleId(serverCoupleId);
+          setCoupleId(serverCoupleId);
+          setMode(getSavedMode(true));
+          return;
+        }
+
+        removeCoupleId();
+        saveMode("solo");
+        setCoupleId(null);
+        setMode("solo");
+      };
+      const refreshWhenVisible = () => {
+        if (document.visibilityState === "visible") void refreshCouple();
+      };
+      const pollVisibleCouple = () => {
+        if (document.visibilityState === "visible") void refreshCouple();
+      };
+
+      void refreshCouple();
+      window.addEventListener("focus", refreshCouple);
+      document.addEventListener("visibilitychange", refreshWhenVisible);
+      const refreshInterval = window.setInterval(pollVisibleCouple, 15_000);
+      return () => {
+        active = false;
+        window.removeEventListener("focus", refreshCouple);
+        document.removeEventListener("visibilitychange", refreshWhenVisible);
+        window.clearInterval(refreshInterval);
+      };
+    }, []);
+
+    useEffect(() => {
       const tg = window.Telegram?.WebApp;
       if (!/^invite_[1-9][0-9]*$/.test(tg?.initDataUnsafe?.start_param ?? "") || !tg?.initData) return;
       // The server checks Telegram's signed start_param; client state never grants credits.
@@ -258,12 +319,13 @@ export default function App() {
       const tg = window.Telegram?.WebApp;
       const savedLang = getSavedLang();
       const savedGender = getSavedGender();
-      const startParam = tg?.initDataUnsafe?.start_param ?? "";
+      const startParam = getTelegramStartParam();
 
-      if (startParam.startsWith("ref_") && !getCoupleId()) {
-        const refUserId = parseInt(startParam.replace("ref_", ""), 10);
+      const pairInvite = /^ref_([1-9][0-9]*)$/.exec(startParam);
+      if (pairInvite) {
+        const refUserId = Number(pairInvite[1]);
         const myId = tg?.initDataUnsafe?.user?.id;
-        if (!isNaN(refUserId) && refUserId !== myId) {
+        if (Number.isSafeInteger(refUserId) && refUserId !== myId) {
           setPendingRefUserId(refUserId);
         }
       }

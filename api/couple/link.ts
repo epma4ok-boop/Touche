@@ -33,13 +33,30 @@ async function notifyInviter(chatId: number, lang: string): Promise<void> {
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   res.setHeader("Access-Control-Allow-Origin", "https://t.me");
-  res.setHeader("Access-Control-Allow-Methods", "POST, DELETE, OPTIONS");
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, DELETE, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type, x-telegram-init-data");
   if (req.method === "OPTIONS") return res.status(204).end();
   if (!BOT_TOKEN) return res.status(503).json({ error: "service_unconfigured" });
 
-  const caller = validateTelegramInitData(req.headers["x-telegram-init-data"] as string | undefined, BOT_TOKEN);
+  const initData = req.headers["x-telegram-init-data"] as string | undefined;
+  const caller = validateTelegramInitData(initData, BOT_TOKEN);
   if (!caller) return res.status(401).json({ error: "unauthorized" });
+
+  if (req.method === "GET") {
+    const { data, error } = await supabase
+      .from("couples")
+      .select("id")
+      .or(`user_a_id.eq.${caller.id},user_b_id.eq.${caller.id}`)
+      .limit(2);
+    if (error) {
+      console.error("Couple lookup failed:", error);
+      return res.status(500).json({ error: "couple_lookup_failed" });
+    }
+    if ((data?.length ?? 0) > 1) {
+      return res.status(409).json({ error: "multiple_couples_found" });
+    }
+    return res.status(200).json({ ok: true, coupleId: data?.[0]?.id ?? null });
+  }
 
   if (req.method === "DELETE") {
     const { error } = await supabase.rpc("unlink_couple", { p_user_id: caller.id });
@@ -52,6 +69,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const lang = String(req.body?.lang ?? "ru");
   if (!Number.isSafeInteger(refUserId) || refUserId <= 0 || refUserId === caller.id) {
     return res.status(400).json({ error: "invalid_ref_user_id" });
+  }
+  const startParam = new URLSearchParams(initData ?? "").get("start_param") ?? "";
+  const pairInvite = /^ref_([1-9][0-9]*)$/.exec(startParam);
+  const signedRefUserId = pairInvite ? Number(pairInvite[1]) : NaN;
+  if (!Number.isSafeInteger(signedRefUserId) || signedRefUserId !== refUserId) {
+    return res.status(400).json({ error: "invalid_invitation" });
   }
   const safeLang = LANGS.has(lang) ? lang : "en";
 

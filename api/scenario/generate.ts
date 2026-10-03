@@ -291,7 +291,7 @@ Private-card rules:
 - If you use teacher/student, both characters are adults at a university. Resistance is acted, never a real refusal; intimacy begins only after clear reciprocation. Never tell a character to ignore a real no, silence, hesitation, or stop.
 - Casting is fictional: no actual recording, image capture, or saved material.
 
-Write 3–4 concise sentences per card: one direct assignment, one sentence of role context, and one concrete opening move with a natural line in quotes. Use the exact translated section labels specified by CARD_FORMAT, each on its own line. Keep the cards distinct and coherent. Actions must be feasible at home without purchases, risky props, or real restraint.
+Write exactly 3 short sentences per card, one sentence in each section, and do not add extra explanation. Aim for 12–14 words or fewer per sentence where natural: one direct assignment, one brief role-context sentence, and one concrete opening move with a natural line in quotes. Use the exact translated section labels specified by CARD_FORMAT, each on its own line. Keep the cards distinct and coherent. Actions must be feasible at home without purchases, risky props, or real restraint.
 Add 3–6 private variation_tags as short lowercase English slugs prefixed by setting:, dynamic:, tone:, or hook:. Describe broad scene elements only, not names, ages, or private card objectives. Tags are internal metadata and must never appear in either role card or title.
 Return ONLY valid JSON: {"title":"...","role_a":"...","role_b":"...","variation_tags":["setting:...","dynamic:...","tone:..."]}`;
 
@@ -315,7 +315,7 @@ const ROLE_LIST_RU = `
 - Если выбрана сцена «преподаватель и студент», оба персонажа — взрослые участники университета. Сопротивление — только игровая роль; близость начинается после ясной взаимности. Нельзя приказывать игнорировать настоящий отказ, молчание, сомнение или стоп-сигнал.
 - Кастинг — только вымышленная ролевая сцена: никаких реальных записей, фото или сохранения материалов.
 
-Каждая карточка — 3–4 коротких предложения: ясное задание, краткий контекст роли и первый шаг с естественной репликой в кавычках. Используй точные заголовки из CARD_FORMAT, каждый с новой строки. Сделай карточки разными и связанными между собой. Всё должно быть выполнимо дома, без покупок, опасного реквизита и реального связывания.
+В каждой карточке ровно 3 коротких предложения — по одному в разделе, без дополнительных пояснений. По возможности не больше 12–14 слов в предложении: ясное задание, краткий контекст роли и первый шаг с естественной репликой в кавычках. Используй точные заголовки из CARD_FORMAT, каждый с новой строки. Сделай карточки разными и связанными между собой. Всё должно быть выполнимо дома, без покупок, опасного реквизита и реального связывания.
 Добавь 3–6 приватных variation_tags: короткие строчные английские теги с префиксом setting:, dynamic:, tone: или hook:. Описывай только общие элементы сцены — без имён, возраста и тайных целей карточек. Теги нужны только для внутреннего разнообразия и не должны попадать в название или карточки.
 Верни ТОЛЬКО JSON: {"title":"...","role_a":"...","role_b":"...","variation_tags":["setting:...","dynamic:...","tone:..."]}`;
 

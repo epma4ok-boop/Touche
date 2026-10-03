@@ -99,6 +99,45 @@ const SCENARIO_STAMP: Record<Lang, string> = {
   ru: "ДЛЯ ДВОИХ · 18+", en: "FOR TWO · 18+", hi: "दो के लिए · 18+",
   pt: "PARA DOIS · 18+", es: "PARA DOS · 18+",
 };
+type RoleSectionKey = "task" | "role" | "firstMove";
+type RoleSections = Record<RoleSectionKey, string>;
+const ROLE_SECTION_COPY: Record<Lang, { task: string; role: string; firstMove: string; legacy: string }> = {
+  ru: { task: "ТВОЁ ЗАДАНИЕ", role: "ТВОЯ РОЛЬ", firstMove: "С ЧЕГО НАЧАТЬ", legacy: "ТВОЯ РОЛЬ" },
+  en: { task: "YOUR TASK", role: "YOUR ROLE", firstMove: "FIRST MOVE", legacy: "YOUR ROLE" },
+  hi: { task: "आपका काम", role: "आपकी भूमिका", firstMove: "पहला कदम", legacy: "आपकी भूमिका" },
+  pt: { task: "SUA TAREFA", role: "SEU PAPEL", firstMove: "PRIMEIRO PASSO", legacy: "SEU PAPEL" },
+  es: { task: "TU TAREA", role: "TU ROL", firstMove: "PRIMER PASO", legacy: "TU ROL" },
+};
+const ROLE_SECTION_MARKERS: Record<RoleSectionKey, string[]> = {
+  task: ["ТВОЁ ЗАДАНИЕ", "ТВОЕ ЗАДАНИЕ", "YOUR TASK", "आपका काम", "SUA TAREFA", "TU TAREA"],
+  role: ["ТВОЯ РОЛЬ", "YOUR ROLE", "आपकी भूमिका", "SEU PAPEL", "TU ROL"],
+  firstMove: ["ПЕРВЫЙ ШАГ", "FIRST MOVE", "पहला कदम", "PRIMEIRO PASSO", "PRIMER PASO"],
+};
+function parseRoleSections(text: string): RoleSections | null {
+  const normalized = text.replace(/\r\n?/g, "\n").trim();
+  const markers = Object.entries(ROLE_SECTION_MARKERS).flatMap(([key, labels]) =>
+    labels.map((label) => ({ key: key as RoleSectionKey, label })),
+  );
+  const markerKeys = new Map(markers.map(({ key, label }) => [label.toLocaleUpperCase(), key]));
+  const escapeRegExp = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const markerPattern = new RegExp(
+    `(^|\\n)\\s*(?:[-•]\\s*)?(?:\\*\\*)?(${markers.map(({ label }) => escapeRegExp(label)).join("|")})(?:\\*\\*)?\\s*[:：—–-]\\s*(?:\\*\\*)?`,
+    "giu",
+  );
+  const matches = Array.from(normalized.matchAll(markerPattern));
+  if (matches.length !== 3) return null;
+
+  const sections: Partial<RoleSections> = {};
+  matches.forEach((match, index) => {
+    const key = markerKeys.get(match[2].toLocaleUpperCase());
+    if (!key) return;
+    const start = (match.index ?? 0) + match[0].length;
+    const end = matches[index + 1]?.index ?? normalized.length;
+    sections[key] = normalized.slice(start, end).trim();
+  });
+  if (!sections.task || !sections.role || !sections.firstMove) return null;
+  return sections as RoleSections;
+}
 
 const SCENARIO_PAIR_COPY: Record<Lang, {
   markRole: string; confirmTogether: string; waiting: string; completed: string;
@@ -147,11 +186,34 @@ function RoleCard({ title, roleText, intensity, lang, notified, isMissed, pairSt
       : pairState === "your_turn"
         ? pairCopy.statusYourTurn
         : pairCopy.statusReady;
+  const roleSections = parseRoleSections(roleText);
+  const sectionCopy = ROLE_SECTION_COPY[lang];
   const [visible, setVisible] = useState(false);
   useEffect(() => { const timer = setTimeout(() => setVisible(true), 160); return () => clearTimeout(timer); }, []);
   return <section className={`scenario-pop role-overlay ${meta.tone}`} style={{ paddingTop: topPadding }}>
     <div className="role-top"><button className="pop-back" onClick={onHideCard} data-testid="button-role-back">{t.back}</button>{isMissed && <span className="pop-status">{t.missed}</span>}</div>
-    <div className={`role-content ${visible ? "is-visible" : ""}`}><span className="pop-eyebrow">{labels.sub}</span><h1 data-testid="text-scenario-title">{title}</h1><div className="role-rule"><span>{t.yourRole}</span></div><div className="role-text" data-testid="text-role-content">{roleText}</div></div>
+    <div className={`role-content ${visible ? "is-visible" : ""}`}>
+      <div className="role-heading"><span className="pop-eyebrow">{labels.sub}</span><h1 data-testid="text-scenario-title">{title}</h1></div>
+      {roleSections ? <div className="role-sections" data-testid="text-role-content">
+        <section className="role-task-card" aria-label={sectionCopy.task} data-testid="scenario-task">
+          <div className="role-task-label"><span className="role-task-index">01</span>{sectionCopy.task}</div>
+          <p className="role-task-copy">{roleSections.task}</p>
+        </section>
+        <div className="role-support-grid">
+          <section className="role-detail-card" aria-label={sectionCopy.role}>
+            <span className="role-detail-label">{sectionCopy.role}</span>
+            <p>{roleSections.role}</p>
+          </section>
+          <section className="role-detail-card role-first-card" aria-label={sectionCopy.firstMove}>
+            <span className="role-detail-label">{sectionCopy.firstMove}</span>
+            <p>{roleSections.firstMove}</p>
+          </section>
+        </div>
+      </div> : <section className="role-task-card role-task-card--legacy" data-testid="text-role-content">
+        <div className="role-task-label"><span className="role-task-index">01</span>{sectionCopy.legacy}</div>
+        <p className="role-task-copy">{roleText}</p>
+      </section>}
+    </div>
      <div className={`role-bottom ${visible ? "is-visible" : ""}`}><div className="partner-note"><strong>{notified ? t.partnerSent : t.partnerPending}</strong><span>{notified ? t.partnerWait : t.partnerPending}</span></div>
        {feedbackEnabled && pairState === "completed" && <div className="scenario-feedback" data-testid="scenario-feedback">
          <strong className="scenario-feedback-title">{pairCopy.feedbackTitle}</strong>

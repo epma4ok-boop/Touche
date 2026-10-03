@@ -19,15 +19,58 @@ import { OWNER_TELEGRAM_ID } from "../../src/config.js";
 const DEEPSEEK_API_KEY = process.env.DEEPSEEK_API_KEY!;
 const DEEPSEEK_URL = "https://api.deepseek.com/v1/chat/completions";
 const BOT_TOKEN = process.env.BOT_TOKEN;
+const APP_URL = (process.env.APP_URL ?? "").replace(/\/$/, "");
 const OWNER_ID = OWNER_TELEGRAM_ID;
 const CATEGORIES = new Set(["compliments", "tenderness", "desire", "passion", "hard"]);
 const PAID_CATEGORIES = new Set(["passion", "hard"]);
 const LANGS = new Set(["ru", "en", "hi", "pt", "es"]);
 const GENDERS = new Set(["male", "female"]);
 const MODES = new Set(["solo", "together"]);
+const MAX_TASK_CHARS = 280;
 const supabase = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!);
 
 type StaticPool = Record<string, string[]>;
+
+async function notifyPartner(chatId: number, partnerUserId: number, coupleId: string, taskId: string, lang: string): Promise<boolean> {
+  if (!BOT_TOKEN || !APP_URL) return false;
+  const { data: preference, error: preferenceError } = await supabase
+    .from("couple_member_preferences")
+    .select("telegram_notifications_enabled")
+    .eq("couple_id", coupleId)
+    .eq("user_id", partnerUserId)
+    .maybeSingle();
+  if (preferenceError || preference?.telegram_notifications_enabled !== true) return false;
+  const messages: Record<string, { text: string; button: string }> = {
+    ru: { text: "Партнёр выбрал для вас совместное задание. Откройте его и подтвердите выполнение каждый со своей стороны.", button: "Открыть наше задание" },
+    en: { text: "Your partner picked a shared task for you. Open it and confirm when each of you has done it.", button: "Open our task" },
+    hi: { text: "आपके साथी ने आपके लिए साझा कार्य चुना है। इसे खोलें और पूरा होने पर दोनों अपनी पुष्टि करें।", button: "हमारा कार्य खोलें" },
+    pt: { text: "Seu parceiro escolheu uma tarefa compartilhada. Abram e confirmem quando ambos a concluírem.", button: "Abrir nossa tarefa" },
+    es: { text: "Tu pareja eligió una tarea compartida. Ábranla y confirmen cuando ambos la hayan completado.", button: "Abrir nuestra tarea" },
+  };
+  const message = messages[lang] ?? messages.en;
+  let url: string;
+  try {
+    const target = new URL(APP_URL);
+    target.searchParams.set("shared_task", taskId);
+    url = target.toString();
+  } catch {
+    return false;
+  }
+  try {
+    const response = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        chat_id: chatId,
+        text: message.text,
+        reply_markup: { inline_keyboard: [[{ text: message.button, web_app: { url } }]] },
+      }),
+    });
+    return response.ok;
+  } catch {
+    return false;
+  }
+}
 
 const STATIC_POOLS: Record<string, StaticPool> = {
   ru: TASKS_RU,
@@ -48,24 +91,24 @@ function getFallback(cat: string, lang: string): string {
 function getGenderLine(lang: string, gender: string): string {
   const map: Record<string, Record<string, string>> = {
     ru: {
-      male: "Пользователь — мужчина, партнёрша — женщина. Обращайся к пользователю на «ты»; партнёршу называй однозначно. Сохраняй эти роли до конца задания.",
-      female: "Пользователь — женщина, партнёр — мужчина. Обращайся к пользователю на «ты»; партнёра называй однозначно. Сохраняй эти роли до конца задания.",
+      male: "Пара совершеннолетняя и гетеросексуальная: пользователь — мужчина, партнёрша — женщина. Обращайся к пользователю на «ты», называй партнёршу в женском роде. Сохраняй роли и анатомию до конца задания.",
+      female: "Пара совершеннолетняя и гетеросексуальная: пользователь — женщина, партнёр — мужчина. Обращайся к пользователю на «ты», называй партнёра в мужском роде. Сохраняй роли и анатомию до конца задания.",
     },
     en: {
-      male: "User is male and partner is female. Address the user as 'you' and refer to the partner consistently as she/her. Do not switch roles.",
-      female: "User is female and partner is male. Address the user as 'you' and refer to the partner consistently as he/him. Do not switch roles.",
+      male: "This is an adult heterosexual couple: the user is a man and the partner is a woman. Address the user as 'you' and refer to the partner as she/her. Keep roles and anatomy consistent.",
+      female: "This is an adult heterosexual couple: the user is a woman and the partner is a man. Address the user as 'you' and refer to the partner as he/him. Keep roles and anatomy consistent.",
     },
     hi: {
-      male: "उपयोगकर्ता पुरुष है और साथी महिला है। भूमिकाएँ पूरे कार्य में स्थिर रखें।",
-      female: "उपयोगकर्ता महिला है और साथी पुरुष है। भूमिकाएँ पूरे कार्य में स्थिर रखें।",
+      male: "यह वयस्क विषमलैंगिक जोड़ा है: उपयोगकर्ता पुरुष और साथी महिला है। भूमिकाएँ और शरीर-संबंधी विवरण पूरे कार्य में स्थिर रखें।",
+      female: "यह वयस्क विषमलैंगिक जोड़ा है: उपयोगकर्ता महिला और साथी पुरुष है। भूमिकाएँ और शरीर-संबंधी विवरण पूरे कार्य में स्थिर रखें।",
     },
     pt: {
-      male: "O usuário é homem e a parceira é mulher. Trate o usuário por 'você', refira-se à parceira de forma consistente e não troque os papéis.",
-      female: "A usuária é mulher e o parceiro é homem. Trate a usuária por 'você', refira-se ao parceiro de forma consistente e não troque os papéis.",
+      male: "Este é um casal adulto e heterossexual: o usuário é homem e a parceira é mulher. Trate o usuário por 'você' e mantenha os papéis e a anatomia coerentes.",
+      female: "Este é um casal adulto e heterossexual: a usuária é mulher e o parceiro é homem. Trate a usuária por 'você' e mantenha os papéis e a anatomia coerentes.",
     },
     es: {
-      male: "El usuario es hombre y su pareja es mujer. Háblale de tú, refiérete a ella de forma consistente y no cambies los papeles.",
-      female: "La usuaria es mujer y su pareja es hombre. Háblale de tú, refiérete a él de forma consistente y no cambies los papeles.",
+      male: "Es una pareja adulta y heterosexual: el usuario es hombre y su pareja es mujer. Háblale de tú y mantén coherentes los papeles y la anatomía.",
+      female: "Es una pareja adulta y heterosexual: la usuaria es mujer y su pareja es hombre. Háblale de tú y mantén coherentes los papeles y la anatomía.",
     },
   };
   return map[lang]?.[gender] ?? map["en"]["male"];
@@ -75,88 +118,74 @@ function getGenderLine(lang: string, gender: string): string {
 
 const PROMPTS: Record<string, Record<string, string>> = {
   compliments: {
-    ru: `Ты генератор заданий для категории "КОМПЛИМЕНТЫ".
+    ru: `Ты создаёшь одно задание для категории «КОМПЛИМЕНТЫ» в гетеросексуальной паре мужчина–женщина.
 
-Суть категории: тёплые слова, жесты внимания, маленькие сюрпризы без физического контакта.
-Что можно: сказать или написать тёплое слово, записать голосовое сообщение, сделать селфи с улыбкой или воздушным поцелуем, записать короткое видео с обращением, сделать мини-сюрприз (шоколад, записка, чай и прочее), написать благодарность за конкретную мелочь, отправить старое фото с тёплым воспоминанием.
-Чего нельзя: касаться партнёра, раздеваться, намёков на секс.
+Стиль: естественное обращение на «ты», конкретный поступок или наблюдение, одна выразительная деталь. Задание должно звучать лично, а не как общий комплимент из открытки.
+Категория только про слова и знаки внимания: сказать или написать комплимент, поблагодарить за конкретную мелочь, напомнить об общем тёплом воспоминании. Без физической близости, эротики и обязательных фото или видео.
 
-Твоя задача: придумать ОДНО новое, оригинальное задание в рамках этой категории. Не копируй примеры дословно, а создавай свои варианты. Одно действие, до 180 символов. Только текст задания, без кавычек, без пояснений.`,
-    en: `You are a task generator for the "COMPLIMENTS" category.
+Придумай новое задание в духе приложенных примеров, не копируя их. Одно ясное действие; максимум 1–3 связанных шага, обычно 1–2 предложения. Не добавляй шаблонный финал «пусть почувствует». До ${MAX_TASK_CHARS} символов. Верни только текст задания.`,
+    en: `Create one task for the "COMPLIMENTS" category for a heterosexual man-woman couple.
 
-The essence: warm words, gestures of attention, small surprises without physical contact.
-What you can do: say or write a warm word, record a voice message, take a selfie with a smile or a blown kiss, record a short video message, make a mini-surprise (chocolate, a note, tea, etc.), write gratitude for a specific small thing, send an old photo with a warm memory.
-What you cannot do: touch your partner, undress, hint at sex.
+Style: natural direct address, one specific observation or gesture, and one vivid detail. Make it personal rather than a generic greeting-card compliment.
+This category is about words and thoughtful gestures only: give a specific compliment, thank the partner for a small real thing, or recall a warm shared memory. No physical intimacy, erotic content, or required photos/videos.
 
-Your task: come up with ONE new, original task within this category. Do not copy examples verbatim, create your own variations. One action, up to 180 characters. Only the task text, no quotes, no explanations.`,
+Create a new task in the style of the supplied examples without copying them. One clear action with at most 1–3 connected steps, usually 1–2 sentences. Avoid a formulaic "let them feel" ending. Up to ${MAX_TASK_CHARS} characters. Return only the task text.`,
   },
   tenderness: {
-    ru: `Ты генератор заданий для категории "НЕЖНОСТЬ".
+    ru: `Ты создаёшь одно задание для категории «НЕЖНОСТЬ» в гетеросексуальной паре мужчина–женщина.
 
-Суть категории: мягкий физический контакт, тепло, уют, безопасность. Без эротики.
-Что можно: объятия (сзади, спереди, объятия ног, долгие, крепкие), поцелуи (в губы, в шею, в плечо, в лоб, спину), массаж (голова, шея, спина, руки, ноги), почесывания, лёгкие покусывания (мочка уха, плечо, ключица), прикосновения (взять за руку, нежно погладить), селфи с воздушным поцелуем, отправить старое совместное фото.
-Чего нельзя: раздеваться, трогать эрогенные зоны, намёков на секс.
+Категория — простая ласковая близость: объятие, поцелуй, прикосновение к руке, мягкий массаж плеч или спины. Задание остаётся нежным и не превращается в прелюдию или секс.
+Стиль — конкретный жест и одна чувственная деталь, без длинной сцены, реквизита и обязательной съёмки.
 
-Твоя задача: придумать ОДНО новое, оригинальное задание в рамках этой категории. Не копируй примеры дословно, а создавай свои варианты. Одно действие, до 180 символов. Только текст задания, без кавычек, без пояснений.`,
-    en: `You are a task generator for the "TENDERNESS" category.
+Создай новое задание в духе приложенных примеров, не копируя их. Одно ясное действие или 1–3 естественно связанных шага, обычно 1–2 предложения. Не повторяй один и тот же шаблонный финал. До ${MAX_TASK_CHARS} символов. Верни только текст задания.`,
+    en: `Create one task for the "TENDERNESS" category for a heterosexual man-woman couple.
 
-The essence: soft physical contact, warmth, comfort, safety. Without eroticism.
-What you can do: hugs (from behind, from the front, leg hugs, long, tight), kisses (on the lips, on the neck, on the shoulder, on the forehead, on the back), massage (head, neck, back, arms, legs), scratching, light bites (earlobe, shoulder, collarbone), touches (hold hands, gently stroke), selfie with a blown kiss, send an old photo together.
-What you cannot do: undress, touch erogenous zones, hint at sex.
+Keep it to gentle affection: a hug, a kiss, a hand touch, or a soft shoulder/back massage. Stay tender; do not turn the task into foreplay or sex.
+Use one concrete gesture and one sensory detail. Avoid a long scene, props, and required recording.
 
-Your task: come up with ONE new, original task within this category. Do not copy examples verbatim, create your own variations. One action, up to 180 characters. Only the task text, no quotes, no explanations.`,
+Create a new task in the style of the supplied examples without copying them. One clear action or 1–3 naturally connected steps, usually 1–2 sentences. Avoid repetitive formulaic endings. Up to ${MAX_TASK_CHARS} characters. Return only the task text.`,
   },
   desire: {
-    ru: `Ты генератор заданий для категории "ЖЕЛАНИЕ" — прелюдия, разогрев, без секса.
+    ru: `Ты создаёшь одно задание для категории «ЖЕЛАНИЕ» — предвкушение и прелюдия до секса — в гетеросексуальной паре мужчина–женщина.
 
-Суть: возбуждение, игра, демонстрация тела, напряжение. Секса нет. Только задания для гетеро пар (Мужчина + Женщина). Учитывай человеческую физиологию и логику происходящего.
-Что можно: раздевание (своё или партнёра), обнажение в быту (фартук, проход мимо, падение полотенца, одеть только туфли, игривое обнажение), фото/видео в белье, касания через ткань, массаж вокруг эрогенных зон (не касаясь центра), поцелуи и облизывания вокруг эрогенных зон, грязные слова на ухо, страстные поцелуи с языком, демонстрация тела без стеснения, изучение обнаженного тела друг друга.
-Чего нельзя: секс, оральный секс, проникновение.
+Создавай напряжение через флирт, поцелуй, шёпот, прикосновение поверх одежды, игривое раздевание или чувственный массаж. Это граница перед сексом: не описывай оральный секс, проникновение или сам половой акт. Не требуй интимных фото, видео или съёмки.
+Соблюдай анатомию и естественную последовательность. Одно центральное действие, не длинная сцена.
 
-Твоя задача: придумать ОДНО новое, оригинальное задание в рамках этой категории. Не копируй примеры дословно, а создавай свои варианты. Одно действие, до 200 символов. Только текст задания, без кавычек, без пояснений.`,
-    en: `You are a task generator for the "DESIRE" category — foreplay, warm-up, without sex.
+Придумай новое задание в духе примеров, не копируя их. 1–3 связанных шага, обычно 1–2 предложения; конкретно и чувственно, без повторяющегося «пусть почувствует». До ${MAX_TASK_CHARS} символов. Верни только текст задания.`,
+    en: `Create one task for the "DESIRE" category—anticipation and foreplay before sex—for a heterosexual man-woman couple.
 
-The essence: arousal, play, body display, tension. No sex. Only for heterosexual couples (Man + Woman). Consider human physiology and the logic of what is happening.
-What you can do: undressing (yourself or your partner), nudity in everyday life (wearing only an apron, walking past naked, dropping a towel, wearing only heels, playful nudity), photo/video in lingerie, touching through fabric, massage around erogenous zones (not touching the center), kisses and licking around erogenous zones, dirty words in the ear, passionate kisses with tongue, body display without embarrassment, exploring each other's naked body.
-What you cannot do: sex, oral sex, penetration.
+Build tension through flirting, a kiss, a whisper, a touch over clothing, playful undressing, or sensual massage. Stay at the edge before sex: do not describe oral sex, penetration, or intercourse. Do not require intimate photos, video, or filming.
+Keep the anatomy and order of actions physically plausible. Use one central action, not a long scene.
 
-Your task: come up with ONE new, original task within this category. Do not copy examples verbatim, create your own variations. One action, up to 200 characters. Only the task text, no quotes, no explanations.`,
+Create a new task in the style of the examples without copying them. Use 1–3 connected steps, usually 1–2 sentences; be concrete and sensual, and avoid repetitive "let them feel" endings. Up to ${MAX_TASK_CHARS} characters. Return only the task text.`,
   },
   passion: {
-    ru: `Ты генератор одного задания для категории «СТРАСТЬ» — чувственный секс без пошлости.
+    ru: `Ты создаёшь одно задание для категории «СТРАСТЬ» — чувственный секс в гетеросексуальной паре мужчина–женщина.
 
-Суть: взаимное удовольствие, близость и ясная реакция друг на друга. Только для гетеро пар (мужчина + женщина); соблюдай физиологию и выполнимый порядок.
-Выбери одну основную идею: подходящая поза, смена темпа, взаимные ласки, оральная или ручная стимуляция, спокойное сообщение о желаниях. Не собирай из этих вариантов длинную цепочку.
-Не добавляй музыку, съёмку, свечи, игрушки или другие предметы по умолчанию. Если в задании есть оргазм, обычно завершай задание на нём: не добавляй автоматически следующий сексуальный акт.
-Чего нельзя: пошлость, грубость, принуждение и съёмка.
+Тон интимный и чувственный, но не грязный: внимание к телесным ощущениям, ритму и реакции партнёра. Выбери одну центральную идею — подходящую позу, темп, ласку или сексуальное действие. Не превращай карточку в длинную последовательность.
+Соблюдай анатомию и выполнимый порядок. Не обещай конкретную реакцию тела. Если упоминается оргазм, он обычно завершает задание; не добавляй после него следующий акт автоматически. Не добавляй реквизит, музыку или съёмку по умолчанию.
 
-Твоя задача: придумать ОДНО новое, конкретное задание до 200 символов. Не копируй примеры дословно. Только текст задания, без кавычек и пояснений.`,
-    en: `You generate one task for the "PASSION" category: sensual sex without vulgarity.
+Создай оригинальное задание в духе примеров: 1–3 связанных шага, обычно 1–2 предложения, до ${MAX_TASK_CHARS} символов. Без шаблонных концовок и пояснений; верни только текст задания.`,
+    en: `Create one task for the "PASSION" category: sensual sex for a heterosexual man-woman couple.
 
-Focus on mutual pleasure, closeness, and responding to each other. For heterosexual couples (man + woman); keep the actions physically possible and in a clear order.
-Choose one central idea: a suitable position, a change of pace, mutual touch, oral or manual stimulation, or clearly sharing a desire. Do not turn these into a long sequence.
-Do not add music, recording, candles, toys, or other props by default. If the task includes an orgasm, usually end the task there; do not automatically add another sexual act afterward.
-Do not include vulgarity, roughness, coercion, or filming.
+Keep the tone intimate and sensual, not dirty: focus on bodily sensation, pace, and the partner's response. Choose one central idea—a suitable position, pace, caress, or sexual act. Do not turn the card into a long sequence.
+Keep anatomy and order physically plausible. Do not guarantee a bodily response. If orgasm is mentioned, it usually ends the task; do not automatically add another act afterward. Do not add props, music, or filming by default.
 
-Create ONE new, specific task of up to 200 characters. Do not copy examples verbatim. Return only the task text, without quotes or explanations.`,
+Create an original task in the style of the examples: 1–3 connected steps, usually 1–2 sentences, up to ${MAX_TASK_CHARS} characters. Avoid formulaic endings and explanations; return only the task text.`,
   },
   hard: {
-    ru: `Ты генератор одного задания для категории «ХАРД» — интенсивные эксперименты с ясным взаимным согласием.
+    ru: `Ты создаёшь одно задание для категории «ХАРД» — более грязный и прямой стиль, чем в «Страсти», для гетеросексуальной пары мужчина–женщина.
 
-Суть: смена инициативы, контроль в оговорённых пределах, новые ощущения или томление. Только для гетеро пар (мужчина + женщина); соблюдай физиологию и выполнимый порядок.
-Можно предложить короткую согласованную команду, добровольное удерживание, лёгкое воздействие или задержку оргазма. Всегда оставляй возможность сразу остановиться; не предлагай «делать что угодно» или подчиняться без вопросов.
-Это не ролевая игра и не сценарий: не придумывай персонажей, сюжет, реплики или роли. Не добавляй повязку на глаза, музыку, камеру или реквизит по умолчанию; используй не больше одного предмета, только если он необходим для основной идеи.
-Чего нельзя: мужчина садится на лицо женщины; эякуляция в рот мужчины.
+Используй откровенную, уверенную лексику и одну центральную идею: более властный тон, томление, контроль темпа или интенсивные ласки. «Хард» отличается прежде всего прямотой и накалом, а не обязательной грубостью. Не описывай принуждение, игнорирование боли или физически опасные действия.
+Соблюдай анатомию и последовательность. Не добавляй пояснения о согласии, стоп-словах или безопасности в текст задания. Это короткая карточка, не ролевая сцена: без персонажей, сюжета и длинных реплик. Не добавляй съёмку и реквизит по умолчанию.
 
-Придумай ОДНО новое, конкретное задание до 200 символов. Только текст задания, без кавычек и пояснений.`,
-    en: `You generate one task for the "HARD" category: intense experimentation with clear mutual consent.
+Создай оригинальное задание в духе примеров: одно действие или 1–3 тесно связанных шага, обычно 1–2 предложения, до ${MAX_TASK_CHARS} символов. Верни только текст задания.`,
+    en: `Create one task for the "HARD" category for a heterosexual man-woman couple. Make it dirtier and more direct than "PASSION".
 
-Focus on changing initiative, agreed control, new sensations, or anticipation. For heterosexual couples (man + woman); keep actions physically possible and in a clear order.
-You may suggest a brief agreed command, voluntary restraint, light impact, or delaying orgasm. Always leave a clear way to stop immediately; never say to do anything without limits or obey without question.
-This is not roleplay or a scenario: do not invent characters, a plot, dialogue, or assigned roles. Do not add blindfolds, music, cameras, or props by default; use at most one item, and only if essential to the central idea.
-Do not suggest a man sitting on a woman's face or ejaculation in a man's mouth.
+Use bold, explicit wording and one central idea: a more commanding tone, anticipation, control of pace, or intense caresses. "Hard" should feel more direct and heated, not automatically rough. Do not describe coercion, ignoring pain, or physically dangerous actions.
+Keep anatomy and sequence plausible. Do not put consent, safeword, or safety explanations in the task text. This is a short task, not a roleplay scene: no characters, plot, or long dialogue. Do not add filming or props by default.
 
-Create ONE new, specific task of up to 200 characters. Return only the task text, without quotes or explanations.`,
+Create an original task in the style of the examples: one action or 1–3 closely connected steps, usually 1–2 sentences, up to ${MAX_TASK_CHARS} characters. Return only the task text.`,
   },
 };
 
@@ -191,16 +220,16 @@ const VARIATION_FOCI: Record<string, { ru: string[]; en: string[] }> = {
   },
   desire: {
     ru: [
-      "игривое предвкушение через одежду, без проникновения",
-      "прямое шёпотом сказанное желание",
-      "чувственное, но не откровенное раскрытие тела без реквизита",
-      "поцелуи и ласки, которые останавливаются до секса",
+      "игривое предвкушение через одежду, до секса",
+      "короткий шёпот о желании без длинного диалога",
+      "чувственное сближение без съёмки и реквизита",
+      "поцелуй или прикосновение, завершающееся на границе прелюдии",
     ],
     en: [
-      "playful anticipation through clothing, without penetration",
-      "a direct desire whispered aloud",
-      "a sensual but non-explicit reveal without props",
-      "kissing and caressing that stop before sex",
+      "playful anticipation through clothing, before sex",
+      "a brief whispered desire without extended dialogue",
+      "sensual closeness without filming or props",
+      "a kiss or touch that stays at the edge of foreplay",
     ],
   },
   passion: {
@@ -208,7 +237,7 @@ const VARIATION_FOCI: Record<string, { ru: string[]; en: string[] }> = {
       "одна смена темпа и пауза, без фоновой музыки",
       "взаимные прикосновения и реакция друг на друга, без реквизита",
       "одна подходящая поза или угол, без длинной последовательности",
-      "партнёры по очереди выбирают одно действие",
+      "одна выразительная пауза или смена ритма",
       "завершить задание оргазмом, без автоматического продолжения после него",
       "внимание к одному желанию партнёра, без камеры и съёмки",
     ],
@@ -216,27 +245,27 @@ const VARIATION_FOCI: Record<string, { ru: string[]; en: string[] }> = {
       "one change of pace and a pause, without background music",
       "mutual touch and responding to each other, without props",
       "one suitable position or angle, not a long sequence",
-      "partners take turns choosing one action",
+      "one expressive pause or change of rhythm",
       "end the task with orgasm, with no automatic continuation afterward",
       "focus on one partner's stated desire, without cameras or recording",
     ],
   },
   hard: {
     ru: [
-      "согласованные команды и ясная возможность сказать «стоп», без персонажей",
-      "временный контроль с заранее оговорёнными границами, без повязки",
-      "интенсивность за счёт темпа и ожидания, без музыки и реквизита",
-      "один простой вид лёгкого воздействия только после явного согласия",
-      "согласованное удерживание, которое можно сразу прекратить, без повязки",
-      "короткая задержка оргазма, без автоматического продолжения после него",
+      "грязная прямая фраза без длинного диалога",
+      "властный тон в одной короткой команде",
+      "интенсивность через темп и ожидание, без реквизита",
+      "одна выразительная деталь физического действия",
+      "короткая игра с задержкой и нарастающим напряжением",
+      "прямое описание желания без метафор и повторов",
     ],
     en: [
-      "agreed commands and a clear way to say stop, without characters",
-      "temporary control with agreed boundaries, without a blindfold",
-      "intensity through pace and anticipation, without music or props",
-      "one simple form of light impact only after explicit agreement",
-      "agreed restraint that can be stopped immediately, without a blindfold",
-      "brief orgasm delay, with no automatic continuation afterward",
+      "a dirty, direct line without extended dialogue",
+      "a commanding tone in one short instruction",
+      "intensity through pace and anticipation, without props",
+      "one vivid detail of physical action",
+      "brief teasing delay and rising tension",
+      "direct wording of desire without metaphors or repetition",
     ],
   },
 };
@@ -257,10 +286,7 @@ function getVariationInstruction(category: string, lang: string, requestId: stri
 }
 
 function getPrompt(category: string, lang: string): string {
-  const prompt = PROMPTS[category]?.[lang] ?? PROMPTS[category]?.["en"] ?? PROMPTS["compliments"]["en"];
-  return prompt
-    .replace(/Одно действие/gu, "Одно завершённое задание из 1–3 связанных шагов")
-    .replace(/One action/gu, "One complete task with 1–3 connected steps");
+  return PROMPTS[category]?.[lang] ?? PROMPTS[category]?.["en"] ?? PROMPTS["compliments"]["en"];
 }
 
 const LANGUAGE_INSTRUCTIONS: Record<string, string> = {
@@ -276,7 +302,13 @@ function matchesRequestedLanguage(text: string, lang: string): boolean {
   const hasDevanagari = /[\u0900-\u097f]/u.test(text);
   if (lang === "ru") return hasCyrillic && !hasDevanagari;
   if (lang === "hi") return hasDevanagari && !hasCyrillic;
-  return !hasCyrillic && !hasDevanagari;
+  if (hasCyrillic || hasDevanagari) return false;
+  const latinLanguageMarkers: Record<string, RegExp> = {
+    en: /\b(?:you|your|the|with|her|him|partner|kiss|touch|say|tell|look|hold|write|send|slowly|together)\b/iu,
+    pt: /\b(?:você|seu|sua|dele|dela|parceir[oa]|com|para|uma?|do|da|no|na|beij|abrac|toqu|dig[ae]|olh|sussurr|escrev|envie|devagar|lentamente|juntos)\b/iu,
+    es: /\b(?:tú|tu|su|pareja|con|para|él|ella|el|la|los|las|un[oa]?|del|bes|abraz|toc|d[ií]le?|mira|susurr|escrib|env[ií]a|despacio|juntos)\b/iu,
+  };
+  return latinLanguageMarkers[lang]?.test(text) ?? false;
 }
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
@@ -304,10 +336,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(500).json({ error: "referral_claim_failed" });
   }
 
+  let partnerTgId: number | null = null;
+  let partnerUserId: number | null = null;
   if (mode === "together") {
     if (!coupleId) return res.status(400).json({ error: "couple_id_required" });
     const { data } = await supabase.from("couples").select("user_a_id,user_b_id").eq("id", coupleId).maybeSingle();
     if (!data || (data.user_a_id !== caller.id && data.user_b_id !== caller.id)) return res.status(403).json({ error: "couple_access_denied" });
+    partnerTgId = data.user_a_id === caller.id ? data.user_b_id : data.user_a_id;
+    partnerUserId = partnerTgId;
   }
   const premium = caller.id === OWNER_ID || !!(await supabase.from("user_subscriptions").select("expires_at").eq("user_id", caller.id).gt("expires_at", new Date().toISOString()).maybeSingle()).data;
   if (!premium && PAID_CATEGORIES.has(category)) {
@@ -334,13 +370,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         body: JSON.stringify({ model: "deepseek-chat", messages: [
           { role: "system", content: systemPrompt },
           { role: "user", content: LANGUAGE_INSTRUCTIONS[lang] },
-        ], max_tokens: 160, temperature: 0.95 }),
+        ], max_tokens: 180, temperature: 0.82 }),
       });
       if (aiRes.ok) {
         const data = await aiRes.json();
         const candidate = String(data.choices?.[0]?.message?.content ?? "").replace(/^["']|["']$/g, "").replace(/^\d+\.\s*/, "").trim();
-        const forbidden = ["я рекомендую", "тебе стоит", "можешь попробовать", "выдыхает", "дыши в", "посмотри в глаза", "отстранись"];
-        if (candidate.length >= 15 && candidate.length <= 350
+        const forbidden = ["я рекомендую", "тебе стоит", "можешь попробовать"];
+        if (candidate.length >= 15 && candidate.length <= MAX_TASK_CHARS
           && matchesRequestedLanguage(candidate, lang)
           && isTaskTextWellFormed(candidate, lang)
           && !forbidden.some(f => candidate.toLowerCase().includes(f))) {
@@ -363,8 +399,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   });
   if (saveError) return res.status(500).json({ error: "task_save_failed" });
   if (saved?.ok !== true) return res.status(403).json({ error: saved?.error ?? "limit_exceeded", remaining: 0, isPremium: false });
+  const partnerNotified = mode === "together" && partnerTgId && saved.taskId
+    ? await notifyPartner(partnerTgId, partnerUserId!, coupleId!, String(saved.taskId), lang)
+    : false;
   return res.status(200).json({
     ok: true, task: saved.task, taskId: saved.taskId,
-    source: saved.source, remaining: saved.remaining, isPremium: premium,
+    source: saved.source, remaining: saved.remaining, isPremium: premium, partnerNotified,
   });
 }

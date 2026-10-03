@@ -43,7 +43,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     const { data: session, error } = await supabase
       .from("scenario_sessions")
-      .select("id, couple_id, pulled_by, title, role_a_text, role_b_text, lang, intensity")
+      .select("id, couple_id, pulled_by, title, role_a_text, role_b_text, lang, intensity, resonance_eligible")
       .eq("id", sessionId)
       .single();
 
@@ -62,6 +62,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       role: isRoleA ? "a" : "b",
       lang: session.lang,
       intensity: session.intensity,
+      feedbackEnabled: session.resonance_eligible === true,
     });
   }
 
@@ -77,7 +78,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     const { data: session, error } = await supabase
       .from("scenario_sessions")
-      .select("id, pulled_by, title, role_b_text, lang, intensity")
+      .select("id, pulled_by, title, role_b_text, lang, intensity, resonance_eligible")
       .eq("couple_id", coupleId)
       .eq("pulled_by", partnerId)
       .eq("pending_for_b", true)
@@ -102,6 +103,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       role: "b",
       lang: session.lang,
       intensity: session.intensity,
+      feedbackEnabled: session.resonance_eligible === true,
     });
   }
 

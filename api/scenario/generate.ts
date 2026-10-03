@@ -40,6 +40,18 @@ const CROSS_CARD_DISCLOSURE = /(?:role[_\s-]?[ab]\s*[:：]|(?:the other|your par
 type FallbackEntry = { title: string; role_a: string; role_b: string };
 type FallbackByGender = { male: FallbackEntry; female: FallbackEntry };
 type FallbackPool = Record<string, Record<string, FallbackByGender>>;
+type GeneratedScenario = FallbackEntry & { variation_tags: string[] };
+type ScenarioVariationSignals = {
+  recent: string[];
+  mutuallyLiked: string[];
+  avoid: string[];
+};
+
+const FALLBACK_VARIATION_TAGS: Record<string, string[]> = {
+  romantic: ["setting:home_photoshoot", "dynamic:playful_flirting", "tone:slow_burn"],
+  passion: ["setting:university_after_class", "dynamic:playful_resistance", "tone:slow_burn"],
+  hard: ["setting:fictional_casting", "dynamic:audition_power_play", "tone:bold"],
+};
 
 const FALLBACKS: FallbackPool = {
   romantic: {
@@ -164,6 +176,80 @@ function getFallback(intensity: string, lang: string, gender: string): FallbackE
   return byLang[gender === "female" ? "female" : "male"];
 }
 
+function cleanVariationTags(value: unknown): string[] {
+  if (!Array.isArray(value)) return [];
+  return [...new Set(value
+    .map((tag) => String(tag ?? "").toLowerCase().trim().replace(/[^a-z0-9:_-]/g, "_").replace(/_+/g, "_").slice(0, 48))
+    .filter((tag) => /^(setting|dynamic|tone|hook):[a-z0-9_-]{2,40}$/.test(tag)))]
+    .slice(0, 6);
+}
+
+async function getScenarioVariationSignals(coupleId: string): Promise<ScenarioVariationSignals> {
+  const { data: sessions, error: sessionsError } = await supabase
+    .from("scenario_sessions")
+    .select("id,variation_tags,resonance_eligible,resonance_feedback_processed_at")
+    .eq("couple_id", coupleId)
+    .order("created_at", { ascending: false })
+    .limit(8);
+  if (sessionsError) throw sessionsError;
+
+  const recent = (sessions ?? []).flatMap((session) => cleanVariationTags(session.variation_tags));
+  const ratedSessionIds = (sessions ?? [])
+    .filter((session) => session.resonance_eligible && session.resonance_feedback_processed_at)
+    .map((session) => session.id);
+  if (!ratedSessionIds.length) {
+    return { recent: [...new Set(recent)].slice(0, 18), mutuallyLiked: [], avoid: [] };
+  }
+
+  const { data: feedback, error: feedbackError } = await supabase
+    .from("scenario_resonance_feedback")
+    .select("session_id,rating")
+    .in("session_id", ratedSessionIds);
+  if (feedbackError) throw feedbackError;
+
+  const ratingsBySession = new Map<string, number[]>();
+  for (const row of feedback ?? []) {
+    if (typeof row.rating !== "number") continue;
+    const ratings = ratingsBySession.get(row.session_id) ?? [];
+    ratings.push(row.rating);
+    ratingsBySession.set(row.session_id, ratings);
+  }
+
+  const tagsBySession = new Map((sessions ?? []).map((session) => [
+    session.id,
+    cleanVariationTags(session.variation_tags),
+  ]));
+  const mutuallyLiked: string[] = [];
+  const avoid: string[] = [];
+  for (const sessionId of ratedSessionIds) {
+    const ratings = ratingsBySession.get(sessionId) ?? [];
+    const tags = tagsBySession.get(sessionId) ?? [];
+    if (ratings.length === 2 && ratings.every((rating) => rating >= 4)) {
+      mutuallyLiked.push(...tags);
+    }
+    if (ratings.some((rating) => rating <= 2)) {
+      avoid.push(...tags);
+    }
+  }
+
+  return {
+    recent: [...new Set(recent)].slice(0, 18),
+    mutuallyLiked: [...new Set(mutuallyLiked)].slice(0, 12),
+    avoid: [...new Set(avoid)].slice(0, 12),
+  };
+}
+
+function variationContext(lang: string, signals: ScenarioVariationSignals): string {
+  const instructions = lang === "ru"
+    ? "Придумай свежую сцену, не выбирай из фиксированного меню. Меняй роли, место, повод, баланс инициативы и эмоциональный тон. Не повторяй недавние сочетания. Элементы, которые обоим партнёрам понравились, можно иногда вернуть, но сочетай их с несколькими новыми элементами. Избегай элементов, которые кому-то из партнёров не подошли. Эти метки и оценки — только внутренний контекст модели: никогда не упоминай их и не раскрывай чужой отклик в карточках."
+    : "Invent a fresh scene instead of choosing from a fixed menu. Vary the roles, setting, trigger, balance of initiative, and emotional tone. Do not repeat recent combinations. You may occasionally revisit an element both partners liked, but combine it with several new elements. Avoid elements that either partner rated poorly. These tags and ratings are private model context: never mention them or reveal the other partner's response in either card.";
+  const lines = [instructions];
+  if (signals.recent.length) lines.push(`Recent elements to vary away from: ${signals.recent.join(", ")}.`);
+  if (signals.mutuallyLiked.length) lines.push(`Elements both partners liked before (use sparingly with fresh combinations): ${signals.mutuallyLiked.join(", ")}.`);
+  if (signals.avoid.length) lines.push(`Avoid these previously low-rated elements: ${signals.avoid.join(", ")}.`);
+  return lines.join("\n");
+}
+
 // ─── Персоны ─────────────────────────────────────────────────────────────────
 
 const PERSONA_RU = `Ты — автор коротких ролевых сценариев для взрослых пар. Создавай живые сцены с разными характерами, конкретными действиями и репликами.`;
@@ -187,11 +273,11 @@ function genderContextEn(gender: string): string {
 // ─── Системные промпты ────────────────────────────────────────────────────────
 
 const ROLE_LIST_EN = `
-Scenario ideas:
-- romantic: an intriguing first meeting, a private concert, neighbors sharing a late-night conversation, or a playful photo session using a phone only as a prop.
-- passion: an adult university lecturer and adult university student after class, with scripted playful resistance that turns into mutual intimacy; or another adult roleplay with an equally clear positive turn.
-- hard: a fictional adult-film casting with an adult director and adult performer, or another adult power-play scene. A casting scene is fictional and never recorded.
-Choose a fitting idea or invent another scenario with adults only. Never use minors, schoolchildren, or characters whose age is unclear.
+Scenario ideas are examples, not a fixed menu:
+- romantic: an intriguing first meeting, private performance, neighbors sharing a late-night conversation, a playful photo session, or an original low-stakes fantasy.
+- passion: adult lecturer/adult university student with acted resistance and a clear positive turn, or any other original adult dynamic with mutual intimacy.
+- hard: fictional adult-film casting, an adult power-play scene, or another bold adult roleplay where both characters keep agency.
+Invent many different role pairings and premises. Do not default to photographer/model, lecturer/student, or casting. Never use minors, schoolchildren, or characters whose age is unclear.
 
 Intensity:
 - romantic: intrigue and flirting, no explicit sexual content.
@@ -202,18 +288,20 @@ Private-card rules:
 - Return one neutral title and two separate role cards. Both partners see the title, so it must not name roles, the pairing, or either character's secret goal.
 - role_a is only for the initiator; role_b is only for the partner. Address each reader as “you”; give only that character's role, private objective, opening move, actions, and lines.
 - Never reveal, summarize, or give instructions from the other card. The cards should complement each other without disclosing one another's private plan.
-- For teacher/student, both characters are adults at a university. Resistance is acted, never a real refusal; intimacy begins only after clear reciprocation. Never tell a character to ignore a real no, silence, hesitation, or stop.
+- If you use teacher/student, both characters are adults at a university. Resistance is acted, never a real refusal; intimacy begins only after clear reciprocation. Never tell a character to ignore a real no, silence, hesitation, or stop.
 - Casting is fictional: no actual recording, image capture, or saved material.
 
 Write 3–5 actionable sentences per card, with a natural line in quotes and a concrete opening action. Keep the cards distinct and coherent. Actions must be feasible at home without purchases, risky props, or real restraint.
-Return ONLY valid JSON: {"title":"...","role_a":"...","role_b":"..."}`;
+Add 3–6 private variation_tags as short lowercase English slugs prefixed by setting:, dynamic:, tone:, or hook:. Describe broad scene elements only, not names, ages, or private card objectives. Tags are internal metadata and must never appear in either role card or title.
+Return ONLY valid JSON: {"title":"...","role_a":"...","role_b":"...","variation_tags":["setting:...","dynamic:...","tone:..."]}`;
 
 const ROLE_LIST_RU = `
 Идеи сцен:
-- romantic: интригующее знакомство, домашний мини-концерт, ночной разговор соседей или фотосессия, где телефон — только реквизит.
-- passion: преподаватель и совершеннолетний студент университета после занятия; студент играет в уклонение, а напряжение переходит во взаимную близость после ясного встречного сигнала. Можно выбрать другую взрослую ролевую динамику с таким же понятным переходом.
-- hard: вымышленный порнокастинг со взрослыми режиссёром и актёром/актрисой или другая ролевая игра взрослых с распределением власти. Кастинг не снимают и не сохраняют.
-Выбери подходящую идею или придумай другую сцену только со взрослыми. Не используй несовершеннолетних, школьников или персонажей с неясным возрастом.
+Примеры — не фиксированный список:
+- romantic: интригующее знакомство, домашний мини-концерт, ночной разговор соседей, фотосессия с телефоном-реквизитом или необычная фантазия без риска.
+- passion: преподаватель и совершеннолетний студент университета с игровым уклонением и ясным встречным сигналом или любая другая оригинальная взрослая динамика с взаимной близостью.
+- hard: вымышленный порнокастинг, ролевая игра взрослых с распределением власти или другая смелая сцена, где каждый сохраняет самостоятельность.
+Придумывай разные пары ролей и завязки. Не зацикливайся на фотографе/модели, преподавателе/студенте или кастинге. Не используй несовершеннолетних, школьников или персонажей с неясным возрастом.
 
 Уровни:
 - romantic: интрига и флирт без откровенного сексуального контента.
@@ -224,22 +312,23 @@ const ROLE_LIST_RU = `
 - Верни одно нейтральное название и две отдельные карточки. Название увидят оба, поэтому в нём нельзя называть роли, их пару или скрытую цель персонажа.
 - role_a предназначена только инициатору, role_b — только партнёру. Обращайся к читателю карточки на «ты» и описывай только его роль, личную цель, начало сцены, действия и реплики.
 - Не раскрывай и не пересказывай инструкции или тайную цель другой карточки. Карточки должны сочетаться, но не выдавать планы друг друга.
-- В сцене «преподаватель и студент» оба персонажа — взрослые участники университета. Сопротивление — только игровая роль; близость начинается после ясной взаимности. Нельзя приказывать игнорировать настоящий отказ, молчание, сомнение или стоп-сигнал.
+- Если выбрана сцена «преподаватель и студент», оба персонажа — взрослые участники университета. Сопротивление — только игровая роль; близость начинается после ясной взаимности. Нельзя приказывать игнорировать настоящий отказ, молчание, сомнение или стоп-сигнал.
 - Кастинг — только вымышленная ролевая сцена: никаких реальных записей, фото или сохранения материалов.
 
 Каждая карточка — 3–5 конкретных предложений с естественной фразой в кавычках и ясным первым действием. Сделай карточки разными и связанными между собой. Всё должно быть выполнимо дома, без покупок, опасного реквизита и реального связывания.
-Верни ТОЛЬКО JSON: {"title":"...","role_a":"...","role_b":"..."}`;
+Добавь 3–6 приватных variation_tags: короткие строчные английские теги с префиксом setting:, dynamic:, tone: или hook:. Описывай только общие элементы сцены — без имён, возраста и тайных целей карточек. Теги нужны только для внутреннего разнообразия и не должны попадать в название или карточки.
+Верни ТОЛЬКО JSON: {"title":"...","role_a":"...","role_b":"...","variation_tags":["setting:...","dynamic:...","tone:..."]}`;
 
 const INTENSITY_RULES_EN: Record<string, string> = {
   romantic: "Current level: romantic. Keep it playful and curious, with no explicit sexual action.",
-  passion: "Current level: passion. You may use the adult university lecturer/student setup; resistance is playful acting, and the student chooses when to give a clear positive signal that opens the path to intimacy.",
-  hard: "Current level: hard. Prefer a fictional adult-film casting with an adult director and adult performer. Keep it bold but unrecorded; the performer chooses what to act out and signals any move toward intimacy.",
+  passion: "Current level: passion. Any adult role dynamic is allowed; the lecturer/student example is optional, not a default. If used, resistance is playful acting and the student chooses when to give a clear positive signal that opens the path to intimacy.",
+  hard: "Current level: hard. Any bold adult role dynamic is allowed; fictional adult-film casting is optional, not a default. Keep scenes fictional and unrecorded; every character chooses what to act out and signals any move toward intimacy.",
 };
 
 const INTENSITY_RULES_RU: Record<string, string> = {
   romantic: "Текущий уровень: romantic. Сохраняй игривую интригу и не описывай сексуальные действия.",
-  passion: "Текущий уровень: passion. Можно выбрать взрослых преподавателя и студента университета; сопротивление студента — игровое, а он сам выбирает момент для ясного встречного сигнала и перехода к близости.",
-  hard: "Текущий уровень: hard. Предпочтительный вариант — вымышленный порнокастинг со взрослыми режиссёром и актёром/актрисой. Актёр/актриса сам(а) выбирает, что разыгрывать; переход к близости — только после ясного встречного сигнала.",
+  passion: "Текущий уровень: passion. Подходит любая взрослая ролевая динамика; преподаватель и студент — лишь один из вариантов, не сюжет по умолчанию. Если он выбран, уклонение только игровое, а студент сам выбирает момент для ясного встречного сигнала и перехода к близости.",
+  hard: "Текущий уровень: hard. Подходит любая смелая ролевая динамика взрослых; вымышленный порнокастинг — лишь один из вариантов. Сцена не записывается, каждый выбирает, что разыгрывать, а близость начинается только после ясного встречного сигнала.",
 };
 
 const SYSTEM_PROMPTS: Record<string, (intensity: string, gender: string) => string> = {
@@ -288,11 +377,11 @@ ${INTENSITY_RULES_EN[intensity]}`,
 };
 
 function userPrompt(lang: string, intensity: string): string {
-  if (lang === "ru") return `Создай живой сценарий уровня ${intensity} для двух взрослых партнёров: две отдельные скрытые карточки и нейтральное название. Каждая карточка — только для её получателя. Верни ТОЛЬКО JSON.`;
-  if (lang === "hi") return `${intensity} स्तर का दृश्य दो वयस्क साथियों के लिए बनाएं: दो अलग गुप्त भूमिका-कार्ड और एक तटस्थ शीर्षक। केवल JSON।`;
-  if (lang === "pt") return `Crie um cenário ${intensity} para dois adultos, com dois cartões de papel separados e secretos e um título neutro. Apenas JSON.`;
-  if (lang === "es") return `Crea un escenario ${intensity} para dos adultos, con dos tarjetas de rol separadas y secretas y un título neutral. Solo JSON.`;
-  return `Create a ${intensity}-level scenario for two adults with two separate private role cards and a neutral title. Return ONLY JSON.`;
+  if (lang === "ru") return `Придумай новый сценарий уровня ${intensity} для двух взрослых партнёров: две отдельные скрытые карточки, нейтральное название и 3–6 внутренних тегов разнообразия. Не повторяй недавние сцены. Верни ТОЛЬКО JSON.`;
+  if (lang === "hi") return `${intensity} स्तर का नया दृश्य दो वयस्क साथियों के लिए बनाएं: दो अलग गुप्त भूमिका-कार्ड, तटस्थ शीर्षक और विविधता के 3–6 निजी टैग। हाल के दृश्यों को न दोहराएँ। केवल JSON।`;
+  if (lang === "pt") return `Crie um novo cenário ${intensity} para dois adultos, com cartões secretos separados, título neutro e 3–6 tags internas de variedade. Não repita cenas recentes. Apenas JSON.`;
+  if (lang === "es") return `Crea un escenario ${intensity} nuevo para dos adultos, con tarjetas secretas separadas, título neutral y 3–6 etiquetas internas de variedad. No repitas escenas recientes. Solo JSON.`;
+  return `Invent a fresh ${intensity}-level scenario for two adults, with separate private role cards, a neutral title, and 3–6 internal variety tags. Avoid recent scenes. Return ONLY JSON.`;
 }
 
 async function notifyPartner(chatId: number, partnerUserId: number, coupleId: string, sessionId: string, lang: string): Promise<boolean> {
@@ -370,13 +459,23 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     if (allowance?.allowed === false || allowance?.ok === false) return res.status(429).json({ error: "rate_limited" });
   }
 
-  let generated: FallbackEntry;
+  let variationSignals: ScenarioVariationSignals;
+  try {
+    variationSignals = await getScenarioVariationSignals(coupleId);
+  } catch (error) {
+    console.error("Could not load scenario variation context:", error);
+    return res.status(500).json({ error: "scenario_context_failed" });
+  }
+
+  let generated: GeneratedScenario;
   let source: "ai" | "fallback" = "ai";
 
   try {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 14_000);
-    const systemContent = (SYSTEM_PROMPTS[lang] ?? SYSTEM_PROMPTS.en)(intensity, gender);
+    const systemContent = `${(SYSTEM_PROMPTS[lang] ?? SYSTEM_PROMPTS.en)(intensity, gender)}
+
+${variationContext(lang, variationSignals)}`;
     const aiRes = await fetch(DEEPSEEK_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${DEEPSEEK_API_KEY}` },
@@ -400,9 +499,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     if (parsed?.title && parsed?.role_a && parsed?.role_b) {
       const roleA = cleanText(parsed.role_a, 1200);
       const roleB = cleanText(parsed.role_b, 1200);
+      const variationTags = cleanVariationTags(parsed.variation_tags);
       if (
         roleA.length < 40 ||
         roleB.length < 40 ||
+        variationTags.length < 3 ||
         roleA === roleB ||
         CROSS_CARD_DISCLOSURE.test(roleA) ||
         CROSS_CARD_DISCLOSURE.test(roleB)
@@ -413,13 +514,17 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         title: sanitizeScenarioTitle(parsed.title, lang, intensity),
         role_a: roleA,
         role_b: roleB,
+        variation_tags: variationTags,
       };
     } else {
       throw new Error("Unexpected AI response shape");
     }
   } catch {
     source = "fallback";
-    generated = getFallback(intensity, lang, gender);
+    generated = {
+      ...getFallback(intensity, lang, gender),
+      variation_tags: FALLBACK_VARIATION_TAGS[intensity] ?? [],
+    };
   }
 
   generated.title = sanitizeScenarioTitle(generated.title, lang, intensity);
@@ -438,6 +543,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       title: generated.title,
       role_a_text: generated.role_a,
       role_b_text: generated.role_b,
+      variation_tags: generated.variation_tags,
+      resonance_eligible: true,
       ai_generated: true,
       pending_for_b: !!partnerTgId,
     })
@@ -465,5 +572,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     sessionId: session?.id ?? null,
     notified,
     source,
+    feedbackEnabled: true,
   });
 }

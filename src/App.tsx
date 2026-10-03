@@ -7,9 +7,10 @@ import LanguageSelect from "@/components/LanguageSelect";
 import { type Gender, GENDER_KEY } from "@/components/GenderSelect";
 import OnboardingScreen from "@/components/OnboardingScreen";
 import { LANG_KEY, ONBOARDED_KEY, CATEGORIES_ORDER, type Lang, type Category } from "@/data/i18n";
-import { ACTIVE_SCENARIO_KEY, type ActiveScenario } from "@/pages/ScenarioScreen";
+import { ACTIVE_SCENARIO_KEY, getActiveScenarioStorageKey, type ActiveScenario } from "@/pages/ScenarioScreen";
+import type { SharedTaskSnapshot } from "@/data/sharedPair";
 
-type AppPhase = "splash" | "lang" | "onboarding" | "gender" | "home" | "category" | "scenario";
+type AppPhase = "splash" | "lang" | "onboarding" | "gender" | "home" | "category" | "scenario" | "shared_task_error";
 export type AppMode = "solo" | "together";
 
 const COUPLE_ID_KEY = "touche_couple_id";
@@ -23,6 +24,30 @@ function getTelegramStartParam(): string {
 
   const params = new URLSearchParams(window.location.search);
   return params.get("tgWebAppStartParam") ?? params.get("startapp") ?? "";
+}
+
+async function apiFetchSharedTask(taskId: string): Promise<SharedTaskSnapshot | null> {
+  const initData = window.Telegram?.WebApp?.initData;
+  if (!initData) return null;
+  try {
+    const response = await fetch(`/api/couple/intimacy?action=task&task_id=${encodeURIComponent(taskId)}`, {
+      headers: { "x-telegram-init-data": initData },
+    });
+    if (!response.ok) return null;
+    const data = await response.json();
+    const task = data.task;
+    if (
+      !task ||
+      typeof task.taskId !== "string" ||
+      typeof task.task !== "string" ||
+      typeof data.coupleId !== "string" ||
+      !CATEGORIES_ORDER.includes(task.category as Category) ||
+      !["ready", "waiting_for_partner", "your_turn", "completed"].includes(task.state)
+    ) return null;
+    return { ...task, coupleId: data.coupleId } as SharedTaskSnapshot;
+  } catch {
+    return null;
+  }
 }
 
 function getSavedLang(): Lang | null {
@@ -75,14 +100,15 @@ function saveMode(mode: AppMode) {
 }
 
 function saveActiveScenario(s: ActiveScenario) {
-    try { localStorage.setItem(ACTIVE_SCENARIO_KEY, JSON.stringify(s)); } catch {}
+    try { localStorage.setItem(getActiveScenarioStorageKey(), JSON.stringify(s)); } catch {}
 }
 
-function clearUserScopedData() {
+function clearUserScopedData(userId?: string) {
   try {
     localStorage.removeItem(COUPLE_ID_KEY);
     localStorage.removeItem(MODE_KEY);
     localStorage.removeItem(ACTIVE_SCENARIO_KEY);
+    localStorage.removeItem(getActiveScenarioStorageKey(userId));
     localStorage.removeItem(HISTORY_KEY);
   } catch {}
 }
@@ -251,6 +277,8 @@ export default function App() {
     const [coupleId, setCoupleId] = useState<string | null>(getCoupleId);
     const [mode, setMode] = useState<AppMode>(() => getSavedMode(!!getCoupleId()));
     const [pendingRefUserId, setPendingRefUserId] = useState<number | null>(null);
+     const [sharedTask, setSharedTask] = useState<SharedTaskSnapshot | null>(null);
+     const [failedSharedTaskId, setFailedSharedTaskId] = useState<string | null>(null);
 
     useEffect(() => {
       const telegramUserId = window.Telegram?.WebApp?.initDataUnsafe?.user?.id;
@@ -258,9 +286,11 @@ export default function App() {
       try {
         const previous = localStorage.getItem(USER_ID_KEY);
         if (previous && previous !== String(telegramUserId)) {
-          clearUserScopedData();
+          clearUserScopedData(previous);
           setCoupleId(null);
           setMode("solo");
+          setSharedTask(null);
+          setFailedSharedTaskId(null);
         }
         localStorage.setItem(USER_ID_KEY, String(telegramUserId));
       } catch {}
@@ -331,9 +361,28 @@ export default function App() {
       }
 
       const params = new URLSearchParams(window.location.search);
+      const sharedTaskId = params.get("shared_task");
+      if (sharedTaskId && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(sharedTaskId)) {
+        const loadedTask = await apiFetchSharedTask(sharedTaskId);
+        if (!loadedTask) {
+          setFailedSharedTaskId(sharedTaskId);
+          setPhase("shared_task_error");
+          return;
+        }
+        setSharedTask(loadedTask);
+        setActiveCategory(loadedTask.category);
+        saveCoupleId(loadedTask.coupleId);
+        setCoupleId(loadedTask.coupleId);
+        saveMode("together");
+        setMode("together");
+        setLang(savedLang ?? "ru");
+        if (savedGender) setGender(savedGender);
+        setPhase(savedLang ? "category" : "lang");
+        return;
+      }
       const scenarioId = params.get("scenario");
       const role = params.get("role");
-      if (scenarioId && role === "b") {
+      if (scenarioId && (role === "a" || role === "b")) {
         const session = await tryFetchScenarioSession(scenarioId);
         if (session) {
           saveActiveScenario(session);
@@ -345,7 +394,27 @@ export default function App() {
       }
 
       try {
-        const existing = localStorage.getItem(ACTIVE_SCENARIO_KEY);
+        const storageKey = getActiveScenarioStorageKey();
+        const existing = localStorage.getItem(storageKey);
+        const legacyScenario = localStorage.getItem(ACTIVE_SCENARIO_KEY);
+        if (legacyScenario) localStorage.removeItem(ACTIVE_SCENARIO_KEY);
+
+        if (!existing && legacyScenario) {
+          const parsed = JSON.parse(legacyScenario) as { sessionId?: unknown };
+          if (typeof parsed.sessionId === "string" && parsed.sessionId) {
+            // Re-fetch from the server so a legacy shared key can never expose
+            // the previous Telegram user's role to the current account.
+            const restored = await tryFetchScenarioSession(parsed.sessionId);
+            if (restored) {
+              saveActiveScenario(restored);
+              setLang(savedLang ?? "ru");
+              if (savedGender) setGender(savedGender);
+              setPhase("scenario");
+              return;
+            }
+          }
+        }
+
         if (!existing) {
           const pending = await tryFetchPendingScenario();
           if (pending) saveActiveScenario(pending);
@@ -365,13 +434,13 @@ export default function App() {
       try { localStorage.setItem(LANG_KEY, chosen); } catch {}
       setLang(chosen);
       if (!isOnboarded()) setPhase("onboarding");
-      else setPhase("home");
-    }, []);
+      else setPhase(sharedTask ? "category" : "home");
+    }, [sharedTask]);
 
     const handleOnboardingDone = useCallback(() => {
       markOnboarded();
-      setPhase("home");
-    }, []);
+      setPhase(sharedTask ? "category" : "home");
+    }, [sharedTask]);
 
     const handleGenderSelect = useCallback((chosen: Gender) => {
       try { localStorage.setItem(GENDER_KEY, chosen); } catch {}
@@ -387,6 +456,7 @@ export default function App() {
       const newIdx = CATEGORIES_ORDER.indexOf(cat);
       setSwipeDir(newIdx >= curIdx ? "left" : "right");
       setActiveCategory(cat);
+      setSharedTask(null);
       setPhase("category");
     }, [activeCategory]);
 
@@ -396,14 +466,38 @@ export default function App() {
 
     const handleScenarioOpen = useCallback(() => setPhase("scenario"), []);
 
-    const handleBack = useCallback(() => setPhase("home"), []);
+    const handleBack = useCallback(() => {
+      setSharedTask(null);
+      setPhase("home");
+    }, []);
+
+    const handleOpenSharedTask = useCallback(async (taskId: string) => {
+      const loadedTask = await apiFetchSharedTask(taskId);
+      if (!loadedTask) {
+        setFailedSharedTaskId(taskId);
+        setPhase("shared_task_error");
+        return;
+      }
+      setSharedTask(loadedTask);
+      setActiveCategory(loadedTask.category);
+      saveCoupleId(loadedTask.coupleId);
+      setCoupleId(loadedTask.coupleId);
+      saveMode("together");
+      setMode("together");
+      setPhase("category");
+    }, []);
+
+    const handleRetrySharedTask = useCallback(() => {
+      if (failedSharedTaskId) void handleOpenSharedTask(failedSharedTaskId);
+    }, [failedSharedTaskId, handleOpenSharedTask]);
 
     const handleCategoryChange = useCallback((cat: Category) => {
       const curIdx = CATEGORIES_ORDER.indexOf(activeCategory);
       const newIdx = CATEGORIES_ORDER.indexOf(cat);
       setSwipeDir(newIdx > curIdx ? "left" : "right");
       setActiveCategory(cat);
-    }, [activeCategory]);
+      if (sharedTask?.category !== cat) setSharedTask(null);
+    }, [activeCategory, sharedTask]);
 
     const handleLinkCouple = useCallback(async (refUserId: number): Promise<boolean> => {
       const id = await apiLinkCouple(refUserId);
@@ -452,6 +546,7 @@ export default function App() {
             pendingRefUserId={pendingRefUserId}
             onCategorySelect={handleCategorySelectWithAgeCheck}
             onScenarioOpen={handleScenarioOpen}
+             onOpenSharedTask={(taskId) => { void handleOpenSharedTask(taskId); }}
             onLanguageOpen={handleLanguageOpen}
             gender={gender}
             onGenderSwitch={(g) => {
@@ -475,11 +570,20 @@ export default function App() {
             swipeDir={swipeDir}
             coupleId={coupleId}
              mode={mode}
+             initialSharedTask={sharedTask}
              onUpgrade={() => apiSubscribe(lang)}
              onBuyPremiumTask={(category) => apiBuyPremiumTask(category, lang)}
           />
         )}
         {phase === "scenario"    && <ScenarioScreen lang={lang} gender={gender} onBack={handleBack} onUpgrade={() => apiSubscribe(lang)} />}
+        {phase === "shared_task_error" && (
+          <main style={{ minHeight: "100dvh", display: "grid", placeContent: "center", gap: 16, padding: 24, textAlign: "center", background: "#0d0610", color: "#fffaf3", fontFamily: "sans-serif" }}>
+            <h1 style={{ fontSize: 22 }}>{lang === "ru" ? "Не удалось открыть общее задание" : "Could not open the shared task"}</h1>
+            <p style={{ maxWidth: 320, lineHeight: 1.5, opacity: 0.75 }}>{lang === "ru" ? "Проверьте подключение и попробуйте ещё раз. Задание доступно только участникам этой пары." : "Check your connection and try again. This task is only available to members of this pair."}</p>
+            <button type="button" onClick={handleRetrySharedTask} style={{ padding: "13px 18px", borderRadius: 14, border: 0, background: "#ff6f61", color: "#162238", fontWeight: 700 }}>{lang === "ru" ? "Попробовать снова" : "Try again"}</button>
+            <button type="button" onClick={() => setPhase("home")} style={{ padding: "10px 18px", borderRadius: 14, border: "1px solid rgba(255,250,243,.35)", background: "transparent", color: "#fffaf3" }}>{lang === "ru" ? "На главную" : "Go home"}</button>
+          </main>
+        )}
       </>
     );
   }

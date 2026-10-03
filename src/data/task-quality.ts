@@ -1,49 +1,54 @@
 const QUALITY_RULES: Record<string, string> = {
   ru: `Проверка качества — выполни её молча перед ответом:
-- Верни одно самостоятельное, завершённое задание из 1–3 тесно связанных шагов, а не набор случайных действий.
-- В каждом шаге ясно, кто действует и на ком; сохраняй одни и те же роли и направление действий. У каждого местоимения должен быть понятный адресат.
-- Расположи действия в выполнимом порядке. Не пропускай необходимый переход, не объединяй физически несовместимые действия и заверши мысль конкретно.
-- Для интимных и силовых действий предполагай только совершеннолетних участников с предварительным взаимным согласием и возможностью остановиться в любой момент.
-- Не ставь оргазм перед следующим сексуальным действием как автоматический переход: обычно оргазм — финал. Продолжение после него допустимо только если ясно, что оба этого хотят и партнёру комфортно.
-- Меняй центральную идею задания. Не добавляй музыку, повязку на глаза, съёмку или реквизит по шаблону — они не обязательны.
-- Это короткое задание, не ролевая сцена: не придумывай персонажей, сюжет, диалоги и распределение ролей. Ролевые сценарии находятся отдельно.
-- Не добавляй вступление, заголовок, слова вроде «Вот цитата» или пояснения. Верни только текст задания.`,
+ - Верни одно самостоятельное задание с одной центральной идеей и 1–3 тесно связанными шагами.
+ - Пиши прямо и естественно: конкретное действие плюс одна выразительная деталь. Обычно достаточно 1–2 предложений; не повторяй один и тот же финал «пусть почувствует».
+ - Сохраняй заданные пол и роли мужчины и женщины. Проверяй, кто действует, на ком и какие части тела участвуют.
+ - Расположи действия в физически выполнимом порядке. Не пропускай необходимый переход и не обещай автоматическую телесную реакцию.
+ - Чётко соблюдай границы категории: комплименты и нежность несексуальны; желание — прелюдия до секса; страсть — чувственный секс; хард — более прямой и грязный стиль.
+ - Не описывай принуждение, игнорирование боли или опасную механику. Не добавляй в текст задания пояснения о договорённостях, стоп-словах или безопасности.
+ - Если упоминается оргазм, обычно заверши задание на нём; не начинай после него следующий сексуальный акт автоматически.
+ - Не требуй интимных фото, видео или съёмки. Не добавляй реквизит по шаблону.
+ - Это короткое задание, не ролевая сцена: без персонажей, сюжета и длинных диалогов. Верни только текст задания, без вступления и пояснений.`,
   en: `Quality check — do this silently before answering:
-- Return one complete, self-contained task with 1–3 closely connected steps, not a pile of unrelated actions.
-- Make it clear who performs each action and who receives it. Keep roles and action direction consistent; every pronoun must have a clear referent.
-- Put actions in a physically possible order. Do not skip a necessary transition, combine incompatible actions, or leave the ending incomplete.
-- For intimate or power-play actions, assume consenting adults who can stop at any time.
-- Do not treat orgasm as an automatic lead-in to another sexual act; usually make it the endpoint. If the task continues afterward, make the mutual desire and comfort explicit.
-- Vary the task's central idea. Do not add music, blindfolds, filming, or props by default; none are required.
-- This is a short task, not a roleplay scene: do not invent characters, a plot, dialogue, or assigned roles. Roleplay scenarios belong in their separate feature.
-- Do not add an introduction, label, quote attribution, or explanation. Return only the task.`,
+ - Return one self-contained task with one central idea and 1–3 closely connected steps.
+ - Write directly and naturally: one concrete action plus one vivid detail. Usually 1–2 sentences are enough; avoid repeating the same "let them feel" ending.
+ - Keep the man-woman roles fixed. Check who acts, who receives the action, and which body parts are involved.
+ - Put actions in a physically possible order. Do not skip necessary transitions or promise an automatic bodily response.
+ - Keep category boundaries clear: compliments and tenderness are nonsexual; desire is foreplay before sex; passion is sensual sex; hard is more direct and dirty in tone.
+ - Do not describe coercion, ignoring pain, or physically dangerous actions. Do not put explanations about agreements, safewords, or safety in the task text.
+ - If orgasm is mentioned, usually make it the endpoint; do not automatically start another sexual act afterward.
+ - Do not require intimate photos, video, or filming. Do not add props by default.
+ - This is a short task, not a roleplay scene: no characters, plot, or long dialogue. Return only the task text, with no introduction or explanation.`,
   hi: `उत्तर देने से पहले चुपचाप जाँचें:
-- एक पूरा, अपने-आप में स्पष्ट कार्य दें, जिसमें 1–3 जुड़े हुए चरण हों; असंबंधित कार्रवाइयों की सूची न दें।
-- हर चरण में स्पष्ट हो कि कौन क्या कर रहा है और किसके साथ। भूमिकाएँ और क्रिया की दिशा न बदलें; सर्वनाम का संदर्भ स्पष्ट रखें।
-- कार्रवाइयों का क्रम व्यावहारिक हो; आवश्यक बदलाव न छोड़ें और अधूरा अंत न दें।
-- अंतरंग या शक्ति-आधारित गतिविधियों में केवल सहमति देने वाले वयस्क हों, जिन्हें किसी भी समय रुकने का विकल्प हो।
-- चरमोत्कर्ष को अपने-आप अगली यौन क्रिया की शुरुआत न मानें; सामान्यतः इसे कार्य का अंत रखें। आगे जारी रखने पर दोनों की इच्छा और सहजता स्पष्ट हो।
-- हर बार कार्य का मुख्य विचार बदलें। संगीत, आँखों पर पट्टी, रिकॉर्डिंग या सामान अपने-आप न जोड़ें।
-- यह छोटा कार्य है, भूमिका-अभिनय का दृश्य नहीं। काल्पनिक पात्र, कहानी, संवाद या तय भूमिकाएँ न बनाएँ; ऐसे दृश्य अलग सुविधा में हैं।
-- भूमिका या उद्धरण का परिचय न जोड़ें। केवल कार्य लिखें।`,
+ - एक स्पष्ट कार्य दें: एक मुख्य विचार और 1–3 जुड़े हुए चरण।
+ - सीधे और स्वाभाविक ढंग से लिखें: एक ठोस क्रिया और एक खास विवरण। आम तौर पर 1–2 वाक्य पर्याप्त हैं; एक ही भावुक अंत बार-बार न दोहराएँ।
+ - पुरुष और महिला की भूमिकाएँ स्थिर रखें। जाँचें कि कौन क्रिया कर रहा है, किस पर, और शरीर के कौन-से हिस्से शामिल हैं।
+ - क्रियाओं का क्रम शारीरिक रूप से संभव हो। आवश्यक बदलाव न छोड़ें और शरीर की प्रतिक्रिया की गारंटी न दें।
+ - श्रेणी की सीमा बनाएँ: प्रशंसा और कोमलता गैर-यौन हैं; इच्छा सेक्स से पहले की भूमिका है; जुनून संवेदनशील सेक्स है; हार्ड अधिक सीधा और अश्लील लहजा है।
+ - ज़बरदस्ती, दर्द की अनदेखी या खतरनाक क्रियाएँ न लिखें। कार्य में समझौते, सुरक्षित शब्द या सुरक्षा की व्याख्या न जोड़ें।
+ - अगर चरमोत्कर्ष का उल्लेख हो, तो आम तौर पर वहीं कार्य समाप्त करें; उसके बाद अपने-आप अगली यौन क्रिया न जोड़ें।
+ - अंतरंग फ़ोटो, वीडियो या रिकॉर्डिंग अनिवार्य न करें। सामान अपने-आप न जोड़ें।
+ - यह छोटा कार्य है, भूमिका-अभिनय का दृश्य नहीं: पात्र, कहानी या लंबा संवाद नहीं। केवल कार्य का पाठ लौटाएँ।`,
   pt: `Verifique a qualidade em silêncio antes de responder:
-- Escreva uma tarefa completa e independente, com 1–3 etapas diretamente relacionadas; não faça uma lista de ações sem ligação.
-- Deixe claro quem faz cada ação e com quem. Mantenha os papéis e a direção das ações; todo pronome deve ter um referente claro.
-- Organize as ações em uma ordem fisicamente possível. Não pule transições necessárias nem deixe o final incompleto.
-- Em atividades íntimas ou de poder, considere apenas adultos que consentem e podem parar a qualquer momento.
-- Não trate o orgasmo como passagem automática para outro ato sexual; normalmente, ele deve encerrar a tarefa. Se houver continuação, deixe claro que ambos querem e estão confortáveis.
-- Varie a ideia central da tarefa. Não acrescente música, venda nos olhos, gravação ou acessórios por padrão; nada disso é obrigatório.
-- Esta é uma tarefa curta, não uma cena de interpretação: não invente personagens, enredo, diálogos ou papéis. Os cenários de interpretação ficam em outro recurso.
-- Não acrescente introdução, rótulo, atribuição de citação ou explicação. Retorne somente a tarefa.`,
+ - Escreva uma tarefa completa com uma ideia central e 1–3 etapas diretamente relacionadas.
+ - Use linguagem direta e natural: uma ação concreta e um detalhe marcante. Em geral, 1–2 frases bastam; evite repetir o mesmo fecho emocional.
+ - Mantenha fixos os papéis do homem e da mulher. Confira quem age, quem recebe a ação e quais partes do corpo estão envolvidas.
+ - Organize as ações em uma ordem fisicamente possível. Não pule transições nem prometa uma reação corporal automática.
+ - Respeite os limites da categoria: elogios e carinho são não sexuais; desejo é preliminar antes do sexo; paixão é sexo sensual; hard tem linguagem mais direta e picante.
+ - Não descreva coerção, ignorar dor ou ações fisicamente perigosas. Não inclua explicações sobre acordos, palavra de segurança ou segurança no texto.
+ - Se mencionar orgasmo, normalmente encerre a tarefa ali; não comece automaticamente outro ato sexual depois.
+ - Não exija fotos íntimas, vídeos ou gravações. Não acrescente acessórios por padrão.
+ - Esta é uma tarefa curta, não uma cena de interpretação: sem personagens, enredo ou diálogos longos. Retorne somente o texto da tarefa.`,
   es: `Comprueba la calidad en silencio antes de responder:
-- Escribe una tarea completa e independiente, con 1–3 pasos estrechamente relacionados; no una lista de acciones inconexas.
-- Deja claro quién realiza cada acción y con quién. Mantén los papeles y la dirección de las acciones; cada pronombre debe tener un referente claro.
-- Ordena las acciones de forma físicamente posible. No omitas transiciones necesarias ni dejes el final incompleto.
-- En actividades íntimas o de poder, presupón adultos que consienten y pueden parar en cualquier momento.
-- No presentes el orgasmo como paso automático hacia otro acto sexual; normalmente debe cerrar la tarea. Si continúa, deja claro que ambos quieren seguir y están cómodos.
-- Varía la idea central de la tarea. No añadas música, vendas, grabación ni accesorios por defecto; no son obligatorios.
-- Esta es una tarea breve, no una escena de interpretación: no inventes personajes, trama, diálogos ni papeles. Los escenarios de interpretación van aparte.
-- No añadas introducciones, etiquetas, atribuciones de citas ni explicaciones. Devuelve solo la tarea.`,
+ - Escribe una tarea completa con una idea central y 1–3 pasos relacionados.
+ - Usa un tono directo y natural: una acción concreta y un detalle expresivo. Normalmente bastan 1–2 frases; evita repetir el mismo cierre emocional.
+ - Mantén fijos los papeles del hombre y la mujer. Comprueba quién actúa, quién recibe la acción y qué partes del cuerpo intervienen.
+ - Ordena las acciones de forma físicamente posible. No omitas transiciones ni prometas una reacción corporal automática.
+ - Respeta los límites de cada categoría: cumplidos y ternura no son sexuales; deseo es el juego previo antes del sexo; pasión es sexo sensual; hard usa un lenguaje más directo y explícito.
+ - No describas coerción, ignorar el dolor ni acciones físicamente peligrosas. No añadas explicaciones sobre acuerdos, palabras de seguridad o seguridad al texto.
+ - Si mencionas el orgasmo, normalmente termina ahí la tarea; no empieces automáticamente otro acto sexual después.
+ - No exijas fotos íntimas, vídeos ni grabaciones. No añadas accesorios por defecto.
+ - Es una tarea breve, no una escena de interpretación: sin personajes, trama ni diálogos largos. Devuelve solo el texto de la tarea.`,
 };
 
 const META_PREFIXES: Record<string, RegExp> = {
@@ -86,14 +91,6 @@ const SEXUAL_CONTINUATION_AFTER_CLIMAX: Record<string, RegExp> = {
   es: /(?:después|cuando|una vez que).{0,50}(?:orgasmo|clímax|correrse|terminar).{0,80}(?:penetr\w*|entr\w*|introduc\w*|tener sexo|continu\w*|empezar otra ronda)/iu,
 };
 
-const EXPLICIT_CONTINUATION_CONSENT: Record<string, RegExp> = {
-  ru: /(?:если|когда)\s+(?:оба|вы оба|партнёр|партнёрша|она|он)\s+(?:хотят|хочет|согласны|согласна|согласен)|спрос(?:и|ите).{0,50}(?:хочет ли|хотят ли|комфортно ли|можно ли)|только если.{0,40}(?:оба согласны|оба хотят|комфортно|согласие)/iu,
-  en: /(?:if|when)\s+(?:both|she|he|they|your partner)\s+(?:want|wants|agree|consent|feel comfortable)|ask.{0,50}(?:if|whether).{0,30}(?:want|comfortable|continue)|only if.{0,40}(?:both agree|both want|comfortable|consent)/iu,
-  hi: /(?:यदि|जब)\s+(?:दोनों|वह)\s+(?:चाहें|चाहती|चाहता|सहमत|आरामदायक)|पूछें.{0,50}(?:चाहते|चाहती|आरामदायक)/u,
-  pt: /(?:se|quando)\s+(?:ambos|ela|ele|vocês|seu parceiro)\s+(?:quiserem|quiser|concordarem|consentirem|se sentirem confortáveis)|pergunte.{0,50}(?:se|se querem|se está confortável)|somente se.{0,40}(?:ambos concordarem|ambos quiserem|consentirem)/iu,
-  es: /(?:si|cuando)\s+(?:ambos|ella|él|ustedes|tu pareja)\s+(?:quieren|quiere|aceptan|consienten|se sienten cómodos)|pregunta.{0,50}(?:si|si quiere|si está cómoda|si está cómodo)|solo si.{0,40}(?:ambos aceptan|ambos quieren|consienten)/iu,
-};
-
 export function getTaskQualityRules(lang: string): string {
   return QUALITY_RULES[lang] ?? QUALITY_RULES.en;
 }
@@ -104,12 +101,7 @@ export function isTaskTextWellFormed(text: string, lang: string): boolean {
   if (META_PREFIXES[lang]?.test(normalized)) return false;
   if (INCOMPLETE_ENDINGS[lang]?.test(normalized)) return false;
   if (ROLEPLAY_SCENARIO_MARKERS[lang]?.test(normalized)) return false;
-  if (
-    (
-      CLIMAX_BEFORE_SEXUAL_CONTINUATION[lang]?.test(normalized)
-      || SEXUAL_CONTINUATION_AFTER_CLIMAX[lang]?.test(normalized)
-    )
-    && !EXPLICIT_CONTINUATION_CONSENT[lang]?.test(normalized)
-  ) return false;
+  if (CLIMAX_BEFORE_SEXUAL_CONTINUATION[lang]?.test(normalized)
+    || SEXUAL_CONTINUATION_AFTER_CLIMAX[lang]?.test(normalized)) return false;
   return true;
 }

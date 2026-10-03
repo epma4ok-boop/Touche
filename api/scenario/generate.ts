@@ -9,6 +9,7 @@ import { createClient } from "@supabase/supabase-js";
 import { validateTelegramInitData } from "../couple/_auth.js";
 import { appDate } from "../limits.js";
 import { OWNER_TELEGRAM_ID } from "../../src/config.js";
+import { sanitizeScenarioTitle } from "../../src/data/scenarioTitle.js";
 
 const DEEPSEEK_API_KEY = process.env.DEEPSEEK_API_KEY!;
 const DEEPSEEK_URL = "https://api.deepseek.com/v1/chat/completions";
@@ -32,6 +33,8 @@ function cleanText(value: unknown, max: number): string {
   return String(value ?? "").replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g, "").trim().slice(0, max);
 }
 
+const CROSS_CARD_DISCLOSURE = /(?:role[_\s-]?[ab]\s*[:：]|(?:the other|your partner['’]s?)\s+(?:secret|hidden|private)\s+(?:role|goal|instructions|card)|другая карточка|скрытая цель партн[её]ра|секретн\w* инструкц\w* партн[её]ра)/iu;
+
 // ─── Фолбэки разделены по полу инициатора (role_a) ────────────────────────
 
 type FallbackEntry = { title: string; role_a: string; role_b: string };
@@ -42,115 +45,115 @@ const FALLBACKS: FallbackPool = {
   romantic: {
     ru: {
       male: {
-        title: "Фотограф и модель",
-        role_a: "Ты фотограф-мужчина. Проводишь домашнюю фотосессию. Жёсткое правило: НЕ КАСАТЬСЯ модели. Командуй позами, смотри в упор. Используй телефон как камеру.",
-        role_b: "Ты модель-женщина. Твоя задача — соблазнить фотографа лёгкими прикосновениями и взглядами. Заставь его забыть о съёмке. Говори: «Снимаешь или смотришь?»",
+        title: "Последний кадр",
+        role_a: "Ты взрослый фотограф на домашней фотосессии с партнёршей. Используй телефон только как реквизит и ничего не записывай. Предложи несколько поз и задержи взгляд чуть дольше обычного. Спроси: «Снимаю или просто любуюсь?»",
+        role_b: "Ты взрослая модель на домашней фотосессии. Меняй позы медленно и отвечай на его взгляд улыбкой. Поддразни его: «Ты снимаешь или уже забыл про камеру?» Сама реши, когда подойти ближе.",
       },
       female: {
-        title: "Фотограф и модель",
-        role_a: "Ты фотограф-женщина. Проводишь домашнюю фотосессию. Жёсткое правило: НЕ КАСАТЬСЯ модели. Командуй позами, смотри в упор. Используй телефон как камеру.",
-        role_b: "Ты модель-мужчина. Твоя задача — соблазнить фотографа взглядами и движениями. Заставь её опустить телефон. Говори: «Снимаешь или смотришь?»",
+        title: "Последний кадр",
+        role_a: "Ты взрослая фотограф на домашней фотосессии с партнёром. Используй телефон только как реквизит и ничего не записывай. Предложи несколько поз и задержи взгляд чуть дольше обычного. Спроси: «Снимаю или просто любуюсь?»",
+        role_b: "Ты мужчина-модель на домашней фотосессии. Меняй позы медленно и отвечай на её взгляд улыбкой. Поддразни её: «Ты снимаешь или уже забыла про камеру?» Сам реши, когда подойти ближе.",
       },
     },
     en: {
       male: {
-        title: "Photographer & Model",
-        role_a: "You're the male photographer. Home photoshoot with your phone. Strict rule: DO NOT TOUCH. Give pose commands, hold eye contact.",
-        role_b: "You're the female model. Seduce the photographer with glances and light touches. Make him forget the camera. Say: 'Shooting or staring?'",
+        title: "One Last Frame",
+        role_a: "You're an adult photographer at a home photoshoot with your partner. Use the phone only as a prop; do not record anything. Suggest a few poses and hold eye contact a little longer than usual. Ask: 'Am I taking a picture, or just admiring you?'",
+        role_b: "You're an adult model at a home photoshoot. Change poses slowly and answer his gaze with a small smile. Tease him: 'Are you shooting, or have you forgotten the camera?' Decide when you want to move closer.",
       },
       female: {
-        title: "Photographer & Model",
-        role_a: "You're the female photographer. Home photoshoot with your phone. Strict rule: DO NOT TOUCH. Give pose commands, hold eye contact.",
-        role_b: "You're the male model. Seduce her with glances and movement. Make her put the phone down. Say: 'Shooting or staring?'",
+        title: "One Last Frame",
+        role_a: "You're an adult photographer at a home photoshoot with your partner. Use the phone only as a prop; do not record anything. Suggest a few poses and hold eye contact a little longer than usual. Ask: 'Am I taking a picture, or just admiring you?'",
+        role_b: "You're an adult model at a home photoshoot. Change poses slowly and answer her gaze with a small smile. Tease her: 'Are you shooting, or have you forgotten the camera?' Decide when you want to move closer.",
       },
     },
     hi: {
-      male: { title: "फोटोग्राफर और मॉडल", role_a: "आप पुरुष फोटोग्राफर हैं। नियम: स्पर्श न करें। पोज़ के निर्देश दें।", role_b: "आप महिला मॉडल हैं। हल्के स्पर्श से फोटोग्राफर को आकर्षित करें।" },
-      female: { title: "फोटोग्राफर और मॉडल", role_a: "आप महिला फोटोग्राफर हैं। नियम: स्पर्श न करें। पोज़ के निर्देश दें।", role_b: "आप पुरुष मॉडल हैं। उसे आकर्षित करें।" },
+      male: { title: "आख़िरी तस्वीर", role_a: "आप अपने वयस्क साथी के साथ घरेलू फोटोशूट का अभिनय कर रहे फोटोग्राफर हैं। फोन को केवल प्रॉप की तरह रखें और कुछ रिकॉर्ड न करें। उनसे अलग-अलग पोज़ लेने को कहें और नज़र थोड़ी देर रोकें। पूछें: “तस्वीर ले रहा हूँ या बस तुम्हें देख रहा हूँ?”", role_b: "आप घरेलू फोटोशूट का अभिनय कर रही वयस्क मॉडल हैं। धीरे-धीरे पोज़ बदलें और उनकी नज़र का जवाब मुस्कान से दें। उन्हें छेड़ते हुए पूछें: “तस्वीर ले रहे हो या कैमरा भूल गए?” तय करें कि कब पास आना है।" },
+      female: { title: "आख़िरी तस्वीर", role_a: "आप अपने वयस्क साथी के साथ घरेलू फोटोशूट का अभिनय कर रही फोटोग्राफर हैं। फोन को केवल प्रॉप की तरह रखें और कुछ रिकॉर्ड न करें। उनसे अलग-अलग पोज़ लेने को कहें और नज़र थोड़ी देर रोकें। पूछें: “तस्वीर ले रही हूँ या बस तुम्हें देख रही हूँ?”", role_b: "आप घरेलू फोटोशूट का अभिनय कर रहे वयस्क मॉडल हैं। धीरे-धीरे पोज़ बदलें और उनकी नज़र का जवाब मुस्कान से दें। उन्हें छेड़ते हुए पूछें: “तस्वीर ले रही हो या कैमरा भूल गई?” तय करें कि कब पास आना है।" },
     },
     pt: {
-      male: { title: "Fotógrafo e Modelo", role_a: "Você é o fotógrafo. Regra: NÃO TOQUE a modelo. Dê comandos de pose.", role_b: "Você é a modelo. Seduza o fotógrafo com toques leves e olhares." },
-      female: { title: "Fotógrafa e Modelo", role_a: "Você é a fotógrafa. Regra: NÃO TOQUE o modelo. Dê comandos de pose.", role_b: "Você é o modelo. Seduza a fotógrafa com olhares e movimentos." },
+      male: { title: "Último Retrato", role_a: "Você é um fotógrafo adulto em um ensaio em casa com sua parceira. Use o celular apenas como objeto de cena; não grave nada. Sugira algumas poses e sustente o olhar. Pergunte: “Estou fotografando ou só admirando você?”", role_b: "Você é uma modelo adulta em um ensaio em casa. Mude de pose devagar e responda ao olhar dele com um sorriso. Provoque: “Você está fotografando ou já esqueceu a câmera?” Decida quando quer se aproximar." },
+      female: { title: "Último Retrato", role_a: "Você é uma fotógrafa adulta em um ensaio em casa com seu parceiro. Use o celular apenas como objeto de cena; não grave nada. Sugira algumas poses e sustente o olhar. Pergunte: “Estou fotografando ou só admirando você?”", role_b: "Você é um modelo adulto em um ensaio em casa. Mude de pose devagar e responda ao olhar dela com um sorriso. Provoque: “Você está fotografando ou já esqueceu a câmera?” Decida quando quer se aproximar." },
     },
     es: {
-      male: { title: "Fotógrafo y Modelo", role_a: "Eres el fotógrafo. Regla: NO TOCAR a la modelo. Da comandos de pose.", role_b: "Eres la modelo. Seduce al fotógrafo con toques suaves y miradas." },
-      female: { title: "Fotógrafa y Modelo", role_a: "Eres la fotógrafa. Regla: NO TOCAR al modelo. Da comandos de pose.", role_b: "Eres el modelo. Sedúcela con miradas y movimientos." },
+      male: { title: "El último retrato", role_a: "Eres un fotógrafo adulto en una sesión en casa con tu pareja. Usa el teléfono solo como accesorio y no grabes nada. Sugiere algunas poses y mantén la mirada. Pregunta: «¿Estoy tomando una foto o simplemente admirándote?»", role_b: "Eres una modelo adulta en una sesión en casa. Cambia de pose despacio y responde a su mirada con una sonrisa. Provócalo: «¿Estás tomando fotos o ya olvidaste la cámara?» Decide cuándo quieres acercarte." },
+      female: { title: "El último retrato", role_a: "Eres una fotógrafa adulta en una sesión en casa con tu pareja. Usa el teléfono solo como accesorio y no grabes nada. Sugiere algunas poses y mantén la mirada. Pregunta: «¿Estoy tomando una foto o simplemente admirándote?»", role_b: "Eres un modelo adulto en una sesión en casa. Cambia de pose despacio y responde a su mirada con una sonrisa. Provócala: «¿Estás tomando fotos o ya olvidaste la cámara?» Decide cuándo quieres acercarte." },
     },
   },
   passion: {
     ru: {
       male: {
-        title: "Массажист и клиент",
-        role_a: "Ты мужчина-массажист. Начни со спины партнёрши. Используй масло из кухни или крем из ванной. Говори уверенно: «Расслабься. Я знаю, что делаю.»",
-        role_b: "Ты женщина-клиент. Пришла за обычным массажем, но этот массажист слишком хорош. Говори только «здесь» и «ещё».",
+        title: "После последнего вопроса",
+        role_a: "Ты преподаватель-мужчина в университете для взрослых. Попроси совершеннолетнюю студентку задержаться после занятия, чтобы обсудить проект, а затем постепенно переведи разговор в смелый флирт. Делай словесные шаги навстречу, но переходи к близости только после ясного ответного сигнала. Оставь ей возможность направить сцену.",
+        role_b: "Ты совершеннолетняя студентка университета. После занятия у тебя есть причина задержаться, но на флирт преподавателя отвечай шутливыми отговорками и колкими репликами. Показывай, что уклонение — часть игры, а не настоящий отказ. Когда захочешь сблизиться, ответь недвусмысленным флиртом и сама сделай первый шаг.",
       },
       female: {
-        title: "Массажистка и клиент",
-        role_a: "Ты женщина-массажистка. Начни со спины партнёра. Используй масло из кухни или крем из ванной. Говори уверенно: «Расслабься. Я знаю, что делаю.»",
-        role_b: "Ты мужчина-клиент. Пришёл за обычным массажем, но эта массажистка слишком хороша. Говори только «здесь» и «ещё».",
+        title: "После последнего вопроса",
+        role_a: "Ты преподавательница в университете для взрослых. Попроси совершеннолетнего студента задержаться после занятия, чтобы обсудить проект, а затем постепенно переведи разговор в смелый флирт. Делай словесные шаги навстречу, но переходи к близости только после ясного ответного сигнала. Оставь ему возможность направить сцену.",
+        role_b: "Ты совершеннолетний студент университета. После занятия у тебя есть причина задержаться, но на флирт преподавательницы отвечай шутливыми отговорками и колкими репликами. Показывай, что уклонение — часть игры, а не настоящий отказ. Когда захочешь сблизиться, ответь недвусмысленным флиртом и сам сделай первый шаг.",
       },
     },
     en: {
       male: {
-        title: "Masseur & Client",
-        role_a: "You're the male masseur. Start with her back. Use kitchen oil or body lotion. Say: 'Relax. I know what I'm doing.'",
-        role_b: "You're the female client. You came for a simple massage, but this masseur is dangerously good. Only say 'here' and 'more'.",
+        title: "One More Question",
+        role_a: "You're an adult male lecturer at a university. Ask your adult female student to stay after class to discuss a project, then let the conversation turn into bold, playful flirting. Make verbal advances, but move toward intimacy only after a clear, positive response. Leave room for her to steer the scene.",
+        role_b: "You're an adult female university student. You have a reason to stay after class, but answer the lecturer's flirting with playful excuses and teasing replies. Keep the avoidance clearly acted, not a real refusal. When you want to get closer, show unmistakable interest and make the first move yourself.",
       },
       female: {
-        title: "Masseuse & Client",
-        role_a: "You're the female masseuse. Start with his back. Use kitchen oil or body lotion. Say: 'Relax. I know what I'm doing.'",
-        role_b: "You're the male client. You came for a simple massage, but this masseuse is dangerously good. Only say 'here' and 'more'.",
+        title: "One More Question",
+        role_a: "You're an adult female lecturer at a university. Ask your adult male student to stay after class to discuss a project, then let the conversation turn into bold, playful flirting. Make verbal advances, but move toward intimacy only after a clear, positive response. Leave room for him to steer the scene.",
+        role_b: "You're an adult male university student. You have a reason to stay after class, but answer the lecturer's flirting with playful excuses and teasing replies. Keep the avoidance clearly acted, not a real refusal. When you want to get closer, show unmistakable interest and make the first move yourself.",
       },
     },
     hi: {
-      male: { title: "मालिश और ग्राहक", role_a: "आप पुरुष मालिशिया हैं। पीठ से शुरू करें।", role_b: "आप महिला ग्राहक हैं। सिर्फ 'यहाँ' और 'और' कहें।" },
-      female: { title: "मालिशिया और ग्राहक", role_a: "आप महिला मालिशिया हैं। पीठ से शुरू करें।", role_b: "आप पुरुष ग्राहक हैं। सिर्फ 'यहाँ' और 'और' कहें।" },
+      male: { title: "एक और सवाल", role_a: "आप वयस्कों के विश्वविद्यालय में पुरुष प्राध्यापक हैं। अपनी वयस्क महिला छात्रा से कक्षा के बाद परियोजना पर बात करने के लिए रुकने को कहें, फिर बातचीत को चंचल छेड़छाड़ की ओर ले जाएँ। केवल बोलकर पहल करें और निकटता तभी बढ़ाएँ जब वह साफ़ तौर पर रुचि दिखाए। उसे दृश्य की दिशा तय करने की जगह दें।", role_b: "आप विश्वविद्यालय की वयस्क महिला छात्रा हैं। कक्षा के बाद आपके पास रुकने का कारण है, पर प्राध्यापक की छेड़छाड़ का जवाब मज़ाकिया बहानों और चुटीली बातों से दें। यह टालना अभिनय है, असली इनकार नहीं। जब आप करीब आना चाहें, साफ़ रुचि दिखाएँ और खुद पहला कदम लें।" },
+      female: { title: "एक और सवाल", role_a: "आप वयस्कों के विश्वविद्यालय में महिला प्राध्यापिका हैं। अपने वयस्क पुरुष छात्र से कक्षा के बाद परियोजना पर बात करने के लिए रुकने को कहें, फिर बातचीत को चंचल छेड़छाड़ की ओर ले जाएँ। केवल बोलकर पहल करें और निकटता तभी बढ़ाएँ जब वह साफ़ तौर पर रुचि दिखाए। उसे दृश्य की दिशा तय करने की जगह दें।", role_b: "आप विश्वविद्यालय के वयस्क पुरुष छात्र हैं। कक्षा के बाद आपके पास रुकने का कारण है, पर प्राध्यापिका की छेड़छाड़ का जवाब मज़ाकिया बहानों और चुटीली बातों से दें। यह टालना अभिनय है, असली इनकार नहीं। जब आप करीब आना चाहें, साफ़ रुचि दिखाएँ और खुद पहला कदम लें।" },
     },
     pt: {
-      male: { title: "Massagista e Cliente", role_a: "Você é o massagista. Comece pelas costas dela. Use óleo de cozinha.", role_b: "Você é a cliente. Diga apenas 'aqui' e 'mais'." },
-      female: { title: "Massagista e Cliente", role_a: "Você é a massagista. Comece pelas costas dele. Use óleo de cozinha.", role_b: "Você é o cliente. Diga apenas 'aqui' e 'mais'." },
+      male: { title: "Mais uma pergunta", role_a: "Você é um professor adulto em uma universidade. Peça à sua aluna adulta que fique após a aula para conversar sobre um projeto e deixe o papo virar uma provocação ousada e divertida. Tome a iniciativa apenas com palavras e avance para a intimidade somente depois de uma resposta claramente positiva. Deixe que ela também conduza a cena.", role_b: "Você é uma estudante adulta. Você tem um motivo para ficar após a aula, mas responda à provocação do professor com desculpas brincalhonas e respostas provocadoras. A resistência é encenada, não uma recusa real. Quando quiser se aproximar, demonstre interesse sem ambiguidade e tome a iniciativa." },
+      female: { title: "Mais uma pergunta", role_a: "Você é uma professora adulta em uma universidade. Peça ao seu aluno adulto que fique após a aula para conversar sobre um projeto e deixe o papo virar uma provocação ousada e divertida. Tome a iniciativa apenas com palavras e avance para a intimidade somente depois de uma resposta claramente positiva. Deixe que ele também conduza a cena.", role_b: "Você é um estudante adulto. Você tem um motivo para ficar após a aula, mas responda à provocação da professora com desculpas brincalhonas e respostas provocadoras. A resistência é encenada, não uma recusa real. Quando quiser se aproximar, demonstre interesse sem ambiguidade e tome a iniciativa." },
     },
     es: {
-      male: { title: "Masajista y Cliente", role_a: "Eres el masajista. Empieza por su espalda. Usa aceite de cocina.", role_b: "Eres la cliente. Solo di 'aquí' y 'más'." },
-      female: { title: "Masajista y Cliente", role_a: "Eres la masajista. Empieza por su espalda. Usa aceite de cocina.", role_b: "Eres el cliente. Solo di 'aquí' y 'más'." },
+      male: { title: "Una pregunta más", role_a: "Eres un profesor adulto en una universidad. Pídele a tu alumna adulta que se quede después de clase para hablar de un proyecto y deja que la conversación se vuelva un coqueteo atrevido y juguetón. Toma la iniciativa con palabras y avanza hacia la intimidad solo después de una respuesta claramente positiva. Deja que ella también dirija la escena.", role_b: "Eres una estudiante adulta. Tienes un motivo para quedarte después de clase, pero responde al coqueteo del profesor con excusas juguetonas y réplicas provocadoras. La resistencia es actuada, no un rechazo real. Cuando quieras acercarte, muestra un interés inequívoco y da tú el primer paso." },
+      female: { title: "Una pregunta más", role_a: "Eres una profesora adulta en una universidad. Pídele a tu alumno adulto que se quede después de clase para hablar de un proyecto y deja que la conversación se vuelva un coqueteo atrevido y juguetón. Toma la iniciativa con palabras y avanza hacia la intimidad solo después de una respuesta claramente positiva. Deja que él también dirija la escena.", role_b: "Eres un estudiante adulto. Tienes un motivo para quedarte después de clase, pero responde al coqueteo de la profesora con excusas juguetonas y réplicas provocadoras. La resistencia es actuada, no un rechazo real. Cuando quieras acercarte, muestra un interés inequívoco y da tú el primer paso." },
     },
   },
   hard: {
     ru: {
       male: {
-        title: "Хозяин и слуга",
-        role_a: "Ты мужчина-хозяин. На 30 минут отдавай команды без объяснений. Начни с: «Встань перед зеркалом. Не отводи взгляд. Раздевайся медленно.»",
-        role_b: "Ты женщина-слуга. Полностью подчиняешься. Можешь говорить только «да» и «как вам угодно».",
+        title: "Позже вечером",
+        role_a: "Ты совершеннолетний режиссёр вымышленного порнокастинга. Проведи закрытую пробу для совершеннолетней актрисы: попроси выбрать выразительную позу и произнести короткую смелую реплику. Играй уверенно, но помни, что это только ролевая сцена: ничего не снимай и не сохраняй. Переходи к близости только после ясного встречного сигнала.",
+        role_b: "Ты совершеннолетняя актриса на вымышленном порнокастинге. Сначала отнесись к пробе профессионально, затем удиви режиссёра своей позой или смелой репликой. Сама решай, что готова разыграть. Когда захочешь перейти к близости, покажи явный интерес и сама задай следующий шаг.",
       },
       female: {
-        title: "Хозяйка и слуга",
-        role_a: "Ты женщина-хозяйка. На 30 минут отдавай команды без объяснений. Начни с: «Встань передо мной. Не отводи взгляд.»",
-        role_b: "Ты мужчина-слуга. Полностью подчиняешься. Можешь говорить только «да» и «как вам угодно».",
+        title: "Позже вечером",
+        role_a: "Ты совершеннолетняя режиссёрка вымышленного порнокастинга. Проведи закрытую пробу для совершеннолетнего актёра: попроси выбрать выразительную позу и произнести короткую смелую реплику. Играй уверенно, но помни, что это только ролевая сцена: ничего не снимай и не сохраняй. Переходи к близости только после ясного встречного сигнала.",
+        role_b: "Ты совершеннолетний актёр на вымышленном порнокастинге. Сначала отнесись к пробе профессионально, затем удиви режиссёрку своей позой или смелой репликой. Сам решай, что готов разыграть. Когда захочешь перейти к близости, покажи явный интерес и сам задай следующий шаг.",
       },
     },
     en: {
       male: {
-        title: "Master & Servant",
-        role_a: "You're the male master. Give commands for 30 minutes without explanation. Start: 'Stand in front of the mirror. Don't look away. Undress slowly.'",
-        role_b: "You're the female servant. Obey completely. You may only say 'yes' and 'as you wish'.",
+        title: "After Hours",
+        role_a: "You're an adult director at a fictional porn casting. Run a private screen test with an adult performer: ask for a striking pose and a short, bold line. Keep your delivery confident, but this is roleplay only—do not record or save anything. Move toward intimacy only after a clear, positive cue.",
+        role_b: "You're an adult performer at a fictional porn casting. Start by treating the audition professionally, then surprise the director with a pose or bold line of your own. Decide what you are willing to act out. When you want to move toward intimacy, show clear interest and lead the next step yourself.",
       },
       female: {
-        title: "Mistress & Servant",
-        role_a: "You're the female mistress. Give commands for 30 minutes without explanation. Start: 'Stand before me. Don't look away.'",
-        role_b: "You're the male servant. Obey completely. You may only say 'yes' and 'as you wish'.",
+        title: "After Hours",
+        role_a: "You're an adult woman directing a fictional porn casting. Run a private screen test with an adult performer: ask for a striking pose and a short, bold line. Keep your delivery confident, but this is roleplay only—do not record or save anything. Move toward intimacy only after a clear, positive cue.",
+        role_b: "You're an adult male performer at a fictional porn casting. Start by treating the audition professionally, then surprise the director with a pose or bold line of your own. Decide what you are willing to act out. When you want to move toward intimacy, show clear interest and lead the next step yourself.",
       },
     },
     hi: {
-      male: { title: "स्वामी और सेवक", role_a: "आप पुरुष स्वामी हैं। बिना स्पष्टीकरण के आदेश दें।", role_b: "आप महिला सेवक हैं। केवल 'जी' कह सकती हैं।" },
-      female: { title: "स्वामिनी और सेवक", role_a: "आप महिला स्वामिनी हैं। बिना स्पष्टीकरण के आदेश दें।", role_b: "आप पुरुष सेवक हैं। केवल 'जी' कह सकते हैं।" },
+      male: { title: "शाम के बाद", role_a: "आप एक काल्पनिक वयस्क फ़िल्म ऑडिशन के पुरुष निर्देशक हैं। एक वयस्क कलाकार से प्रभावशाली पोज़ और छोटी, साहसी पंक्ति देने को कहें। यह केवल अभिनय है—कुछ भी रिकॉर्ड या सेव न करें। निकटता तभी बढ़ाएँ जब सामने से साफ़ सकारात्मक संकेत मिले।", role_b: "आप काल्पनिक वयस्क फ़िल्म ऑडिशन के वयस्क महिला कलाकार हैं। पहले ऑडिशन को पेशेवर ढंग से लें, फिर अपनी पोज़ या साहसी पंक्ति से निर्देशक को चौंकाएँ। आप तय करें कि क्या अभिनय करना है। जब निकटता चाहें, स्पष्ट रुचि दिखाएँ और अगला कदम खुद तय करें।" },
+      female: { title: "शाम के बाद", role_a: "आप एक काल्पनिक वयस्क फ़िल्म ऑडिशन की महिला निर्देशक हैं। एक वयस्क कलाकार से प्रभावशाली पोज़ और छोटी, साहसी पंक्ति देने को कहें। यह केवल अभिनय है—कुछ भी रिकॉर्ड या सेव न करें। निकटता तभी बढ़ाएँ जब सामने से साफ़ सकारात्मक संकेत मिले।", role_b: "आप काल्पनिक वयस्क फ़िल्म ऑडिशन के वयस्क पुरुष कलाकार हैं। पहले ऑडिशन को पेशेवर ढंग से लें, फिर अपनी पोज़ या साहसी पंक्ति से निर्देशक को चौंकाएँ। आप तय करें कि क्या अभिनय करना है। जब निकटता चाहें, स्पष्ट रुचि दिखाएँ और अगला कदम खुद तय करें।" },
     },
     pt: {
-      male: { title: "Mestre e Serva", role_a: "Você é o mestre. Dê ordens sem explicação.", role_b: "Você é a serva. Só pode dizer 'sim'." },
-      female: { title: "Mestra e Servo", role_a: "Você é a mestra. Dê ordens sem explicação.", role_b: "Você é o servo. Só pode dizer 'sim'." },
+      male: { title: "Depois do expediente", role_a: "Você é um diretor adulto de um casting fictício de filmes adultos. Faça um teste privado com uma artista adulta: peça uma pose marcante e uma fala curta e ousada. É apenas encenação—não grave nem salve nada. Só avance para a intimidade depois de um sinal claramente positivo.", role_b: "Você é uma artista adulta em um casting fictício. Comece tratando o teste com profissionalismo e depois surpreenda o diretor com uma pose ou fala ousada. Decida o que aceita encenar. Quando quiser avançar para a intimidade, demonstre interesse com clareza e conduza o próximo passo." },
+      female: { title: "Depois do expediente", role_a: "Você é uma diretora adulta de um casting fictício de filmes adultos. Faça um teste privado com um artista adulto: peça uma pose marcante e uma fala curta e ousada. É apenas encenação—não grave nem salve nada. Só avance para a intimidade depois de um sinal claramente positivo.", role_b: "Você é um artista adulto em um casting fictício. Comece tratando o teste com profissionalismo e depois surpreenda a diretora com uma pose ou fala ousada. Decida o que aceita encenar. Quando quiser avançar para a intimidade, demonstre interesse com clareza e conduza o próximo passo." },
     },
     es: {
-      male: { title: "Amo y Sirvienta", role_a: "Eres el amo. Da órdenes sin explicación.", role_b: "Eres la sirvienta. Solo puedes decir 'sí'." },
-      female: { title: "Ama y Sirviente", role_a: "Eres el ama. Da órdenes sin explicación.", role_b: "Eres el sirviente. Solo puedes decir 'sí'." },
+      male: { title: "Después del cierre", role_a: "Eres un director adulto de un casting ficticio de cine para adultos. Haz una prueba privada con una intérprete adulta: pídele una pose llamativa y una frase breve y atrevida. Es solo una escena de rol; no grabes ni guardes nada. Avanza hacia la intimidad solo después de una señal claramente positiva.", role_b: "Eres una intérprete adulta en un casting ficticio. Empieza tratando la prueba con profesionalidad y luego sorprende al director con una pose o frase atrevida. Decide qué quieres representar. Cuando quieras avanzar hacia la intimidad, muestra interés con claridad y guía tú el siguiente paso." },
+      female: { title: "Después del cierre", role_a: "Eres una directora adulta de un casting ficticio de cine para adultos. Haz una prueba privada con un intérprete adulto: pídele una pose llamativa y una frase breve y atrevida. Es solo una escena de rol; no grabes ni guardes nada. Avanza hacia la intimidad solo después de una señal claramente positiva.", role_b: "Eres un intérprete adulto en un casting ficticio. Empieza tratando la prueba con profesionalidad y luego sorprende a la directora con una pose o frase atrevida. Decide qué quieres representar. Cuando quieras avanzar hacia la intimidad, muestra interés con claridad y guía tú el siguiente paso." },
     },
   },
 };
@@ -163,112 +166,154 @@ function getFallback(intensity: string, lang: string, gender: string): FallbackE
 
 // ─── Персоны ─────────────────────────────────────────────────────────────────
 
-const PERSONA_RU = `Ты — доктор Соня, сертифицированный сексолог-психолог с 15-летней практикой работы с парами. Ты создаёшь ролевые сценарии с психологической глубиной и эротическим напряжением. Каждый сценарий — неожиданный, богатый деталями, с точными репликами и конкретными действиями. Никогда не банальный, всегда психологически интересный.`;
+const PERSONA_RU = `Ты — автор коротких ролевых сценариев для взрослых пар. Создавай живые сцены с разными характерами, конкретными действиями и репликами.`;
 
-const PERSONA_EN = `You are Dr. Sofia — a certified sex therapist and couples psychologist with 15 years of clinical practice. You design roleplay scenarios with psychological depth and erotic tension. Each scenario is unexpected, detail-rich, with exact lines to say and specific physical actions. Never generic. Always psychologically interesting.`;
+const PERSONA_EN = `You write short, engaging roleplay scenarios for adult couples. Create distinct characters, concrete actions, and natural dialogue.`;
 
 // ─── Гендерный контекст ───────────────────────────────────────────────────────
 
 function genderContextRu(gender: string): string {
   return gender === "female"
-    ? `Роли: role_a — ЖЕНЩИНА (инициатор сценария), role_b — МУЖЧИНА (её партнёр). Пиши роли строго под правильный пол. Учитывай физиологию гетеросексуальной пары.`
-    : `Роли: role_a — МУЖЧИНА (инициатор сценария), role_b — ЖЕНЩИНА (его партнёрша). Пиши роли строго под правильный пол. Учитывай физиологию гетеросексуальной пары.`;
+    ? `Оба персонажа совершеннолетние. role_a — женщина, которая тянет сценарий; role_b — её совершеннолетний партнёр-мужчина. Пиши с учётом этих ролей.`
+    : `Оба персонажа совершеннолетние. role_a — мужчина, который тянет сценарий; role_b — его совершеннолетняя партнёрша. Пиши с учётом этих ролей.`;
 }
 
 function genderContextEn(gender: string): string {
   return gender === "female"
-    ? `Roles: role_a = WOMAN (the one who draws the card), role_b = MAN (her partner). Write each role strictly for that gender. Heterosexual couple.`
-    : `Roles: role_a = MAN (the one who draws the card), role_b = WOMAN (his partner). Write each role strictly for that gender. Heterosexual couple.`;
+    ? `Both characters are adults. role_a is a woman who draws the scenario; role_b is her adult male partner.`
+    : `Both characters are adults. role_a is a man who draws the scenario; role_b is his adult female partner.`;
 }
 
 // ─── Системные промпты ────────────────────────────────────────────────────────
 
 const ROLE_LIST_EN = `
-Available roles (choose one or invent something better): Nurse/patient, Teacher/student, Boss/subordinate, Doctor/patient, Police officer/detained person, Coach/athlete, Master/servant, Photographer/model, Neighbors, Masseuse/client, Therapist/patient, Strangers on a night train, Vocal coach/student, Librarian/visitor, Taxi driver/passenger.
+Scenario ideas:
+- romantic: an intriguing first meeting, a private concert, neighbors sharing a late-night conversation, or a playful photo session using a phone only as a prop.
+- passion: an adult university lecturer and adult university student after class, with scripted playful resistance that turns into mutual intimacy; or another adult roleplay with an equally clear positive turn.
+- hard: a fictional adult-film casting with an adult director and adult performer, or another adult power-play scene. A casting scene is fictional and never recorded.
+Choose a fitting idea or invent another scenario with adults only. Never use minors, schoolchildren, or characters whose age is unclear.
 
-Scene elements to weave in: Slow command-driven undressing, charged silences, whispered commands, gaze prohibition, orgasm denial, bets with real stakes, light spanking, wrist binding (consensual), blindfolds, specific household props (belt / tie / scarf / ice cube from freezer / kitchen oil / mirror / headphones), exact phrases spoken out loud, temperature play, mid-scene power reversal.
+Intensity:
+- romantic: intrigue and flirting, no explicit sexual content.
+- passion: sensual, direct adult flirting and intimacy after clear reciprocation.
+- hard: bold adult roleplay and confident power dynamics, while each character keeps agency and an actual refusal is respected.
 
-Intensity levels:
-- romantic: playful and psychologically tense — no explicit sexual content, only charged anticipation
-- passion: sensual and bold, explicit erotic contact (18+), somatic vulnerability, direct desire expressed
-- hard: dominant control, BDSM power dynamics, total submission (18+) — write specific commands directly into the role text
+Private-card rules:
+- Return one neutral title and two separate role cards. Both partners see the title, so it must not name roles, the pairing, or either character's secret goal.
+- role_a is only for the initiator; role_b is only for the partner. Address each reader as “you”; give only that character's role, private objective, opening move, actions, and lines.
+- Never reveal, summarize, or give instructions from the other card. The cards should complement each other without disclosing one another's private plan.
+- For teacher/student, both characters are adults at a university. Resistance is acted, never a real refusal; intimacy begins only after clear reciprocation. Never tell a character to ignore a real no, silence, hesitation, or stop.
+- Casting is fictional: no actual recording, image capture, or saved material.
 
-IMPORTANT — HOME CONSTRAINT: Every action must be doable at home right now without going to any store. Use only items already available at home: tie, scarf, belt, ice from freezer, cooking oil, lotion, mirror, phone camera, headphones.
-
-Rules: Each role = 3–5 sentences. Include exact phrases in quotes. Describe exact physical actions. Make it psychologically surprising.
+Write 3–5 actionable sentences per card, with a natural line in quotes and a concrete opening action. Keep the cards distinct and coherent. Actions must be feasible at home without purchases, risky props, or real restraint.
 Return ONLY valid JSON: {"title":"...","role_a":"...","role_b":"..."}`;
+
+const ROLE_LIST_RU = `
+Идеи сцен:
+- romantic: интригующее знакомство, домашний мини-концерт, ночной разговор соседей или фотосессия, где телефон — только реквизит.
+- passion: преподаватель и совершеннолетний студент университета после занятия; студент играет в уклонение, а напряжение переходит во взаимную близость после ясного встречного сигнала. Можно выбрать другую взрослую ролевую динамику с таким же понятным переходом.
+- hard: вымышленный порнокастинг со взрослыми режиссёром и актёром/актрисой или другая ролевая игра взрослых с распределением власти. Кастинг не снимают и не сохраняют.
+Выбери подходящую идею или придумай другую сцену только со взрослыми. Не используй несовершеннолетних, школьников или персонажей с неясным возрастом.
+
+Уровни:
+- romantic: интрига и флирт без откровенного сексуального контента.
+- passion: чувственный флирт и близость взрослых только после ясной взаимности.
+- hard: смелая ролевая динамика взрослых; каждый сохраняет право выбирать действия, настоящий отказ принимается.
+
+Правила скрытых карточек:
+- Верни одно нейтральное название и две отдельные карточки. Название увидят оба, поэтому в нём нельзя называть роли, их пару или скрытую цель персонажа.
+- role_a предназначена только инициатору, role_b — только партнёру. Обращайся к читателю карточки на «ты» и описывай только его роль, личную цель, начало сцены, действия и реплики.
+- Не раскрывай и не пересказывай инструкции или тайную цель другой карточки. Карточки должны сочетаться, но не выдавать планы друг друга.
+- В сцене «преподаватель и студент» оба персонажа — взрослые участники университета. Сопротивление — только игровая роль; близость начинается после ясной взаимности. Нельзя приказывать игнорировать настоящий отказ, молчание, сомнение или стоп-сигнал.
+- Кастинг — только вымышленная ролевая сцена: никаких реальных записей, фото или сохранения материалов.
+
+Каждая карточка — 3–5 конкретных предложений с естественной фразой в кавычках и ясным первым действием. Сделай карточки разными и связанными между собой. Всё должно быть выполнимо дома, без покупок, опасного реквизита и реального связывания.
+Верни ТОЛЬКО JSON: {"title":"...","role_a":"...","role_b":"..."}`;
+
+const INTENSITY_RULES_EN: Record<string, string> = {
+  romantic: "Current level: romantic. Keep it playful and curious, with no explicit sexual action.",
+  passion: "Current level: passion. You may use the adult university lecturer/student setup; resistance is playful acting, and the student chooses when to give a clear positive signal that opens the path to intimacy.",
+  hard: "Current level: hard. Prefer a fictional adult-film casting with an adult director and adult performer. Keep it bold but unrecorded; the performer chooses what to act out and signals any move toward intimacy.",
+};
+
+const INTENSITY_RULES_RU: Record<string, string> = {
+  romantic: "Текущий уровень: romantic. Сохраняй игривую интригу и не описывай сексуальные действия.",
+  passion: "Текущий уровень: passion. Можно выбрать взрослых преподавателя и студента университета; сопротивление студента — игровое, а он сам выбирает момент для ясного встречного сигнала и перехода к близости.",
+  hard: "Текущий уровень: hard. Предпочтительный вариант — вымышленный порнокастинг со взрослыми режиссёром и актёром/актрисой. Актёр/актриса сам(а) выбирает, что разыгрывать; переход к близости — только после ясного встречного сигнала.",
+};
 
 const SYSTEM_PROMPTS: Record<string, (intensity: string, gender: string) => string> = {
   ru: (intensity, gender) => `${PERSONA_RU}
 
 ${genderContextRu(gender)}
 
-Доступные роли (выбери или придумай лучше): Медсестра/пациент, Учитель/ученица, Начальник/подчинённая, Врач/пациентка, Полицейский/задержанная, Тренер/спортсменка, Хозяин/служанка, Фотограф/модель, Соседи, Массажист/клиент, Терапевт/клиент, Незнакомцы в ночном поезде, Тренер по вокалу/ученица.
+${ROLE_LIST_RU}
 
-Элементы сцены: Раздевание по команде медленно, заряженные паузы, шёпот команд, запрет на взгляд, запрет на оргазм, спор со ставками, шлепки, связывание запястий (с согласия), повязка на глаза, домашний реквизит (ремень/галстук/шарф/кубик льда из морозилки/масло или лосьон/зеркало), точные фразы вслух, игры с температурой, переворот ролей.
-
-ВАЖНО — ДОМАШНИЙ ФОРМАТ: все действия должны быть выполнимы дома прямо сейчас, без похода в магазин. Только то, что обычно есть дома.
-
-Текущий уровень: ${intensity}
-- romantic: игривое психологическое напряжение — без явного контента
-- passion: чувственно и смело (18+), соматическая уязвимость
-- hard: БДСМ, полное подчинение (18+) — конкретные команды в тексте
-
-Правила: Каждая роль 3–5 предложений. Точные фразы в кавычках. Конкретные физические действия. Психологически неожиданно.
-Верни ТОЛЬКО JSON: {"title":"Название","role_a":"текст роли А","role_b":"текст роли Б"}`,
+${INTENSITY_RULES_RU[intensity]}`,
 
   en: (intensity, gender) => `${PERSONA_EN}
 
 ${genderContextEn(gender)}
 
-Current intensity level: ${intensity}
-${ROLE_LIST_EN}`,
+${ROLE_LIST_EN}
+
+${INTENSITY_RULES_EN[intensity]}`,
 
   hi: (intensity, gender) => `${PERSONA_EN}
 IMPORTANT: Write ALL output in Hindi (हिंदी) using Devanagari script.
 
 ${genderContextEn(gender)}
 
-Current intensity level: ${intensity}
-${ROLE_LIST_EN}`,
+${ROLE_LIST_EN}
+
+${INTENSITY_RULES_EN[intensity]}`,
 
   pt: (intensity, gender) => `${PERSONA_EN}
 IMPORTANT: Write ALL output in Brazilian Portuguese (Português Brasileiro).
 
 ${genderContextEn(gender)}
 
-Current intensity level: ${intensity}
-${ROLE_LIST_EN}`,
+${ROLE_LIST_EN}
+
+${INTENSITY_RULES_EN[intensity]}`,
 
   es: (intensity, gender) => `${PERSONA_EN}
 IMPORTANT: Write ALL output in Spanish (Español).
 
 ${genderContextEn(gender)}
 
-Current intensity level: ${intensity}
-${ROLE_LIST_EN}`,
+${ROLE_LIST_EN}
+
+${INTENSITY_RULES_EN[intensity]}`,
 };
 
 function userPrompt(lang: string, intensity: string): string {
-  if (lang === "ru") return `Создай неожиданный, психологически богатый сценарий уровня ${intensity}. Все действия — дома. Верни ТОЛЬКО JSON.`;
-  if (lang === "hi") return `${intensity} स्तर का एक अप्रत्याशित घरेलू दृश्य बनाएं। केवल JSON।`;
-  if (lang === "pt") return `Crie um cenário inesperado de nível ${intensity} realizável em casa. Apenas JSON.`;
-  if (lang === "es") return `Crea un escenario inesperado de nivel ${intensity} que se pueda hacer en casa. Solo JSON.`;
-  return `Create an unexpected, psychologically rich ${intensity}-level scenario doable at home. Return ONLY JSON.`;
+  if (lang === "ru") return `Создай живой сценарий уровня ${intensity} для двух взрослых партнёров: две отдельные скрытые карточки и нейтральное название. Каждая карточка — только для её получателя. Верни ТОЛЬКО JSON.`;
+  if (lang === "hi") return `${intensity} स्तर का दृश्य दो वयस्क साथियों के लिए बनाएं: दो अलग गुप्त भूमिका-कार्ड और एक तटस्थ शीर्षक। केवल JSON।`;
+  if (lang === "pt") return `Crie um cenário ${intensity} para dois adultos, com dois cartões de papel separados e secretos e um título neutro. Apenas JSON.`;
+  if (lang === "es") return `Crea un escenario ${intensity} para dos adultos, con dos tarjetas de rol separadas y secretas y un título neutral. Solo JSON.`;
+  return `Create a ${intensity}-level scenario for two adults with two separate private role cards and a neutral title. Return ONLY JSON.`;
 }
 
-async function notifyPartner(chatId: number, title: string, sessionId: string, lang: string): Promise<boolean> {
+async function notifyPartner(chatId: number, partnerUserId: number, coupleId: string, sessionId: string, lang: string): Promise<boolean> {
+  const { data: preference, error: preferenceError } = await supabase
+    .from("couple_member_preferences")
+    .select("telegram_notifications_enabled")
+    .eq("couple_id", coupleId)
+    .eq("user_id", partnerUserId)
+    .maybeSingle();
+  if (preferenceError || preference?.telegram_notifications_enabled !== true) return false;
   const texts: Record<string, string> = {
-    ru: `🎭 <b>${title}</b>\n\nПартнёр вытянул сценарий — твоя роль готова.\nОткрой карточку чтобы узнать её.`,
-    hi: `🎭 <b>${title}</b>\n\nआपके साथी ने दृश्य खींचा — आपकी भूमिका तैयार है।`,
-    pt: `🎭 <b>${title}</b>\n\nSeu parceiro escolheu um cenário — seu papel está pronto.`,
-    es: `🎭 <b>${title}</b>\n\nTu pareja eligió un escenario — tu rol está listo.`,
+    ru: "Партнёр подготовил для вас сценарий. Откройте Touché, чтобы увидеть свою роль.",
+    hi: "आपके साथी ने आपके लिए एक दृश्य तैयार किया है। अपनी भूमिका देखने के लिए Touché खोलें।",
+    pt: "Seu parceiro preparou um cenário para vocês. Abra o Touché para ver seu papel.",
+    es: "Tu pareja preparó un escenario para ustedes. Abre Touché para ver tu papel.",
   };
   const buttons: Record<string, string> = {
     ru: "🃏 Открыть мою роль", hi: "🃏 मेरी भूमिका खोलें",
     pt: "🃏 Abrir meu papel", es: "🃏 Abrir mi rol",
   };
-  const text = texts[lang] ?? `🎭 <b>${title}</b>\n\nYour partner drew a scenario — your role is ready.`;
+  const text = texts[lang] ?? "Your partner prepared a scenario for you. Open Touché to see your role.";
   const buttonText = buttons[lang] ?? "🃏 Open my role";
   try {
     const r = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
@@ -313,6 +358,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (!couple || (couple.user_a_id !== caller.id && couple.user_b_id !== caller.id)) {
     return res.status(403).json({ error: "couple_access_denied" });
   }
+  const partnerUserId = couple.user_a_id === caller.id ? couple.user_b_id : couple.user_a_id;
   const isOwner = caller.id === OWNER_ID;
   const premium = isOwner || !!(await supabase.from("user_subscriptions").select("expires_at").eq("user_id", caller.id).gt("expires_at", new Date().toISOString()).maybeSingle()).data;
   if (!premium) return res.status(403).json({ error: "subscription_required" });
@@ -352,10 +398,21 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const raw = (aiData.choices?.[0]?.message?.content ?? "").trim();
     const parsed = JSON.parse(raw);
     if (parsed?.title && parsed?.role_a && parsed?.role_b) {
+      const roleA = cleanText(parsed.role_a, 1200);
+      const roleB = cleanText(parsed.role_b, 1200);
+      if (
+        roleA.length < 40 ||
+        roleB.length < 40 ||
+        roleA === roleB ||
+        CROSS_CARD_DISCLOSURE.test(roleA) ||
+        CROSS_CARD_DISCLOSURE.test(roleB)
+      ) {
+        throw new Error("Scenario cards are incomplete or reveal cross-card instructions");
+      }
       generated = {
-        title: cleanText(parsed.title, 100),
-        role_a: cleanText(parsed.role_a, 1200),
-        role_b: cleanText(parsed.role_b, 1200),
+        title: sanitizeScenarioTitle(parsed.title, lang, intensity),
+        role_a: roleA,
+        role_b: roleB,
       };
     } else {
       throw new Error("Unexpected AI response shape");
@@ -364,6 +421,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     source = "fallback";
     generated = getFallback(intensity, lang, gender);
   }
+
+  generated.title = sanitizeScenarioTitle(generated.title, lang, intensity);
 
   const partnerTgId: number | null = couple
     ? (couple.user_a_id === caller.id ? couple.user_b_id : couple.user_a_id)
@@ -390,7 +449,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   let notified = false;
   if (partnerTgId && session?.id) {
-    notified = await notifyPartner(partnerTgId, escapeHtml(generated.title), session.id, lang);
+    notified = await notifyPartner(partnerTgId, partnerUserId, coupleId, session.id, lang);
     if (notified) {
       await supabase
         .from("scenario_sessions")

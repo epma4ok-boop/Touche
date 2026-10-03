@@ -12,6 +12,7 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { createClient } from "@supabase/supabase-js";
 import { validateTelegramInitData } from "../couple/_auth.js";
+import { sanitizeScenarioTitle } from "../../src/data/scenarioTitle.js";
 
 const supabase = createClient(
   process.env.SUPABASE_URL!,
@@ -56,7 +57,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(200).json({
       ok: true,
       sessionId: session.id,
-      title: session.title,
+      title: sanitizeScenarioTitle(session.title, session.lang, session.intensity),
       roleText: isRoleA ? session.role_a_text : session.role_b_text,
       role: isRoleA ? "a" : "b",
       lang: session.lang,
@@ -96,7 +97,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(200).json({
       pending: true,
       sessionId: session.id,
-      title: session.title,
+      title: sanitizeScenarioTitle(session.title, session.lang, session.intensity),
       roleText: session.role_b_text,
       role: "b",
       lang: session.lang,

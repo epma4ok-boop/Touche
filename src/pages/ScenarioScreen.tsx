@@ -190,7 +190,7 @@ function RoleCard({ title, roleText, intensity, lang, notified, isMissed, pairSt
   const sectionCopy = ROLE_SECTION_COPY[lang];
   const [visible, setVisible] = useState(false);
   useEffect(() => { const timer = setTimeout(() => setVisible(true), 160); return () => clearTimeout(timer); }, []);
-  return <section className={`scenario-pop role-overlay ${meta.tone}`} style={{ paddingTop: topPadding }}>
+  return <section className={`scenario-pop role-overlay ${meta.tone} ${visible ? "is-revealed" : ""}`} style={{ paddingTop: topPadding }}>
     <div className="role-top"><button className="pop-back" onClick={onHideCard} data-testid="button-role-back">{t.back}</button>{isMissed && <span className="pop-status">{t.missed}</span>}</div>
     <div className={`role-content ${visible ? "is-visible" : ""}`}>
       <div className="role-heading"><span className="pop-eyebrow">{labels.sub}</span><h1 data-testid="text-scenario-title">{title}</h1></div>
@@ -401,7 +401,8 @@ export default function ScenarioScreen({ lang, gender, onBack, onUpgrade }: Scen
   }, [feedbackEnabled, feedbackLoaded, feedbackSubmitted, pairState]);
   if (phase === "no_partner") return <NoPartner lang={lang} onInvite={handleInvite} onBack={onBack} />;
   const tone = INTENSITY_META[intensity].tone;
-  return <main className={`scenario-pop scenario-main ${tone}`} style={{ paddingTop: topPadding, opacity: mounted ? 1 : 0 }}>
+  return <>
+    <main className={`scenario-pop scenario-main ${tone}`} style={{ paddingTop: topPadding, opacity: mounted ? 1 : 0 }}>
     <header className="scenario-header"><button className="pop-back" onClick={onBack} data-testid="button-scenarios-back">{t.back}</button><div className="scenario-brand">Touch<em>é</em></div><span className="premium-tag">PREMIUM</span></header>
     <section className="scenario-intro"><span className="pop-stamp">{SCENARIO_STAMP[lang]}</span><h1>{t.title}</h1><p>{t.sub}</p><div className="scenario-orb" aria-hidden="true">♥</div></section>
     <IntensitySelector value={intensity} onChange={setIntensity} lang={lang} />
@@ -409,6 +410,7 @@ export default function ScenarioScreen({ lang, gender, onBack, onUpgrade }: Scen
     <div className="heartbeat-stage"><HeartbeatCanvas onHoldComplete={handleHoldComplete} isCasting={isCasting} color={intensity === "romantic" ? { r: 255, g: 212, b: 93 } : intensity === "passion" ? { r: 255, g: 111, b: 97 } : { r: 62, g: 91, b: 255 }} hintText={hintText} holdDuration={2600} baseRScale={0.28} bgColor="#fffaf3" /></div>
     <footer className="scenario-footer"><span>TOUCHÉ / AI SCENARIO</span></footer>
     {errorKind && <div className="scenario-error" role="alert"><p>{errorKind === "subscription_required" ? SCENARIO_COPY[lang].subscription : errorKind === "rate_limited" ? SCENARIO_COPY[lang].rate : SCENARIO_COPY[lang].unknown}</p>{errorKind === "subscription_required" && onUpgrade && <button className="pop-primary" onClick={onUpgrade}>{SCENARIO_COPY[lang].upgrade}</button>}<button className="error-dismiss" onClick={() => setErrorKind(null)}>{SCENARIO_COPY[lang].dismiss}</button></div>}
-      {phase === "revealed" && <RoleCard title={revealTitle} roleText={revealRoleText} intensity={revealIntensity} lang={lang} notified={notified} pairState={pairState} isSaving={completionBusy} completionError={completionError} onComplete={() => { void handleComplete(); }} onHideCard={handleHideCard} isMissed={isMissed} topPadding={topPadding} feedbackEnabled={feedbackEnabled} feedbackSubmitted={feedbackSubmitted} feedbackResolved={feedbackResolved} feedbackBusy={feedbackBusy} feedbackError={feedbackError} onFeedback={(rating) => { void handleScenarioFeedback(rating); }} />}
-  </main>;
+    </main>
+    {phase === "revealed" && <RoleCard title={revealTitle} roleText={revealRoleText} intensity={revealIntensity} lang={lang} notified={notified} pairState={pairState} isSaving={completionBusy} completionError={completionError} onComplete={() => { void handleComplete(); }} onHideCard={handleHideCard} isMissed={isMissed} topPadding={topPadding} feedbackEnabled={feedbackEnabled} feedbackSubmitted={feedbackSubmitted} feedbackResolved={feedbackResolved} feedbackBusy={feedbackBusy} feedbackError={feedbackError} onFeedback={(rating) => { void handleScenarioFeedback(rating); }} />}
+  </>;
 }

@@ -291,7 +291,7 @@ Private-card rules:
 - If you use teacher/student, both characters are adults at a university. Resistance is acted, never a real refusal; intimacy begins only after clear reciprocation. Never tell a character to ignore a real no, silence, hesitation, or stop.
 - Casting is fictional: no actual recording, image capture, or saved material.
 
-Write 3–5 actionable sentences per card, with a natural line in quotes and a concrete opening action. Keep the cards distinct and coherent. Actions must be feasible at home without purchases, risky props, or real restraint.
+Write 3–4 concise sentences per card: one direct assignment, one sentence of role context, and one concrete opening move with a natural line in quotes. Use the exact translated section labels specified by CARD_FORMAT, each on its own line. Keep the cards distinct and coherent. Actions must be feasible at home without purchases, risky props, or real restraint.
 Add 3–6 private variation_tags as short lowercase English slugs prefixed by setting:, dynamic:, tone:, or hook:. Describe broad scene elements only, not names, ages, or private card objectives. Tags are internal metadata and must never appear in either role card or title.
 Return ONLY valid JSON: {"title":"...","role_a":"...","role_b":"...","variation_tags":["setting:...","dynamic:...","tone:..."]}`;
 
@@ -315,9 +315,17 @@ const ROLE_LIST_RU = `
 - Если выбрана сцена «преподаватель и студент», оба персонажа — взрослые участники университета. Сопротивление — только игровая роль; близость начинается после ясной взаимности. Нельзя приказывать игнорировать настоящий отказ, молчание, сомнение или стоп-сигнал.
 - Кастинг — только вымышленная ролевая сцена: никаких реальных записей, фото или сохранения материалов.
 
-Каждая карточка — 3–5 конкретных предложений с естественной фразой в кавычках и ясным первым действием. Сделай карточки разными и связанными между собой. Всё должно быть выполнимо дома, без покупок, опасного реквизита и реального связывания.
+Каждая карточка — 3–4 коротких предложения: ясное задание, краткий контекст роли и первый шаг с естественной репликой в кавычках. Используй точные заголовки из CARD_FORMAT, каждый с новой строки. Сделай карточки разными и связанными между собой. Всё должно быть выполнимо дома, без покупок, опасного реквизита и реального связывания.
 Добавь 3–6 приватных variation_tags: короткие строчные английские теги с префиксом setting:, dynamic:, tone: или hook:. Описывай только общие элементы сцены — без имён, возраста и тайных целей карточек. Теги нужны только для внутреннего разнообразия и не должны попадать в название или карточки.
 Верни ТОЛЬКО JSON: {"title":"...","role_a":"...","role_b":"...","variation_tags":["setting:...","dynamic:...","tone:..."]}`;
+
+const CARD_FORMAT: Record<string, string> = {
+  ru: `CARD_FORMAT: In each role string, return exactly these three sections in this order, each on its own line, with plain text labels and a colon: "ТВОЁ ЗАДАНИЕ:", "ТВОЯ РОЛЬ:", "ПЕРВЫЙ ШАГ:". The first section must state the reader's concrete action. Do not use markdown or add other headings.`,
+  en: `CARD_FORMAT: In each role string, return exactly these three sections in this order, each on its own line, with plain text labels and a colon: "YOUR TASK:", "YOUR ROLE:", "FIRST MOVE:". The first section must state the reader's concrete action. Do not use markdown or add other headings.`,
+  hi: `CARD_FORMAT: In each role string, return exactly these three sections in this order, each on its own line, with plain text labels and a colon: "आपका काम:", "आपकी भूमिका:", "पहला कदम:". The first section must state the reader's concrete action. Do not use markdown or add other headings.`,
+  pt: `CARD_FORMAT: In each role string, return exactly these three sections in this order, each on its own line, with plain text labels and a colon: "SUA TAREFA:", "SEU PAPEL:", "PRIMEIRO PASSO:". The first section must state the reader's concrete action. Do not use markdown or add other headings.`,
+  es: `CARD_FORMAT: In each role string, return exactly these three sections in this order, each on its own line, with plain text labels and a colon: "TU TAREA:", "TU ROL:", "PRIMER PASO:". The first section must state the reader's concrete action. Do not use markdown or add other headings.`,
+};
 
 const INTENSITY_RULES_EN: Record<string, string> = {
   romantic: "Current level: romantic. Keep it playful and curious, with no explicit sexual action.",
@@ -338,6 +346,8 @@ ${genderContextRu(gender)}
 
 ${ROLE_LIST_RU}
 
+${CARD_FORMAT.ru}
+
 ${INTENSITY_RULES_RU[intensity]}`,
 
   en: (intensity, gender) => `${PERSONA_EN}
@@ -345,6 +355,8 @@ ${INTENSITY_RULES_RU[intensity]}`,
 ${genderContextEn(gender)}
 
 ${ROLE_LIST_EN}
+
+${CARD_FORMAT.en}
 
 ${INTENSITY_RULES_EN[intensity]}`,
 
@@ -355,6 +367,8 @@ ${genderContextEn(gender)}
 
 ${ROLE_LIST_EN}
 
+${CARD_FORMAT.hi}
+
 ${INTENSITY_RULES_EN[intensity]}`,
 
   pt: (intensity, gender) => `${PERSONA_EN}
@@ -364,6 +378,8 @@ ${genderContextEn(gender)}
 
 ${ROLE_LIST_EN}
 
+${CARD_FORMAT.pt}
+
 ${INTENSITY_RULES_EN[intensity]}`,
 
   es: (intensity, gender) => `${PERSONA_EN}
@@ -372,6 +388,8 @@ IMPORTANT: Write ALL output in Spanish (Español).
 ${genderContextEn(gender)}
 
 ${ROLE_LIST_EN}
+
+${CARD_FORMAT.es}
 
 ${INTENSITY_RULES_EN[intensity]}`,
 };

@@ -4,8 +4,8 @@ import type { AppMode } from "@/App";
 import HeartbeatCanvas from "@/components/HeartbeatCanvas";
 import { UI, CATEGORY_CONFIG, CATEGORIES_ORDER, type Lang, type Category } from "@/data/i18n";
 import { playReveal } from "@/hooks/useSensualSound";
-import { addLocalPoints } from "@/data/intimacy";
 import HistoryPanel, { type HistoryEntry } from "@/components/HistoryPanel";
+import type { SharedPairState, SharedTaskSnapshot } from "@/data/sharedPair";
 import "./CategoryPop.css";
 
 const HISTORY_KEY = "touche_history_v2";
@@ -105,6 +105,44 @@ function categoryLabel(category: Category, t: typeof UI["en"]): string {
   })[category];
 }
 
+const SHARED_TASK_COPY: Record<Lang, {
+  ready: string; waiting: string; yourTurn: string; completed: string;
+  readyHint: string; waitingHint: string; yourTurnHint: string; completedHint: string;
+  confirmMine: string; confirmTogether: string; saving: string; close: string;
+  openTask: string; confirmError: string;
+}> = {
+  ru: {
+    ready: "Задание ждёт подтверждения", waiting: "Вы подтвердили свою часть", yourTurn: "Партнёр уже подтвердил", completed: "Вы выполнили задание вместе",
+    readyHint: "Завтра вы отдельно ответите, выполнил ли задание партнёр. «Да» добавит ему сердечко.", waitingHint: "Touché сообщит партнёру, что теперь его очередь.", yourTurnHint: "Подтвердите общую часть задания.", completedHint: "Завтра каждый сможет отдельно отметить, выполнил ли партнёр задание.",
+    confirmMine: "Я выполнил(а) свою часть", confirmTogether: "Подтвердить выполнение вместе", saving: "Сохраняем…", close: "Закрыть", openTask: "Открыть задание",
+    confirmError: "Не удалось сохранить подтверждение. Попробуйте ещё раз.",
+  },
+  en: {
+    ready: "Waiting for your confirmation", waiting: "You confirmed your part", yourTurn: "Your partner has confirmed", completed: "You completed this together",
+    readyHint: "Tomorrow, you can each privately say whether your partner completed it. “Yes” gives them a heart.", waitingHint: "Touché will let your partner know it is their turn.", yourTurnHint: "Confirm your part of the shared task.", completedHint: "Tomorrow, each of you can privately say whether your partner completed the task.",
+    confirmMine: "I completed my part", confirmTogether: "Confirm we completed it together", saving: "Saving…", close: "Close", openTask: "Open task",
+    confirmError: "Could not save your confirmation. Please try again.",
+  },
+  hi: {
+    ready: "आपकी पुष्टि बाकी है", waiting: "आपने अपना हिस्सा पूरा किया", yourTurn: "आपके साथी ने पुष्टि कर दी", completed: "आपने इसे साथ में पूरा किया",
+    readyHint: "कल आप अलग-अलग बताएँगे कि आपके साथी ने काम पूरा किया या नहीं। “हाँ” से उन्हें एक दिल मिलेगा।", waitingHint: "Touché आपके साथी को बताएगा कि अब उनकी बारी है।", yourTurnHint: "साझा काम में अपनी भूमिका की पुष्टि करें।", completedHint: "कल आप अलग-अलग बताएँगे कि आपके साथी ने काम पूरा किया या नहीं।",
+    confirmMine: "मैंने अपना हिस्सा पूरा किया", confirmTogether: "पुष्टि करें कि हमने साथ में पूरा किया", saving: "सहेज रहे हैं…", close: "बंद करें", openTask: "कार्य खोलें",
+    confirmError: "पुष्टि सहेजी नहीं जा सकी। फिर प्रयास करें।",
+  },
+  pt: {
+    ready: "Aguardando sua confirmação", waiting: "Você confirmou sua parte", yourTurn: "Seu parceiro confirmou", completed: "Vocês concluíram juntos",
+    readyHint: "Amanhã, cada um poderá dizer em privado se o parceiro concluiu a tarefa. “Sim” dá um coração a ele.", waitingHint: "O Touché avisará seu parceiro que chegou a vez dele.", yourTurnHint: "Confirme sua parte da tarefa compartilhada.", completedHint: "Amanhã, cada um poderá dizer em privado se o parceiro concluiu a tarefa.",
+    confirmMine: "Concluí minha parte", confirmTogether: "Confirmar que concluímos juntos", saving: "Salvando…", close: "Fechar", openTask: "Abrir tarefa",
+    confirmError: "Não foi possível salvar a confirmação. Tente novamente.",
+  },
+  es: {
+    ready: "Falta tu confirmación", waiting: "Confirmaste tu parte", yourTurn: "Tu pareja ya confirmó", completed: "Lo completaron juntos",
+    readyHint: "Mañana, cada uno podrá decir en privado si su pareja completó la tarea. Un “sí” le da un corazón.", waitingHint: "Touché avisará a tu pareja que ahora le toca.", yourTurnHint: "Confirma tu parte de la tarea compartida.", completedHint: "Mañana, cada uno podrá decir en privado si su pareja completó la tarea.",
+    confirmMine: "He completado mi parte", confirmTogether: "Confirmar que lo completamos juntos", saving: "Guardando…", close: "Cerrar", openTask: "Abrir tarea",
+    confirmError: "No se pudo guardar la confirmación. Inténtalo de nuevo.",
+  },
+};
+
 function categorySub(category: Category, t: typeof UI["en"]): string {
   return ({
     compliments: t.catComplimentsSub,
@@ -127,11 +165,21 @@ function wrapText(ctx: CanvasRenderingContext2D, text: string, maxWidth: number)
   return lines;
 }
 
-function TaskReveal({ text, color, visible, onDismiss, onGenerateAgain, lang, catLabel, source }: {
+function TaskReveal({ text, color, visible, onDismiss, onGenerateAgain, lang, catLabel, source, sharedState, sharedBusy, sharedMessage, onConfirmShared }: {
   text: string; color: { r: number; g: number; b: number }; visible: boolean;
   onDismiss: () => void; onGenerateAgain: () => void; lang: Lang; catLabel: string; source?: "ai" | "fallback";
+  sharedState?: SharedPairState | null; sharedBusy?: boolean; sharedMessage?: string | null; onConfirmShared?: () => void;
 }) {
   const t = UI[lang];
+  const pairCopy = SHARED_TASK_COPY[lang];
+  const isShared = !!onConfirmShared;
+  const stateCopy = sharedState === "waiting_for_partner"
+    ? [pairCopy.waiting, pairCopy.waitingHint]
+    : sharedState === "your_turn"
+      ? [pairCopy.yourTurn, pairCopy.yourTurnHint]
+      : sharedState === "completed"
+        ? [pairCopy.completed, pairCopy.completedHint]
+        : [pairCopy.ready, pairCopy.readyHint];
   const [sharing, setSharing] = useState(false);
   useEffect(() => { if (visible) playReveal(); }, [visible]);
   const share = useCallback(async () => {
@@ -175,11 +223,33 @@ function TaskReveal({ text, color, visible, onDismiss, onGenerateAgain, lang, ca
       <div className="task-reveal__rule" style={{ background: `rgb(${color.r},${color.g},${color.b})` }} />
       <span className="task-reveal__label">{catLabel}</span>
       <p className="task-reveal__text">{text}</p>
+      {isShared && (
+        <div className="task-reveal__shared-status" role="status" data-testid="status-shared-task" style={{ maxWidth: 560, padding: "13px 16px", border: "1px solid rgba(22,34,56,.25)", borderRadius: 14, background: "rgba(255,250,243,.34)", color: "var(--pop-ink)", textAlign: "left" }}>
+          <strong style={{ display: "block", fontSize: 13 }}>{stateCopy[0]}</strong>
+          <small style={{ display: "block", marginTop: 4, lineHeight: 1.45 }}>{stateCopy[1]}</small>
+          {sharedMessage && <small role="alert" style={{ display: "block", marginTop: 5, fontWeight: 700 }}>{sharedMessage}</small>}
+        </div>
+      )}
       {source === "ai" && <span className="task-reveal__source">AI prompt</span>}
       <div className="task-reveal__actions">
         <button data-testid="button-task-again" onClick={onGenerateAgain}>{t.taskAgain}</button>
         <button data-testid="button-share-task" onClick={share} disabled={sharing}>{sharing ? "..." : t.share}</button>
-        <button className="task-reveal__done" data-testid="button-task-done" onClick={onDismiss}>{t.taskDone}</button>
+        <button
+          className="task-reveal__done"
+          data-testid={isShared ? "button-confirm-shared-task" : "button-task-done"}
+          onClick={isShared && (sharedState === "ready" || sharedState === "your_turn") ? onConfirmShared : onDismiss}
+          disabled={!!sharedBusy}
+        >
+          {isShared
+            ? sharedBusy
+              ? pairCopy.saving
+              : sharedState === "ready"
+                ? pairCopy.confirmMine
+                : sharedState === "your_turn"
+                  ? pairCopy.confirmTogether
+                  : pairCopy.close
+            : t.taskDone}
+        </button>
       </div>
     </div>
   );
@@ -190,6 +260,7 @@ interface Props {
   onCategoryChange: (category: Category) => void; swipeDir: "left" | "right";
   coupleId?: string | null; mode?: AppMode; onUpgrade?: () => Promise<boolean>;
   onBuyPremiumTask?: (category: Category) => Promise<boolean>;
+  initialSharedTask?: SharedTaskSnapshot | null;
 }
 
 const PREMIUM_GATE_COPY: Record<Lang, {
@@ -234,7 +305,7 @@ const PREMIUM_GATE_COPY: Record<Lang, {
   },
 };
 
-export default function CategoryScreen({ lang, gender, category, onBack, onCategoryChange, swipeDir, coupleId, mode = "solo", onUpgrade, onBuyPremiumTask }: Props) {
+export default function CategoryScreen({ lang, gender, category, onBack, onCategoryChange, swipeDir, coupleId, mode = "solo", onUpgrade, onBuyPremiumTask, initialSharedTask }: Props) {
   const cfg = CATEGORY_CONFIG[category];
   const popColor = POP_COLORS[category];
   const t = UI[lang];
@@ -243,11 +314,14 @@ export default function CategoryScreen({ lang, gender, category, onBack, onCateg
   const [history, setHistory] = useState<HistoryEntry[]>(loadHistory);
   const [remaining, setRemaining] = useState<number | null>(null);
   const [isPremium, setIsPremium] = useState(false);
-  const [taskId, setTaskId] = useState<string | null>(null);
-  const [taskText, setTaskText] = useState("");
-  const [taskSource, setTaskSource] = useState<"ai" | "fallback">("fallback");
+  const [taskId, setTaskId] = useState<string | null>(() => initialSharedTask?.taskId ?? null);
+  const [taskText, setTaskText] = useState(() => initialSharedTask?.task ?? "");
+  const [sharedTask, setSharedTask] = useState<SharedTaskSnapshot | null>(() => initialSharedTask ?? null);
+  const [sharedMessage, setSharedMessage] = useState<string | null>(null);
+  const [sharedBusy, setSharedBusy] = useState(false);
+  const [taskSource, setTaskSource] = useState<"ai" | "fallback">(() => initialSharedTask?.source ?? "fallback");
   const [isCasting, setIsCasting] = useState(false);
-  const [showReveal, setShowReveal] = useState(false);
+  const [showReveal, setShowReveal] = useState(() => !!initialSharedTask);
   const [historyOpen, setHistoryOpen] = useState(false);
   const [errorKind, setErrorKind] = useState<TaskError["kind"] | null>(null);
   const [generatedErrorCode, setGeneratedErrorCode] = useState<string | null>(null);
@@ -262,6 +336,21 @@ export default function CategoryScreen({ lang, gender, category, onBack, onCateg
   const sub = categorySub(category, t);
   const sensitive = category === "passion" || category === "hard";
   const paywallCopy = PREMIUM_GATE_COPY[lang];
+  const sharedCopy = SHARED_TASK_COPY[lang];
+  const sharedTaskStatus = sharedTask?.state === "waiting_for_partner"
+    ? sharedCopy.waiting
+    : sharedTask?.state === "your_turn"
+      ? sharedCopy.yourTurn
+      : sharedTask?.state === "completed"
+        ? sharedCopy.completed
+        : sharedCopy.ready;
+  const sharedTaskHint = sharedTask?.state === "waiting_for_partner"
+    ? sharedCopy.waitingHint
+    : sharedTask?.state === "your_turn"
+      ? sharedCopy.yourTurnHint
+      : sharedTask?.state === "completed"
+        ? sharedCopy.completedHint
+        : sharedCopy.readyHint;
   const errorCopy: Record<TaskError["kind"], string> = {
     subscription_required: lang === "ru" ? "Эта категория доступна в Premium." : "This category is available in Premium.",
     limit_exceeded: lang === "ru" ? "Лимит на сегодня закончился." : "Today's limit is used.",
@@ -303,6 +392,38 @@ export default function CategoryScreen({ lang, gender, category, onBack, onCateg
     return () => window.removeEventListener("focus", refresh);
   }, [refreshLimits]);
 
+  const refreshSharedTask = useCallback(async () => {
+    if (!sharedTask || mode !== "together" || sharedTask.state === "completed") return;
+    const initData = getInitData();
+    if (!initData) return;
+    try {
+      const response = await fetch(`/api/couple/intimacy?action=task&task_id=${encodeURIComponent(sharedTask.taskId)}`, {
+        headers: { "x-telegram-init-data": initData },
+      });
+      if (!response.ok) return;
+      const data = await response.json();
+      if (!data.task || data.task.taskId !== sharedTask.taskId) return;
+      setSharedTask({ ...data.task, coupleId: data.coupleId } as SharedTaskSnapshot);
+    } catch {
+      // Retain the last confirmed status when the network is temporarily unavailable.
+    }
+  }, [mode, sharedTask]);
+
+  useEffect(() => {
+    if (!sharedTask || mode !== "together" || sharedTask.state === "completed") return;
+    const refreshWhenVisible = () => {
+      if (document.visibilityState === "visible") void refreshSharedTask();
+    };
+    window.addEventListener("focus", refreshWhenVisible);
+    document.addEventListener("visibilitychange", refreshWhenVisible);
+    const timer = window.setInterval(refreshWhenVisible, 15_000);
+    return () => {
+      window.removeEventListener("focus", refreshWhenVisible);
+      document.removeEventListener("visibilitychange", refreshWhenVisible);
+      window.clearInterval(timer);
+    };
+  }, [mode, refreshSharedTask, sharedTask]);
+
   const goToCategory = useCallback((next: Category) => {
     window.Telegram?.WebApp?.HapticFeedback?.impactOccurred("light");
     onCategoryChange(next);
@@ -340,11 +461,60 @@ export default function CategoryScreen({ lang, gender, category, onBack, onCateg
     if (typeof generated.result.remaining === "number") setRemaining(generated.result.remaining);
     const entry: HistoryEntry = { id: `${Date.now()}-${Math.random()}`, text: picked, category, date: new Date().toISOString() };
     const nextHistory = [...history, entry]; saveHistory(nextHistory); setHistory(nextHistory);
-    setTaskId(generated.result.taskId); setTaskText(picked); setTaskSource(generated.result.source ?? "ai"); setIsCasting(false);
+    setTaskId(generated.result.taskId);
+    setTaskText(picked);
+    setTaskSource(generated.result.source ?? "ai");
+    if (mode === "together" && coupleId && generated.result.taskId) {
+      setSharedTask({
+        taskId: generated.result.taskId,
+        coupleId,
+        category,
+        task: picked,
+        source: generated.result.source ?? "ai",
+        createdAt: new Date().toISOString(),
+        completedAt: null,
+        myCompleted: false,
+        partnerCompleted: false,
+        state: "ready",
+      });
+      setSharedMessage(null);
+    } else {
+      setSharedTask(null);
+    }
+    setIsCasting(false);
     tg?.HapticFeedback?.notificationOccurred?.("success");
     if (revealTimer.current) clearTimeout(revealTimer.current);
     revealTimer.current = setTimeout(() => setShowReveal(true), 80);
   }, [category, coupleId, gender, history, isCasting, lang, mode]);
+
+  const confirmSharedTask = useCallback(async () => {
+    if (!sharedTask || sharedBusy) return;
+    setSharedBusy(true);
+    setSharedMessage(null);
+    try {
+      const response = await fetch("/api/couple/intimacy?action=complete", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "x-telegram-init-data": getInitData() },
+        body: JSON.stringify({ task_id: sharedTask.taskId, lang }),
+      });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok || !["waiting_for_partner", "completed"].includes(result.state)) {
+        throw new Error(result.error ?? "confirmation_failed");
+      }
+      setSharedTask((current) => current ? {
+        ...current,
+        myCompleted: true,
+        partnerCompleted: result.state === "completed",
+        completedAt: result.state === "completed" ? new Date().toISOString() : current.completedAt,
+        state: result.state as SharedPairState,
+      } : current);
+      window.dispatchEvent(new CustomEvent("touche-intimacy-updated"));
+    } catch {
+      setSharedMessage(SHARED_TASK_COPY[lang].confirmError);
+    } finally {
+      setSharedBusy(false);
+    }
+  }, [lang, sharedBusy, sharedTask]);
 
   const openPremiumGate = useCallback(() => {
     setPaywallNotice(null);
@@ -388,18 +558,9 @@ export default function CategoryScreen({ lang, gender, category, onBack, onCateg
   }, [category, generate, onBuyPremiumTask, onUpgrade, paywallBusy, paywallCopy, refreshLimits]);
 
   const dismiss = useCallback(() => {
-    if (mode === "together" && coupleId && taskId) {
-      fetch("/api/couple/intimacy?action=complete", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "x-telegram-init-data": getInitData() },
-        body: JSON.stringify({ task_id: taskId }),
-      }).then((response) => {
-        if (response.ok) { addLocalPoints(category); window.dispatchEvent(new CustomEvent("touche-intimacy-updated")); }
-      }).catch(() => {});
-    }
     setShowReveal(false);
     setTimeout(() => setTaskText(""), 400);
-  }, [category, coupleId, mode, taskId]);
+  }, []);
 
   const height = viewportHeight ? `${viewportHeight}px` : "100dvh";
   const enterX = swipeDir === "left" ? 60 : -60;
@@ -423,6 +584,15 @@ export default function CategoryScreen({ lang, gender, category, onBack, onCateg
         </section>
          {sensitive && <div className="category-pop__warning" role="note">18+ · {t.lockSub}</div>}
          {mode === "together" && <div className="category-pop__mode"><span className="category-pop__mode-dot" style={{ background: `rgb(${popColor.r},${popColor.g},${popColor.b})` }} /><strong>{t.sharedTask}</strong><small>{coupleId ? t.linked : t.appSub}</small></div>}
+          {mode === "together" && sharedTask && !showReveal && (
+            <div data-testid="card-shared-task-status" role="status" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, padding: "12px 14px", borderRadius: 14, background: "rgba(22,34,56,.05)", border: "1px solid rgba(22,34,56,.10)" }}>
+              <span style={{ minWidth: 0 }}>
+                <strong style={{ display: "block", fontSize: 12, color: "#162238" }}>{sharedTaskStatus}</strong>
+                <small style={{ display: "block", marginTop: 3, fontSize: 10, lineHeight: 1.4, color: "rgba(22,34,56,.68)" }}>{sharedTaskHint}</small>
+              </span>
+              <button type="button" data-testid="button-reopen-shared-task" onClick={() => setShowReveal(true)} style={{ flexShrink: 0, padding: "9px 11px", border: "1px solid rgba(22,34,56,.18)", borderRadius: 11, background: "#fffaf3", color: "#162238", fontSize: 10, fontWeight: 700, cursor: "pointer" }}>{sharedCopy.openTask}</button>
+            </div>
+          )}
         {(remaining !== null || isPremium) && <div className="category-pop__remaining" data-testid="status-remaining">{isPremium ? (lang === "ru" ? "Задания без ограничений" : "Unlimited tasks") : t.remaining(remaining!)}</div>}
         <section className="category-pop__generator">
            <div className="category-pop__generator-head"><span>{t.hint}</span><b>{String(index + 1).padStart(2, "0")} / {String(CATEGORIES_ORDER.length).padStart(2, "0")}</b></div>
@@ -456,7 +626,20 @@ export default function CategoryScreen({ lang, gender, category, onBack, onCateg
           </section>
         </div>
       )}
-      <TaskReveal text={taskText} color={cfg} visible={showReveal} onDismiss={dismiss} onGenerateAgain={() => { setShowReveal(false); setTimeout(generate, 120); }} lang={lang} catLabel={label} source={taskSource} />
+      <TaskReveal
+        text={taskText}
+        color={cfg}
+        visible={showReveal}
+        onDismiss={dismiss}
+        onGenerateAgain={() => { setShowReveal(false); setTimeout(generate, 120); }}
+        lang={lang}
+        catLabel={label}
+        source={taskSource}
+        sharedState={mode === "together" ? sharedTask?.state : null}
+        sharedBusy={sharedBusy}
+        sharedMessage={sharedMessage}
+        onConfirmShared={mode === "together" && sharedTask ? confirmSharedTask : undefined}
+      />
       <HistoryPanel entries={history.filter((entry) => entry.category === category)} open={historyOpen} onClose={() => setHistoryOpen(false)} accentRgb={cfg} lang={lang} />
     </main>
   );

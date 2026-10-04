@@ -3,7 +3,7 @@ import type { Gender } from "@/components/GenderSelect";
 import { GENDER_KEY } from "@/components/GenderSelect";
 import { UI, CATEGORIES_ORDER, type Lang, type Category } from "@/data/i18n";
 import type { AppMode } from "@/App";
-import IntimacyIndex from "@/components/IntimacyIndex";
+import WishMap from "@/components/WishMap";
 import SmokeBackground from "@/components/SmokeBackground";
 import { BRAND } from "@/theme/palette";
 import { BOT_USERNAME, TELEGRAM_MINI_APP_SHORT_NAME } from "@/config";
@@ -42,6 +42,7 @@ interface HomeProps {
   pendingRefUserId: number | null;
   onCategorySelect: (cat: Category) => void;
   onScenarioOpen: () => void;
+  onOpenSharedTask: (taskId: string) => void;
   onLanguageOpen: () => void;
   onGenderSwitch?: (g: Gender) => void;
   onModeChange: (mode: AppMode) => void;
@@ -667,6 +668,17 @@ function GhostBtn({ onClick, children, danger }: { onClick: () => void; children
 }
 
 /* ─── CoupleModal ──────────────────────────────────────────────── */
+const NOTIFICATION_COPY: Record<Lang, {
+  title: string; description: string; enabled: string; disabled: string;
+  loading: string; updating: string; error: string; toggleLabel: string;
+}> = {
+  ru: { title: "Уведомления о совместных заданиях", description: "Разрешите Touché присылать сдержанные уведомления о заданиях и сценариях. Интимные подробности не появятся в сообщениях.", enabled: "Уведомления включены", disabled: "Уведомления выключены", loading: "Проверяем настройку…", updating: "Сохраняем…", error: "Не удалось сохранить настройку. Попробуйте ещё раз.", toggleLabel: "Разрешить уведомления о совместных заданиях" },
+  en: { title: "Shared activity notifications", description: "Allow Touché to send discreet Telegram updates about tasks and scenarios. Messages won’t include intimate details.", enabled: "Notifications are on", disabled: "Notifications are off", loading: "Checking preference…", updating: "Saving…", error: "Could not save this setting. Please try again.", toggleLabel: "Allow shared activity notifications" },
+  hi: { title: "साझा गतिविधि सूचनाएँ", description: "Touché को कार्यों और दृश्यों के बारे में गोपनीय Telegram अपडेट भेजने दें। संदेशों में निजी विवरण नहीं होंगे।", enabled: "सूचनाएँ चालू हैं", disabled: "सूचनाएँ बंद हैं", loading: "सेटिंग जाँची जा रही है…", updating: "सहेज रहे हैं…", error: "सेटिंग सहेजी नहीं जा सकी। फिर प्रयास करें।", toggleLabel: "साझा गतिविधि सूचनाएँ अनुमति दें" },
+  pt: { title: "Notificações de atividades compartilhadas", description: "Permita que o Touché envie avisos discretos no Telegram sobre tarefas e cenários. As mensagens não incluem detalhes íntimos.", enabled: "Notificações ativadas", disabled: "Notificações desativadas", loading: "Verificando preferência…", updating: "Salvando…", error: "Não foi possível salvar. Tente novamente.", toggleLabel: "Permitir notificações de atividades compartilhadas" },
+  es: { title: "Avisos de actividad compartida", description: "Permite que Touché envíe avisos discretos por Telegram sobre tareas y escenarios. Los mensajes no incluirán detalles íntimos.", enabled: "Avisos activados", disabled: "Avisos desactivados", loading: "Comprobando preferencia…", updating: "Guardando…", error: "No se pudo guardar la configuración. Inténtalo de nuevo.", toggleLabel: "Permitir avisos de actividad compartida" },
+};
+
 function CoupleModal({ lang, coupleId, pendingRefUserId, onLink, onUnlink, onClose }: {
   lang: Lang;
   coupleId: string | null;
@@ -680,6 +692,54 @@ function CoupleModal({ lang, coupleId, pendingRefUserId, onLink, onUnlink, onClo
   const [linking, setLinking] = useState(false);
   const [unlinking, setUnlinking] = useState(false);
   const [error, setError] = useState("");
+  const [notificationsEnabled, setNotificationsEnabled] = useState(false);
+  const [notificationsLoading, setNotificationsLoading] = useState(true);
+  const [notificationsSaving, setNotificationsSaving] = useState(false);
+  const [notificationsError, setNotificationsError] = useState(false);
+  const notificationCopy = NOTIFICATION_COPY[lang];
+
+  useEffect(() => {
+    if (!coupleId) {
+      setNotificationsEnabled(false);
+      setNotificationsLoading(false);
+      return;
+    }
+    let active = true;
+    setNotificationsLoading(true);
+    setNotificationsError(false);
+    fetch("/api/couple/intimacy?action=preferences", {
+      headers: { "x-telegram-init-data": window.Telegram?.WebApp?.initData ?? "" },
+    }).then(async (response) => {
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error("preference_read_failed");
+      if (active) setNotificationsEnabled(data.telegramNotificationsEnabled === true);
+    }).catch(() => {
+      if (active) setNotificationsError(true);
+    }).finally(() => {
+      if (active) setNotificationsLoading(false);
+    });
+    return () => { active = false; };
+  }, [coupleId]);
+
+  async function handleNotificationToggle() {
+    if (!coupleId || notificationsLoading || notificationsSaving) return;
+    setNotificationsSaving(true);
+    setNotificationsError(false);
+    try {
+      const response = await fetch("/api/couple/intimacy?action=preferences", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "x-telegram-init-data": window.Telegram?.WebApp?.initData ?? "" },
+        body: JSON.stringify({ telegram_notifications_enabled: !notificationsEnabled }),
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok || data.ok !== true) throw new Error("preference_update_failed");
+      setNotificationsEnabled(data.telegramNotificationsEnabled === true);
+    } catch {
+      setNotificationsError(true);
+    } finally {
+      setNotificationsSaving(false);
+    }
+  }
 
   const myId = window.Telegram?.WebApp?.initDataUnsafe?.user?.id;
   function handleShareMyLink() {
@@ -763,6 +823,33 @@ function CoupleModal({ lang, coupleId, pendingRefUserId, onLink, onUnlink, onClo
         <div style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", fontSize: 11, color: "rgba(255,238,248,0.35)" }}>{lb.id}</div>
         <div style={{ fontFamily: "monospace", fontSize: 14, color: `rgba(${PR},${PG},${PB},0.90)`, letterSpacing: "0.05em" }}>{maskedId}</div>
       </div>
+
+      <section aria-labelledby="pair-notification-title" data-testid="section-pair-notifications" style={{
+        display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 14,
+        padding: "14px 15px", marginBottom: 18, borderRadius: 16,
+        background: "rgba(255,238,248,0.04)", border: "1px solid rgba(255,238,248,0.08)",
+      }}>
+        <div style={{ minWidth: 0 }}>
+          <strong id="pair-notification-title" style={{ display: "block", fontFamily: "'Plus Jakarta Sans',sans-serif", fontSize: 12, lineHeight: 1.35, color: "rgba(255,238,248,0.9)" }}>{notificationCopy.title}</strong>
+          <p style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", fontSize: 11, lineHeight: 1.5, color: "rgba(255,238,248,0.48)", margin: "6px 0 8px" }}>{notificationCopy.description}</p>
+          <span data-testid="status-pair-notifications" role="status" style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", fontSize: 10, color: notificationsEnabled ? `rgba(${PR},${PG},${PB},0.95)` : "rgba(255,238,248,0.45)" }}>
+            {notificationsLoading ? notificationCopy.loading : notificationsSaving ? notificationCopy.updating : notificationsEnabled ? notificationCopy.enabled : notificationCopy.disabled}
+          </span>
+          {notificationsError && <span data-testid="error-pair-notifications" role="alert" style={{ display: "block", marginTop: 5, fontFamily: "'Plus Jakarta Sans',sans-serif", fontSize: 10, color: "rgba(255,150,170,.9)" }}>{notificationCopy.error}</span>}
+        </div>
+        <button
+          type="button"
+          role="switch"
+          aria-checked={notificationsEnabled}
+          aria-label={notificationCopy.toggleLabel}
+          data-testid="toggle-pair-notifications"
+          disabled={notificationsLoading || notificationsSaving}
+          onClick={() => { void handleNotificationToggle(); }}
+          style={{ width: 46, height: 28, padding: 3, flexShrink: 0, border: 0, borderRadius: 20, cursor: notificationsLoading || notificationsSaving ? "wait" : "pointer", background: notificationsEnabled ? PINK : "rgba(255,238,248,0.16)", opacity: notificationsLoading || notificationsSaving ? 0.65 : 1, transition: "background .2s ease" }}
+        >
+          <span aria-hidden="true" style={{ display: "block", width: 22, height: 22, borderRadius: "50%", background: "#fffaf3", transform: notificationsEnabled ? "translateX(18px)" : "translateX(0)", transition: "transform .2s ease" }} />
+        </button>
+      </section>
 
       {!confirm ? (
         <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
@@ -1100,7 +1187,7 @@ function MenuPanel({ lang, gender, onGenderSwitch, onClose, onLanguageOpen, onSu
 /* ─── Home ─────────────────────────────────────────────────────── */
 export default function Home({
   lang, gender, coupleId, mode, pendingRefUserId,
-  onCategorySelect, onScenarioOpen, onLanguageOpen, onGenderSwitch,
+  onCategorySelect, onScenarioOpen, onOpenSharedTask, onLanguageOpen, onGenderSwitch,
   onModeChange,
   onLinkCouple, onUnlinkCouple, onSubscribe,
 }: HomeProps) {
@@ -1109,7 +1196,7 @@ export default function Home({
   const [vh, setVh] = useState<number | null>(null);
   const [showCoupleModal, setShowCoupleModal] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
-  const [intimacyKey, setIntimacyKey] = useState(0);
+  const [wishMapKey, setWishMapKey] = useState(0);
   const [showScenarioGate, setShowScenarioGate] = useState(false);
   const [limits, setLimits] = useState<Partial<Record<Category, number | null>>>({});
   const topPx = useTelegramTopInset();
@@ -1125,12 +1212,12 @@ export default function Home({
     tg?.onEvent?.("viewportChanged", updateVh);
     const tm = setTimeout(updateVh, 500);
     requestAnimationFrame(() => setMounted(true));
-    function onIntimacyUpdate() { setIntimacyKey(k => k+1); }
-    window.addEventListener("touche-intimacy-updated", onIntimacyUpdate);
+    function onWishMapUpdate() { setWishMapKey(k => k+1); }
+    window.addEventListener("touche-wish-map-updated", onWishMapUpdate);
     return () => {
       tg?.offEvent?.("viewportChanged", updateVh);
       clearTimeout(tm);
-      window.removeEventListener("touche-intimacy-updated", onIntimacyUpdate);
+      window.removeEventListener("touche-wish-map-updated", onWishMapUpdate);
     };
   }, []);
 
@@ -1303,7 +1390,7 @@ export default function Home({
 
         {/* ── List ── */}
         <div className="pop-list" style={{ flex: 1, overflowY: "auto", overflowX: "hidden", padding: `10px 14px max(28px,env(safe-area-inset-bottom))`, display: "flex", flexDirection: "column", gap: 10, position: "relative", zIndex: 1, scrollbarWidth: "none" as const }}>
-          {mode === "together" && <IntimacyIndex lang={lang} refreshKey={intimacyKey} index={0} />}
+          {mode === "together" && <WishMap lang={lang} coupleId={coupleId} onOpenTask={onOpenSharedTask} refreshKey={wishMapKey} />}
           <div className="pop-tiles" style={{ display: "grid", gridTemplateColumns: "repeat(2,minmax(0,1fr))", gap: 10 }}>
             {mode === "together" ? togetherCards : soloCards}
           </div>

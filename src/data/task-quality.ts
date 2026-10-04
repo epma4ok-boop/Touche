@@ -51,6 +51,37 @@ const QUALITY_RULES: Record<string, string> = {
  - Es una tarea breve, no una escena de interpretación: sin personajes, trama ni diálogos largos. Devuelve solo el texto de la tarea.`,
 };
 
+const MODE_RULES: Record<string, Record<"solo" | "together", string>> = {
+  ru: {
+    solo: "В режиме «один» действует только пользователь: не упоминай партнёра, второго человека или совместное действие.",
+    together: "В парном режиме это одно общее действие для обоих, не отдельные роли и не два независимых задания.",
+  },
+  en: {
+    solo: "In solo mode, only the user acts: do not mention a partner, another person, or a shared action.",
+    together: "In together mode, write one shared action for both people, not separate roles or two independent tasks.",
+  },
+  hi: {
+    solo: "एकल मोड में केवल उपयोगकर्ता शामिल है: साथी, दूसरे व्यक्ति या साझा क्रिया का उल्लेख न करें।",
+    together: "साथी मोड में दोनों के लिए एक साझा क्रिया लिखें, अलग भूमिकाएँ या दो स्वतंत्र काम नहीं।",
+  },
+  pt: {
+    solo: "No modo individual, somente o usuário participa: não mencione parceiro, outra pessoa ou ação compartilhada.",
+    together: "No modo a dois, escreva uma ação compartilhada pelos dois, não papéis separados nem duas tarefas independentes.",
+  },
+  es: {
+    solo: "En modo individual solo participa el usuario: no menciones pareja, otra persona ni una acción compartida.",
+    together: "En modo en pareja, escribe una acción compartida por ambos, no papeles separados ni dos tareas independientes.",
+  },
+};
+
+const SOLO_PARTNER_REFERENCES: Record<string, RegExp> = {
+  ru: /\b(?:партн[её]р\w*|девушк\w*|парн\w*|вдво[её]м|оба|обоим|друг\s+другу)\b/iu,
+  en: /\b(?:partner|boyfriend|girlfriend|both of you|each other|one another|your man|your woman)\b/iu,
+  hi: /(?:साथी|दोनों|एक-दूसरे|एक दूसरे|आप दोनों)/u,
+  pt: /\b(?:parceir[oa]\w*|namorad[oa]\w*|companheir[oa]\w*|vocês|um ao outro|uma à outra|juntos)\b/iu,
+  es: /\b(?:pareja|novi[oa]\w*|compañer[oa]\w*|ustedes|ambos|ambas|entre sí|uno al otro|una a la otra|juntos)\b/iu,
+};
+
 const META_PREFIXES: Record<string, RegExp> = {
   ru: /^(?:вот\s+(?:цитата|задание|вариант|текст)|(?:задание|ответ|цитата)\s*[:;—-])/iu,
   en: /^(?:here\s+(?:is|'s)\s+(?:the\s+)?(?:task|quote|text)|(?:task|answer|quote)\s*[:;—-])/iu,
@@ -91,11 +122,13 @@ const SEXUAL_CONTINUATION_AFTER_CLIMAX: Record<string, RegExp> = {
   es: /(?:después|cuando|una vez que).{0,50}(?:orgasmo|clímax|correrse|terminar).{0,80}(?:penetr\w*|entr\w*|introduc\w*|tener sexo|continu\w*|empezar otra ronda)/iu,
 };
 
-export function getTaskQualityRules(lang: string): string {
-  return QUALITY_RULES[lang] ?? QUALITY_RULES.en;
+export function getTaskQualityRules(lang: string, mode: "solo" | "together" = "together"): string {
+  const languageRules = QUALITY_RULES[lang] ?? QUALITY_RULES.en;
+  const modeRule = MODE_RULES[lang]?.[mode] ?? MODE_RULES.en[mode];
+  return `${languageRules}\n - ${modeRule}`;
 }
 
-export function isTaskTextWellFormed(text: string, lang: string): boolean {
+export function isTaskTextWellFormed(text: string, lang: string, mode?: "solo" | "together"): boolean {
   const normalized = text.replace(/\s+/gu, " ").trim();
   if (!normalized) return false;
   if (META_PREFIXES[lang]?.test(normalized)) return false;
@@ -103,5 +136,6 @@ export function isTaskTextWellFormed(text: string, lang: string): boolean {
   if (ROLEPLAY_SCENARIO_MARKERS[lang]?.test(normalized)) return false;
   if (CLIMAX_BEFORE_SEXUAL_CONTINUATION[lang]?.test(normalized)
     || SEXUAL_CONTINUATION_AFTER_CLIMAX[lang]?.test(normalized)) return false;
+  if (mode === "solo" && SOLO_PARTNER_REFERENCES[lang]?.test(normalized)) return false;
   return true;
 }

@@ -53,33 +53,25 @@ const QUALITY_RULES: Record<string, string> = {
 
 const MODE_RULES: Record<string, Record<"solo" | "together", string>> = {
   ru: {
-    solo: "В режиме «один» действует только пользователь: не упоминай партнёра, второго человека или совместное действие.",
-    together: "В парном режиме это одно общее действие для обоих, не отдельные роли и не два независимых задания.",
+    solo: "В режиме «один получает» задание адресовано инициатору, но выполняется им вместе со взрослым партнёром: описывай совместное действие пары, не самопомощь и не уход за собой.",
+    together: "В парном режиме один инициирует задание, а оба получают один и тот же текст. Опиши одно общее действие для совершеннолетних мужчины и женщины, не два отдельных задания.",
   },
   en: {
-    solo: "In solo mode, only the user acts: do not mention a partner, another person, or a shared action.",
-    together: "In together mode, write one shared action for both people, not separate roles or two independent tasks.",
+    solo: "In one-person-start mode, the initiator receives the task, but does it with their adult partner: describe a shared couple activity, never self-care or an action performed alone.",
+    together: "In together mode, one person starts and both receive the same text. Write one shared action for an adult man and woman, not two separate tasks.",
   },
   hi: {
-    solo: "एकल मोड में केवल उपयोगकर्ता शामिल है: साथी, दूसरे व्यक्ति या साझा क्रिया का उल्लेख न करें।",
-    together: "साथी मोड में दोनों के लिए एक साझा क्रिया लिखें, अलग भूमिकाएँ या दो स्वतंत्र काम नहीं।",
+    solo: "एक व्यक्ति-शुरू मोड में उपयोगकर्ता को काम मिलता है, लेकिन वह इसे अपने वयस्क साथी के साथ करता है। जोड़े की साझा गतिविधि लिखें, अकेले की देखभाल या अकेली क्रिया नहीं।",
+    together: "साथी मोड में एक व्यक्ति शुरुआत करता है और दोनों को वही पाठ मिलता है। वयस्क पुरुष और महिला के लिए एक साझा गतिविधि लिखें, दो अलग काम नहीं।",
   },
   pt: {
-    solo: "No modo individual, somente o usuário participa: não mencione parceiro, outra pessoa ou ação compartilhada.",
-    together: "No modo a dois, escreva uma ação compartilhada pelos dois, não papéis separados nem duas tarefas independentes.",
+    solo: "No modo iniciado por uma pessoa, o usuário recebe a tarefa, mas a realiza com seu parceiro adulto: descreva uma atividade do casal, nunca autocuidado ou uma ação solitária.",
+    together: "No modo a dois, uma pessoa inicia e ambos recebem o mesmo texto. Escreva uma ação compartilhada por um homem e uma mulher adultos, não duas tarefas separadas.",
   },
   es: {
-    solo: "En modo individual solo participa el usuario: no menciones pareja, otra persona ni una acción compartida.",
-    together: "En modo en pareja, escribe una acción compartida por ambos, no papeles separados ni dos tareas independientes.",
+    solo: "En el modo que inicia una persona, quien lo inicia recibe la tarea, pero la realiza con su pareja adulta: describe una actividad compartida, nunca autocuidado ni una acción en solitario.",
+    together: "En modo en pareja, una persona inicia y ambos reciben el mismo texto. Escribe una acción compartida para un hombre y una mujer adultos, no dos tareas separadas.",
   },
-};
-
-const SOLO_PARTNER_REFERENCES: Record<string, RegExp> = {
-  ru: /\b(?:партн[её]р\w*|девушк\w*|парн\w*|вдво[её]м|оба|обоим|друг\s+другу)\b/iu,
-  en: /\b(?:partner|boyfriend|girlfriend|both of you|each other|one another|your man|your woman)\b/iu,
-  hi: /(?:साथी|दोनों|एक-दूसरे|एक दूसरे|आप दोनों)/u,
-  pt: /\b(?:parceir[oa]\w*|namorad[oa]\w*|companheir[oa]\w*|vocês|um ao outro|uma à outra|juntos)\b/iu,
-  es: /\b(?:pareja|novi[oa]\w*|compañer[oa]\w*|ustedes|ambos|ambas|entre sí|uno al otro|una a la otra|juntos)\b/iu,
 };
 
 const META_PREFIXES: Record<string, RegExp> = {
@@ -136,6 +128,5 @@ export function isTaskTextWellFormed(text: string, lang: string, mode?: "solo" |
   if (ROLEPLAY_SCENARIO_MARKERS[lang]?.test(normalized)) return false;
   if (CLIMAX_BEFORE_SEXUAL_CONTINUATION[lang]?.test(normalized)
     || SEXUAL_CONTINUATION_AFTER_CLIMAX[lang]?.test(normalized)) return false;
-  if (mode === "solo" && SOLO_PARTNER_REFERENCES[lang]?.test(normalized)) return false;
   return true;
 }

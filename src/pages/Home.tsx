@@ -315,11 +315,11 @@ const INVITE_MSG: Record<Lang, string> = {
 const MODE_LABELS: Record<Lang, {
   solo: string; soloSub: string; together: string; togetherSub: string; connected: string;
 }> = {
-  ru: { solo: "Личный режим", soloSub: "категории по настроению", together: "Вместе", togetherSub: "для двоих", connected: "пара подключена" },
-  en: { solo: "Personal", soloSub: "choose a mood", together: "Together", togetherSub: "for two", connected: "pair connected" },
-  hi: { solo: "व्यक्तिगत", soloSub: "मूड चुनें", together: "साथ में", togetherSub: "दो के लिए", connected: "जोड़ी जुड़ी है" },
-  pt: { solo: "Pessoal", soloSub: "escolha um clima", together: "Juntos", togetherSub: "para dois", connected: "casal conectado" },
-  es: { solo: "Personal", soloSub: "elige un estado", together: "Juntos", togetherSub: "para dos", connected: "pareja conectada" },
+  ru: { solo: "Один получает", soloSub: "выполнить вдвоём", together: "Вместе", togetherSub: "то же задание обоим", connected: "пара подключена" },
+  en: { solo: "One starts", soloSub: "do it together", together: "Together", togetherSub: "same task for both", connected: "pair connected" },
+  hi: { solo: "एक शुरुआत करे", soloSub: "दोनों साथ करें", together: "साथ में", togetherSub: "दोनों को वही काम", connected: "जोड़ी जुड़ी है" },
+  pt: { solo: "Uma pessoa inicia", soloSub: "façam juntos", together: "A dois", togetherSub: "mesma tarefa para ambos", connected: "casal conectado" },
+  es: { solo: "Uno inicia", soloSub: "háganlo juntos", together: "En pareja", togetherSub: "misma tarea para ambos", connected: "pareja conectada" },
 };
 
 function ModeSwitcher({ lang, mode, coupleId, onChange }: {

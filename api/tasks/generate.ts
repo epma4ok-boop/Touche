@@ -25,7 +25,8 @@ const CATEGORIES = new Set(["compliments", "tenderness", "desire", "passion", "h
 const PAID_CATEGORIES = new Set(["passion", "hard"]);
 const LANGS = new Set(["ru", "en", "hi", "pt", "es"]);
 const GENDERS = new Set(["male", "female"]);
-const MODES = new Set(["solo", "together"]);
+const MODES = new Set(["solo", "together"] as const);
+type TaskMode = "solo" | "together";
 const MAX_TASK_CHARS = 280;
 const supabase = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!);
 
@@ -41,11 +42,11 @@ async function notifyPartner(chatId: number, partnerUserId: number, coupleId: st
     .maybeSingle();
   if (preferenceError || preference?.telegram_notifications_enabled !== true) return false;
   const messages: Record<string, { text: string; button: string }> = {
-    ru: { text: "Партнёр выбрал для вас совместное задание. Откройте его и подтвердите выполнение каждый со своей стороны.", button: "Открыть наше задание" },
-    en: { text: "Your partner picked a shared task for you. Open it and confirm when each of you has done it.", button: "Open our task" },
-    hi: { text: "आपके साथी ने आपके लिए साझा कार्य चुना है। इसे खोलें और पूरा होने पर दोनों अपनी पुष्टि करें।", button: "हमारा कार्य खोलें" },
-    pt: { text: "Seu parceiro escolheu uma tarefa compartilhada. Abram e confirmem quando ambos a concluírem.", button: "Abrir nossa tarefa" },
-    es: { text: "Tu pareja eligió una tarea compartida. Ábranla y confirmen cuando ambos la hayan completado.", button: "Abrir nuestra tarea" },
+    ru: { text: "Партнёр выбрал общее задание для вас двоих. Откройте его в Touché, когда будете готовы.", button: "Открыть наше задание" },
+    en: { text: "Your partner picked a shared task for the two of you. Open it in Touché when you’re ready.", button: "Open our task" },
+    hi: { text: "आपके साथी ने आप दोनों के लिए एक साझा काम चुना है। तैयार होने पर इसे Touché में खोलें।", button: "हमारा काम खोलें" },
+    pt: { text: "Seu parceiro escolheu uma tarefa para vocês dois. Abram no Touché quando estiverem prontos.", button: "Abrir nossa tarefa" },
+    es: { text: "Tu pareja eligió una tarea para ambos. Ábranla en Touché cuando estén listos.", button: "Abrir nuestra tarea" },
   };
   const message = messages[lang] ?? messages.en;
   let url: string;
@@ -80,10 +81,57 @@ const STATIC_POOLS: Record<string, StaticPool> = {
   es: TASKS_ES,
 };
 
-function getFallback(cat: string, lang: string): string {
+const SOLO_FALLBACKS: Record<string, StaticPool> = {
+  ru: {
+    compliments: ["Назови три качества, которые ценишь в себе, и произнеси вслух то, которое сейчас особенно важно."],
+    tenderness: ["Нанеси немного крема на руки и медленно помассируй каждую ладонь, не отвлекаясь на экран."],
+    desire: ["Проведи ладонью по телу поверх одежды и задержись там, где предвкушение ощущается сильнее."],
+    passion: ["Устрой себе личный чувственный момент: исследуй прикосновениями одну зону тела в удобном для тебя темпе."],
+    hard: ["Выбери одно уверенное, прямое прикосновение к себе и несколько минут сохраняй выбранный ритм."],
+  },
+  en: {
+    compliments: ["Name three things you appreciate about yourself, then say the one you most need to hear out loud."],
+    tenderness: ["Warm a little lotion between your palms and slowly massage each hand without looking at a screen."],
+    desire: ["Trace a slow touch over your clothes and linger where the anticipation feels strongest."],
+    passion: ["Make a private sensual moment for yourself: explore one area of your body at a pace that feels comfortable."],
+    hard: ["Choose one firm, direct touch for yourself and keep a deliberate rhythm for a few minutes."],
+  },
+  hi: {
+    compliments: ["अपने बारे में तीन ऐसी बातें बोलें जिनकी आप कद्र करते हैं, फिर उनमें से एक बात ज़ोर से कहें।"],
+    tenderness: ["हथेलियों में थोड़ा लोशन गर्म करें और बिना स्क्रीन देखे हर हथेली की धीरे-धीरे मालिश करें।"],
+    desire: ["कपड़ों के ऊपर अपनी त्वचा पर धीरे हाथ फेरें और जहाँ उत्सुकता अधिक लगे वहाँ ठहरें।"],
+    passion: ["अपने लिए एक निजी, संवेदनशील पल बनाएँ और अपनी सुविधा की गति से शरीर के एक हिस्से को स्पर्श से महसूस करें।"],
+    hard: ["अपने लिए एक दृढ़ और स्पष्ट स्पर्श चुनें और कुछ मिनट उसी लय को बनाए रखें।"],
+  },
+  pt: {
+    compliments: ["Diga três qualidades que você aprecia em si e fale em voz alta aquela que mais precisa ouvir hoje."],
+    tenderness: ["Aqueça um pouco de creme entre as mãos e massageie cada palma devagar, sem olhar para a tela."],
+    desire: ["Deslize a mão lentamente sobre a roupa e demore onde a expectativa parecer mais forte."],
+    passion: ["Crie um momento sensual só seu: explore uma região do corpo no ritmo que for confortável."],
+    hard: ["Escolha um toque firme e direto em si e mantenha um ritmo intencional por alguns minutos."],
+  },
+  es: {
+    compliments: ["Di tres cosas que valoras de ti y expresa en voz alta la que más necesitas escuchar hoy."],
+    tenderness: ["Calienta un poco de crema entre las manos y masajea cada palma despacio, sin mirar la pantalla."],
+    desire: ["Desliza la mano lentamente sobre la ropa y detente donde la expectativa se sienta más intensa."],
+    passion: ["Regálate un momento sensual y privado: explora una zona de tu cuerpo al ritmo que te resulte cómodo."],
+    hard: ["Elige un toque firme y directo para ti y mantén un ritmo deliberado durante unos minutos."],
+  },
+};
+
+function isTaskMode(mode: string): mode is TaskMode {
+  return MODES.has(mode as TaskMode);
+}
+
+function getFallback(cat: string, lang: string, mode: TaskMode): string {
+  if (mode === "solo") {
+    const pool = SOLO_FALLBACKS[lang] ?? SOLO_FALLBACKS.en;
+    const options = pool[cat] ?? pool.compliments;
+    return options[Math.floor(Math.random() * options.length)];
+  }
   const pool = STATIC_POOLS[lang] ?? STATIC_POOLS["en"];
   const list = (pool as StaticPool)[cat] ?? (pool as StaticPool)["compliments"];
-  const wellFormed = list.filter(task => isTaskTextWellFormed(task, lang));
+  const wellFormed = list.filter(task => isTaskTextWellFormed(task, lang, mode));
   const candidates = wellFormed.length > 0 ? wellFormed : list;
   return candidates[Math.floor(Math.random() * candidates.length)];
 }
@@ -113,6 +161,49 @@ function getGenderLine(lang: string, gender: string): string {
   };
   return map[lang]?.[gender] ?? map["en"]["male"];
 }
+
+function getSoloGenderLine(lang: string, gender: string): string {
+  const copy: Record<string, Record<string, string>> = {
+    ru: {
+      male: "Пользователь — совершеннолетний мужчина. Обращайся к нему на «ты»; в задании действует только он.",
+      female: "Пользователь — совершеннолетняя женщина. Обращайся к ней на «ты»; в задании действует только она.",
+    },
+    en: {
+      male: "The user is an adult man. Address him directly as 'you'; he is the only person in the task.",
+      female: "The user is an adult woman. Address her directly as 'you'; she is the only person in the task.",
+    },
+    hi: {
+      male: "उपयोगकर्ता वयस्क पुरुष है। सीधे 'आप' कहकर संबोधित करें; कार्य में केवल वही व्यक्ति शामिल है।",
+      female: "उपयोगकर्ता वयस्क महिला है। सीधे 'आप' कहकर संबोधित करें; कार्य में केवल वही व्यक्ति शामिल है।",
+    },
+    pt: {
+      male: "O usuário é um homem adulto. Fale diretamente com 'você'; somente ele participa da tarefa.",
+      female: "A usuária é uma mulher adulta. Fale diretamente com 'você'; somente ela participa da tarefa.",
+    },
+    es: {
+      male: "El usuario es un hombre adulto. Háblale directamente de tú; solo él participa en la tarea.",
+      female: "La usuaria es una mujer adulta. Háblale directamente de tú; solo ella participa en la tarea.",
+    },
+  };
+  return copy[lang]?.[gender] ?? copy.en.male;
+}
+
+const MODE_INSTRUCTIONS: Record<string, Record<string, string>> = {
+  solo: {
+    ru: "Режим «один»: создай задание для одного совершеннолетнего пользователя, которое он выполняет самостоятельно. Это указание важнее формулировок о паре в описании категории. Не упоминай партнёра, взаимодействие или действия второго человека. В комплиментах — самоподдержка, в нежности — бережный уход за собой; чувственные категории остаются одиночными.",
+    en: "Solo mode: write for one adult user acting alone. This instruction overrides couple wording in the category description. Do not mention a partner, interaction, or actions by a second person. Compliments should be self-affirming; tenderness should be self-care. Sensual categories remain solo.",
+    hi: "एकल मोड: एक वयस्क उपयोगकर्ता के लिए काम लिखें जो इसे अकेले करे। यह निर्देश श्रेणी के जोड़े-संबंधी वर्णन से ऊपर है। साथी, बातचीत या दूसरे व्यक्ति की क्रिया का उल्लेख न करें। प्रशंसा आत्म-प्रोत्साहन हो और कोमलता स्वयं की देखभाल हो।",
+    pt: "Modo individual: escreva para uma pessoa adulta que realiza a tarefa sozinha. Esta regra prevalece sobre qualquer descrição de casal na categoria. Não mencione parceiro, interação ou ações de outra pessoa. Elogios são de autoestima; carinho é autocuidado.",
+    es: "Modo individual: escribe para una persona adulta que realiza la tarea a solas. Esta regla prevalece sobre cualquier descripción de pareja en la categoría. No menciones pareja, interacción ni acciones de otra persona. Los cumplidos son de autoestima y la ternura es autocuidado.",
+  },
+  together: {
+    ru: "Парный режим: это одно общее задание для совершеннолетних мужчины и женщины, а не две отдельные роли. Оба участвуют в одном естественном ритуале; текст виден обоим. Соблюдай согласованное описание пола, анатомию и физически правдоподобный порядок действий.",
+    en: "Together mode: create one shared task for an adult man and woman, not two separate roles. Both take part in the same natural ritual; both see the same text. Keep the stated genders, anatomy, and physical sequence plausible.",
+    hi: "साथी मोड: वयस्क पुरुष और महिला के लिए एक साझा काम लिखें, दो अलग भूमिकाएँ नहीं। दोनों एक ही स्वाभाविक गतिविधि में भाग लें; वही पाठ दोनों देखेंगे।",
+    pt: "Modo a dois: crie uma única tarefa compartilhada para um homem e uma mulher adultos, não dois papéis separados. Ambos participam do mesmo ritual natural e veem o mesmo texto.",
+    es: "Modo en pareja: crea una sola tarea compartida para un hombre y una mujer adultos, no dos papeles separados. Ambos participan en el mismo ritual natural y ven el mismo texto.",
+  },
+};
 
 // ─── ПРОМПТЫ (ИИ сам придумывает, а не выбирает из списка) ────────────────
 
@@ -325,7 +416,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const mode = String(body.mode ?? "solo");
   const coupleId = typeof body.coupleId === "string" ? body.coupleId : null;
   if (!CATEGORIES.has(category)) return res.status(400).json({ error: "invalid_category" });
-  if (!LANGS.has(lang) || !GENDERS.has(gender) || !MODES.has(mode)) return res.status(400).json({ error: "invalid_generation_options" });
+  if (!LANGS.has(lang) || !GENDERS.has(gender) || !isTaskMode(mode)) return res.status(400).json({ error: "invalid_generation_options" });
   if (body.requestId !== undefined && (typeof body.requestId !== "string" || !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(body.requestId))) {
     return res.status(400).json({ error: "invalid_request_id" });
   }
@@ -356,13 +447,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     if (credits < 1) return res.status(403).json({ error: "subscription_required" });
   }
 
-  let task = getFallback(category, lang);
+  let task = getFallback(category, lang, mode);
   let source: "ai" | "fallback" = "fallback";
   if (DEEPSEEK_API_KEY) {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 12_000);
     try {
-        const systemPrompt = `${getPrompt(category, lang)}\n\n${getVariationInstruction(category, lang, requestId)}\n\n${getGenderLine(lang, gender)}\n\n${getTaskQualityRules(lang)}\n\n${LANGUAGE_INSTRUCTIONS[lang]}`;
+        const roleInstruction = mode === "solo" ? getSoloGenderLine(lang, gender) : getGenderLine(lang, gender);
+        const systemPrompt = `${getPrompt(category, lang)}\n\n${MODE_INSTRUCTIONS[mode][lang]}\n\n${getVariationInstruction(category, lang, requestId)}\n\n${roleInstruction}\n\n${getTaskQualityRules(lang, mode)}\n\n${LANGUAGE_INSTRUCTIONS[lang]}`;
       const aiRes = await fetch(DEEPSEEK_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${DEEPSEEK_API_KEY}` },
@@ -378,7 +470,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         const forbidden = ["я рекомендую", "тебе стоит", "можешь попробовать"];
         if (candidate.length >= 15 && candidate.length <= MAX_TASK_CHARS
           && matchesRequestedLanguage(candidate, lang)
-          && isTaskTextWellFormed(candidate, lang)
+          && isTaskTextWellFormed(candidate, lang, mode)
           && !forbidden.some(f => candidate.toLowerCase().includes(f))) {
           task = candidate;
           source = "ai";

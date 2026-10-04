@@ -56,33 +56,33 @@ async function sendBotMessage(coupleId: string, chatId: number, lang: string, ki
   const copy: Record<string, Record<typeof kind, { text: string; button: string }>> = {
     ru: {
       task_waiting: { text: "Партнёр отметил наше задание. Теперь твоя очередь — подтвердите его вместе в Touché.", button: "Открыть наше задание" },
-      task_done: { text: "Вы выполнили совместное задание. Индекс близости обновлён.", button: "Открыть Touché" },
+      task_done: { text: "Вы подтвердили общее задание в Touché.", button: "Открыть Touché" },
       scenario_waiting: { text: "Партнёр завершил свою роль в сценарии. Теперь твоя очередь.", button: "Продолжить сценарий" },
-      scenario_done: { text: "Вы завершили сценарий вместе. Индекс близости обновлён.", button: "Открыть Touché" },
+      scenario_done: { text: "Вы подтвердили завершение сценария в Touché.", button: "Открыть Touché" },
     },
     en: {
       task_waiting: { text: "Your partner marked your shared task. It’s your turn to confirm it together in Touché.", button: "Open our task" },
-      task_done: { text: "You completed a shared task together. Your intimacy index is updated.", button: "Open Touché" },
+      task_done: { text: "You confirmed your shared task in Touché.", button: "Open Touché" },
       scenario_waiting: { text: "Your partner finished their scenario role. It’s your turn.", button: "Continue scenario" },
-      scenario_done: { text: "You completed a scenario together. Your intimacy index is updated.", button: "Open Touché" },
+      scenario_done: { text: "You confirmed your scenario in Touché.", button: "Open Touché" },
     },
     hi: {
       task_waiting: { text: "आपके साथी ने साझा कार्य पूरा किया। अब Touché में आपकी बारी है।", button: "हमारा कार्य खोलें" },
-      task_done: { text: "आपने साझा कार्य साथ में पूरा किया। निकटता सूचकांक अपडेट हो गया है।", button: "Touché खोलें" },
+      task_done: { text: "आपने Touché में साझा कार्य की पुष्टि की।", button: "Touché खोलें" },
       scenario_waiting: { text: "आपके साथी ने अपनी भूमिका पूरी की। अब आपकी बारी है।", button: "दृश्य जारी रखें" },
-      scenario_done: { text: "आपने दृश्य साथ में पूरा किया। निकटता सूचकांक अपडेट हो गया है।", button: "Touché खोलें" },
+      scenario_done: { text: "आपने Touché में दृश्य पूरा होने की पुष्टि की।", button: "Touché खोलें" },
     },
     pt: {
       task_waiting: { text: "Seu parceiro confirmou a tarefa compartilhada. Agora é sua vez no Touché.", button: "Abrir nossa tarefa" },
-      task_done: { text: "Vocês concluíram uma tarefa juntos. O índice de intimidade foi atualizado.", button: "Abrir Touché" },
+      task_done: { text: "Vocês confirmaram a tarefa compartilhada no Touché.", button: "Abrir Touché" },
       scenario_waiting: { text: "Seu parceiro terminou o papel dele. Agora é sua vez.", button: "Continuar cenário" },
-      scenario_done: { text: "Vocês concluíram o cenário juntos. O índice foi atualizado.", button: "Abrir Touché" },
+      scenario_done: { text: "Vocês confirmaram o cenário no Touché.", button: "Abrir Touché" },
     },
     es: {
       task_waiting: { text: "Tu pareja confirmó la tarea compartida. Ahora te toca en Touché.", button: "Abrir nuestra tarea" },
-      task_done: { text: "Completaron una tarea juntos. El índice de intimidad se actualizó.", button: "Abrir Touché" },
+      task_done: { text: "Confirmaron la tarea compartida en Touché.", button: "Abrir Touché" },
       scenario_waiting: { text: "Tu pareja terminó su papel. Ahora te toca a ti.", button: "Continuar escenario" },
-      scenario_done: { text: "Completaron el escenario juntos. El índice se actualizó.", button: "Abrir Touché" },
+      scenario_done: { text: "Confirmaron el escenario en Touché.", button: "Abrir Touché" },
     },
   };
   const message = (copy[lang] ?? copy.en)[kind];
@@ -94,6 +94,41 @@ async function sendBotMessage(coupleId: string, chatId: number, lang: string, ki
         chat_id: chatId,
         text: message.text,
         reply_markup: url ? { inline_keyboard: [[{ text: message.button, web_app: { url } }]] } : undefined,
+      }),
+    });
+    return response.ok;
+  } catch {
+    return false;
+  }
+}
+
+async function sendWishCardNotification(coupleId: string, chatId: number, lang: string): Promise<boolean> {
+  if (!BOT) return false;
+  const { data: preference, error } = await sb
+    .from("couple_member_preferences")
+    .select("telegram_notifications_enabled")
+    .eq("couple_id", coupleId)
+    .eq("user_id", chatId)
+    .maybeSingle();
+  if (error || preference?.telegram_notifications_enabled !== true) return false;
+  const copy: Record<string, { text: string; button: string }> = {
+    ru: { text: "В вашей Карте желаний появилась личная карточка. Откройте Touché, чтобы посмотреть её.", button: "Открыть Карту желаний" },
+    en: { text: "A private card is waiting in your Wish Map. Open Touché to view it.", button: "Open Wish Map" },
+    hi: { text: "आपके इच्छा मानचित्र में एक निजी कार्ड आया है। इसे देखने के लिए Touché खोलें।", button: "इच्छा मानचित्र खोलें" },
+    pt: { text: "Há um cartão privado no seu Mapa de Desejos. Abra o Touché para vê-lo.", button: "Abrir Mapa de Desejos" },
+    es: { text: "Hay una tarjeta privada en tu Mapa de Deseos. Abre Touché para verla.", button: "Abrir Mapa de Deseos" },
+  };
+  const url = appUrlWith({ wish_map: "1" });
+  if (!url) return false;
+  const message = copy[lang] ?? copy.en;
+  try {
+    const response = await fetch(`https://api.telegram.org/bot${BOT}/sendMessage`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        chat_id: chatId,
+        text: message.text,
+        reply_markup: { inline_keyboard: [[{ text: message.button, web_app: { url } }]] },
       }),
     });
     return response.ok;
@@ -125,6 +160,188 @@ async function handleUpdatePreferences(couple: Couple, userId: number, body: Rec
   }, { onConflict: "couple_id,user_id" });
   if (error) throw error;
   return { status: 200, body: { ok: true, telegramNotificationsEnabled: body.telegram_notifications_enabled } };
+}
+
+const WISH_HEART_THRESHOLD = 20;
+const TASK_CHECKIN_DELAY_MS = 24 * 60 * 60 * 1000;
+
+async function handleWishMap(couple: Couple, userId: number) {
+  const cutoff = new Date(Date.now() - TASK_CHECKIN_DELAY_MS).toISOString();
+  const [heartResult, cardResult, taskResult] = await Promise.all([
+    sb.from("wish_map_hearts").select("id", { count: "exact", head: true }).eq("couple_id", couple.id).eq("user_id", userId),
+    sb.from("wish_map_cards")
+      .select("id,couple_id,sender_user_id,recipient_user_id,milestone,wish_text,status,created_at")
+      .eq("couple_id", couple.id)
+      .or(`sender_user_id.eq.${userId},recipient_user_id.eq.${userId}`)
+      .order("created_at", { ascending: false })
+      .limit(1000),
+    sb.from("generated_tasks")
+      .select("id,category,task_text,created_at")
+      .eq("couple_id", couple.id)
+      .eq("mode", "together")
+      .lte("created_at", cutoff)
+      .order("created_at", { ascending: false })
+      .limit(100),
+  ]);
+  if (heartResult.error || cardResult.error || taskResult.error) {
+    throw heartResult.error ?? cardResult.error ?? taskResult.error;
+  }
+
+  const tasks = taskResult.data ?? [];
+  const taskIds = tasks.map((task) => task.id);
+  let attestedIds = new Set<string>();
+  if (taskIds.length > 0) {
+    const { data, error } = await sb.from("wish_map_task_attestations")
+      .select("generated_task_id")
+      .eq("couple_id", couple.id)
+      .eq("evaluator_user_id", userId)
+      .in("generated_task_id", taskIds);
+    if (error) throw error;
+    attestedIds = new Set((data ?? []).map((row) => String(row.generated_task_id)));
+  }
+
+  const cards = cardResult.data ?? [];
+  const sent = cards.filter((card) => Number(card.sender_user_id) === userId);
+  const received = cards.filter((card) => Number(card.recipient_user_id) === userId);
+  const hearts = Number(heartResult.count ?? 0);
+  const unlockedMilestones = Math.floor(hearts / WISH_HEART_THRESHOLD);
+  const usedMilestones = new Set(sent.map((card) => Number(card.milestone)));
+
+  return {
+    hearts,
+    threshold: WISH_HEART_THRESHOLD,
+    availableWishes: Math.max(0, unlockedMilestones - usedMilestones.size),
+    dueTasks: tasks
+      .filter((task) => !attestedIds.has(String(task.id)))
+      .slice(0, 12)
+      .map((task) => ({
+        taskId: String(task.id),
+        category: String(task.category),
+        task: String(task.task_text),
+        createdAt: String(task.created_at),
+      })),
+    sentWishes: sent.slice(0, 20).map((card) => ({
+      id: String(card.id),
+      text: String(card.wish_text),
+      status: card.status,
+      createdAt: String(card.created_at),
+      milestone: Number(card.milestone),
+    })),
+    receivedWishes: received.slice(0, 20).map((card) => ({
+      id: String(card.id),
+      text: String(card.wish_text),
+      status: card.status,
+      createdAt: String(card.created_at),
+    })),
+  };
+}
+
+async function handleWishTaskAttestation(couple: Couple, userId: number, body: Record<string, unknown>) {
+  const taskId = String(body.task_id ?? "");
+  const partnerCompleted = body.partner_completed;
+  if (!UUID.test(taskId) || typeof partnerCompleted !== "boolean") {
+    return { status: 400, body: { error: "invalid_task_attestation" } };
+  }
+
+  const { data: task, error: taskError } = await sb.from("generated_tasks")
+    .select("id,created_at")
+    .eq("id", taskId)
+    .eq("couple_id", couple.id)
+    .eq("mode", "together")
+    .maybeSingle();
+  if (taskError) throw taskError;
+  if (!task) return { status: 404, body: { error: "shared_task_not_found" } };
+  if (Date.now() - new Date(task.created_at).getTime() < TASK_CHECKIN_DELAY_MS) {
+    return { status: 409, body: { error: "task_checkin_not_due" } };
+  }
+
+  const { data, error } = await sb.rpc("submit_wish_map_task_attestation", {
+    p_task_id: taskId,
+    p_user_id: userId,
+    p_partner_completed: partnerCompleted,
+  });
+  if (error) throw error;
+  return {
+    status: 200,
+    body: {
+      ok: true,
+      heartAdded: data?.heartAdded === true,
+      alreadySubmitted: data?.alreadySubmitted === true,
+    },
+  };
+}
+
+async function handleCreateWish(couple: Couple, userId: number, body: Record<string, unknown>) {
+  const rawText = typeof body.wish_text === "string" ? body.wish_text : "";
+  const wishText = rawText.replace(/[\u0000-\u001f\u007f]/gu, " ").replace(/\s+/gu, " ").trim();
+  if (!wishText || wishText.length > 280) {
+    return { status: 400, body: { error: "invalid_wish_text" } };
+  }
+
+  const [{ count, error: heartError }, { data: existingCards, error: cardsError }] = await Promise.all([
+    sb.from("wish_map_hearts").select("id", { count: "exact", head: true }).eq("couple_id", couple.id).eq("user_id", userId),
+    sb.from("wish_map_cards").select("milestone").eq("couple_id", couple.id).eq("sender_user_id", userId),
+  ]);
+  if (heartError || cardsError) throw heartError ?? cardsError;
+
+  const unlocked = Math.floor(Number(count ?? 0) / WISH_HEART_THRESHOLD);
+  const used = new Set((existingCards ?? []).map((card) => Number(card.milestone)));
+  let milestone = 0;
+  for (let candidate = 1; candidate <= unlocked; candidate += 1) {
+    if (!used.has(candidate)) {
+      milestone = candidate;
+      break;
+    }
+  }
+  if (!milestone) return { status: 403, body: { error: "wish_card_not_unlocked" } };
+
+  const partnerId = couple.user_a_id === userId ? couple.user_b_id : couple.user_a_id;
+  const { data: card, error: insertError } = await sb.from("wish_map_cards")
+    .insert({
+      couple_id: couple.id,
+      sender_user_id: userId,
+      recipient_user_id: partnerId,
+      milestone,
+      wish_text: wishText,
+    })
+    .select("id")
+    .single();
+  if (insertError?.code === "23505") return { status: 409, body: { error: "wish_milestone_already_used" } };
+  if (insertError) throw insertError;
+
+  const notified = await sendWishCardNotification(couple.id, partnerId, safeLang(body.lang));
+  return { status: 200, body: { ok: true, wishId: card.id, notified } };
+}
+
+async function handleRespondToWish(couple: Couple, userId: number, body: Record<string, unknown>) {
+  const wishId = String(body.wish_id ?? "");
+  const response = String(body.response ?? "");
+  const statusMap: Record<string, string> = { accept: "accepted", adjust: "adjust", not_now: "not_now" };
+  if (!UUID.test(wishId) || !statusMap[response]) {
+    return { status: 400, body: { error: "invalid_wish_response" } };
+  }
+
+  const { data, error } = await sb.from("wish_map_cards")
+    .update({ status: statusMap[response], responded_at: new Date().toISOString() })
+    .eq("id", wishId)
+    .eq("couple_id", couple.id)
+    .eq("recipient_user_id", userId)
+    .eq("status", "pending")
+    .select("id,status")
+    .maybeSingle();
+  if (error) throw error;
+  if (data) return { status: 200, body: { ok: true, status: data.status } };
+
+  const { data: current, error: readError } = await sb.from("wish_map_cards")
+    .select("status")
+    .eq("id", wishId)
+    .eq("couple_id", couple.id)
+    .eq("recipient_user_id", userId)
+    .maybeSingle();
+  if (readError) throw readError;
+  return current
+    ? { status: 200, body: { ok: true, status: current.status, alreadyResponded: true } }
+    : { status: 404, body: { error: "wish_card_not_found" } };
 }
 
 async function getCouple(userId: number): Promise<Couple | null> {
@@ -401,6 +618,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       if (action === "preferences") {
         return res.status(200).json(await handleGetPreferences(couple, user.id));
       }
+      if (action === "wish_map") return res.status(200).json(await handleWishMap(couple, user.id));
       if (action === "stats") {
         const stats = await handleStats(couple, user.id);
         return stats ? res.status(200).json(stats) : res.status(404).json({ error: "not_found" });
@@ -423,6 +641,18 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     if (req.method === "POST" && action === "complete") {
       const result = await handleCompleteTask(couple, user.id, req.body ?? {});
+      return res.status(result.status).json(result.body);
+    }
+    if (req.method === "POST" && action === "attest") {
+      const result = await handleWishTaskAttestation(couple, user.id, req.body ?? {});
+      return res.status(result.status).json(result.body);
+    }
+    if (req.method === "POST" && action === "create_wish") {
+      const result = await handleCreateWish(couple, user.id, req.body ?? {});
+      return res.status(result.status).json(result.body);
+    }
+    if (req.method === "POST" && action === "respond_wish") {
+      const result = await handleRespondToWish(couple, user.id, req.body ?? {});
       return res.status(result.status).json(result.body);
     }
     if (req.method === "POST" && action === "preferences") {

@@ -1,54 +1,54 @@
 const QUALITY_RULES: Record<string, string> = {
   ru: `Проверка качества — выполни её молча перед ответом:
- - Верни одно самостоятельное задание с одной центральной идеей и 1–3 тесно связанными шагами.
- - Пиши прямо и естественно: конкретное действие плюс одна выразительная деталь. Обычно достаточно 1–2 предложений; не повторяй один и тот же финал «пусть почувствует».
+  - Верни одно общее задание с одной центральной идеей. Оно может разворачиваться в течение ближайших суток через 2–4 коротких момента в свободное время; не требуй постоянной переписки или присутствия рядом весь день.
+  - Пиши прямо и естественно, обычно в 1–2 предложениях: конкретные действия плюс одна выразительная деталь. Не повторяй один и тот же финал «пусть почувствует».
  - Сохраняй заданные пол и роли мужчины и женщины. Проверяй, кто действует, на ком и какие части тела участвуют.
  - Расположи действия в физически выполнимом порядке. Не пропускай необходимый переход и не обещай автоматическую телесную реакцию.
  - Чётко соблюдай границы категории: комплименты и нежность несексуальны; желание — прелюдия до секса; страсть — чувственный секс; хард — более прямой и грязный стиль.
  - Не описывай принуждение, игнорирование боли или опасную механику. Не добавляй в текст задания пояснения о договорённостях, стоп-словах или безопасности.
  - Если упоминается оргазм, обычно заверши задание на нём; не начинай после него следующий сексуальный акт автоматически.
- - Не требуй интимных фото, видео или съёмки. Не добавляй реквизит по шаблону.
- - Это короткое задание, не ролевая сцена: без персонажей, сюжета и длинных диалогов. Верни только текст задания, без вступления и пояснений.`,
+  - Не требуй интимных фото, видео или съёмки. Обычные личные селфи допустимы, если уместны для категории. Не добавляй реквизит по шаблону.
+  - Это реальное общее задание, не ролевая игра: без вымышленных персонажей, сюжета и длинных диалогов. Верни только текст задания, без вступления и пояснений.`,
   en: `Quality check — do this silently before answering:
- - Return one self-contained task with one central idea and 1–3 closely connected steps.
- - Write directly and naturally: one concrete action plus one vivid detail. Usually 1–2 sentences are enough; avoid repeating the same "let them feel" ending.
+  - Return one shared task with one central idea. It may unfold over the next 24 hours in 2–4 short moments during free time; do not require constant messaging or being together all day.
+  - Write directly and naturally, usually in 1–2 sentences: concrete actions plus one vivid detail. Avoid repeating the same "let them feel" ending.
  - Keep the man-woman roles fixed. Check who acts, who receives the action, and which body parts are involved.
  - Put actions in a physically possible order. Do not skip necessary transitions or promise an automatic bodily response.
  - Keep category boundaries clear: compliments and tenderness are nonsexual; desire is foreplay before sex; passion is sensual sex; hard is more direct and dirty in tone.
  - Do not describe coercion, ignoring pain, or physically dangerous actions. Do not put explanations about agreements, safewords, or safety in the task text.
  - If orgasm is mentioned, usually make it the endpoint; do not automatically start another sexual act afterward.
- - Do not require intimate photos, video, or filming. Do not add props by default.
- - This is a short task, not a roleplay scene: no characters, plot, or long dialogue. Return only the task text, with no introduction or explanation.`,
+  - Do not require intimate photos, video, or filming. Ordinary private selfies are allowed when relevant to the category. Do not add props by default.
+  - This is a real shared activity, not roleplay: no fictional characters, plot, or long dialogue. Return only the task text, with no introduction or explanation.`,
   hi: `उत्तर देने से पहले चुपचाप जाँचें:
- - एक स्पष्ट कार्य दें: एक मुख्य विचार और 1–3 जुड़े हुए चरण।
- - सीधे और स्वाभाविक ढंग से लिखें: एक ठोस क्रिया और एक खास विवरण। आम तौर पर 1–2 वाक्य पर्याप्त हैं; एक ही भावुक अंत बार-बार न दोहराएँ।
+  - एक साझा काम और एक मुख्य विचार दें। यह अगले 24 घंटों में खाली समय के 2–4 छोटे पलों में पूरा हो सकता है; लगातार संदेश भेजना या पूरे दिन साथ रहना आवश्यक न करें।
+  - सीधे और स्वाभाविक ढंग से लिखें, आम तौर पर 1–2 वाक्यों में: ठोस क्रियाएँ और एक खास विवरण। एक ही भावुक अंत बार-बार न दोहराएँ।
  - पुरुष और महिला की भूमिकाएँ स्थिर रखें। जाँचें कि कौन क्रिया कर रहा है, किस पर, और शरीर के कौन-से हिस्से शामिल हैं।
  - क्रियाओं का क्रम शारीरिक रूप से संभव हो। आवश्यक बदलाव न छोड़ें और शरीर की प्रतिक्रिया की गारंटी न दें।
  - श्रेणी की सीमा बनाएँ: प्रशंसा और कोमलता गैर-यौन हैं; इच्छा सेक्स से पहले की भूमिका है; जुनून संवेदनशील सेक्स है; हार्ड अधिक सीधा और अश्लील लहजा है।
  - ज़बरदस्ती, दर्द की अनदेखी या खतरनाक क्रियाएँ न लिखें। कार्य में समझौते, सुरक्षित शब्द या सुरक्षा की व्याख्या न जोड़ें।
  - अगर चरमोत्कर्ष का उल्लेख हो, तो आम तौर पर वहीं कार्य समाप्त करें; उसके बाद अपने-आप अगली यौन क्रिया न जोड़ें।
- - अंतरंग फ़ोटो, वीडियो या रिकॉर्डिंग अनिवार्य न करें। सामान अपने-आप न जोड़ें।
- - यह छोटा कार्य है, भूमिका-अभिनय का दृश्य नहीं: पात्र, कहानी या लंबा संवाद नहीं। केवल कार्य का पाठ लौटाएँ।`,
+  - अंतरंग फ़ोटो, वीडियो या रिकॉर्डिंग अनिवार्य न करें। श्रेणी के लिए उपयुक्त होने पर साधारण निजी सेल्फ़ी ठीक हैं। सामान अपने-आप न जोड़ें।
+  - यह वास्तविक साझा गतिविधि है, भूमिका-अभिनय नहीं: काल्पनिक पात्र, कहानी या लंबा संवाद नहीं। केवल कार्य का पाठ लौटाएँ।`,
   pt: `Verifique a qualidade em silêncio antes de responder:
- - Escreva uma tarefa completa com uma ideia central e 1–3 etapas diretamente relacionadas.
- - Use linguagem direta e natural: uma ação concreta e um detalhe marcante. Em geral, 1–2 frases bastam; evite repetir o mesmo fecho emocional.
+  - Escreva uma tarefa compartilhada com uma ideia central. Ela pode acontecer em 2–4 momentos curtos durante o tempo livre nas próximas 24 horas; não exija mensagens constantes nem que estejam juntos o dia todo.
+  - Use linguagem direta e natural, geralmente em 1–2 frases: ações concretas e um detalhe marcante. Evite repetir o mesmo fecho emocional.
  - Mantenha fixos os papéis do homem e da mulher. Confira quem age, quem recebe a ação e quais partes do corpo estão envolvidas.
  - Organize as ações em uma ordem fisicamente possível. Não pule transições nem prometa uma reação corporal automática.
  - Respeite os limites da categoria: elogios e carinho são não sexuais; desejo é preliminar antes do sexo; paixão é sexo sensual; hard tem linguagem mais direta e picante.
  - Não descreva coerção, ignorar dor ou ações fisicamente perigosas. Não inclua explicações sobre acordos, palavra de segurança ou segurança no texto.
  - Se mencionar orgasmo, normalmente encerre a tarefa ali; não comece automaticamente outro ato sexual depois.
- - Não exija fotos íntimas, vídeos ou gravações. Não acrescente acessórios por padrão.
- - Esta é uma tarefa curta, não uma cena de interpretação: sem personagens, enredo ou diálogos longos. Retorne somente o texto da tarefa.`,
+  - Não exija fotos íntimas, vídeos ou gravações. Selfies comuns e privadas são permitidas quando fizerem sentido para a categoria. Não acrescente acessórios por padrão.
+  - Esta é uma atividade real compartilhada, não uma interpretação: sem personagens fictícios, enredo ou diálogos longos. Retorne somente o texto da tarefa.`,
   es: `Comprueba la calidad en silencio antes de responder:
- - Escribe una tarea completa con una idea central y 1–3 pasos relacionados.
- - Usa un tono directo y natural: una acción concreta y un detalle expresivo. Normalmente bastan 1–2 frases; evita repetir el mismo cierre emocional.
+  - Escribe una tarea compartida con una idea central. Puede desarrollarse durante las próximas 24 horas en 2–4 momentos breves durante el tiempo libre; no exijas mensajes constantes ni estar juntos todo el día.
+  - Usa un tono directo y natural, normalmente en 1–2 frases: acciones concretas y un detalle expresivo. Evita repetir el mismo cierre emocional.
  - Mantén fijos los papeles del hombre y la mujer. Comprueba quién actúa, quién recibe la acción y qué partes del cuerpo intervienen.
  - Ordena las acciones de forma físicamente posible. No omitas transiciones ni prometas una reacción corporal automática.
  - Respeta los límites de cada categoría: cumplidos y ternura no son sexuales; deseo es el juego previo antes del sexo; pasión es sexo sensual; hard usa un lenguaje más directo y explícito.
  - No describas coerción, ignorar el dolor ni acciones físicamente peligrosas. No añadas explicaciones sobre acuerdos, palabras de seguridad o seguridad al texto.
  - Si mencionas el orgasmo, normalmente termina ahí la tarea; no empieces automáticamente otro acto sexual después.
- - No exijas fotos íntimas, vídeos ni grabaciones. No añadas accesorios por defecto.
- - Es una tarea breve, no una escena de interpretación: sin personajes, trama ni diálogos largos. Devuelve solo el texto de la tarea.`,
+  - No exijas fotos íntimas, vídeos ni grabaciones. Se permiten selfies normales y privados si encajan con la categoría. No añadas accesorios por defecto.
+  - Es una actividad real compartida, no una interpretación: sin personajes ficticios, trama ni diálogos largos. Devuelve solo el texto de la tarea.`,
 };
 
 const MODE_RULES: Record<string, Record<"solo" | "together", string>> = {

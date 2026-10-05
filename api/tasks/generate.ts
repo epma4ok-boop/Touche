@@ -8,7 +8,7 @@ import { createClient } from "@supabase/supabase-js";
 import { validateTelegramInitData } from "../couple/_auth.js";
 import { appDate } from "../limits.js";
 import { claimFriendInvite } from "../referrals/_claim.js";
-import { getTaskQualityRules, isSharedTaskText, isTaskTextModeAppropriate, isTaskTextWellFormed } from "../../src/data/task-quality.js";
+import { getTaskQualityRules, hasConcreteSexualAct, isSharedTaskText, isTaskTextModeAppropriate, isTaskTextWellFormed } from "../../src/data/task-quality.js";
 import { OWNER_TELEGRAM_ID } from "../../src/config.js";
 import { TASKS_RU } from "../../src/data/tasks-ru.js";
 import { TASKS_EN } from "../../src/data/tasks-en.js";
@@ -126,14 +126,14 @@ const DAILY_TASK_FALLBACKS: Record<string, StaticPool> = {
       "Обменяйтесь в течение дня парой игривых намёков, а вечером по очереди выберите, где оставить друг другу один нежный поцелуй.",
     ],
     passion: [
-      "В течение дня обменяйтесь по одному чувственному намёку, а когда останетесь вдвоём, займитесь медленным сексом, меняя темп по реакции друг друга.",
-      "Когда будете вместе, по очереди задавайте ритм поцелуям и ласкам; замечайте реакцию партнёра и сделайте одну выразительную паузу.",
-      "Обменяйтесь коротким сообщением о желании, а затем вместе уделите время медленному сексу, меняя темп один раз по реакции друг друга.",
+      "По очереди занимайтесь оральным сексом, не спеша целуя друг друга и сохраняя тёплый зрительный контакт.",
+      "Вдвоём займитесь вагинальным сексом в медленном ритме: по очереди задавайте темп и оставайтесь близко друг к другу.",
+      "По очереди мастурбируйте друг друга руками, меняя нежные прикосновения по реакции партнёра.",
     ],
     hard: [
-      "В течение дня обменяйтесь откровенными сообщениями о желании; при встрече по очереди задайте уверенный темп близости и меняйте его по реакции друг друга.",
-      "Когда останетесь вдвоём, по очереди произнесите одну короткую властную просьбу и ответьте на неё откровенной лаской.",
-      "Обменяйтесь одной прямой фразой о том, чего хотите, а затем вместе выберите интенсивный темп близости и держите его столько, сколько нравится обоим.",
+      "По очереди занимайтесь оральным сексом и прямо, грязными словами называйте, что делаете друг с другом.",
+      "Вместе займитесь энергичным вагинальным сексом: один задаёт жёсткий ритм, второй направляет движения руками; затем поменяйтесь ролями.",
+      "Если оба хотите, снимите приватное порно, пока по очереди мастурбируете друг друга; оставьте видео только себе и никому не отправляйте.",
     ],
   },
   en: {
@@ -153,14 +153,14 @@ const DAILY_TASK_FALLBACKS: Record<string, StaticPool> = {
       "Exchange a couple of playful hints during the day, then both of you choose one place to leave each other a gentle kiss.",
     ],
     passion: [
-      "Trade one sensual hint during the day, then enjoy slow sex together, changing pace in response to each other.",
-      "When you are together, take turns setting the rhythm for kisses and caresses; notice each other's response and add one deliberate pause.",
-      "Both of you share one brief message about desire, then enjoy slow sex together and change the rhythm once in response to each other.",
+      "Take turns giving each other oral sex slowly, with unhurried kisses and warm eye contact.",
+      "Have gentle vaginal sex together; trade control of the pace and stay close, looking into each other's eyes.",
+      "Take turns masturbating each other by hand, keeping a tender rhythm and following each other's reactions.",
     ],
     hard: [
-      "Trade direct messages about what you want during the day; when together, take turns setting a confident pace and adjusting to each other's response.",
-      "When alone together, take turns making one brief, commanding request and answering it with an intimate caress.",
-      "Both of you name one direct desire, then choose an intense pace together and keep it for as long as you both enjoy.",
+      "Take turns giving each other oral sex; say plainly, in dirty words, what you are doing and keep a firm pace.",
+      "Have vigorous vaginal sex together: one partner sets the rhythm while the other guides the movement with their hands.",
+      "If you both want to, film private porn while taking turns masturbating each other; keep the video private and never share it.",
     ],
   },
   hi: {
@@ -180,14 +180,14 @@ const DAILY_TASK_FALLBACKS: Record<string, StaticPool> = {
       "दिन में आपस में दो चंचल इशारे साझा करें, फिर शाम को बारी-बारी से एक जगह चुनें जहां साथी को चूमें।",
     ],
     passion: [
-      "दिन में आप दोनों एक-एक कामुक संकेत साझा करें, फिर साथ होने पर धीरे-धीरे सेक्स करें और एक-दूसरे की प्रतिक्रिया के अनुसार गति बदलें।",
-      "साथ होने पर आप दोनों बारी-बारी से चुंबन और स्पर्श की गति तय करें; साथी की प्रतिक्रिया देखकर एक ठहराव जोड़ें।",
-      "आप दोनों इच्छा के बारे में एक छोटा संदेश साझा करें, फिर साथ में धीमा सेक्स करें और प्रतिक्रिया के अनुसार एक बार लय बदलें।",
+      "बारी-बारी से एक-दूसरे को ओरल सेक्स दें, धीरे-धीरे चुंबन करें और प्यार भरी नज़रें मिलाएँ।",
+      "आप दोनों धीरे-धीरे योनि सेक्स करें; बारी-बारी से लय तय करें और एक-दूसरे के करीब रहें।",
+      "बारी-बारी से हाथों से एक-दूसरे का हस्तमैथुन करें और साथी की प्रतिक्रिया के अनुसार कोमल लय रखें।",
     ],
     hard: [
-      "दिन में आप दोनों अपनी इच्छा के बारे में सीधे संदेश भेजें; साथ होने पर बारी-बारी से अंतरंगता की दृढ़ गति तय करें और साथी की प्रतिक्रिया देखें।",
-      "जब आप दोनों अकेले हों, बारी-बारी से एक छोटी स्पष्ट मांग कहें और उसका जवाब अंतरंग स्पर्श से दें।",
-      "आप दोनों अपनी एक स्पष्ट इच्छा बताएं, फिर साथ में तीव्र गति चुनें और जब तक दोनों चाहें उसे बनाए रखें।",
+      "बारी-बारी से एक-दूसरे को ओरल सेक्स दें; सीधे और अश्लील शब्दों में बताएं कि क्या कर रहे हैं, और लय तेज़ रखें।",
+      "आप दोनों तेज़ योनि सेक्स करें: एक व्यक्ति लय तय करे और दूसरा हाथों से गति को निर्देशित करे।",
+      "अगर आप दोनों चाहें, तो एक-दूसरे का हस्तमैथुन करते हुए निजी पोर्न वीडियो बनाएं और किसी के साथ साझा न करें।",
     ],
   },
   pt: {
@@ -207,14 +207,14 @@ const DAILY_TASK_FALLBACKS: Record<string, StaticPool> = {
       "Troquem duas provocações leves durante o dia e, à noite, escolham um lugar para beijar um ao outro.",
     ],
     passion: [
-      "Troquem uma insinuação sensual durante o dia e, quando estiverem juntos, façam sexo devagar, ajustando o ritmo às reações um do outro.",
-      "Quando estiverem juntos, revezem-se em definir o ritmo dos beijos e das carícias; observem a reação um do outro e façam uma pausa marcada.",
-      "Vocês dois compartilhem uma mensagem breve sobre desejo e depois façam sexo devagar, mudando o ritmo uma vez em resposta um ao outro.",
+      "Revezem-se no sexo oral, sem pressa, com beijos demorados e um olhar carinhoso.",
+      "Revezem-se no sexo vaginal, mantendo um ritmo lento e o corpo perto um do outro.",
+      "Revezem-se em masturbar um ao outro com as mãos, mantendo um ritmo suave e atento às reações do parceiro.",
     ],
     hard: [
-      "Troquem mensagens diretas sobre o que desejam; quando estiverem juntos, revezem-se em conduzir a intimidade com um ritmo firme.",
-      "Quando estiverem a sós, revezem-se em fazer um pedido curto e ousado e respondam com uma carícia íntima.",
-      "Digam um ao outro um desejo direto e escolham juntos um ritmo intenso, mantendo-o enquanto ambos gostarem.",
+      "Revezem-se no sexo oral e digam sem rodeios, com palavras mais sujas, o que estão fazendo.",
+      "Juntos, façam sexo vaginal com ritmo intenso: uma pessoa conduz e a outra guia o movimento com as mãos.",
+      "Se vocês dois quiserem, gravem um vídeo pornô privado enquanto se masturbam mutuamente; não compartilhem a gravação.",
     ],
   },
   es: {
@@ -234,14 +234,77 @@ const DAILY_TASK_FALLBACKS: Record<string, StaticPool> = {
       "Compartan un par de insinuaciones juguetonas durante el día y, por turnos, elijan dónde dejar un beso al otro.",
     ],
     passion: [
-      "Envíense una insinuación sensual durante el día y, cuando estén juntos, disfruten de sexo lento, ajustando el ritmo a las reacciones del otro.",
-      "Cuando estén juntos, túrnense para marcar el ritmo de los besos y las caricias; observen la reacción del otro e incluyan una pausa deliberada.",
-      "Ambos compartan un mensaje breve sobre el deseo y luego disfruten de sexo lento, cambiando el ritmo una vez según la respuesta del otro.",
+      "Por turnos, practiquen sexo oral sin prisa, con besos largos y una mirada cariñosa.",
+      "Hagan juntos sexo vaginal lentamente, alternando quién guía el ritmo y manteniéndose cerca.",
+      "Por turnos, masturben al otro con las manos, con un ritmo suave y atentos a su reacción.",
     ],
     hard: [
-      "Intercambien mensajes directos sobre lo que desean; cuando estén juntos, túrnense para llevar la intimidad con un ritmo firme.",
-      "Cuando estén a solas, por turnos hagan una petición breve y atrevida y respondan con una caricia íntima.",
-      "Díganse un deseo directo y elijan juntos un ritmo intenso, manteniéndolo mientras ambos lo disfruten.",
+      "Por turnos, practiquen sexo oral y díganse sin rodeos, con palabras obscenas, lo que están haciendo.",
+      "Tengan juntos sexo vaginal con un ritmo intenso: una persona marca el movimiento y la otra lo guía con las manos.",
+      "Si ambos quieren, graben un vídeo porno privado mientras se masturban mutuamente; guárdenlo en privado y no lo compartan.",
+    ],
+  },
+};
+
+const SOLO_SEXUAL_FALLBACKS: Record<string, Pick<StaticPool, "passion" | "hard">> = {
+  ru: {
+    passion: [
+      "При встрече займись с партнёром оральным сексом медленно и нежно, следя за реакцией партнёра.",
+      "Веди вагинальный секс с партнёром в мягком ритме, нежно меняя темп по его реакции.",
+      "Мастурбируй партнёру руками, меняя нежные прикосновения по реакции партнёра.",
+    ],
+    hard: [
+      "При встрече займись с партнёром оральным сексом и прямо, грязными словами называй, что делаешь.",
+      "Веди энергичный вагинальный секс с партнёром, задавая жёсткий ритм и меняя его по реакции партнёра.",
+      "Мастурбируй партнёру руками в быстром ритме и прямо говори, что именно делаешь.",
+    ],
+  },
+  en: {
+    passion: [
+      "Give your partner gentle oral sex at an unhurried pace, adjusting to their reactions.",
+      "Lead slow vaginal sex with your partner, keeping a tender rhythm and warm eye contact.",
+      "Masturbate your partner by hand, keeping your touch gentle and following their response.",
+    ],
+    hard: [
+      "Give your partner oral sex and say plainly, with a little dirty talk, what you are doing.",
+      "Lead vigorous vaginal sex with your partner, setting a firm pace and adjusting to their response.",
+      "Masturbate your partner by hand at a brisk pace and name the act directly in dirty words.",
+    ],
+  },
+  hi: {
+    passion: [
+      "अपने साथी को प्यार से ओरल सेक्स दें, धीरे-धीरे और उनकी प्रतिक्रिया देखते हुए।",
+      "अपने साथी के साथ धीरे योनि सेक्स शुरू करें और उनकी प्रतिक्रिया के अनुसार लय नरम रखें।",
+      "अपने साथी का हाथों से हस्तमैथुन करें और उनकी प्रतिक्रिया के अनुसार कोमल गति रखें।",
+    ],
+    hard: [
+      "अपने साथी को सीधे और थोड़े अश्लील शब्दों में ओरल सेक्स दें और बताएं कि आप क्या कर रहे हैं।",
+      "अपने साथी के साथ तेज़ योनि सेक्स करें और गति को साफ़ तौर पर नियंत्रित करें।",
+      "अपने साथी का हाथों से हस्तमैथुन करें और सीधे, गंदे शब्दों में क्रिया का नाम लें।",
+    ],
+  },
+  pt: {
+    passion: [
+      "Faça sexo oral no seu par sem pressa, com delicadeza e atenção às reações.",
+      "Conduza o sexo vaginal com seu par em um ritmo suave e carinhoso.",
+      "Masturbe seu par com as mãos, mantendo um toque delicado e observando as reações.",
+    ],
+    hard: [
+      "Faça sexo oral no seu par e diga sem rodeios, com palavras mais sujas, o que está fazendo.",
+      "Conduza o sexo vaginal com seu par em um ritmo intenso e firme.",
+      "Masturbe seu par com as mãos em ritmo acelerado e nomeie o ato com palavras diretas.",
+    ],
+  },
+  es: {
+    passion: [
+      "Practica sexo oral con tu pareja sin prisa, con ternura y observa su reacción.",
+      "Guía el sexo vaginal con tu pareja a un ritmo lento y cariñoso.",
+      "Masturba a tu pareja con las manos, con caricias suaves y observa su respuesta.",
+    ],
+    hard: [
+      "Practica sexo oral con tu pareja y di sin rodeos, con palabras algo obscenas, lo que estás haciendo.",
+      "Guía el sexo vaginal con tu pareja a un ritmo intenso y firme.",
+      "Masturba a tu pareja con las manos a buen ritmo y nombra el acto con palabras directas y sucias.",
     ],
   },
 };
@@ -286,13 +349,19 @@ const UNSAFE_TASK_MARKERS: Record<string, RegExp> = {
 };
 
 function getTaskExamples(category: string, lang: string, requestId: string, mode: TaskMode): string[] {
-  const pool = SOURCE_TASKS[lang]?.[category] ?? [];
+  const pool = [
+    ...(SOURCE_TASKS[lang]?.[category] ?? []),
+    ...(mode === "solo"
+      ? SOLO_SEXUAL_FALLBACKS[lang]?.[category as "passion" | "hard"] ?? []
+      : DAILY_TASK_FALLBACKS[lang]?.[category] ?? []),
+  ];
   const mediaMarkers = EXAMPLE_MEDIA_MARKERS[lang] ?? EXAMPLE_MEDIA_MARKERS.en;
   const unsafeMarkers = UNSAFE_TASK_MARKERS[lang] ?? UNSAFE_TASK_MARKERS.en;
   const eligible = pool.filter((example) =>
-    isTaskTextWellFormed(example, lang, "together")
+    isTaskTextWellFormed(example, lang, mode)
     && !unsafeMarkers.test(example)
-    && (mode !== "solo" || !isSharedTaskText(example, lang))
+    && (!["passion", "hard"].includes(category) || hasConcreteSexualAct(example, lang))
+    && isTaskTextModeAppropriate(example, lang, mode)
     && (category === "compliments" || !mediaMarkers.test(example))
   );
   const shuffled = seededShuffle(eligible, hashSeed(`${requestId}:${lang}:${category}:examples`));
@@ -315,24 +384,28 @@ function getTaskExamplesPrompt(category: string, lang: string, requestId: string
   const examples = getTaskExamples(category, lang, requestId, mode);
   if (examples.length === 0) return "";
   const intro: Record<string, string> = {
-    ru: "Ниже — разные примеры из списка заданий пользователя. Используй их только как источник идей; не копируй формулировки.",
-    en: "Below are varied examples from the user's task lists. Use them only as idea references; do not copy their wording.",
-    hi: "नीचे उपयोगकर्ता की कार्य-सूची से अलग-अलग उदाहरण हैं। इन्हें केवल विचारों के लिए लें; शब्दशः न दोहराएँ।",
-    pt: "Abaixo estão exemplos variados das listas do usuário. Use-os apenas como inspiração; não copie a redação.",
-    es: "A continuación hay ejemplos variados de las listas del usuario. Úsalos solo como inspiración; no copies su redacción.",
+    ru: "Ниже — разные примеры заданий этой категории. Используй их только как источник идей; не копируй формулировки.",
+    en: "Below are varied examples for this category. Use them only as idea references; do not copy their wording.",
+    hi: "नीचे इस श्रेणी के अलग-अलग उदाहरण हैं। इन्हें केवल विचारों के लिए लें; शब्दशः न दोहराएँ।",
+    pt: "Abaixo estão exemplos variados desta categoria. Use-os apenas como inspiração; não copie a redação.",
+    es: "A continuación hay ejemplos variados de esta categoría. Úsalos solo como inspiración; no copies su redacción.",
   };
   return `${intro[lang] ?? intro.en}\n${examples.map((example, index) => `${index + 1}. ${example}`).join("\n")}`;
 }
 
 function getFallback(cat: string, lang: string, mode: TaskMode, requestId: string): string {
   if (mode === "solo") {
-    const pool = SOURCE_TASKS[lang]?.[cat] ?? [];
+    const pool = [
+      ...(SOURCE_TASKS[lang]?.[cat] ?? []),
+      ...(SOLO_SEXUAL_FALLBACKS[lang]?.[cat as "passion" | "hard"] ?? []),
+    ];
     const mediaMarkers = EXAMPLE_MEDIA_MARKERS[lang] ?? EXAMPLE_MEDIA_MARKERS.en;
     const unsafeMarkers = UNSAFE_TASK_MARKERS[lang] ?? UNSAFE_TASK_MARKERS.en;
     const soloTasks = pool.filter((task) =>
       isTaskTextWellFormed(task, lang, "solo")
       && !mediaMarkers.test(task)
       && !unsafeMarkers.test(task)
+      && (!["passion", "hard"].includes(cat) || hasConcreteSexualAct(task, lang))
       && !isSharedTaskText(task, lang)
     );
     if (soloTasks.length === 0) {
@@ -344,7 +417,9 @@ function getFallback(cat: string, lang: string, mode: TaskMode, requestId: strin
   const pool = DAILY_TASK_FALLBACKS[lang] ?? DAILY_TASK_FALLBACKS.en;
   const list = pool[cat] ?? pool.compliments;
   const wellFormed = list.filter(task =>
-    isTaskTextWellFormed(task, lang, mode) && isTaskTextModeAppropriate(task, lang, mode)
+    isTaskTextWellFormed(task, lang, mode)
+    && isTaskTextModeAppropriate(task, lang, mode)
+    && (!["passion", "hard"].includes(cat) || hasConcreteSexualAct(task, lang))
   );
   if (wellFormed.length === 0) {
     throw new Error(`No valid shared-task fallback for ${lang}/${cat}/${mode}`);
@@ -380,18 +455,18 @@ function getGenderLine(lang: string, gender: string): string {
 
 const MODE_INSTRUCTIONS: Record<string, Record<string, string>> = {
   solo: {
-    ru: "Одиночный режим: задание получает только один совершеннолетний пользователь. Обращайся к нему как к одному человеку и опиши одно действие, которое он может сделать для партнёра. Партнёр может быть адресатом, но не должен выполнять отдельную часть или отвечать.",
-    en: "Solo mode: only one adult user receives the task. Address that user individually and describe one action they can take for their partner. The partner may receive the gesture but must not be assigned a separate action or reply.",
-    hi: "एकल मोड: काम केवल एक वयस्क उपयोगकर्ता को मिलता है। उसी व्यक्ति को संबोधित करें और ऐसा एक काम बताएँ जो वह अपने साथी के लिए कर सकता है। साथी काम का प्राप्तकर्ता हो सकता है, लेकिन उससे अलग काम या जवाब की अपेक्षा न करें।",
-    pt: "Modo solo: somente um adulto recebe a tarefa. Dirija-se a essa pessoa e descreva uma ação que ela pode fazer para o parceiro. O parceiro pode receber o gesto, mas não deve ter uma ação separada nem uma resposta como obrigação.",
-    es: "Modo individual: solo una persona adulta recibe la tarea. Dirígete a esa persona y describe una acción que pueda hacer por su pareja. La pareja puede recibir el gesto, pero no debe tener una acción separada ni una respuesta obligatoria.",
+    ru: "Одиночный режим: задание получает только один совершеннолетний пользователь. Обращайся к нему как к одному человеку и опиши одно действие, которое он может сделать для партнёра. Партнёр может быть адресатом, но не должен выполнять отдельную часть или отвечать. В «Страсти» и «Харде» пользователь выполняет конкретный названный акт для партнёра; не пиши о взаимных действиях и очередности.",
+    en: "Solo mode: only one adult user receives the task. Address that user individually and describe one action they can take for their partner. The partner may receive the gesture but must not be assigned a separate action or reply. In Passion and Hard, the user performs the named act for their partner; do not make the act mutual or alternate turns.",
+    hi: "एकल मोड: काम केवल एक वयस्क उपयोगकर्ता को मिलता है। उसी व्यक्ति को संबोधित करें और ऐसा एक काम बताएँ जो वह अपने साथी के लिए कर सकता है। साथी काम का प्राप्तकर्ता हो सकता है, लेकिन उससे अलग काम या जवाब की अपेक्षा न करें। जुनून और हार्ड में उपयोगकर्ता साथी के लिए नामित यौन क्रिया करे; आपसी क्रिया या बारी-बारी के निर्देश न दें।",
+    pt: "Modo solo: somente um adulto recebe a tarefa. Dirija-se a essa pessoa e descreva uma ação que ela pode fazer para o parceiro. O parceiro pode receber o gesto, mas não deve ter uma ação separada nem uma resposta como obrigação. Em Paixão e hard, o usuário executa o ato nomeado no parceiro; não use ações mútuas nem alternância.",
+    es: "Modo individual: solo una persona adulta recibe la tarea. Dirígete a esa persona y describe una acción que pueda hacer por su pareja. La pareja puede recibir el gesto, pero no debe tener una acción separada ni una respuesta obligatoria. En Pasión y hard, quien inicia realiza el acto nombrado para su pareja; no uses acciones mutuas ni turnos.",
   },
   together: {
-    ru: "Парный режим: одно и то же задание показывается обоим и при включённых уведомлениях отправляется партнёру в Telegram. Создай одно совместное действие для совершеннолетних мужчины и женщины, а не два отдельных задания и не ролевую сцену. Обращайся к обоим во множественном числе; явно укажи, что делают оба.",
-    en: "Together mode: both partners see the same task, and the identical text is sent to the partner in Telegram when notifications are enabled. Create one shared activity for an adult man and woman, not two separate tasks or roleplay. Address both and explicitly include both in the action.",
-    hi: "साथी मोड: दोनों को एक ही काम दिखता है और सूचनाएँ चालू होने पर वही पाठ साथी को Telegram पर भेजा जाता है। वयस्क पुरुष और महिला के लिए एक साझा गतिविधि लिखें, दो अलग काम या भूमिका-अभिनय नहीं; दोनों को स्पष्ट रूप से शामिल करें।",
-    pt: "Modo a dois: ambos veem a mesma tarefa, que é enviada ao parceiro pelo Telegram quando as notificações estão ativadas. Crie uma atividade compartilhada para um homem e uma mulher adultos, não duas tarefas nem uma encenação; inclua claramente os dois.",
-    es: "Modo en pareja: ambos ven la misma tarea y el mismo texto se envía a la pareja por Telegram si las notificaciones están activadas. Crea una actividad compartida para un hombre y una mujer adultos, no dos tareas ni una escena de rol; incluye claramente a ambos.",
+    ru: "Парный режим: одно и то же задание показывается обоим и при включённых уведомлениях отправляется партнёру в Telegram. Создай одно совместное действие для совершеннолетних мужчины и женщины, а не два отдельных задания и не ролевую сцену. Обращайся к обоим во множественном числе; явно укажи, что делают оба. В «Страсти» и «Харде» включи обоих в конкретный сексуальный акт.",
+    en: "Together mode: both partners see the same task, and the identical text is sent to the partner in Telegram when notifications are enabled. Create one shared activity for an adult man and woman, not two separate tasks or roleplay. Address both, explicitly include both in the action, and make both part of the named sexual act in Passion and Hard.",
+    hi: "साथी मोड: दोनों को एक ही काम दिखता है और सूचनाएँ चालू होने पर वही पाठ साथी को Telegram पर भेजा जाता है। वयस्क पुरुष और महिला के लिए एक साझा गतिविधि लिखें, दो अलग काम या भूमिका-अभिनय नहीं; दोनों को स्पष्ट रूप से शामिल करें। जुनून और हार्ड में दोनों को नामित यौन क्रिया में शामिल करें।",
+    pt: "Modo a dois: ambos veem a mesma tarefa, que é enviada ao parceiro pelo Telegram quando as notificações estão ativadas. Crie uma atividade compartilhada para um homem e uma mulher adultos, não duas tarefas nem uma encenação; inclua claramente os dois na ação sexual nomeada.",
+    es: "Modo en pareja: ambos ven la misma tarea y el mismo texto se envía a la pareja por Telegram si las notificaciones están activadas. Crea una actividad compartida para un hombre y una mujer adultos, no dos tareas ni una escena de rol; incluye claramente a ambos en el acto sexual nombrado.",
   },
 };
 
@@ -441,30 +516,30 @@ Keep the anatomy and order of actions physically plausible. Use one central acti
 Create a new task in the style of the examples without copying them. Use 1–3 connected steps, usually 1–2 sentences; be concrete and sensual, and avoid repetitive "let them feel" endings. Up to ${MAX_TASK_CHARS} characters. Return only the task text.`,
   },
   passion: {
-    ru: `Ты создаёшь одно задание для категории «СТРАСТЬ» — чувственный секс в гетеросексуальной паре мужчина–женщина.
+    ru: `Ты создаёшь одно задание для категории «СТРАСТЬ» — конкретный чувственный секс в гетеросексуальной паре мужчина–женщина.
 
-Тон интимный и чувственный, но не грязный: внимание к телесным ощущениям, ритму и реакции партнёра. Выбери одну центральную идею — подходящую позу, темп, ласку или сексуальное действие. Не превращай карточку в длинную последовательность.
+Это секс, а не только прелюдия. В каждом задании назови конкретный акт: оральный секс, вагинальный секс или мастурбация партнёра в одиночном режиме / взаимная мастурбация в парном. Не заменяй его просьбой «скажи, чего хочешь», намёком, поцелуем, общей лаской или фразой «займитесь сексом». Выбери один акт и опиши его нежно, красиво и чувственно: прикосновения, медленный ритм, близость и взгляды.
 Соблюдай анатомию и выполнимый порядок. Не обещай конкретную реакцию тела. Если упоминается оргазм, он обычно завершает задание; не добавляй после него следующий акт автоматически. Не добавляй реквизит, музыку или съёмку по умолчанию.
 
 Создай оригинальное задание в духе примеров: 1–3 связанных шага, обычно 1–2 предложения, до ${MAX_TASK_CHARS} символов. Без шаблонных концовок и пояснений; верни только текст задания.`,
-    en: `Create one task for the "PASSION" category: sensual sex for a heterosexual man-woman couple.
+    en: `Create one task for the "PASSION" category: a concrete, sensual sexual act for a heterosexual man-woman couple.
 
-Keep the tone intimate and sensual, not dirty: focus on bodily sensation, pace, and the partner's response. Choose one central idea—a suitable position, pace, caress, or sexual act. Do not turn the card into a long sequence.
+This is sex, not just foreplay. Every task must name a specific act: oral sex, vaginal sex, or partner-directed masturbation in solo mode / mutual masturbation in together mode. Do not replace it with “say what you want,” a hint, a kiss, a general caress, or the vague phrase “have sex.” Choose one act and describe it tenderly and beautifully through touch, a slow rhythm, closeness, and eye contact.
 Keep anatomy and order physically plausible. Do not guarantee a bodily response. If orgasm is mentioned, it usually ends the task; do not automatically add another act afterward. Do not add props, music, or filming by default.
 
 Create an original task in the style of the examples: 1–3 connected steps, usually 1–2 sentences, up to ${MAX_TASK_CHARS} characters. Avoid formulaic endings and explanations; return only the task text.`,
   },
   hard: {
-    ru: `Ты создаёшь одно задание для категории «ХАРД» — более грязный и прямой стиль, чем в «Страсти», для гетеросексуальной пары мужчина–женщина.
+    ru: `Ты создаёшь одно задание для категории «ХАРД» — конкретный полноценный секс в более грязной и прямой подаче для гетеросексуальной пары мужчина–женщина.
 
-Используй откровенную, уверенную лексику и одну центральную идею: более властный тон, томление, контроль темпа или интенсивные ласки. «Хард» отличается прежде всего прямотой и накалом, а не обязательной грубостью. Не описывай принуждение, игнорирование боли или физически опасные действия.
-Соблюдай анатомию и последовательность. Не добавляй пояснения о согласии, стоп-словах или безопасности в текст задания. Это короткая карточка, не ролевая сцена: без персонажей, сюжета и длинных реплик. Не добавляй съёмку и реквизит по умолчанию.
+В каждом задании обязательно назови конкретный телесный акт: оральный секс, вагинальный секс или мастурбацию партнёра в одиночном режиме / взаимную мастурбацию в парном. Приватная эротическая съёмка допустима только как дополнение к одному из этих действий и только если оба этого хотят; сама съёмка не заменяет сексуальный акт. Не выдавай задание только из разговоров о желании, просьбы «скажи, что хочешь», обещаний, поцелуев, общей ласки или фразы «делайте это». Опиши, что именно делают тела. Используй прямую лексику и немного грязных слов; хард не требует боли, принуждения или опасных действий.
+Соблюдай анатомию и последовательность. Если предлагаешь эротическую съёмку, видео остаётся личным: не предлагай отправлять или публиковать его. Это короткая карточка, не ролевая сцена: без персонажей, сюжета и длинных реплик.
 
 Создай оригинальное задание в духе примеров: одно действие или 1–3 тесно связанных шага, обычно 1–2 предложения, до ${MAX_TASK_CHARS} символов. Верни только текст задания.`,
-    en: `Create one task for the "HARD" category for a heterosexual man-woman couple. Make it dirtier and more direct than "PASSION".
+    en: `Create one task for the "HARD" category: a concrete full sexual act for a heterosexual man-woman couple, in a dirtier and more direct style than "PASSION".
 
-Use bold, explicit wording and one central idea: a more commanding tone, anticipation, control of pace, or intense caresses. "Hard" should feel more direct and heated, not automatically rough. Do not describe coercion, ignoring pain, or physically dangerous actions.
-Keep anatomy and sequence plausible. Do not put consent, safeword, or safety explanations in the task text. This is a short task, not a roleplay scene: no characters, plot, or long dialogue. Do not add filming or props by default.
+Every task must name a specific physical act: oral sex, vaginal sex, or partner-directed masturbation in solo mode / mutual masturbation in together mode. Private erotic filming may only be added to one of those acts if both want it; filming alone does not replace the sexual act. Do not make the task only about talking about desire, asking “what do you want,” promising, kissing, general caresses, or saying “do it.” State exactly what the bodies do. Use direct wording and a little dirty talk; hard does not mean pain, coercion, or danger.
+Keep anatomy and sequence plausible. If erotic filming appears, keep the video private and never suggest sending or posting it. This is a short task, not a roleplay scene: no characters, plot, or long dialogue.
 
 Create an original task in the style of the examples: one action or 1–3 closely connected steps, usually 1–2 sentences, up to ${MAX_TASK_CHARS} characters. Return only the task text.`,
   },
@@ -515,44 +590,85 @@ const VARIATION_FOCI: Record<string, { ru: string[]; en: string[] }> = {
   },
   passion: {
     ru: [
-      "один чувственный намёк в течение дня, затем взаимные поцелуи и медленный секс при встрече",
-      "обмен короткими сообщениями о желании и одна смена темпа во время секса",
-      "внимание к одному желанию партнёра, высказанному раньше в течение дня",
-      "одна выразительная пауза или смена ритма во время секса после флирта в сообщениях",
-      "завершить задание оргазмом, без автоматического продолжения после него",
-      "короткое сообщение о желании днём и чувственная близость позже, без съёмки",
+      "медленный оральный секс с долгими поцелуями и нежным зрительным контактом",
+      "вагинальный секс в мягком ритме с одной красивой сменой положения",
+      "взаимная мастурбация руками с ласковым чередованием прикосновений",
+      "оральные ласки с нежными словами и вниманием к реакции партнёра",
+      "вагинальный секс с медленным ритмом и близкими объятиями",
+      "взаимная мастурбация с одним партнёром, который нежно задаёт темп",
     ],
     en: [
-      "one sensual hint during the day, then mutual kisses and slow sex when you meet",
-      "trade brief messages about desire and make one change of pace during sex",
-      "focus on one partner's desire, shared earlier in the day",
-      "one expressive pause or rhythm change during sex after flirting by message",
-      "end the task with orgasm, with no automatic continuation afterward",
-      "a short message about desire during the day and sensual closeness later, without recording",
+      "slow oral sex with lingering kisses and tender eye contact",
+      "vaginal sex at a gentle pace with one graceful change of position",
+      "mutual hand masturbation with affectionate, alternating touch",
+      "oral caresses with tender words and attention to the partner's response",
+      "vaginal sex at a slow pace, holding each other close",
+      "mutual masturbation with one partner gently setting the rhythm",
     ],
   },
   hard: {
     ru: [
-      "короткое откровенное сообщение днём и прямое физическое действие при встрече",
-      "одна властная короткая фраза в переписке и уверенный темп позже",
-      "нарастающее напряжение через сообщения и одну выразительную деталь физического действия",
-      "прямое сообщение о желании днём и интенсивная близость позже",
-      "короткая провокационная реплика в свободную минуту и продолжение при встрече",
-      "прямое описание желания без длинной переписки или вымышленной роли",
+      "прямой оральный секс с грязными словами о том, что каждый делает",
+      "энергичный вагинальный секс, где один задаёт темп, а второй направляет движения",
+      "взаимная мастурбация с откровенными словами и быстрым чередованием ролей",
+      "приватная эротическая съёмка взаимной мастурбации, только если оба этого хотят",
+      "оральный секс с одним конкретным действием и прямой грязной репликой",
+      "вагинальный секс с интенсивным ритмом и одной сменой положения",
     ],
     en: [
-      "a brief explicit message during the day and a direct physical act when you meet",
-      "one short commanding line by message and a confident pace later",
-      "build intensity through messages and one vivid detail of physical action",
-      "a direct message about desire during the day and intense closeness later",
-      "a short provocative line in a free moment and continuation when you meet",
-      "direct wording of desire without long exchanges or invented roles",
+      "direct oral sex with dirty talk naming what each person is doing",
+      "vigorous vaginal sex with one partner setting the pace and the other guiding the movement",
+      "mutual masturbation with blunt dirty talk and a quick role reversal",
+      "private erotic filming of mutual masturbation, only if both want it",
+      "oral sex built around one specific act and one blunt, dirty line",
+      "vaginal sex at an intense pace with one change of position",
     ],
   },
 };
 
-function getVariationInstruction(category: string, lang: string, requestId: string): string {
-  const focuses = VARIATION_FOCI[category];
+const SOLO_VARIATION_FOCI: Record<string, { ru: string[]; en: string[] }> = {
+  passion: {
+    ru: [
+      "медленный оральный секс с партнёром, который получает нежные ласки",
+      "веди мягкий вагинальный секс с партнёром, подстраивая ритм по его реакции",
+      "мастурбируй партнёру руками в нежном темпе",
+      "оральный секс с долгими поцелуями и вниманием к реакции партнёра",
+      "вагинальный секс с медленной сменой позиции, которую ведёт пользователь",
+      "ручная мастурбация партнёра с мягкой сменой прикосновений",
+    ],
+    en: [
+      "slow oral sex given to the partner, with tender attention to their response",
+      "lead gentle vaginal sex with your partner and adjust the rhythm to their response",
+      "masturbate your partner by hand at a tender pace",
+      "oral sex with lingering kisses and attention to the partner's reaction",
+      "vaginal sex with the user leading one slow change of position",
+      "hand masturbation of the partner with a gentle change of touch",
+    ],
+  },
+  hard: {
+    ru: [
+      "прямой оральный секс с короткой грязной фразой о действии",
+      "энергичный вагинальный секс с жёстким ритмом, который задаёт пользователь",
+      "ручная мастурбация партнёра с прямым грязным разговором",
+      "приватная съёмка порно, пока пользователь мастурбирует партнёра, только если партнёр тоже хочет",
+      "грязный прямой оральный секс с партнёром",
+      "мастурбируй партнёру руками в интенсивном ритме",
+    ],
+    en: [
+      "direct oral sex with a short dirty line naming the act",
+      "vigorous vaginal sex with the user setting a firm pace",
+      "hand masturbation of the partner with blunt dirty talk",
+      "private porn filming while you masturbate your partner, only if your partner also wants it",
+      "direct, dirty oral sex with the partner",
+      "masturbate your partner by hand at an intense pace",
+    ],
+  },
+};
+
+function getVariationInstruction(category: string, lang: string, requestId: string, mode: TaskMode): string {
+  const focuses = mode === "solo"
+    ? SOLO_VARIATION_FOCI[category] ?? VARIATION_FOCI[category]
+    : VARIATION_FOCI[category];
   if (!focuses) return "";
 
   const options = lang === "ru" ? focuses.ru : focuses.en;
@@ -642,7 +758,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const timeout = setTimeout(() => controller.abort(), 12_000);
     try {
         const roleInstruction = getGenderLine(lang, gender);
-        const systemPrompt = `${getPrompt(category, lang)}\n\n${MODE_INSTRUCTIONS[mode][lang]}\n\n${getVariationInstruction(category, lang, requestId)}\n\n${roleInstruction}\n\n${getTaskQualityRules(lang, mode)}\n\n${LANGUAGE_INSTRUCTIONS[lang]}`;
+        const systemPrompt = `${getPrompt(category, lang)}\n\n${MODE_INSTRUCTIONS[mode][lang]}\n\n${getVariationInstruction(category, lang, requestId, mode)}\n\n${roleInstruction}\n\n${getTaskQualityRules(lang, mode)}\n\n${LANGUAGE_INSTRUCTIONS[lang]}`;
       const aiRes = await fetch(DEEPSEEK_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${DEEPSEEK_API_KEY}` },
@@ -663,6 +779,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           && matchesRequestedLanguage(candidate, lang)
           && isTaskTextWellFormed(candidate, lang, mode)
           && isTaskTextModeAppropriate(candidate, lang, mode)
+          && (!["passion", "hard"].includes(category) || hasConcreteSexualAct(candidate, lang))
           && !forbidden.some(f => candidate.toLowerCase().includes(f))) {
           task = candidate;
           source = "ai";

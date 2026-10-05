@@ -165,6 +165,16 @@ async function handleUpdatePreferences(couple: Couple, userId: number, body: Rec
 const WISH_HEART_THRESHOLD = 20;
 const TASK_CHECKIN_DELAY_MS = 24 * 60 * 60 * 1000;
 
+function isWishMapSchemaMissing(error: unknown): boolean {
+  if (!error || typeof error !== "object") return false;
+  const details = error as { code?: unknown; message?: unknown; details?: unknown; hint?: unknown };
+  const code = String(details.code ?? "");
+  const text = [details.message, details.details, details.hint].map((value) => String(value ?? "")).join(" ");
+  const missingSchemaCodes = new Set(["42P01", "42703", "PGRST202", "PGRST204", "PGRST205", "42883"]);
+  return missingSchemaCodes.has(code)
+    && /wish_map_[a-z_]+|submit_wish_map_task_attestation|generated_tasks/iu.test(text);
+}
+
 async function handleWishMap(couple: Couple, userId: number) {
   const cutoff = new Date(Date.now() - TASK_CHECKIN_DELAY_MS).toISOString();
   const [heartResult, cardResult, taskResult] = await Promise.all([
@@ -669,6 +679,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
     return res.status(405).json({ error: "method_not_allowed" });
   } catch (error) {
+    if (isWishMapSchemaMissing(error)) {
+      return res.status(503).json({ error: "wish_map_setup_required" });
+    }
     console.error("Couple intimacy request failed:", error);
     return res.status(500).json({ error: "couple_intimacy_failed" });
   }

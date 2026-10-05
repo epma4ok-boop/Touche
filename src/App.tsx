@@ -393,6 +393,11 @@ export default function App() {
         }
       }
 
+      if (params.get("wish_map") === "1") {
+        saveMode("together");
+        setMode("together");
+      }
+
       try {
         const storageKey = getActiveScenarioStorageKey();
         const existing = localStorage.getItem(storageKey);

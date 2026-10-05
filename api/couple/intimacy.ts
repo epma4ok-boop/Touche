@@ -13,7 +13,6 @@ type Couple = {
   id: string;
   user_a_id: number;
   user_b_id: number;
-  intimacy_score: number;
   streak_days: number;
   last_active_date: string | null;
 };
@@ -371,7 +370,7 @@ async function handleRespondToWish(couple: Couple, userId: number, body: Record<
 async function getCouple(userId: number): Promise<Couple | null> {
   const { data, error } = await sb
     .from("couples")
-    .select("id,user_a_id,user_b_id,intimacy_score,streak_days,last_active_date")
+    .select("id,user_a_id,user_b_id,streak_days,last_active_date")
     .or(`user_a_id.eq.${userId},user_b_id.eq.${userId}`)
     .maybeSingle();
   if (error) throw error;

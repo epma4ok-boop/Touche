@@ -8,11 +8,6 @@ import { createClient } from "@supabase/supabase-js";
 import { validateTelegramInitData } from "../couple/_auth.js";
 import { appDate } from "../limits.js";
 import { claimFriendInvite } from "../referrals/_claim.js";
-import { TASKS_RU } from "../../src/data/tasks-ru.js";
-import { TASKS_EN } from "../../src/data/tasks-en.js";
-import { TASKS_HI } from "../../src/data/tasks-hi.js";
-import { TASKS_PT } from "../../src/data/tasks-pt.js";
-import { TASKS_ES } from "../../src/data/tasks-es.js";
 import { getTaskQualityRules, isTaskTextWellFormed } from "../../src/data/task-quality.js";
 import { OWNER_TELEGRAM_ID } from "../../src/config.js";
 
@@ -101,49 +96,41 @@ async function notifyPartner(
   }
 }
 
-const STATIC_POOLS: Record<string, StaticPool> = {
-  ru: TASKS_RU,
-  en: TASKS_EN,
-  hi: TASKS_HI,
-  pt: TASKS_PT,
-  es: TASKS_ES,
-};
-
-const ONE_INITIATOR_FALLBACKS: Record<string, StaticPool> = {
+const DAILY_TASK_FALLBACKS: Record<string, StaticPool> = {
   ru: {
-    compliments: ["Сядьте напротив и, глядя друг другу в глаза, по очереди назовите по одному качеству партнёра, которое цените больше всего."],
-    tenderness: ["Устройте банный вечер: встаньте вместе под тёплый душ и по очереди мягко намыльте плечи, спину и ноги друг друга гелем."],
-    desire: ["Останьтесь вдвоём под тёплым душем, медленно намыливайте друг друга и задерживайте ладони на коже там, где прикосновения усиливают предвкушение."],
-    passion: ["После взаимных ласк под душем, когда оба возбуждены, женщина наклоняется и упирается ладонями в стену, а мужчина входит в неё сзади, сохраняя медленный ритм."],
-    hard: ["Под струями душа женщина наклоняется к стене и упирается в неё ладонями; мужчина обхватывает её за бёдра и входит сзади, задавая уверенный ритм."],
+    compliments: ["В ближайшие сутки в свободные минуты отправляйте друг другу обычные селфи с короткими подписями-комплиментами; пусть каждое остаётся личным."],
+    tenderness: ["В ближайшие сутки обнимайтесь при каждой встрече, а если будете врозь — отправьте друг другу по одному короткому тёплому голосовому сообщению."],
+    desire: ["В течение ближайших суток обменивайтесь короткими флиртующими сообщениями в свободное время, а при встрече оставьте один долгий поцелуй на границе прелюдии."],
+    passion: ["В течение дня обменяйтесь по одному чувственному намёку, а когда останетесь вдвоём, займитесь медленным сексом, меняя темп по реакции друг друга."],
+    hard: ["В течение дня обменяйтесь откровенными сообщениями о желании; при встрече женщина наклоняется и упирается ладонями в стену, а мужчина входит в неё сзади в уверенном ритме."],
   },
   en: {
-    compliments: ["Sit facing each other, hold eye contact, and take turns naming one quality you value most in your partner."],
-    tenderness: ["Make it a bath night: stand together under a warm shower and take turns gently washing each other’s shoulders, back, and legs with shower gel."],
-    desire: ["Stay together under the warm shower, slowly lather each other, and let your hands linger where each touch builds anticipation."],
-    passion: ["After warming each other up under the shower, once you are both aroused, she braces her palms against the wall and he enters her from behind at a slow pace."],
-    hard: ["Under the shower, she leans toward the wall and braces both palms against it; he holds her hips and enters her from behind with a firm, steady rhythm."],
+    compliments: ["Over the next 24 hours, send each other ordinary selfies with short compliment captions whenever you have a free moment; keep them private."],
+    tenderness: ["Over the next day, share a brief hug whenever you meet; if you are apart, send each other one warm, short voice note."],
+    desire: ["Over the next 24 hours, trade brief flirty messages in your free moments, then share one lingering kiss when you meet and stop at the edge of foreplay."],
+    passion: ["Trade one sensual hint during the day, then enjoy slow sex when you are together, changing pace in response to each other."],
+    hard: ["Trade explicit messages about what you want during the day; when you meet, she leans against the wall and he enters her from behind with a firm rhythm."],
   },
   hi: {
-    compliments: ["आमने-सामने बैठें, एक-दूसरे की आँखों में देखें और बारी-बारी से अपने साथी की वह एक बात बताएँ जिसकी आप सबसे अधिक कद्र करते हैं।"],
-    tenderness: ["आज साथ में स्नान का समय रखें: गर्म शॉवर के नीचे खड़े होकर बारी-बारी से एक-दूसरे के कंधे, पीठ और पैरों पर धीरे से शॉवर जेल लगाएँ।"],
-    desire: ["गर्म शॉवर के नीचे साथ रहें, धीरे-धीरे एक-दूसरे पर जेल लगाएँ और जहाँ स्पर्श उत्सुकता बढ़ाए वहाँ हाथ ठहरने दें।"],
-    passion: ["शॉवर के नीचे एक-दूसरे को प्यार से छूने के बाद, जब दोनों उत्तेजित हों, महिला दीवार पर हथेलियाँ टिकाकर झुके और पुरुष पीछे से उसमें प्रवेश करे।"],
-    hard: ["शॉवर के नीचे महिला दीवार की ओर झुककर दोनों हथेलियाँ टिकाए; पुरुष उसकी कमर थामकर पीछे से प्रवेश करे और दृढ़ लय बनाए रखे।"],
+    compliments: ["अगले 24 घंटों में, खाली समय मिलने पर एक-दूसरे को साधारण सेल्फ़ी के साथ छोटा तारीफ़ भरा कैप्शन भेजें; तस्वीरें सिर्फ़ आप दोनों तक रहें।"],
+    tenderness: ["अगले 24 घंटों में हर मुलाक़ात पर थोड़ी देर गले मिलें; दूर हों तो एक-दूसरे को छोटा और स्नेह भरा वॉइस मैसेज भेजें।"],
+    desire: ["अगले 24 घंटों में खाली समय पर छोटे फ़्लर्टिंग संदेश भेजें, फिर मिलने पर एक लंबा चुंबन साझा करें और चुंबन को ही इस काम का अंत रखें।"],
+    passion: ["दिन में एक कामुक संकेत भेजें, फिर साथ होने पर धीरे-धीरे सेक्स करें और एक-दूसरे की प्रतिक्रिया के अनुसार गति बदलें।"],
+    hard: ["दिन में अपनी इच्छा के बारे में स्पष्ट संदेश भेजें; मिलने पर महिला दीवार की ओर झुके और पुरुष पीछे से प्रवेश करे, एक दृढ़ लय के साथ।"],
   },
   pt: {
-    compliments: ["Sentem-se um de frente para o outro, mantenham o olhar e digam, alternadamente, uma qualidade do parceiro que mais admiram."],
-    tenderness: ["Façam uma noite de banho: fiquem juntos sob o chuveiro morno e lavem com carinho, alternadamente, os ombros, as costas e as pernas um do outro."],
-    desire: ["Fiquem juntos sob o chuveiro morno, ensaboem-se devagar e deixem as mãos demorarem onde cada toque aumentar a expectativa."],
-    passion: ["Depois de se acariciarem sob o chuveiro, quando ambos estiverem excitados, ela apoia as mãos na parede e ele a penetra por trás, num ritmo lento."],
-    hard: ["Sob o chuveiro, ela se inclina para a parede e apoia as duas mãos; ele segura seus quadris e a penetra por trás num ritmo firme e constante."],
+    compliments: ["Nas próximas 24 horas, enviem selfies comuns com legendas curtas de elogio nos momentos livres; mantenham as fotos privadas entre vocês."],
+    tenderness: ["Nas próximas 24 horas, troquem um abraço breve sempre que se encontrarem; se estiverem longe, enviem uma mensagem de voz carinhosa."],
+    desire: ["Nas próximas 24 horas, troquem mensagens curtas de flerte nos momentos livres e depois compartilhem um beijo demorado quando se encontrarem."],
+    passion: ["Troquem uma sugestão sensual durante o dia e, quando estiverem juntos, façam sexo devagar, ajustando o ritmo às reações um do outro."],
+    hard: ["Troquem mensagens explícitas sobre o que desejam durante o dia; ao se encontrarem, ela se inclina contra a parede e ele a penetra por trás num ritmo firme."],
   },
   es: {
-    compliments: ["Siéntense frente a frente, mírense a los ojos y nombren por turnos una cualidad de su pareja que valoren especialmente."],
-    tenderness: ["Preparen una noche de baño: pónganse juntos bajo una ducha tibia y lávense con cuidado, por turnos, los hombros, la espalda y las piernas."],
-    desire: ["Quédense juntos bajo la ducha tibia, enjabónense despacio y dejen que las manos se detengan donde cada caricia aumente la expectativa."],
-    passion: ["Después de acariciarse bajo la ducha, cuando ambos estén excitados, ella apoya las manos en la pared y él la penetra por detrás a un ritmo lento."],
-    hard: ["Bajo la ducha, ella se inclina hacia la pared y apoya ambas manos; él la sujeta por las caderas y la penetra por detrás con un ritmo firme y constante."],
+    compliments: ["Durante las próximas 24 horas, envíense selfies normales con frases breves de cumplido cuando tengan un rato libre; manténganlas en privado."],
+    tenderness: ["Durante las próximas 24 horas, abrácense brevemente cada vez que se encuentren; si están separados, envíense una nota de voz cariñosa."],
+    desire: ["Durante las próximas 24 horas, intercambien mensajes breves de coqueteo en sus ratos libres y luego compartan un beso largo al verse."],
+    passion: ["Envíense una insinuación sensual durante el día y, cuando estén juntos, disfruten de sexo lento, ajustando el ritmo a las reacciones del otro."],
+    hard: ["Intercambien mensajes explícitos sobre lo que desean durante el día; al verse, ella se inclina contra la pared y él la penetra por detrás con un ritmo firme."],
   },
 };
 
@@ -152,9 +139,7 @@ function isTaskMode(mode: string): mode is TaskMode {
 }
 
 function getFallback(cat: string, lang: string, mode: TaskMode): string {
-  const pool = mode === "solo"
-    ? ONE_INITIATOR_FALLBACKS[lang] ?? ONE_INITIATOR_FALLBACKS.en
-    : STATIC_POOLS[lang] ?? STATIC_POOLS.en;
+  const pool = DAILY_TASK_FALLBACKS[lang] ?? DAILY_TASK_FALLBACKS.en;
   const list = pool[cat] ?? pool.compliments;
   const wellFormed = list.filter(task => isTaskTextWellFormed(task, lang, mode));
   const candidates = wellFormed.length > 0 ? wellFormed : list;
@@ -211,13 +196,13 @@ const PROMPTS: Record<string, Record<string, string>> = {
     ru: `Ты создаёшь одно задание для категории «КОМПЛИМЕНТЫ» в гетеросексуальной паре мужчина–женщина.
 
 Стиль: естественное обращение на «ты», конкретный поступок или наблюдение, одна выразительная деталь. Задание должно звучать лично, а не как общий комплимент из открытки.
-Категория только про слова и знаки внимания: сказать или написать комплимент, поблагодарить за конкретную мелочь, напомнить об общем тёплом воспоминании. Без физической близости, эротики и обязательных фото или видео.
+Категория только про слова и знаки внимания: сказать или написать комплимент, поблагодарить за конкретную мелочь, напомнить об общем тёплом воспоминании. Можно предложить в течение дня обмениваться обычными личными селфи с короткими подписями-комплиментами; никаких интимных фото или публикаций.
 
 Придумай новое задание в духе приложенных примеров, не копируя их. Одно ясное действие; максимум 1–3 связанных шага, обычно 1–2 предложения. Не добавляй шаблонный финал «пусть почувствует». До ${MAX_TASK_CHARS} символов. Верни только текст задания.`,
     en: `Create one task for the "COMPLIMENTS" category for a heterosexual man-woman couple.
 
 Style: natural direct address, one specific observation or gesture, and one vivid detail. Make it personal rather than a generic greeting-card compliment.
-This category is about words and thoughtful gestures only: give a specific compliment, thank the partner for a small real thing, or recall a warm shared memory. No physical intimacy, erotic content, or required photos/videos.
+This category is about words and thoughtful gestures only: give a specific compliment, thank the partner for a small real thing, or recall a warm shared memory. One option is to exchange ordinary private selfies with short compliment captions during free moments through the day; never request intimate photos or public posts.
 
 Create a new task in the style of the supplied examples without copying them. One clear action with at most 1–3 connected steps, usually 1–2 sentences. Avoid a formulaic "let them feel" ending. Up to ${MAX_TASK_CHARS} characters. Return only the task text.`,
   },
@@ -282,80 +267,80 @@ Create an original task in the style of the examples: one action or 1–3 closel
 const VARIATION_FOCI: Record<string, { ru: string[]; en: string[] }> = {
   compliments: {
     ru: [
-      "поблагодарить за одну конкретную недавнюю мелочь",
-      "короткий голосовой комплимент без подарков и реквизита",
-      "тёплая отсылка к общему воспоминанию",
-      "спонтанный знак внимания, который не требует покупки",
+      "обмен обычными личными селфи с короткими комплиментами в свободные моменты дня",
+      "два конкретных тёплых сообщения, отправленных в разные моменты дня",
+      "короткие голосовые комплименты, которыми пара обменивается в течение дня",
+      "вспомнить в сообщении о маленьком общем воспоминании и вернуться к нему позже",
     ],
     en: [
-      "thank your partner for one specific recent small thing",
-      "a short spoken compliment without gifts or props",
-      "a warm reference to a shared memory",
-      "a spontaneous small gesture that requires no purchase",
+      "exchange ordinary private selfies with short compliment captions in free moments through the day",
+      "send two specific warm messages at separate moments during the day",
+      "trade short voice-note compliments throughout the day",
+      "recall a small shared memory in a message and return to it later",
     ],
   },
   tenderness: {
     ru: [
-      "короткое успокаивающее прикосновение без эротического продолжения",
-      "объятие или забота о руках без реквизита",
-      "мягкий массаж одной конкретной зоны",
-      "спокойный совместный момент с одним понятным жестом заботы",
+      "короткое объятие при встрече и тёплое сообщение, если будете врозь",
+      "по одному короткому успокаивающему прикосновению при двух встречах",
+      "небольшая забота о руках, когда найдёте свободную минуту вместе",
+      "нежный короткий голосовой контакт в начале и конце дня",
     ],
     en: [
-      "a brief comforting touch without erotic escalation",
-      "a hug or gentle hand care without props",
-      "a gentle massage focused on one specific area",
-      "a calm shared moment with one clear gesture of care",
+      "a short hug when you meet and a warm message if you are apart",
+      "one brief comforting touch at two separate moments together",
+      "a small act of hand care when you find a free moment together",
+      "a gentle short voice note at the start and end of the day",
     ],
   },
   desire: {
     ru: [
-      "игривое предвкушение через одежду, до секса",
-      "короткий шёпот о желании без длинного диалога",
-      "чувственное сближение без съёмки и реквизита",
-      "поцелуй или прикосновение, завершающееся на границе прелюдии",
+      "флиртующие сообщения в течение дня и поцелуй при встрече, остающийся на границе прелюдии",
+      "короткие намёки о желании в разные моменты и один поцелуй позже",
+      "игривое предвкушение через одежду после обмена сообщениями в течение дня",
+      "один долгий поцелуй при встрече после коротких флиртующих сообщений",
     ],
     en: [
-      "playful anticipation through clothing, before sex",
-      "a brief whispered desire without extended dialogue",
-      "sensual closeness without filming or props",
-      "a kiss or touch that stays at the edge of foreplay",
+      "flirty messages through the day and a kiss when you meet, staying at the edge of foreplay",
+      "short hints about desire at separate moments and one kiss later",
+      "playful anticipation through clothing after trading messages during the day",
+      "one lingering kiss when you meet after brief flirty messages",
     ],
   },
   passion: {
     ru: [
-      "одна смена темпа и пауза, без фоновой музыки",
-      "взаимные прикосновения и реакция друг на друга, без реквизита",
-      "одна подходящая поза или угол, без длинной последовательности",
-      "одна выразительная пауза или смена ритма",
+      "один чувственный намёк в течение дня, затем взаимные поцелуи и медленный секс при встрече",
+      "обмен короткими сообщениями о желании и одна смена темпа во время секса",
+      "внимание к одному желанию партнёра, высказанному раньше в течение дня",
+      "одна выразительная пауза или смена ритма во время секса после флирта в сообщениях",
       "завершить задание оргазмом, без автоматического продолжения после него",
-      "внимание к одному желанию партнёра, без камеры и съёмки",
+      "короткое сообщение о желании днём и чувственная близость позже, без съёмки",
     ],
     en: [
-      "one change of pace and a pause, without background music",
-      "mutual touch and responding to each other, without props",
-      "one suitable position or angle, not a long sequence",
-      "one expressive pause or change of rhythm",
+      "one sensual hint during the day, then mutual kisses and slow sex when you meet",
+      "trade brief messages about desire and make one change of pace during sex",
+      "focus on one partner's desire, shared earlier in the day",
+      "one expressive pause or rhythm change during sex after flirting by message",
       "end the task with orgasm, with no automatic continuation afterward",
-      "focus on one partner's stated desire, without cameras or recording",
+      "a short message about desire during the day and sensual closeness later, without recording",
     ],
   },
   hard: {
     ru: [
-      "грязная прямая фраза без длинного диалога",
-      "властный тон в одной короткой команде",
-      "интенсивность через темп и ожидание, без реквизита",
-      "одна выразительная деталь физического действия",
-      "короткая игра с задержкой и нарастающим напряжением",
-      "прямое описание желания без метафор и повторов",
+      "короткое откровенное сообщение днём и прямое физическое действие при встрече",
+      "одна властная короткая фраза в переписке и уверенный темп позже",
+      "нарастающее напряжение через сообщения и одну выразительную деталь физического действия",
+      "прямое сообщение о желании днём и интенсивная близость позже",
+      "короткая провокационная реплика в свободную минуту и продолжение при встрече",
+      "прямое описание желания без длинной переписки или вымышленной роли",
     ],
     en: [
-      "a dirty, direct line without extended dialogue",
-      "a commanding tone in one short instruction",
-      "intensity through pace and anticipation, without props",
-      "one vivid detail of physical action",
-      "brief teasing delay and rising tension",
-      "direct wording of desire without metaphors or repetition",
+      "a brief explicit message during the day and a direct physical act when you meet",
+      "one short commanding line by message and a confident pace later",
+      "build intensity through messages and one vivid detail of physical action",
+      "a direct message about desire during the day and intense closeness later",
+      "a short provocative line in a free moment and continuation when you meet",
+      "direct wording of desire without long exchanges or invented roles",
     ],
   },
 };

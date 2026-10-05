@@ -4,7 +4,7 @@ const QUALITY_RULES: Record<string, string> = {
   - Пиши прямо и естественно, обычно в 1–2 предложениях: конкретные действия плюс одна выразительная деталь. Не повторяй один и тот же финал «пусть почувствует».
  - Сохраняй заданные пол и роли мужчины и женщины. Проверяй, кто действует, на ком и какие части тела участвуют.
  - Расположи действия в физически выполнимом порядке. Не пропускай необходимый переход и не обещай автоматическую телесную реакцию.
-  - Чётко соблюдай границы категории: комплименты и нежность несексуальны; желание — прелюдия до секса; в страсти и харде используй разнообразные конкретные сексуальные действия из больших списков примеров, а не только оральный/вагинальный секс и мастурбацию. Не принимай вместо действия общие слова «скажи, чего хочешь» или «займитесь сексом». В страсти описывай действие нежно и красиво, в харде — прямо и немного грязно.
+  - Чётко соблюдай границы категории: комплименты и нежность несексуальны; желание — прелюдия до секса; в страсти и харде используй разнообразные конкретные сексуальные действия из больших списков примеров, а не только оральный/вагинальный секс и мастурбацию. Не принимай вместо действия общие слова «скажи, чего хочешь» или «займитесь сексом». В страсти описывай действие нежно и красиво, в харде — прямо и немного грязно. В «Харде» обязательно назови прямое сексуальное действие: одной наготы, лежания, раздевания или общих прикосновений недостаточно.
  - Не описывай принуждение, игнорирование боли или опасную механику. Не добавляй в текст задания пояснения о договорённостях, стоп-словах или безопасности.
  - Если упоминается оргазм, обычно заверши задание на нём; не начинай после него следующий сексуальный акт автоматически.
    - Не требуй интимных фото. Эротическая съёмка допустима только как необязательное дополнение к конкретному сексуальному действию в «Харде», если оба этого хотят; одна съёмка не заменяет действие, а видео нельзя публиковать или отправлять. Обычные личные селфи допустимы, если уместны. Не добавляй реквизит по шаблону.
@@ -14,7 +14,7 @@ const QUALITY_RULES: Record<string, string> = {
   - Write directly and naturally, usually in 1–2 sentences: concrete actions plus one vivid detail. Avoid repeating the same "let them feel" ending.
  - Keep the man-woman roles fixed. Check who acts, who receives the action, and which body parts are involved.
  - Put actions in a physically possible order. Do not skip necessary transitions or promise an automatic bodily response.
-   - Keep category boundaries clear: compliments and tenderness are nonsexual; desire is foreplay before sex; for Passion and Hard, draw from the full range of concrete sexual actions in the large supplied example lists, not only oral/vaginal sex and masturbation. Do not substitute vague wording such as “say what you want” or “have sex.” Make Passion tender and beautiful; make Hard direct and a little dirty.
+   - Keep category boundaries clear: compliments and tenderness are nonsexual; desire is foreplay before sex; for Passion and Hard, draw from the full range of concrete sexual actions in the large supplied example lists, not only oral/vaginal sex and masturbation. Do not substitute vague wording such as “say what you want” or “have sex.” Make Passion tender and beautiful; make Hard direct and a little dirty. Every Hard task must name a direct sexual act; nudity, lying naked, undressing, or general touching alone do not qualify.
  - Do not describe coercion, ignoring pain, or physically dangerous actions. Do not put explanations about agreements, safewords, or safety in the task text.
  - If orgasm is mentioned, usually make it the endpoint; do not automatically start another sexual act afterward.
     - Do not require intimate photos. Optional erotic filming is allowed only as an addition to a concrete sexual act in Hard, only if both want it; filming alone is not enough, and never ask them to share or post it. Ordinary private selfies are allowed when relevant. Do not add props by default.
@@ -24,7 +24,7 @@ const QUALITY_RULES: Record<string, string> = {
   - सीधे और स्वाभाविक ढंग से लिखें, आम तौर पर 1–2 वाक्यों में: ठोस क्रियाएँ और एक खास विवरण। एक ही भावुक अंत बार-बार न दोहराएँ।
  - पुरुष और महिला की भूमिकाएँ स्थिर रखें। जाँचें कि कौन क्रिया कर रहा है, किस पर, और शरीर के कौन-से हिस्से शामिल हैं।
  - क्रियाओं का क्रम शारीरिक रूप से संभव हो। आवश्यक बदलाव न छोड़ें और शरीर की प्रतिक्रिया की गारंटी न दें।
-   - श्रेणी की सीमा बनाएँ: प्रशंसा और कोमलता गैर-यौन हैं; इच्छा सेक्स से पहले की भूमिका है; जुनून और हार्ड में बड़े दिए गए उदाहरण-संग्रह से विविध ठोस यौन क्रियाएँ लें—इन्हें केवल ओरल/योनि सेक्स और हस्तमैथुन तक सीमित न करें। “अपनी इच्छा बताओ” या “सेक्स करो” जैसे अस्पष्ट वाक्य पर्याप्त नहीं हैं। चुने हुए मोड के अनुसार भूमिकाएँ तय करें। जुनून को कोमल और सुंदर रखें; हार्ड को सीधा और थोड़ा अश्लील रखें।
+    - श्रेणी की सीमा बनाएँ: प्रशंसा और कोमलता गैर-यौन हैं; इच्छा सेक्स से पहले की भूमिका है; जुनून और हार्ड में बड़े दिए गए उदाहरण-संग्रह से विविध ठोस यौन क्रियाएँ लें—इन्हें केवल ओरल/योनि सेक्स और हस्तमैथुन तक सीमित न करें। “अपनी इच्छा बताओ” या “सेक्स करो” जैसे अस्पष्ट वाक्य पर्याप्त नहीं हैं। चुने हुए मोड के अनुसार भूमिकाएँ तय करें। जुनून को कोमल और सुंदर रखें; हार्ड को सीधा और थोड़ा अश्लील रखें। हर हार्ड काम में स्पष्ट यौन क्रिया होनी चाहिए; केवल नग्नता, साथ लेटना, कपड़े उतारना या सामान्य स्पर्श पर्याप्त नहीं हैं।
  - ज़बरदस्ती, दर्द की अनदेखी या खतरनाक क्रियाएँ न लिखें। कार्य में समझौते, सुरक्षित शब्द या सुरक्षा की व्याख्या न जोड़ें।
  - अगर चरमोत्कर्ष का उल्लेख हो, तो आम तौर पर वहीं कार्य समाप्त करें; उसके बाद अपने-आप अगली यौन क्रिया न जोड़ें।
     - अंतरंग फ़ोटो अनिवार्य न करें। कामुक वीडियो केवल हार्ड में किसी ठोस यौन क्रिया के साथ वैकल्पिक रूप से आए, जब दोनों उसे चाहें; वीडियो अकेले पर्याप्त नहीं है और उसे साझा या प्रकाशित करने को न कहें। उपयुक्त होने पर साधारण निजी सेल्फ़ी ठीक हैं। सामान अपने-आप न जोड़ें।
@@ -34,7 +34,7 @@ const QUALITY_RULES: Record<string, string> = {
   - Use linguagem direta e natural, geralmente em 1–2 frases: ações concretas e um detalhe marcante. Evite repetir o mesmo fecho emocional.
  - Mantenha fixos os papéis do homem e da mulher. Confira quem age, quem recebe a ação e quais partes do corpo estão envolvidas.
  - Organize as ações em uma ordem fisicamente possível. Não pule transições nem prometa uma reação corporal automática.
-   - Respeite os limites da categoria: elogios e carinho são não sexuais; desejo é preliminar antes do sexo; em Paixão e hard, use a variedade de ações sexuais concretas das listas extensas de exemplos, sem limitar tudo a sexo oral/vaginal e masturbação. Não substitua a ação por frases vagas como “diga o que deseja” ou “façam sexo”. Paixão deve ser terna e bonita; hard, direto e um pouco mais sujo.
+    - Respeite os limites da categoria: elogios e carinho são não sexuais; desejo é preliminar antes do sexo; em Paixão e hard, use a variedade de ações sexuais concretas das listas extensas de exemplos, sem limitar tudo a sexo oral/vaginal e masturbação. Não substitua a ação por frases vagas como “diga o que deseja” ou “façam sexo”. Paixão deve ser terna e bonita; hard, direto e um pouco mais sujo. Toda tarefa hard deve nomear um ato sexual direto; nudez, ficar deitado nu, tirar a roupa ou toques genéricos não bastam.
  - Não descreva coerção, ignorar dor ou ações fisicamente perigosas. Não inclua explicações sobre acordos, palavra de segurança ou segurança no texto.
  - Se mencionar orgasmo, normalmente encerre a tarefa ali; não comece automaticamente outro ato sexual depois.
     - Não exija fotos íntimas. Uma gravação erótica só pode ser um complemento opcional a um ato sexual concreto em hard, se ambos quiserem; a gravação sozinha não basta, e nunca peça para compartilhar ou publicar o vídeo. Selfies comuns e privadas podem aparecer quando fizerem sentido. Não acrescente acessórios por padrão.
@@ -44,7 +44,7 @@ const QUALITY_RULES: Record<string, string> = {
   - Usa un tono directo y natural, normalmente en 1–2 frases: acciones concretas y un detalle expresivo. Evita repetir el mismo cierre emocional.
  - Mantén fijos los papeles del hombre y la mujer. Comprueba quién actúa, quién recibe la acción y qué partes del cuerpo intervienen.
  - Ordena las acciones de forma físicamente posible. No omitas transiciones ni prometas una reacción corporal automática.
-   - Respeta los límites de cada categoría: cumplidos y ternura no son sexuales; deseo es el juego previo antes del sexo; en Pasión y hard, usa la variedad de acciones sexuales concretas de las listas amplias de ejemplos, sin limitarlo todo al sexo oral/vaginal y la masturbación. No sustituyas la acción por frases vagas como «di lo que deseas» o «tengan sexo». Pasión debe ser tierna y bonita; hard, directo y algo más sucio.
+    - Respeta los límites de cada categoría: cumplidos y ternura no son sexuales; deseo es el juego previo antes del sexo; en Pasión y hard, usa la variedad de acciones sexuales concretas de las listas amplias de ejemplos, sin limitarlo todo al sexo oral/vaginal y la masturbación. No sustituyas la acción por frases vagas como «di lo que deseas» o «tengan sexo». Pasión debe ser tierna y bonita; hard, directo y algo más sucio. Cada tarea hard debe nombrar un acto sexual directo; la desnudez, tumbarse desnudos, quitarse la ropa o los toques generales no bastan.
  - No describas coerción, ignorar el dolor ni acciones físicamente peligrosas. No añadas explicaciones sobre acuerdos, palabras de seguridad o seguridad al texto.
  - Si mencionas el orgasmo, normalmente termina ahí la tarea; no empieces automáticamente otro acto sexual después.
     - No exijas fotos íntimas. La grabación erótica solo puede ser un añadido opcional a un acto sexual concreto en hard y si ambos la quieren; grabar por sí solo no basta, y nunca pidas compartir ni publicar el vídeo. Se permiten selfies normales y privados cuando encajen. No añadas accesorios por defecto.
@@ -138,6 +138,22 @@ const CONCRETE_SEXUAL_ACT_MARKERS: Record<string, RegExp> = {
   es: /(?:sexo oral|sexo vaginal|penetraci\w*|masturbaci\w*|masturb\p{L}*|pene|clítoris|genital\p{L}*|pezones?|pechos?|muslos internos|nalgas|acarici\p{L}*|masaje\p{L}*|estimula\p{L}*|provoca\p{L}*|frota\p{L}*|lam\p{L}*|chup\p{L}*|ded\p{L}*|desnúd\p{L}*|quítate.{0,30}ropa|quítale.{0,30}ropa|azot\p{L}*|ata\p{L}*|vend\p{L}*|vibrador|juguete sexual|al borde del orgasmo|borde|lleva.{0,30}(?:al límite|al borde)|estimula.{0,30}(?:cuerpo|piel|pechos|genitales))/iu,
 };
 
+const HARD_SEXUAL_ACT_MARKERS: Record<string, RegExp> = {
+  ru: /(?:оральн\p{L}*\s+секс|минет|кунилингус|вагинальн\p{L}*\s+секс|анальн\p{L}*\s+секс|мастурбац\p{L}*|мастурбир\p{L}*|дроч\p{L}*|секс.{0,40}позици|позици.{0,25}секс|проник\p{L}*.{0,35}(?:влагалищ|анус|пенис|палец|игрушк)|(?:клитор|пенис|член|генитал\p{L}*|влагалищ\p{L}*|анус).{0,45}(?:стимулиру|ласкай|ласка|поглаж|лиж|сос|вибратор|пальц|ввод|проник|тр[иу])|(?:стимулиру|ласкай|ласка|поглаж|лиж|сос|вибратор|пальц|ввод|проник|тр[иу]).{0,45}(?:клитор|пенис|член|генитал\p{L}*|влагалищ\p{L}*|анус)|(?:сосок\p{L}*|груд\p{L}*|ягодиц\p{L}*).{0,35}(?:шл[её]п|сильно|жёстк|прикус)|доведи.{0,60}(?:оргазм|кра[юя]).{0,60}(?:рук|пальц|язык|рот|вибратор|пенис|клитор))/iu,
+  en: /(?:oral sex|cunnilingus|fellatio|blow ?job|vaginal sex|anal sex|intercourse|penetrat\w*|masturbat\w*|hand ?job|fingering|sex.{0,40}position|position.{0,25}sex|finger.{0,35}(?:vagina|clit|genital|anus)|(?:clitoris|penis|genitals|vulva|vagina|anus).{0,45}(?:stimulat|lick|suck|finger|rub|stroke|vibrator|penetrat|enter|grind)|(?:stimulat|lick|suck|finger|rub|stroke|vibrator|penetrat|enter|grind).{0,45}(?:clitoris|penis|genitals|vulva|vagina|anus)|(?:nipples?|breasts?|buttocks|ass).{0,35}(?:spank|slap|bite|squeeze)|(?:spank|slap|bite|squeeze).{0,35}(?:nipples?|breasts?|buttocks|ass)|bring.{0,50}(?:orgasm|climax|edge).{0,50}(?:hand|finger|mouth|tongue|vibrator|penis|clitoris|penetrat))/iu,
+  hi: /(?:ओरल\s+सेक्स|मुख\s+मैथुन|योनि\s+सेक्स|गुदा\s+सेक्स|हस्तमैथुन|मास्टर्बेशन|सेक्स.{0,30}स्थिति|स्थिति.{0,25}सेक्स|प्रवेश.{0,35}(?:योनि|गुदा|लिंग|उंगली|खिलौना)|(?:क्लिटोरिस|लिंग|जननांग|योनि|गुदा).{0,40}(?:उत्तेजित|सहल|स्पर्श|रगड़|वाइब्रेटर|उंगली|प्रवेश|चाट|चूस)|(?:उत्तेजित|सहल|स्पर्श|रगड़|वाइब्रेटर|उंगली|प्रवेश|चाट|चूस).{0,40}(?:क्लिटोरिस|लिंग|जननांग|योनि|गुदा)|(?:स्तन|नितंब|निप्पल).{0,30}(?:थप्पड़|काट|दबाव)|(?:थप्पड़|काट|दबाव).{0,30}(?:स्तन|नितंब|निप्पल))/u,
+  pt: /(?:sexo oral|sexo vaginal|sexo anal|penetraç\p{L}*|penetr\p{L}*|masturb\p{L}*|sexo.{0,40}posição|posição.{0,25}sexo|(?:clitóris|pênis|genitais|vulva|vagina|ânus).{0,45}(?:estimula|acaricia|esfrega|lambe|chupa|dedilha|vibrador|penetra|introduz)|(?:estimula|acaricia|esfrega|lambe|chupa|dedilha|vibrador|penetra|introduz).{0,45}(?:clitóris|pênis|genitais|vulva|vagina|ânus)|(?:mamilos?|seios|nádegas).{0,35}(?:bate|palmad|morde|aperta)|(?:bate|palmad|morde|aperta).{0,35}(?:mamilos?|seios|nádegas)|leva.{0,50}(?:orgasmo|limite).{0,50}(?:mão|dedo|boca|língua|vibrador|penetra))/iu,
+  es: /(?:sexo oral|sexo vaginal|sexo anal|penetr\p{L}*|masturb\p{L}*|sexo.{0,40}posición|posición.{0,25}sexo|(?:clítoris|pene|genital\p{L}*|vulva|vagina|ano).{0,45}(?:estimula|acaricia|frota|lame|chupa|dedilha|vibrador|penetra|introduce)|(?:estimula|acaricia|frota|lame|chupa|dedilha|vibrador|penetra|introduce).{0,45}(?:clítoris|pene|genital\p{L}*|vulva|vagina|ano)|(?:pezones?|pechos?|nalgas).{0,35}(?:azota|golpea|muerde|aprieta)|(?:azota|golpea|muerde|aprieta).{0,35}(?:pezones?|pechos?|nalgas)|lleva.{0,50}(?:orgasmo|límite|borde).{0,50}(?:mano|dedo|boca|lengua|vibrador|penetra))/iu,
+};
+
+const HARD_AUXILIARY_ACT_MARKERS: Record<string, RegExp> = {
+  ru: /(?:возьми.{0,45}(?:партн[её]ра|его|её).{0,20}рук.{0,100}(?:доведи|довод\p{L}*|конц|оргазм|край)|(?:рук|пальц).{0,60}(?:доведи|довод\p{L}*|до\s+(?:конца|оргазм\p{L}*|края))|доведи.{0,60}(?:оргазм|кра[юя]).{0,60}(?:рук|пальц|язык|рот|вибратор)|довод\p{L}*.{0,60}(?:оргазм|кра[юя]).{0,60}(?:рук|пальц|язык|рот|вибратор)|вибратор.{0,70}(?:чувствительн|кра[юя]|оргазм\p{L}*)|(?:кра[юя]|оргазм\p{L}*).{0,70}вибратор)/iu,
+  en: /(?:use.{0,20}mouth.{0,90}(?:deliberate|intention|pleasure|slow|partner)|take.{0,35}partner.{0,20}in.{0,12}(?:your )?hand.{0,120}(?:end|finish|orgasm|climax)|(?:hands?|fingers?).{0,70}(?:bring|edge|orgasm|climax|finish)|(?:bring|edge).{0,70}(?:hands?|fingers?)|vibrator.{0,70}(?:sensitive|edge|orgasm|climax)|(?:edge|orgasm|climax).{0,70}vibrator)/iu,
+  hi: /(?:(?:हाथों|उंगलियों|अंगुलियों).{0,60}(?:किनारे|चरमोत्कर्ष|अंत तक|रुक)|(?:किनारे|चरमोत्कर्ष).{0,60}(?:हाथों|उंगलियों|अंगुलियों)|वाइब्रेटर.{0,70}(?:संवेदनशील|किनारे|चरमोत्कर्ष)|(?:किनारे|चरमोत्कर्ष).{0,70}वाइब्रेटर)/u,
+  pt: /(?:(?:mão|dedos?|vibrador).{0,70}(?:beira|limite|orgasmo|fim|final)|(?:beira|limite|orgasmo).{0,70}(?:mão|dedos?|vibrador)|vibrador.{0,70}(?:sensível|genitais|clitóris|beira|limite|orgasmo))/iu,
+  es: /(?:(?:mano|dedos?|vibrador).{0,70}(?:borde|límite|orgasmo|final)|(?:borde|límite|orgasmo).{0,70}(?:mano|dedos?|vibrador)|vibrador.{0,70}(?:sensible|genital\p{L}*|clítoris|borde|límite|orgasmo))/iu,
+};
+
 export function getTaskQualityRules(lang: string, mode: "solo" | "together" = "together"): string {
   const languageRules = QUALITY_RULES[lang] ?? QUALITY_RULES.en;
   const modeRule = MODE_RULES[lang]?.[mode] ?? MODE_RULES.en[mode];
@@ -161,6 +177,13 @@ export function isTaskTextModeAppropriate(text: string, lang: string, mode: "sol
 export function hasConcreteSexualAct(text: string, lang: string): boolean {
   const marker = CONCRETE_SEXUAL_ACT_MARKERS[lang] ?? CONCRETE_SEXUAL_ACT_MARKERS.en;
   return marker.test(text.replace(/\s+/gu, " ").trim());
+}
+
+export function hasHardSexualAct(text: string, lang: string): boolean {
+  const normalized = text.replace(/\s+/gu, " ").trim();
+  const directMarker = HARD_SEXUAL_ACT_MARKERS[lang] ?? HARD_SEXUAL_ACT_MARKERS.en;
+  const auxiliaryMarker = HARD_AUXILIARY_ACT_MARKERS[lang] ?? HARD_AUXILIARY_ACT_MARKERS.en;
+  return directMarker.test(normalized) || auxiliaryMarker.test(normalized);
 }
 
 export function isTaskTextWellFormed(text: string, lang: string, mode?: "solo" | "together"): boolean {

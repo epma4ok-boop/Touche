@@ -101,36 +101,48 @@ async function sendBotMessage(coupleId: string, chatId: number, lang: string, ki
   }
 }
 
-async function sendWishCardNotification(coupleId: string, chatId: number, lang: string): Promise<boolean> {
+const MAX_WISH_IMAGE_BYTES = 1_500_000;
+const WISH_IMAGE_PREFIX = "data:image/jpeg;base64,";
+
+function parseWishImage(value: unknown): Uint8Array | null {
+  if (typeof value !== "string" || !value.startsWith(WISH_IMAGE_PREFIX)) return null;
+  const encoded = value.slice(WISH_IMAGE_PREFIX.length);
+  if (encoded.length < 16 || encoded.length > Math.ceil(MAX_WISH_IMAGE_BYTES * 4 / 3) + 4) return null;
+  if (!/^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/u.test(encoded)) return null;
+  const bytes = Buffer.from(encoded, "base64");
+  if (bytes.length > MAX_WISH_IMAGE_BYTES || bytes.length < 4) return null;
+  if (bytes[0] !== 0xff || bytes[1] !== 0xd8 || bytes[2] !== 0xff) return null;
+  return Uint8Array.from(bytes);
+}
+
+async function sendWishCardImage(chatId: number, lang: string, image: Uint8Array): Promise<boolean> {
   if (!BOT) return false;
-  const { data: preference, error } = await sb
-    .from("couple_member_preferences")
-    .select("telegram_notifications_enabled")
-    .eq("couple_id", coupleId)
-    .eq("user_id", chatId)
-    .maybeSingle();
-  if (error || preference?.telegram_notifications_enabled !== true) return false;
-  const copy: Record<string, { text: string; button: string }> = {
-    ru: { text: "В вашей Карте желаний появилась личная карточка. Откройте Touché, чтобы посмотреть её.", button: "Открыть Карту желаний" },
-    en: { text: "A private card is waiting in your Wish Map. Open Touché to view it.", button: "Open Wish Map" },
-    hi: { text: "आपके इच्छा मानचित्र में एक निजी कार्ड आया है। इसे देखने के लिए Touché खोलें।", button: "इच्छा मानचित्र खोलें" },
-    pt: { text: "Há um cartão privado no seu Mapa de Desejos. Abra o Touché para vê-lo.", button: "Abrir Mapa de Desejos" },
-    es: { text: "Hay una tarjeta privada en tu Mapa de Deseos. Abre Touché para verla.", button: "Abrir Mapa de Deseos" },
+  const copy: Record<string, { caption: string; button: string }> = {
+    ru: { caption: "Партнёр отправил вам карточку желания в Touché.", button: "Открыть дневник желаний" },
+    en: { caption: "Your partner sent you a Wish Card in Touché.", button: "Open Wish Diary" },
+    hi: { caption: "आपके साथी ने Touché में आपको इच्छा कार्ड भेजा है।", button: "इच्छा डायरी खोलें" },
+    pt: { caption: "Seu parceiro enviou um Cartão de Desejo pelo Touché.", button: "Abrir Diário de Desejos" },
+    es: { caption: "Tu pareja te envió una Tarjeta de Deseo en Touché.", button: "Abrir Diario de Deseos" },
   };
-  const url = appUrlWith({ wish_map: "1" });
-  if (!url) return false;
   const message = copy[lang] ?? copy.en;
+  const url = appUrlWith({ wish_map: "1" });
+  const form = new FormData();
+  form.append("chat_id", String(chatId));
+  form.append("photo", new Blob([Uint8Array.from(image)], { type: "image/jpeg" }), "touche-wish.jpg");
+  form.append("caption", message.caption);
+  if (url) {
+    form.append("reply_markup", JSON.stringify({
+      inline_keyboard: [[{ text: message.button, web_app: { url } }]],
+    }));
+  }
+
   try {
-    const response = await fetch(`https://api.telegram.org/bot${BOT}/sendMessage`, {
+    const response = await fetch(`https://api.telegram.org/bot${BOT}/sendPhoto`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        chat_id: chatId,
-        text: message.text,
-        reply_markup: { inline_keyboard: [[{ text: message.button, web_app: { url } }]] },
-      }),
+      body: form,
     });
-    return response.ok;
+    const result = await response.json().catch(() => null) as { ok?: unknown } | null;
+    return response.ok && result?.ok === true;
   } catch {
     return false;
   }
@@ -229,11 +241,19 @@ async function handleWishMap(couple: Couple, userId: number) {
   const hearts = Number(heartResult.count ?? 0);
   const unlockedMilestones = Math.floor(hearts / WISH_HEART_THRESHOLD);
   const usedMilestones = new Set(sent.map((card) => Number(card.milestone)));
+  let nextMilestone: number | null = null;
+  for (let candidate = 1; candidate <= unlockedMilestones; candidate += 1) {
+    if (!usedMilestones.has(candidate * WISH_HEART_THRESHOLD)) {
+      nextMilestone = candidate * WISH_HEART_THRESHOLD;
+      break;
+    }
+  }
 
   return {
     hearts,
     threshold: WISH_HEART_THRESHOLD,
     availableWishes: Math.max(0, unlockedMilestones - usedMilestones.size),
+    nextMilestone,
     dueTasks: tasks
       .filter((task) => !attestedIds.has(String(task.id)))
       .slice(0, 12)
@@ -295,45 +315,92 @@ async function handleWishTaskAttestation(couple: Couple, userId: number, body: R
 }
 
 async function handleCreateWish(couple: Couple, userId: number, body: Record<string, unknown>) {
+  const wishId = String(body.wish_id ?? "");
+  const milestone = Number(body.milestone);
+  if (!UUID.test(wishId) || !Number.isSafeInteger(milestone) || milestone < WISH_HEART_THRESHOLD || milestone % WISH_HEART_THRESHOLD !== 0) {
+    return { status: 400, body: { error: "invalid_wish_request" } };
+  }
+
   const rawText = typeof body.wish_text === "string" ? body.wish_text : "";
   const wishText = rawText.replace(/[\u0000-\u001f\u007f]/gu, " ").replace(/\s+/gu, " ").trim();
   if (!wishText || wishText.length > 280) {
     return { status: 400, body: { error: "invalid_wish_text" } };
   }
+  const wishImage = parseWishImage(body.wish_image);
+  if (!wishImage) return { status: 400, body: { error: "invalid_wish_image" } };
 
-  const [{ count, error: heartError }, { data: existingCards, error: cardsError }] = await Promise.all([
+  const [
+    { count, error: heartError },
+    { data: existingCards, error: cardsError },
+    { data: existingRequest, error: requestError },
+  ] = await Promise.all([
     sb.from("wish_map_hearts").select("couple_id", { count: "exact", head: true }).eq("couple_id", couple.id).eq("user_id", userId),
     sb.from("wish_map_cards").select("milestone").eq("couple_id", couple.id).eq("sender_user_id", userId),
+    sb.from("wish_map_cards").select("id,milestone,wish_text").eq("id", wishId).eq("couple_id", couple.id).eq("sender_user_id", userId).maybeSingle(),
   ]);
-  if (heartError || cardsError) throw heartError ?? cardsError;
+  if (heartError || cardsError || requestError) throw heartError ?? cardsError ?? requestError;
+
+  if (existingRequest) {
+    if (Number(existingRequest.milestone) !== milestone || String(existingRequest.wish_text) !== wishText) {
+      return { status: 409, body: { error: "wish_request_id_reused" } };
+    }
+    return { status: 200, body: { ok: true, wishId: existingRequest.id, notified: false, alreadyCreated: true } };
+  }
 
   const unlocked = Math.floor(Number(count ?? 0) / WISH_HEART_THRESHOLD);
   const used = new Set((existingCards ?? []).map((card) => Number(card.milestone)));
-  let milestone = 0;
-  for (let candidate = 1; candidate <= unlocked; candidate += 1) {
-    if (!used.has(candidate)) {
-      milestone = candidate;
-      break;
-    }
-  }
-  if (!milestone) return { status: 403, body: { error: "wish_card_not_unlocked" } };
+  const milestoneIndex = milestone / WISH_HEART_THRESHOLD;
+  if (milestoneIndex > unlocked) return { status: 403, body: { error: "wish_card_not_unlocked" } };
+  if (used.has(milestone)) return { status: 409, body: { error: "wish_milestone_already_used" } };
 
   const partnerId = couple.user_a_id === userId ? couple.user_b_id : couple.user_a_id;
   const { data: card, error: insertError } = await sb.from("wish_map_cards")
     .insert({
+      id: wishId,
       couple_id: couple.id,
       sender_user_id: userId,
       recipient_user_id: partnerId,
       milestone,
       wish_text: wishText,
     })
-    .select("id")
+    .select("id,milestone,wish_text")
     .single();
-  if (insertError?.code === "23505") return { status: 409, body: { error: "wish_milestone_already_used" } };
+  if (insertError?.code === "23505") {
+    const { data: existing, error: existingError } = await sb.from("wish_map_cards")
+      .select("id,milestone,wish_text")
+      .eq("id", wishId)
+      .eq("couple_id", couple.id)
+      .eq("sender_user_id", userId)
+      .maybeSingle();
+    if (existingError) throw existingError;
+    if (existing && Number(existing.milestone) === milestone && String(existing.wish_text) === wishText) {
+      return { status: 200, body: { ok: true, wishId: existing.id, notified: false, alreadyCreated: true } };
+    }
+    return { status: 409, body: { error: "wish_milestone_already_used" } };
+  }
   if (insertError) throw insertError;
 
-  const notified = await sendWishCardNotification(couple.id, partnerId, safeLang(body.lang));
+  const notified = await sendWishCardImage(partnerId, safeLang(body.lang), wishImage);
   return { status: 200, body: { ok: true, wishId: card.id, notified } };
+}
+
+async function handleResendWishImage(couple: Couple, userId: number, body: Record<string, unknown>) {
+  const wishId = String(body.wish_id ?? "");
+  if (!UUID.test(wishId)) return { status: 400, body: { error: "invalid_wish_id" } };
+  const wishImage = parseWishImage(body.wish_image);
+  if (!wishImage) return { status: 400, body: { error: "invalid_wish_image" } };
+
+  const { data: wish, error } = await sb.from("wish_map_cards")
+    .select("id,recipient_user_id")
+    .eq("id", wishId)
+    .eq("couple_id", couple.id)
+    .eq("sender_user_id", userId)
+    .maybeSingle();
+  if (error) throw error;
+  if (!wish) return { status: 404, body: { error: "wish_card_not_found" } };
+
+  const notified = await sendWishCardImage(Number(wish.recipient_user_id), safeLang(body.lang), wishImage);
+  return { status: 200, body: { ok: true, wishId: wish.id, notified } };
 }
 
 async function handleRespondToWish(couple: Couple, userId: number, body: Record<string, unknown>) {
@@ -672,6 +739,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
     if (req.method === "POST" && action === "create_wish") {
       const result = await handleCreateWish(couple, user.id, req.body ?? {});
+      return res.status(result.status).json(result.body);
+    }
+    if (req.method === "POST" && action === "send_wish_photo") {
+      const result = await handleResendWishImage(couple, user.id, req.body ?? {});
       return res.status(result.status).json(result.body);
     }
     if (req.method === "POST" && action === "respond_wish") {

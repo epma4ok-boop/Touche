@@ -8,7 +8,7 @@ import { createClient } from "@supabase/supabase-js";
 import { validateTelegramInitData } from "../couple/_auth.js";
 import { appDate } from "../limits.js";
 import { claimFriendInvite } from "../referrals/_claim.js";
-import { getTaskQualityRules, isSharedTaskText, isTaskTextWellFormed } from "../../src/data/task-quality.js";
+import { getTaskQualityRules, isSharedTaskText, isTaskTextModeAppropriate, isTaskTextWellFormed } from "../../src/data/task-quality.js";
 import { OWNER_TELEGRAM_ID } from "../../src/config.js";
 import { TASKS_RU } from "../../src/data/tasks-ru.js";
 import { TASKS_EN } from "../../src/data/tasks-en.js";
@@ -277,11 +277,22 @@ const EXAMPLE_MEDIA_MARKERS: Record<string, RegExp> = {
   es: /(?:foto|selfi|selfie|imagen|grabación|grabar|filmación|vídeo|video|cámara|registrar)/iu,
 };
 
-function getTaskExamples(category: string, lang: string, requestId: string): string[] {
+const UNSAFE_TASK_MARKERS: Record<string, RegExp> = {
+  ru: /(?:без\s+согласия|игнорир\w*\s+(?:отказ|боль)|не\s+может\s+(?:двигаться|отказаться)|не\s+двигается|делай\s+что\s+хочешь|застав\w*|принуд\w*|удуш\w*|души\s|не\s+спрашивай|насиль\w*)/iu,
+  en: /(?:without consent|can't (?:move|refuse)|cannot (?:move|refuse)|at their mercy|do whatever you want|force(?:d)?|coerc|chok|strangl|ignore (?:their )?(?:no|stop|pain)|don't ask)/iu,
+  hi: /(?:सहमति के बिना|हिल नहीं सकता|हिल नहीं सकती|हिलते नहीं|जो चाहो करो|जबरदस्ती|ज़बरदस्ती|मना करने पर भी|गला घोंट|दर्द की अनदेखी)/u,
+  pt: /(?:sem consentimento|não pode se mover|não consegue se mexer|à mercê|faça o que quiser|forç\w*|coag\w*|estrang\w*|ignore.*(?:não|pare|dor))/iu,
+  es: /(?:sin consentimiento|no puede moverse|no puede negarse|a su merced|haz lo que quieras|forz\w*|coaccion\w*|estrang\w*|ignora.*(?:no|para|dolor))/iu,
+};
+
+function getTaskExamples(category: string, lang: string, requestId: string, mode: TaskMode): string[] {
   const pool = SOURCE_TASKS[lang]?.[category] ?? [];
   const mediaMarkers = EXAMPLE_MEDIA_MARKERS[lang] ?? EXAMPLE_MEDIA_MARKERS.en;
+  const unsafeMarkers = UNSAFE_TASK_MARKERS[lang] ?? UNSAFE_TASK_MARKERS.en;
   const eligible = pool.filter((example) =>
     isTaskTextWellFormed(example, lang, "together")
+    && !unsafeMarkers.test(example)
+    && (mode !== "solo" || !isSharedTaskText(example, lang))
     && (category === "compliments" || !mediaMarkers.test(example))
   );
   const shuffled = seededShuffle(eligible, hashSeed(`${requestId}:${lang}:${category}:examples`));
@@ -300,24 +311,40 @@ function getTaskExamples(category: string, lang: string, requestId: string): str
   return examples;
 }
 
-function getTaskExamplesPrompt(category: string, lang: string, requestId: string): string {
-  const examples = getTaskExamples(category, lang, requestId);
+function getTaskExamplesPrompt(category: string, lang: string, requestId: string, mode: TaskMode): string {
+  const examples = getTaskExamples(category, lang, requestId, mode);
   if (examples.length === 0) return "";
   const intro: Record<string, string> = {
-    ru: "Ниже — разные примеры из большого списка заданий пользователя. Используй их только как источник идей; не копируй формулировки и не сохраняй их формат «один делает — другой получает».",
-    en: "Below are varied examples from the user's large task lists. Use them only as idea references; do not copy their wording or preserve a one-person-does-it, one-person-receives-it format.",
-    hi: "नीचे उपयोगकर्ता की बड़ी कार्य-सूची से अलग-अलग उदाहरण हैं। इन्हें केवल विचारों के लिए लें; शब्दशः न दोहराएँ और एक व्यक्ति के करने वाला प्रारूप न रखें।",
-    pt: "Abaixo estão exemplos variados das listas extensas do usuário. Use-os apenas como inspiração; não copie a redação nem mantenha um formato em que só uma pessoa age.",
-    es: "A continuación hay ejemplos variados de las listas extensas del usuario. Úsalos solo como inspiración; no copies su redacción ni mantengas un formato en el que actúa una sola persona.",
+    ru: "Ниже — разные примеры из списка заданий пользователя. Используй их только как источник идей; не копируй формулировки.",
+    en: "Below are varied examples from the user's task lists. Use them only as idea references; do not copy their wording.",
+    hi: "नीचे उपयोगकर्ता की कार्य-सूची से अलग-अलग उदाहरण हैं। इन्हें केवल विचारों के लिए लें; शब्दशः न दोहराएँ।",
+    pt: "Abaixo estão exemplos variados das listas do usuário. Use-os apenas como inspiração; não copie a redação.",
+    es: "A continuación hay ejemplos variados de las listas del usuario. Úsalos solo como inspiración; no copies su redacción.",
   };
   return `${intro[lang] ?? intro.en}\n${examples.map((example, index) => `${index + 1}. ${example}`).join("\n")}`;
 }
 
 function getFallback(cat: string, lang: string, mode: TaskMode, requestId: string): string {
+  if (mode === "solo") {
+    const pool = SOURCE_TASKS[lang]?.[cat] ?? [];
+    const mediaMarkers = EXAMPLE_MEDIA_MARKERS[lang] ?? EXAMPLE_MEDIA_MARKERS.en;
+    const unsafeMarkers = UNSAFE_TASK_MARKERS[lang] ?? UNSAFE_TASK_MARKERS.en;
+    const soloTasks = pool.filter((task) =>
+      isTaskTextWellFormed(task, lang, "solo")
+      && !mediaMarkers.test(task)
+      && !unsafeMarkers.test(task)
+      && !isSharedTaskText(task, lang)
+    );
+    if (soloTasks.length === 0) {
+      throw new Error(`No valid solo-task fallback for ${lang}/${cat}`);
+    }
+    return seededShuffle(soloTasks, hashSeed(`${requestId}:${lang}:${cat}:solo-fallback`))[0];
+  }
+
   const pool = DAILY_TASK_FALLBACKS[lang] ?? DAILY_TASK_FALLBACKS.en;
   const list = pool[cat] ?? pool.compliments;
   const wellFormed = list.filter(task =>
-    isTaskTextWellFormed(task, lang, mode) && isSharedTaskText(task, lang)
+    isTaskTextWellFormed(task, lang, mode) && isTaskTextModeAppropriate(task, lang, mode)
   );
   if (wellFormed.length === 0) {
     throw new Error(`No valid shared-task fallback for ${lang}/${cat}/${mode}`);
@@ -353,11 +380,11 @@ function getGenderLine(lang: string, gender: string): string {
 
 const MODE_INSTRUCTIONS: Record<string, Record<string, string>> = {
   solo: {
-    ru: "Режим «один инициирует»: задание первым получает один совершеннолетний пользователь, но оно предназначено для обоих партнёров. Обращайся к паре во множественном числе; назови, что делают оба, вместе или по очереди. Не пиши команду только одному человеку.",
-    en: "One-person-start mode: one adult user receives the task first, but it is for both partners. Address the couple together and state what both do, either jointly or in turns. Never make only one partner the actor.",
-    hi: "एक व्यक्ति-शुरू मोड: एक वयस्क उपयोगकर्ता को काम पहले मिलता है, लेकिन यह दोनों साथियों के लिए है। दोनों को साथ संबोधित करें और बताएं कि वे मिलकर या बारी-बारी से क्या करेंगे।",
-    pt: "Modo iniciado por uma pessoa: um adulto recebe a tarefa primeiro, mas ela é para os dois. Dirija-se ao casal e diga o que ambos farão juntos ou em turnos; não deixe só uma pessoa como responsável.",
-    es: "Modo iniciado por una persona: un adulto recibe la tarea primero, pero es para ambos. Dirígete a la pareja y di qué harán juntos o por turnos; no dejes a una sola persona como responsable.",
+    ru: "Одиночный режим: задание получает только один совершеннолетний пользователь. Обращайся к нему как к одному человеку и опиши одно действие, которое он может сделать для партнёра. Партнёр может быть адресатом, но не должен выполнять отдельную часть или отвечать.",
+    en: "Solo mode: only one adult user receives the task. Address that user individually and describe one action they can take for their partner. The partner may receive the gesture but must not be assigned a separate action or reply.",
+    hi: "एकल मोड: काम केवल एक वयस्क उपयोगकर्ता को मिलता है। उसी व्यक्ति को संबोधित करें और ऐसा एक काम बताएँ जो वह अपने साथी के लिए कर सकता है। साथी काम का प्राप्तकर्ता हो सकता है, लेकिन उससे अलग काम या जवाब की अपेक्षा न करें।",
+    pt: "Modo solo: somente um adulto recebe a tarefa. Dirija-se a essa pessoa e descreva uma ação que ela pode fazer para o parceiro. O parceiro pode receber o gesto, mas não deve ter uma ação separada nem uma resposta como obrigação.",
+    es: "Modo individual: solo una persona adulta recibe la tarea. Dirígete a esa persona y describe una acción que pueda hacer por su pareja. La pareja puede recibir el gesto, pero no debe tener una acción separada ni una respuesta obligatoria.",
   },
   together: {
     ru: "Парный режим: одно и то же задание показывается обоим и при включённых уведомлениях отправляется партнёру в Telegram. Создай одно совместное действие для совершеннолетних мужчины и женщины, а не два отдельных задания и не ролевую сцену. Обращайся к обоим во множественном числе; явно укажи, что делают оба.",
@@ -374,13 +401,13 @@ const PROMPTS: Record<string, Record<string, string>> = {
   compliments: {
     ru: `Ты создаёшь одно задание для категории «КОМПЛИМЕНТЫ» в гетеросексуальной паре мужчина–женщина.
 
-Стиль: естественно обращайся к обоим во множественном числе; используй конкретный поступок или наблюдение и одну выразительную деталь. Задание должно звучать лично, а не как общий комплимент из открытки.
+Стиль: используй конкретный поступок или наблюдение и одну выразительную деталь. Задание должно звучать лично, а не как общий комплимент из открытки.
 Категория только про слова и знаки внимания: сказать или написать комплимент, поблагодарить за конкретную мелочь, напомнить об общем тёплом воспоминании. Можно предложить в течение дня обмениваться обычными личными селфи с короткими подписями-комплиментами; никаких интимных фото или публикаций.
 
 Придумай новое задание в духе приложенных примеров, не копируя их. Одно ясное действие; максимум 1–3 связанных шага, обычно 1–2 предложения. Не добавляй шаблонный финал «пусть почувствует». До ${MAX_TASK_CHARS} символов. Верни только текст задания.`,
     en: `Create one task for the "COMPLIMENTS" category for a heterosexual man-woman couple.
 
-Style: address both partners naturally, with one specific observation or gesture and one vivid detail. Make it personal rather than a generic greeting-card compliment.
+Style: use one specific observation or gesture and one vivid detail. Make it personal rather than a generic greeting-card compliment.
 This category is about words and thoughtful gestures only: give a specific compliment, thank the partner for a small real thing, or recall a warm shared memory. One option is to exchange ordinary private selfies with short compliment captions during free moments through the day; never request intimate photos or public posts.
 
 Create a new task in the style of the supplied examples without copying them. One clear action with at most 1–3 connected steps, usually 1–2 sentences. Avoid a formulaic "let them feel" ending. Up to ${MAX_TASK_CHARS} characters. Return only the task text.`,
@@ -624,7 +651,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           { role: "system", content: systemPrompt },
           { role: "user", content: [
             LANGUAGE_INSTRUCTIONS[lang],
-            getTaskExamplesPrompt(category, lang, requestId),
+            getTaskExamplesPrompt(category, lang, requestId, mode),
           ].filter(Boolean).join("\n\n") },
         ], max_tokens: 180, temperature: 0.98 }),
       });
@@ -635,7 +662,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         if (candidate.length >= 15 && candidate.length <= MAX_TASK_CHARS
           && matchesRequestedLanguage(candidate, lang)
           && isTaskTextWellFormed(candidate, lang, mode)
-          && isSharedTaskText(candidate, lang)
+          && isTaskTextModeAppropriate(candidate, lang, mode)
           && !forbidden.some(f => candidate.toLowerCase().includes(f))) {
           task = candidate;
           source = "ai";

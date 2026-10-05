@@ -8,8 +8,13 @@ import { createClient } from "@supabase/supabase-js";
 import { validateTelegramInitData } from "../couple/_auth.js";
 import { appDate } from "../limits.js";
 import { claimFriendInvite } from "../referrals/_claim.js";
-import { getTaskQualityRules, isTaskTextWellFormed } from "../../src/data/task-quality.js";
+import { getTaskQualityRules, isSharedTaskText, isTaskTextWellFormed } from "../../src/data/task-quality.js";
 import { OWNER_TELEGRAM_ID } from "../../src/config.js";
+import { TASKS_RU } from "../../src/data/tasks-ru.js";
+import { TASKS_EN } from "../../src/data/tasks-en.js";
+import { TASKS_HI } from "../../src/data/tasks-hi.js";
+import { TASKS_PT } from "../../src/data/tasks-pt.js";
+import { TASKS_ES } from "../../src/data/tasks-es.js";
 
 const DEEPSEEK_API_KEY = process.env.DEEPSEEK_API_KEY!;
 const DEEPSEEK_URL = "https://api.deepseek.com/v1/chat/completions";
@@ -26,6 +31,13 @@ const MAX_TASK_CHARS = 280;
 const supabase = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!);
 
 type StaticPool = Record<string, string[]>;
+const SOURCE_TASKS: Record<string, StaticPool> = {
+  ru: TASKS_RU,
+  en: TASKS_EN,
+  hi: TASKS_HI,
+  pt: TASKS_PT,
+  es: TASKS_ES,
+};
 
 async function notifyPartner(
   partnerUserId: number,
@@ -98,39 +110,139 @@ async function notifyPartner(
 
 const DAILY_TASK_FALLBACKS: Record<string, StaticPool> = {
   ru: {
-    compliments: ["В ближайшие сутки в свободные минуты отправляйте друг другу обычные селфи с короткими подписями-комплиментами; пусть каждое остаётся личным."],
-    tenderness: ["В ближайшие сутки обнимайтесь при каждой встрече, а если будете врозь — отправьте друг другу по одному короткому тёплому голосовому сообщению."],
-    desire: ["В течение ближайших суток обменивайтесь короткими флиртующими сообщениями в свободное время, а при встрече оставьте один долгий поцелуй на границе прелюдии."],
-    passion: ["В течение дня обменяйтесь по одному чувственному намёку, а когда останетесь вдвоём, займитесь медленным сексом, меняя темп по реакции друг друга."],
-    hard: ["В течение дня обменяйтесь откровенными сообщениями о желании; при встрече женщина наклоняется и упирается ладонями в стену, а мужчина входит в неё сзади в уверенном ритме."],
+    compliments: [
+      "В ближайшие сутки в свободные минуты отправляйте друг другу обычные селфи с короткими личными комплиментами; фотографии остаются только между вами.",
+      "Вечером по очереди назовите друг другу одну черту, которой вы особенно дорожите, и вспомните конкретный момент, когда она проявилась.",
+      "Каждый из вас напишите партнёру одну короткую благодарность за недавнюю мелочь, которую обычно не замечают.",
+    ],
+    tenderness: [
+      "В ближайшие сутки обнимайтесь при встрече, а если будете врозь — отправьте друг другу по одному короткому тёплому голосовому сообщению.",
+      "Когда окажетесь рядом, по очереди сделайте друг другу короткий массаж плеч, подстраивая прикосновения под реакцию партнёра.",
+      "По очереди погладьте ладони друг друга и задержите руки вместе на несколько спокойных вдохов.",
+    ],
+    desire: [
+      "В течение ближайших суток обменивайтесь короткими флиртующими сообщениями, а при встрече вместе остановитесь на одном долгом поцелуе.",
+      "Когда останетесь вдвоём, по очереди прошепчите друг другу одну фразу о желании и ответьте на неё поцелуем поверх одежды.",
+      "Обменяйтесь в течение дня парой игривых намёков, а вечером по очереди выберите, где оставить друг другу один нежный поцелуй.",
+    ],
+    passion: [
+      "В течение дня обменяйтесь по одному чувственному намёку, а когда останетесь вдвоём, займитесь медленным сексом, меняя темп по реакции друг друга.",
+      "Когда будете вместе, по очереди задавайте ритм поцелуям и ласкам; замечайте реакцию партнёра и сделайте одну выразительную паузу.",
+      "Обменяйтесь коротким сообщением о желании, а затем вместе уделите время медленному сексу, меняя темп один раз по реакции друг друга.",
+    ],
+    hard: [
+      "В течение дня обменяйтесь откровенными сообщениями о желании; при встрече по очереди задайте уверенный темп близости и меняйте его по реакции друг друга.",
+      "Когда останетесь вдвоём, по очереди произнесите одну короткую властную просьбу и ответьте на неё откровенной лаской.",
+      "Обменяйтесь одной прямой фразой о том, чего хотите, а затем вместе выберите интенсивный темп близости и держите его столько, сколько нравится обоим.",
+    ],
   },
   en: {
-    compliments: ["Over the next 24 hours, send each other ordinary selfies with short compliment captions whenever you have a free moment; keep them private."],
-    tenderness: ["Over the next day, share a brief hug whenever you meet; if you are apart, send each other one warm, short voice note."],
-    desire: ["Over the next 24 hours, trade brief flirty messages in your free moments, then share one lingering kiss when you meet and stop at the edge of foreplay."],
-    passion: ["Trade one sensual hint during the day, then enjoy slow sex when you are together, changing pace in response to each other."],
-    hard: ["Trade explicit messages about what you want during the day; when you meet, she leans against the wall and he enters her from behind with a firm rhythm."],
+    compliments: [
+      "Over the next day, take turns sending each other ordinary private selfies with specific compliment captions; keep every photo between the two of you.",
+      "Tonight, each of you name one small detail you appreciate about the other and share a real moment when it stood out.",
+      "Both of you send the other a short thank-you for a recent everyday gesture that might otherwise go unnoticed.",
+    ],
+    tenderness: [
+      "Whenever you meet over the next day, both of you share a brief hug; if apart, trade one warm voice note each.",
+      "When you are together, take turns giving each other a short shoulder massage and follow the other's response.",
+      "Take turns gently tracing a line across each other's palm, then hold hands for a few quiet breaths.",
+    ],
+    desire: [
+      "Both of you trade a few flirty messages during the day, then pause at one lingering kiss when you meet.",
+      "When alone together, take turns whispering one thing you want and answer each with a kiss over clothing.",
+      "Exchange a couple of playful hints during the day, then both of you choose one place to leave each other a gentle kiss.",
+    ],
+    passion: [
+      "Trade one sensual hint during the day, then enjoy slow sex together, changing pace in response to each other.",
+      "When you are together, take turns setting the rhythm for kisses and caresses; notice each other's response and add one deliberate pause.",
+      "Both of you share one brief message about desire, then enjoy slow sex together and change the rhythm once in response to each other.",
+    ],
+    hard: [
+      "Trade direct messages about what you want during the day; when together, take turns setting a confident pace and adjusting to each other's response.",
+      "When alone together, take turns making one brief, commanding request and answering it with an intimate caress.",
+      "Both of you name one direct desire, then choose an intense pace together and keep it for as long as you both enjoy.",
+    ],
   },
   hi: {
-    compliments: ["अगले 24 घंटों में, खाली समय मिलने पर एक-दूसरे को साधारण सेल्फ़ी के साथ छोटा तारीफ़ भरा कैप्शन भेजें; तस्वीरें सिर्फ़ आप दोनों तक रहें।"],
-    tenderness: ["अगले 24 घंटों में हर मुलाक़ात पर थोड़ी देर गले मिलें; दूर हों तो एक-दूसरे को छोटा और स्नेह भरा वॉइस मैसेज भेजें।"],
-    desire: ["अगले 24 घंटों में खाली समय पर छोटे फ़्लर्टिंग संदेश भेजें, फिर मिलने पर एक लंबा चुंबन साझा करें और चुंबन को ही इस काम का अंत रखें।"],
-    passion: ["दिन में एक कामुक संकेत भेजें, फिर साथ होने पर धीरे-धीरे सेक्स करें और एक-दूसरे की प्रतिक्रिया के अनुसार गति बदलें।"],
-    hard: ["दिन में अपनी इच्छा के बारे में स्पष्ट संदेश भेजें; मिलने पर महिला दीवार की ओर झुके और पुरुष पीछे से प्रवेश करे, एक दृढ़ लय के साथ।"],
+    compliments: [
+      "अगले दिन खाली समय में आप दोनों एक-दूसरे को साधारण निजी सेल्फ़ी के साथ खास तारीफ़ भेजें; तस्वीरें केवल आप दोनों के बीच रहें।",
+      "आज शाम बारी-बारी से एक-दूसरे की वह छोटी बात बताएं जिसकी आप सबसे ज़्यादा कद्र करते हैं, और उससे जुड़ा एक सच्चा पल याद करें।",
+      "आप दोनों हाल की किसी छोटी मदद के लिए एक-दूसरे को छोटा-सा धन्यवाद संदेश भेजें।",
+    ],
+    tenderness: [
+      "अगले दिन जब भी मिलें, आप दोनों एक-दूसरे को थोड़ी देर गले लगाएं; दूर हों तो एक-एक स्नेह भरा वॉइस नोट भेजें।",
+      "साथ होने पर बारी-बारी से एक-दूसरे के कंधों की हल्की मालिश करें और साथी की प्रतिक्रिया के अनुसार स्पर्श बदलें।",
+      "बारी-बारी से एक-दूसरे की हथेली पर हल्की उंगली फेरें, फिर कुछ शांत सांसों तक हाथ थामे रहें।",
+    ],
+    desire: [
+      "दिन में आप दोनों कुछ छोटे फ़्लर्टिंग संदेश एक-दूसरे को भेजें, फिर मिलने पर एक लंबा चुंबन साझा करें।",
+      "जब आप दोनों अकेले हों, बारी-बारी से अपनी एक इच्छा फुसफुसाएं और कपड़ों के ऊपर से चुंबन देकर जवाब दें।",
+      "दिन में आपस में दो चंचल इशारे साझा करें, फिर शाम को बारी-बारी से एक जगह चुनें जहां साथी को चूमें।",
+    ],
+    passion: [
+      "दिन में आप दोनों एक-एक कामुक संकेत साझा करें, फिर साथ होने पर धीरे-धीरे सेक्स करें और एक-दूसरे की प्रतिक्रिया के अनुसार गति बदलें।",
+      "साथ होने पर आप दोनों बारी-बारी से चुंबन और स्पर्श की गति तय करें; साथी की प्रतिक्रिया देखकर एक ठहराव जोड़ें।",
+      "आप दोनों इच्छा के बारे में एक छोटा संदेश साझा करें, फिर साथ में धीमा सेक्स करें और प्रतिक्रिया के अनुसार एक बार लय बदलें।",
+    ],
+    hard: [
+      "दिन में आप दोनों अपनी इच्छा के बारे में सीधे संदेश भेजें; साथ होने पर बारी-बारी से अंतरंगता की दृढ़ गति तय करें और साथी की प्रतिक्रिया देखें।",
+      "जब आप दोनों अकेले हों, बारी-बारी से एक छोटी स्पष्ट मांग कहें और उसका जवाब अंतरंग स्पर्श से दें।",
+      "आप दोनों अपनी एक स्पष्ट इच्छा बताएं, फिर साथ में तीव्र गति चुनें और जब तक दोनों चाहें उसे बनाए रखें।",
+    ],
   },
   pt: {
-    compliments: ["Nas próximas 24 horas, enviem selfies comuns com legendas curtas de elogio nos momentos livres; mantenham as fotos privadas entre vocês."],
-    tenderness: ["Nas próximas 24 horas, troquem um abraço breve sempre que se encontrarem; se estiverem longe, enviem uma mensagem de voz carinhosa."],
-    desire: ["Nas próximas 24 horas, troquem mensagens curtas de flerte nos momentos livres e depois compartilhem um beijo demorado quando se encontrarem."],
-    passion: ["Troquem uma sugestão sensual durante o dia e, quando estiverem juntos, façam sexo devagar, ajustando o ritmo às reações um do outro."],
-    hard: ["Troquem mensagens explícitas sobre o que desejam durante o dia; ao se encontrarem, ela se inclina contra a parede e ele a penetra por trás num ritmo firme."],
+    compliments: [
+      "Nas próximas 24 horas, vocês dois enviem selfies comuns e privadas com elogios específicos; mantenham as fotos só entre vocês.",
+      "Hoje à noite, vocês dois digam um ao outro uma qualidade que admiram e lembrem um momento real em que ela apareceu.",
+      "Vocês dois enviem ao parceiro um agradecimento curto por um gesto cotidiano recente.",
+    ],
+    tenderness: [
+      "Quando se encontrarem amanhã, vocês dois compartilhem um abraço breve; se estiverem longe, troquem uma mensagem de voz carinhosa.",
+      "Quando estiverem juntos, revezem-se numa massagem curta nos ombros e acompanhem a reação um do outro.",
+      "Revezem-se em desenhar um círculo leve na palma um do outro e depois permaneçam de mãos dadas por algumas respirações.",
+    ],
+    desire: [
+      "Vocês dois troquem algumas mensagens de flerte durante o dia e parem num beijo demorado quando se encontrarem.",
+      "Quando estiverem a sós, revezem-se em sussurrar um desejo e respondam cada vez com um beijo por cima da roupa.",
+      "Troquem duas provocações leves durante o dia e, à noite, escolham um lugar para beijar um ao outro.",
+    ],
+    passion: [
+      "Troquem uma insinuação sensual durante o dia e, quando estiverem juntos, façam sexo devagar, ajustando o ritmo às reações um do outro.",
+      "Quando estiverem juntos, revezem-se em definir o ritmo dos beijos e das carícias; observem a reação um do outro e façam uma pausa marcada.",
+      "Vocês dois compartilhem uma mensagem breve sobre desejo e depois façam sexo devagar, mudando o ritmo uma vez em resposta um ao outro.",
+    ],
+    hard: [
+      "Troquem mensagens diretas sobre o que desejam; quando estiverem juntos, revezem-se em conduzir a intimidade com um ritmo firme.",
+      "Quando estiverem a sós, revezem-se em fazer um pedido curto e ousado e respondam com uma carícia íntima.",
+      "Digam um ao outro um desejo direto e escolham juntos um ritmo intenso, mantendo-o enquanto ambos gostarem.",
+    ],
   },
   es: {
-    compliments: ["Durante las próximas 24 horas, envíense selfies normales con frases breves de cumplido cuando tengan un rato libre; manténganlas en privado."],
-    tenderness: ["Durante las próximas 24 horas, abrácense brevemente cada vez que se encuentren; si están separados, envíense una nota de voz cariñosa."],
-    desire: ["Durante las próximas 24 horas, intercambien mensajes breves de coqueteo en sus ratos libres y luego compartan un beso largo al verse."],
-    passion: ["Envíense una insinuación sensual durante el día y, cuando estén juntos, disfruten de sexo lento, ajustando el ritmo a las reacciones del otro."],
-    hard: ["Intercambien mensajes explícitos sobre lo que desean durante el día; al verse, ella se inclina contra la pared y él la penetra por detrás con un ritmo firme."],
+    compliments: [
+      "Durante el próximo día, los dos envíense selfies normales y privados con un cumplido concreto; mantengan las fotos solo entre ustedes.",
+      "Esta noche, ambos díganse qué detalle del otro admiran y recuerden un momento real en que lo notaron.",
+      "Ambos envíense un agradecimiento breve por un gesto cotidiano reciente del otro.",
+    ],
+    tenderness: [
+      "Cuando se vean, los dos compartan un abrazo breve; si están lejos, intercambien una nota de voz cariñosa.",
+      "Cuando estén juntos, túrnense para dar un masaje corto en los hombros y sigan la reacción del otro.",
+      "Por turnos, recorran suavemente la palma del otro con un dedo y luego quédense de la mano durante unas respiraciones.",
+    ],
+    desire: [
+      "Intercambien algunos mensajes coquetos durante el día y, al verse, quédense en un beso largo.",
+      "Cuando estén a solas, por turnos susurren un deseo y respondan con un beso por encima de la ropa.",
+      "Compartan un par de insinuaciones juguetonas durante el día y, por turnos, elijan dónde dejar un beso al otro.",
+    ],
+    passion: [
+      "Envíense una insinuación sensual durante el día y, cuando estén juntos, disfruten de sexo lento, ajustando el ritmo a las reacciones del otro.",
+      "Cuando estén juntos, túrnense para marcar el ritmo de los besos y las caricias; observen la reacción del otro e incluyan una pausa deliberada.",
+      "Ambos compartan un mensaje breve sobre el deseo y luego disfruten de sexo lento, cambiando el ritmo una vez según la respuesta del otro.",
+    ],
+    hard: [
+      "Intercambien mensajes directos sobre lo que desean; cuando estén juntos, túrnense para llevar la intimidad con un ritmo firme.",
+      "Cuando estén a solas, por turnos hagan una petición breve y atrevida y respondan con una caricia íntima.",
+      "Díganse un deseo directo y elijan juntos un ritmo intenso, manteniéndolo mientras ambos lo disfruten.",
+    ],
   },
 };
 
@@ -138,12 +250,79 @@ function isTaskMode(mode: string): mode is TaskMode {
   return MODES.has(mode as TaskMode);
 }
 
-function getFallback(cat: string, lang: string, mode: TaskMode): string {
+function hashSeed(value: string): number {
+  let hash = 2166136261;
+  for (let i = 0; i < value.length; i += 1) {
+    hash = Math.imul(hash ^ value.charCodeAt(i), 16777619) >>> 0;
+  }
+  return hash || 1;
+}
+
+function seededShuffle<T>(items: T[], seed: number): T[] {
+  const shuffled = [...items];
+  let state = seed || 1;
+  for (let index = shuffled.length - 1; index > 0; index -= 1) {
+    state = (Math.imul(state, 1664525) + 1013904223) >>> 0;
+    const target = state % (index + 1);
+    [shuffled[index], shuffled[target]] = [shuffled[target], shuffled[index]];
+  }
+  return shuffled;
+}
+
+const EXAMPLE_MEDIA_MARKERS: Record<string, RegExp> = {
+  ru: /(?:фото|фотограф|селфи|съ[её]мк|сним(?:и|ите|ать|айте)|видеозапис|камер\w*|записыва)/iu,
+  en: /(?:photo|picture|selfie|image|filming|film|recording|record|camera|video)/iu,
+  hi: /(?:फोटो|तस्वीर|सेल्फ़ी|सेल्फी|वीडियो|रिकॉर्ड|कैमरा)/u,
+  pt: /(?:foto|selfie|imagem|filmagem|gravação|gravar|vídeo|câmera|registrar)/iu,
+  es: /(?:foto|selfi|selfie|imagen|grabación|grabar|filmación|vídeo|video|cámara|registrar)/iu,
+};
+
+function getTaskExamples(category: string, lang: string, requestId: string): string[] {
+  const pool = SOURCE_TASKS[lang]?.[category] ?? [];
+  const mediaMarkers = EXAMPLE_MEDIA_MARKERS[lang] ?? EXAMPLE_MEDIA_MARKERS.en;
+  const eligible = pool.filter((example) =>
+    isTaskTextWellFormed(example, lang, "together")
+    && (category === "compliments" || !mediaMarkers.test(example))
+  );
+  const shuffled = seededShuffle(eligible, hashSeed(`${requestId}:${lang}:${category}:examples`));
+  const examples: string[] = [];
+  for (const candidate of shuffled) {
+    const candidateWords = new Set(candidate.toLowerCase().match(/[\p{L}\p{N}]{3,}/gu) ?? []);
+    const tooSimilar = examples.some((selected) => {
+      const selectedWords = new Set(selected.toLowerCase().match(/[\p{L}\p{N}]{3,}/gu) ?? []);
+      const intersection = [...candidateWords].filter((word) => selectedWords.has(word)).length;
+      const union = new Set([...candidateWords, ...selectedWords]).size;
+      return union > 0 && intersection / union > 0.55;
+    });
+    if (!tooSimilar) examples.push(candidate);
+    if (examples.length === 5) break;
+  }
+  return examples;
+}
+
+function getTaskExamplesPrompt(category: string, lang: string, requestId: string): string {
+  const examples = getTaskExamples(category, lang, requestId);
+  if (examples.length === 0) return "";
+  const intro: Record<string, string> = {
+    ru: "Ниже — разные примеры из большого списка заданий пользователя. Используй их только как источник идей; не копируй формулировки и не сохраняй их формат «один делает — другой получает».",
+    en: "Below are varied examples from the user's large task lists. Use them only as idea references; do not copy their wording or preserve a one-person-does-it, one-person-receives-it format.",
+    hi: "नीचे उपयोगकर्ता की बड़ी कार्य-सूची से अलग-अलग उदाहरण हैं। इन्हें केवल विचारों के लिए लें; शब्दशः न दोहराएँ और एक व्यक्ति के करने वाला प्रारूप न रखें।",
+    pt: "Abaixo estão exemplos variados das listas extensas do usuário. Use-os apenas como inspiração; não copie a redação nem mantenha um formato em que só uma pessoa age.",
+    es: "A continuación hay ejemplos variados de las listas extensas del usuario. Úsalos solo como inspiración; no copies su redacción ni mantengas un formato en el que actúa una sola persona.",
+  };
+  return `${intro[lang] ?? intro.en}\n${examples.map((example, index) => `${index + 1}. ${example}`).join("\n")}`;
+}
+
+function getFallback(cat: string, lang: string, mode: TaskMode, requestId: string): string {
   const pool = DAILY_TASK_FALLBACKS[lang] ?? DAILY_TASK_FALLBACKS.en;
   const list = pool[cat] ?? pool.compliments;
-  const wellFormed = list.filter(task => isTaskTextWellFormed(task, lang, mode));
-  const candidates = wellFormed.length > 0 ? wellFormed : list;
-  return candidates[Math.floor(Math.random() * candidates.length)];
+  const wellFormed = list.filter(task =>
+    isTaskTextWellFormed(task, lang, mode) && isSharedTaskText(task, lang)
+  );
+  if (wellFormed.length === 0) {
+    throw new Error(`No valid shared-task fallback for ${lang}/${cat}/${mode}`);
+  }
+  return wellFormed[hashSeed(`${requestId}:${lang}:${cat}:${mode}:fallback`) % wellFormed.length];
 }
 
 function getGenderLine(lang: string, gender: string): string {
@@ -174,18 +353,18 @@ function getGenderLine(lang: string, gender: string): string {
 
 const MODE_INSTRUCTIONS: Record<string, Record<string, string>> = {
   solo: {
-    ru: "Режим «один инициирует»: задание первым получает один совершеннолетний пользователь, но выполняет его вместе со взрослым партнёром. Это всегда совместное действие пары, не самопомощь и не уход за собой.",
-    en: "One-person-start mode: one adult user receives the task first, but completes it with their adult partner. It must be a shared couple action, never self-care or something done alone.",
-    hi: "एक व्यक्ति-शुरू मोड: एक वयस्क उपयोगकर्ता को काम पहले मिलता है, लेकिन वह इसे अपने वयस्क साथी के साथ करता है। यह जोड़े की साझा गतिविधि हो, अकेले की देखभाल या अकेली क्रिया नहीं।",
-    pt: "Modo iniciado por uma pessoa: um usuário adulto recebe a tarefa primeiro, mas a realiza com seu parceiro adulto. A atividade deve ser do casal, nunca autocuidado ou algo feito sozinho.",
-    es: "Modo iniciado por una persona: un usuario adulto recibe la tarea primero, pero la realiza con su pareja adulta. Debe ser una actividad compartida, nunca autocuidado ni algo que se haga a solas.",
+    ru: "Режим «один инициирует»: задание первым получает один совершеннолетний пользователь, но оно предназначено для обоих партнёров. Обращайся к паре во множественном числе; назови, что делают оба, вместе или по очереди. Не пиши команду только одному человеку.",
+    en: "One-person-start mode: one adult user receives the task first, but it is for both partners. Address the couple together and state what both do, either jointly or in turns. Never make only one partner the actor.",
+    hi: "एक व्यक्ति-शुरू मोड: एक वयस्क उपयोगकर्ता को काम पहले मिलता है, लेकिन यह दोनों साथियों के लिए है। दोनों को साथ संबोधित करें और बताएं कि वे मिलकर या बारी-बारी से क्या करेंगे।",
+    pt: "Modo iniciado por uma pessoa: um adulto recebe a tarefa primeiro, mas ela é para os dois. Dirija-se ao casal e diga o que ambos farão juntos ou em turnos; não deixe só uma pessoa como responsável.",
+    es: "Modo iniciado por una persona: un adulto recibe la tarea primero, pero es para ambos. Dirígete a la pareja y di qué harán juntos o por turnos; no dejes a una sola persona como responsable.",
   },
   together: {
-    ru: "Парный режим: один инициирует задание в приложении, а партнёру автоматически отправляется тот же текст в Telegram. Создай одно общее действие для совершеннолетних мужчины и женщины, не два отдельных задания. Сохраняй роли, анатомию и физически правдоподобную последовательность.",
-    en: "Together mode: one person starts the task in the app and the identical text is automatically sent to their partner in Telegram. Create one shared action for an adult man and woman, not two separate tasks. Keep roles, anatomy, and physical sequence plausible.",
-    hi: "साथी मोड: एक व्यक्ति ऐप में काम शुरू करता है और वही पाठ उसके साथी को Telegram पर अपने-आप भेजा जाता है। वयस्क पुरुष और महिला के लिए एक साझा गतिविधि लिखें, दो अलग काम नहीं; भूमिकाएँ और शारीरिक क्रम सही रखें।",
-    pt: "Modo a dois: uma pessoa inicia a tarefa no app e o mesmo texto é enviado automaticamente ao parceiro pelo Telegram. Crie uma única ação compartilhada por um homem e uma mulher adultos, não duas tarefas; mantenha papéis, anatomia e sequência plausíveis.",
-    es: "Modo en pareja: una persona inicia la tarea en la app y el mismo texto se envía automáticamente a su pareja por Telegram. Crea una sola acción compartida por un hombre y una mujer adultos, no dos tareas; mantén coherentes los papeles, la anatomía y la secuencia.",
+    ru: "Парный режим: одно и то же задание показывается обоим и при включённых уведомлениях отправляется партнёру в Telegram. Создай одно совместное действие для совершеннолетних мужчины и женщины, а не два отдельных задания и не ролевую сцену. Обращайся к обоим во множественном числе; явно укажи, что делают оба.",
+    en: "Together mode: both partners see the same task, and the identical text is sent to the partner in Telegram when notifications are enabled. Create one shared activity for an adult man and woman, not two separate tasks or roleplay. Address both and explicitly include both in the action.",
+    hi: "साथी मोड: दोनों को एक ही काम दिखता है और सूचनाएँ चालू होने पर वही पाठ साथी को Telegram पर भेजा जाता है। वयस्क पुरुष और महिला के लिए एक साझा गतिविधि लिखें, दो अलग काम या भूमिका-अभिनय नहीं; दोनों को स्पष्ट रूप से शामिल करें।",
+    pt: "Modo a dois: ambos veem a mesma tarefa, que é enviada ao parceiro pelo Telegram quando as notificações estão ativadas. Crie uma atividade compartilhada para um homem e uma mulher adultos, não duas tarefas nem uma encenação; inclua claramente os dois.",
+    es: "Modo en pareja: ambos ven la misma tarea y el mismo texto se envía a la pareja por Telegram si las notificaciones están activadas. Crea una actividad compartida para un hombre y una mujer adultos, no dos tareas ni una escena de rol; incluye claramente a ambos.",
   },
 };
 
@@ -195,13 +374,13 @@ const PROMPTS: Record<string, Record<string, string>> = {
   compliments: {
     ru: `Ты создаёшь одно задание для категории «КОМПЛИМЕНТЫ» в гетеросексуальной паре мужчина–женщина.
 
-Стиль: естественное обращение на «ты», конкретный поступок или наблюдение, одна выразительная деталь. Задание должно звучать лично, а не как общий комплимент из открытки.
+Стиль: естественно обращайся к обоим во множественном числе; используй конкретный поступок или наблюдение и одну выразительную деталь. Задание должно звучать лично, а не как общий комплимент из открытки.
 Категория только про слова и знаки внимания: сказать или написать комплимент, поблагодарить за конкретную мелочь, напомнить об общем тёплом воспоминании. Можно предложить в течение дня обмениваться обычными личными селфи с короткими подписями-комплиментами; никаких интимных фото или публикаций.
 
 Придумай новое задание в духе приложенных примеров, не копируя их. Одно ясное действие; максимум 1–3 связанных шага, обычно 1–2 предложения. Не добавляй шаблонный финал «пусть почувствует». До ${MAX_TASK_CHARS} символов. Верни только текст задания.`,
     en: `Create one task for the "COMPLIMENTS" category for a heterosexual man-woman couple.
 
-Style: natural direct address, one specific observation or gesture, and one vivid detail. Make it personal rather than a generic greeting-card compliment.
+Style: address both partners naturally, with one specific observation or gesture and one vivid detail. Make it personal rather than a generic greeting-card compliment.
 This category is about words and thoughtful gestures only: give a specific compliment, thank the partner for a small real thing, or recall a warm shared memory. One option is to exchange ordinary private selfies with short compliment captions during free moments through the day; never request intimate photos or public posts.
 
 Create a new task in the style of the supplied examples without copying them. One clear action with at most 1–3 connected steps, usually 1–2 sentences. Avoid a formulaic "let them feel" ending. Up to ${MAX_TASK_CHARS} characters. Return only the task text.`,
@@ -429,7 +608,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     if (credits < 1) return res.status(403).json({ error: "subscription_required" });
   }
 
-  let task = getFallback(category, lang, mode);
+  let task = getFallback(category, lang, mode, requestId);
   let source: "ai" | "fallback" = "fallback";
   if (DEEPSEEK_API_KEY) {
     const controller = new AbortController();
@@ -443,8 +622,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         signal: controller.signal,
         body: JSON.stringify({ model: "deepseek-chat", messages: [
           { role: "system", content: systemPrompt },
-          { role: "user", content: LANGUAGE_INSTRUCTIONS[lang] },
-        ], max_tokens: 180, temperature: 0.82 }),
+          { role: "user", content: [
+            LANGUAGE_INSTRUCTIONS[lang],
+            getTaskExamplesPrompt(category, lang, requestId),
+          ].filter(Boolean).join("\n\n") },
+        ], max_tokens: 180, temperature: 0.98 }),
       });
       if (aiRes.ok) {
         const data = await aiRes.json();
@@ -453,6 +635,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         if (candidate.length >= 15 && candidate.length <= MAX_TASK_CHARS
           && matchesRequestedLanguage(candidate, lang)
           && isTaskTextWellFormed(candidate, lang, mode)
+          && isSharedTaskText(candidate, lang)
           && !forbidden.some(f => candidate.toLowerCase().includes(f))) {
           task = candidate;
           source = "ai";

@@ -619,10 +619,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const user = validateTelegramInitData(req.headers["x-telegram-init-data"] as string, BOT);
   if (!user) return res.status(401).json({ error: "unauthorized" });
 
+  const action = String(req.query.action ?? "");
   try {
     const couple = await getCouple(user.id);
     if (!couple) return res.status(404).json({ error: "no_couple" });
-    const action = String(req.query.action ?? "");
 
     if (req.method === "GET") {
       if (action === "preferences") {
@@ -681,6 +681,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   } catch (error) {
     if (isWishMapSchemaMissing(error)) {
       return res.status(503).json({ error: "wish_map_setup_required" });
+    }
+    if (action === "wish_map") {
+      const details = error && typeof error === "object" ? error as { code?: unknown } : {};
+      const rawCode = String(details.code ?? "");
+      const diagnosticCode = /^[A-Z0-9_]{1,24}$/iu.test(rawCode) ? rawCode : "unclassified";
+      console.error("Wish Diary load failed:", diagnosticCode);
+      return res.status(500).json({ error: "wish_map_load_failed", diagnosticCode });
     }
     console.error("Couple intimacy request failed:", error);
     return res.status(500).json({ error: "couple_intimacy_failed" });

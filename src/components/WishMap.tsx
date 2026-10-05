@@ -53,14 +53,14 @@ const COPY = {
     howItWorks: "One Wish Card unlocks every 20 stars. Stars stay yours; nothing is spent.",
     privateNote: "A wish is a request, never an obligation. Wish text stays here in the app.",
     taskHeading: "Daily task check-in",
-    taskQuestion: "Did your partner complete this task?",
+    taskQuestion: "Did your partner complete their part of this shared task?",
     yes: "Yes, they did",
     no: "Not this time",
     starAwarded: "A star was added to your partner’s Wish Diary.",
     noStar: "Your answer was saved. No star is added, and there is no penalty.",
     alreadyAnswered: "You have already answered this check-in.",
     noAnswer: "No answer is okay. Nothing changes unless you choose.",
-    noTasks: "No shared tasks need a check-in right now.",
+    noTasks: "No partner-completion check-ins are due right now.",
     openTask: "Open task",
     taskCategory: "Shared task",
     writeHeading: "Write a Wish Card",
@@ -95,14 +95,14 @@ const COPY = {
     howItWorks: "Одна карточка желания за каждые 20 звёзд. Звёзды сохраняются и не тратятся.",
     privateNote: "Желание — это просьба, а не обязанность. Текст карточки остаётся в приложении.",
     taskHeading: "Вопрос по заданию",
-    taskQuestion: "Ваш партнёр выполнил это задание?",
+    taskQuestion: "Партнёр выполнил свою часть общего задания?",
     yes: "Да, выполнил",
     no: "В этот раз нет",
     starAwarded: "Партнёру добавлена звезда в Дневник желаний.",
     noStar: "Ответ сохранён. Звезда не начисляется, штрафа нет.",
     alreadyAnswered: "Вы уже ответили на этот вопрос.",
     noAnswer: "Можно не отвечать. Ничего не изменится, пока вы сами не выберете.",
-    noTasks: "Сейчас нет общих заданий, которые нужно подтвердить.",
+    noTasks: "Пока нет заданий, по которым нужно спросить о выполнении партнёром.",
     openTask: "Открыть задание",
     taskCategory: "Общее задание",
     writeHeading: "Написать карточку желания",
@@ -137,14 +137,14 @@ const COPY = {
     howItWorks: "हर 20 तारों पर एक इच्छा कार्ड मिलता है। तारे आपके पास रहते हैं; खर्च नहीं होते।",
     privateNote: "इच्छा एक अनुरोध है, कोई बाध्यता नहीं। इच्छा का पाठ ऐप में ही रहता है।",
     taskHeading: "काम के बारे में सवाल",
-    taskQuestion: "क्या आपके साथी ने यह काम पूरा किया?",
+    taskQuestion: "क्या आपके साथी ने इस साझा काम में अपना हिस्सा पूरा किया?",
     yes: "हाँ, किया",
     no: "इस बार नहीं",
     starAwarded: "आपके साथी की इच्छा डायरी में एक तारा जुड़ गया।",
     noStar: "आपका जवाब सहेजा गया। कोई तारा नहीं जुड़ा और कोई दंड नहीं है।",
     alreadyAnswered: "आप इस सवाल का जवाब पहले ही दे चुके हैं।",
     noAnswer: "जवाब न देना भी ठीक है। आपके चुनने तक कुछ नहीं बदलेगा।",
-    noTasks: "अभी किसी साझा काम की पुष्टि बाकी नहीं है।",
+    noTasks: "अभी साथी के काम के बारे में पूछने वाला कोई चेक-इन नहीं है।",
     openTask: "काम खोलें",
     taskCategory: "साझा काम",
     writeHeading: "इच्छा कार्ड लिखें",
@@ -179,14 +179,14 @@ const COPY = {
     howItWorks: "Um Cartão de Desejo a cada 20 estrelas. As estrelas continuam com vocês; nada é gasto.",
     privateNote: "Um desejo é um pedido, nunca uma obrigação. O texto fica no app.",
     taskHeading: "Pergunta sobre a tarefa",
-    taskQuestion: "Seu parceiro concluiu esta tarefa?",
+    taskQuestion: "Seu parceiro concluiu a parte dele desta tarefa compartilhada?",
     yes: "Sim, concluiu",
     no: "Desta vez, não",
     starAwarded: "Uma estrela foi adicionada ao Diário de Desejos do seu parceiro.",
     noStar: "Sua resposta foi salva. Nenhuma estrela é adicionada e não há penalidade.",
     alreadyAnswered: "Você já respondeu a esta pergunta.",
     noAnswer: "Tudo bem não responder. Nada muda até você escolher.",
-    noTasks: "Nenhuma tarefa compartilhada precisa de confirmação agora.",
+    noTasks: "Não há perguntas pendentes sobre a parte do seu parceiro.",
     openTask: "Abrir tarefa",
     taskCategory: "Tarefa compartilhada",
     writeHeading: "Escreva um Cartão de Desejo",
@@ -221,14 +221,14 @@ const COPY = {
     howItWorks: "Una Tarjeta de Deseo por cada 20 estrellas. Las estrellas se conservan; no se gastan.",
     privateNote: "Un deseo es una petición, nunca una obligación. El texto se queda en la app.",
     taskHeading: "Pregunta sobre la tarea",
-    taskQuestion: "¿Tu pareja completó esta tarea?",
+    taskQuestion: "¿Tu pareja completó su parte de esta tarea compartida?",
     yes: "Sí, la completó",
     no: "Esta vez, no",
     starAwarded: "Se añadió una estrella al Diario de Deseos de tu pareja.",
     noStar: "La respuesta se guardó. No se añade una estrella ni hay penalización.",
     alreadyAnswered: "Ya respondiste a esta pregunta.",
     noAnswer: "No responder está bien. Nada cambia hasta que tú elijas.",
-    noTasks: "Ahora no hay tareas compartidas que confirmar.",
+    noTasks: "Ahora no hay preguntas pendientes sobre la parte de tu pareja.",
     openTask: "Abrir tarea",
     taskCategory: "Tarea compartida",
     writeHeading: "Escribe una Tarjeta de Deseo",
@@ -324,11 +324,20 @@ function WishCard({ wish, t }: { wish: SentWish | ReceivedWish; t: (typeof COPY)
   );
 }
 
+const SETUP_REQUIRED_COPY: Record<Lang, string> = {
+  en: "The Wish Diary database update is missing. Run migration_wish_map.sql in Supabase, then retry.",
+  ru: "Не применено обновление базы Дневника желаний. Выполните migration_wish_map.sql в Supabase и повторите попытку.",
+  hi: "Wish Diary के लिए डेटाबेस अपडेट लागू नहीं हुआ है। Supabase में migration_wish_map.sql चलाकर फिर प्रयास करें।",
+  pt: "A atualização do banco do Wish Diary não foi aplicada. Execute migration_wish_map.sql no Supabase e tente novamente.",
+  es: "Falta la actualización de la base de datos del Wish Diary. Ejecuta migration_wish_map.sql en Supabase y vuelve a intentarlo.",
+};
+
 export default function WishMap({ lang, coupleId, refreshKey, onOpenTask }: WishMapProps) {
   const t = COPY[lang];
   const [data, setData] = useState<WishMapData | null>(null);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState(false);
+  const [setupRequired, setSetupRequired] = useState(false);
   const [mutationError, setMutationError] = useState(false);
   const [pendingAction, setPendingAction] = useState<string | null>(null);
   const [wishText, setWishText] = useState("");
@@ -341,15 +350,23 @@ export default function WishMap({ lang, coupleId, refreshKey, onOpenTask }: Wish
       setData(null);
       setLoading(false);
       setLoadError(!!coupleId);
+      setSetupRequired(false);
       return;
     }
     setLoading(true);
     setLoadError(false);
+    setSetupRequired(false);
     try {
       const response = await fetch("/api/couple/intimacy?action=wish_map", {
         headers: { "x-telegram-init-data": getInitData() },
       });
-      if (!response.ok) throw new Error("wish_map_unavailable");
+      if (!response.ok) {
+        const body = await response.json().catch(() => ({}));
+        if (body.error === "wish_map_setup_required" && request === requestId.current) {
+          setSetupRequired(true);
+        }
+        throw new Error(body.error ?? "wish_map_unavailable");
+      }
       const result = await response.json() as WishMapData;
       if (request !== requestId.current) return;
       setData({
@@ -566,7 +583,7 @@ export default function WishMap({ lang, coupleId, refreshKey, onOpenTask }: Wish
             ) : null}
 
             {loadError && (
-              <div className="wm-alert" role="alert"><span>{t.error}</span><button type="button" onClick={() => void refresh()}>{t.retry}</button></div>
+              <div className="wm-alert" role="alert"><span>{setupRequired ? SETUP_REQUIRED_COPY[lang] : t.error}</span><button type="button" onClick={() => void refresh()}>{t.retry}</button></div>
             )}
             {mutationError && (
               <div className="wm-alert" role="alert"><span>{t.mutationError}</span><button type="button" onClick={() => setMutationError(false)}>{t.close}</button></div>

@@ -8,7 +8,7 @@ import { createClient } from "@supabase/supabase-js";
 import { validateTelegramInitData } from "../couple/_auth.js";
 import { appDate } from "../limits.js";
 import { claimFriendInvite } from "../referrals/_claim.js";
-import { getTaskQualityRules, hasConcreteSexualAct, isSharedTaskText, isTaskTextModeAppropriate, isTaskTextWellFormed } from "../../src/data/task-quality.js";
+import { getTaskQualityRules, hasConcreteSexualAct, hasHardSexualAct, isSharedTaskText, isTaskTextModeAppropriate, isTaskTextWellFormed } from "../../src/data/task-quality.js";
 import { OWNER_TELEGRAM_ID } from "../../src/config.js";
 import { TASKS_RU } from "../../src/data/tasks-ru.js";
 import { TASKS_EN } from "../../src/data/tasks-en.js";
@@ -134,6 +134,8 @@ const DAILY_TASK_FALLBACKS: Record<string, StaticPool> = {
       "По очереди занимайтесь оральным сексом и прямо, грязными словами называйте, что делаете друг с другом.",
       "Вместе займитесь энергичным вагинальным сексом: один задаёт жёсткий ритм, второй направляет движения руками; затем поменяйтесь ролями.",
       "Если оба хотите, снимите приватное порно, пока по очереди мастурбируете друг друга; оставьте видео только себе и никому не отправляйте.",
+      "По очереди водите вибратором прямо по гениталиям партнёра, повышая интенсивность и прямо называя свои действия.",
+      "Доводите друг друга до края пальцами, останавливайтесь перед оргазмом, а затем возобновляйте стимуляцию в более быстром ритме.",
     ],
   },
   en: {
@@ -161,6 +163,8 @@ const DAILY_TASK_FALLBACKS: Record<string, StaticPool> = {
       "Take turns giving each other oral sex; say plainly, in dirty words, what you are doing and keep a firm pace.",
       "Have vigorous vaginal sex together: one partner sets the rhythm while the other guides the movement with their hands.",
       "If you both want to, film private porn while taking turns masturbating each other; keep the video private and never share it.",
+      "Take turns pressing a vibrator directly against each other's genitals, increasing the intensity as you name what you are doing.",
+      "Take turns bringing each other close to orgasm with your fingers, stopping just before it and resuming with a firmer rhythm.",
     ],
   },
   hi: {
@@ -188,6 +192,8 @@ const DAILY_TASK_FALLBACKS: Record<string, StaticPool> = {
       "बारी-बारी से एक-दूसरे को ओरल सेक्स दें; सीधे और अश्लील शब्दों में बताएं कि क्या कर रहे हैं, और लय तेज़ रखें।",
       "आप दोनों तेज़ योनि सेक्स करें: एक व्यक्ति लय तय करे और दूसरा हाथों से गति को निर्देशित करे।",
       "अगर आप दोनों चाहें, तो एक-दूसरे का हस्तमैथुन करते हुए निजी पोर्न वीडियो बनाएं और किसी के साथ साझा न करें।",
+      "बारी-बारी से वाइब्रेटर को एक-दूसरे के जननांगों पर चलाएँ, तीव्रता बढ़ाते हुए सीधे बताएं कि क्या कर रहे हैं।",
+      "बारी-बारी से उंगलियों से साथी के जननांगों को उत्तेजित करें, लय तेज़ करें और चरमोत्कर्ष से ठीक पहले रुकें।",
     ],
   },
   pt: {
@@ -215,6 +221,8 @@ const DAILY_TASK_FALLBACKS: Record<string, StaticPool> = {
       "Revezem-se no sexo oral e digam sem rodeios, com palavras mais sujas, o que estão fazendo.",
       "Juntos, façam sexo vaginal com ritmo intenso: uma pessoa conduz e a outra guia o movimento com as mãos.",
       "Se vocês dois quiserem, gravem um vídeo pornô privado enquanto se masturbam mutuamente; não compartilhem a gravação.",
+      "Revezem-se usando um vibrador diretamente nos genitais um do outro, aumentando a intensidade enquanto dizem claramente o que fazem.",
+      "Levem um ao outro até perto do orgasmo com os dedos, parem antes do clímax e retomem com um ritmo mais firme.",
     ],
   },
   es: {
@@ -242,6 +250,8 @@ const DAILY_TASK_FALLBACKS: Record<string, StaticPool> = {
       "Por turnos, practiquen sexo oral y díganse sin rodeos, con palabras obscenas, lo que están haciendo.",
       "Tengan juntos sexo vaginal con un ritmo intenso: una persona marca el movimiento y la otra lo guía con las manos.",
       "Si ambos quieren, graben un vídeo porno privado mientras se masturban mutuamente; guárdenlo en privado y no lo compartan.",
+      "Por turnos, pasen un vibrador directamente por los genitales del otro, aumentando la intensidad mientras nombran lo que hacen.",
+      "Por turnos, cada uno estimula los genitales del otro con los dedos, aumenta el ritmo y se detiene justo antes del orgasmo.",
     ],
   },
 };
@@ -257,6 +267,8 @@ const SOLO_SEXUAL_FALLBACKS: Record<string, Pick<StaticPool, "passion" | "hard">
       "При встрече займись с партнёром оральным сексом и прямо, грязными словами называй, что делаешь.",
       "Веди энергичный вагинальный секс с партнёром, задавая жёсткий ритм и меняя его по реакции партнёра.",
       "Мастурбируй партнёру руками в быстром ритме и прямо говори, что именно делаешь.",
+      "При встрече води вибратором прямо по гениталиям партнёра, постепенно усиливай стимуляцию и прямо называй, что делаешь.",
+      "Доведи партнёра до края пальцами, остановись перед оргазмом, затем возобнови стимуляцию в более быстром ритме.",
     ],
   },
   en: {
@@ -269,6 +281,8 @@ const SOLO_SEXUAL_FALLBACKS: Record<string, Pick<StaticPool, "passion" | "hard">
       "Give your partner oral sex and say plainly, with a little dirty talk, what you are doing.",
       "Lead vigorous vaginal sex with your partner, setting a firm pace and adjusting to their response.",
       "Masturbate your partner by hand at a brisk pace and name the act directly in dirty words.",
+      "Press a vibrator directly against your partner's genitals, increase the intensity, and say plainly what you are doing.",
+      "Bring your partner close to orgasm with your fingers, stop just before it, then resume with a firmer rhythm.",
     ],
   },
   hi: {
@@ -281,6 +295,8 @@ const SOLO_SEXUAL_FALLBACKS: Record<string, Pick<StaticPool, "passion" | "hard">
       "अपने साथी को सीधे और थोड़े अश्लील शब्दों में ओरल सेक्स दें और बताएं कि आप क्या कर रहे हैं।",
       "अपने साथी के साथ तेज़ योनि सेक्स करें और गति को साफ़ तौर पर नियंत्रित करें।",
       "अपने साथी का हाथों से हस्तमैथुन करें और सीधे, गंदे शब्दों में क्रिया का नाम लें।",
+      "अपने साथी के जननांगों पर वाइब्रेटर चलाएँ, तीव्रता बढ़ाएँ और सीधे बताएं कि आप क्या कर रहे हैं।",
+      "उंगलियों से अपने साथी के जननांगों को उत्तेजित करें, लय तेज़ करें और चरमोत्कर्ष से ठीक पहले रुकें।",
     ],
   },
   pt: {
@@ -293,6 +309,8 @@ const SOLO_SEXUAL_FALLBACKS: Record<string, Pick<StaticPool, "passion" | "hard">
       "Faça sexo oral no seu par e diga sem rodeios, com palavras mais sujas, o que está fazendo.",
       "Conduza o sexo vaginal com seu par em um ritmo intenso e firme.",
       "Masturbe seu par com as mãos em ritmo acelerado e nomeie o ato com palavras diretas.",
+      "Pressione um vibrador diretamente contra os genitais do seu par, aumente a intensidade e diga sem rodeios o que está fazendo.",
+      "Leve seu par ao limite com os dedos, pare antes do orgasmo e retome a estimulação em um ritmo mais firme.",
     ],
   },
   es: {
@@ -305,6 +323,8 @@ const SOLO_SEXUAL_FALLBACKS: Record<string, Pick<StaticPool, "passion" | "hard">
       "Practica sexo oral con tu pareja y di sin rodeos, con palabras algo obscenas, lo que estás haciendo.",
       "Guía el sexo vaginal con tu pareja a un ritmo intenso y firme.",
       "Masturba a tu pareja con las manos a buen ritmo y nombra el acto con palabras directas y sucias.",
+      "Presiona un vibrador directamente contra los genitales de tu pareja, aumenta la intensidad y di sin rodeos lo que haces.",
+      "Lleva a tu pareja al límite con los dedos, detente antes del orgasmo y retoma la estimulación con un ritmo más firme.",
     ],
   },
 };
@@ -376,13 +396,21 @@ function isTaskExampleMediaAllowed(task: string, category: string, lang: string)
   const mediaMarkers = EXAMPLE_MEDIA_MARKERS[lang] ?? EXAMPLE_MEDIA_MARKERS.en;
   if (!mediaMarkers.test(task) || category === "compliments") return true;
   if (category !== "hard" || !(SEXUAL_FILMING_MARKERS[lang] ?? SEXUAL_FILMING_MARKERS.en).test(task)) return false;
-  return hasConcreteSexualAct(task, lang)
+  return hasHardSexualAct(task, lang)
     && (FILMING_CONSENT_MARKERS[lang] ?? FILMING_CONSENT_MARKERS.en).test(task)
     && (PRIVATE_FILMING_MARKERS[lang] ?? PRIVATE_FILMING_MARKERS.en).test(task);
 }
 
+function hasCategorySexualAct(task: string, category: string, lang: string): boolean {
+  if (category === "hard") return hasHardSexualAct(task, lang);
+  if (category === "passion") return hasConcreteSexualAct(task, lang);
+  return true;
+}
+
 function getTaskExamples(category: string, lang: string, requestId: string, mode: TaskMode): string[] {
-  const sourcePool = SOURCE_TASKS[lang]?.[category] ?? [];
+  const sourcePool = category === "hard"
+    ? [...(SOURCE_TASKS[lang]?.hard ?? []), ...(SOURCE_TASKS[lang]?.passion ?? [])]
+    : SOURCE_TASKS[lang]?.[category] ?? [];
   const fallbackPool = mode === "solo"
     ? SOLO_SEXUAL_FALLBACKS[lang]?.[category as "passion" | "hard"] ?? []
     : DAILY_TASK_FALLBACKS[lang]?.[category] ?? [];
@@ -390,6 +418,7 @@ function getTaskExamples(category: string, lang: string, requestId: string, mode
   const eligibleSource = sourcePool.filter((example) =>
     isTaskTextWellFormed(example, lang)
     && !unsafeMarkers.test(example)
+    && (category !== "hard" || hasHardSexualAct(example, lang))
     && isTaskExampleMediaAllowed(example, category, lang)
   );
   const modeMatched = eligibleSource.filter((example) => isTaskTextModeAppropriate(example, lang, mode));
@@ -397,7 +426,7 @@ function getTaskExamples(category: string, lang: string, requestId: string, mode
   const eligibleFallbacks = fallbackPool.filter((example) =>
     isTaskTextWellFormed(example, lang, mode)
     && !unsafeMarkers.test(example)
-    && (!["passion", "hard"].includes(category) || hasConcreteSexualAct(example, lang))
+    && hasCategorySexualAct(example, category, lang)
     && isTaskTextModeAppropriate(example, lang, mode)
     && isTaskExampleMediaAllowed(example, category, lang)
   );
@@ -434,7 +463,14 @@ function getTaskExamplesPrompt(category: string, lang: string, requestId: string
     pt: "Abaixo estão exemplos variados da lista original extensa desta categoria. Use as ideias, não a redação. Alguns podem ter outro modo; adapte os papéis às instruções de solo/a dois.",
     es: "A continuación hay ejemplos variados de la lista original amplia de esta categoría. Usa las ideas, no copies el texto. Algunos pueden usar otro modo; adapta los papeles a las instrucciones individual/en pareja.",
   };
-  return `${intro[lang] ?? intro.en}\n${examples.map((example, index) => `${index + 1}. ${example}`).join("\n")}`;
+  const hardIntro: Record<string, string> = {
+    ru: "Примеры ниже отобраны из больших списков «Страсть» и «Хард» по конкретным сексуальным действиям; некоторые формулировки могут быть мягче нужного тона. Используй их для разнообразия, но в каждом задании назови прямой сексуальный акт. Нагота, лежание, раздевание, поцелуи и общие ласки могут быть только дополнительными деталями.",
+    en: "These examples are selected from the large Passion and Hard lists for their concrete sexual actions; some may use a softer tone. Use them for variety, but name a direct sexual act in every task. Nudity, lying together, undressing, kissing, and general caresses may only be supporting details.",
+    hi: "ये उदाहरण बड़े जुनून और हार्ड संग्रह से ठोस यौन क्रियाओं के आधार पर चुने गए हैं; कुछ का स्वर अपेक्षाकृत नरम हो सकता है। विविधता लें, लेकिन हर काम में स्पष्ट यौन क्रिया बताएं। नग्नता, साथ लेटना, कपड़े उतारना, चूमना और सामान्य सहलाना केवल अतिरिक्त विवरण हो सकते हैं।",
+    pt: "Estes exemplos foram selecionados das listas extensas de Paixão e hard por suas ações sexuais concretas; alguns podem ter um tom mais suave. Use-os para variar, mas nomeie um ato sexual direto em cada tarefa. Nudez, ficar deitado junto, tirar a roupa, beijar e carícias gerais só podem ser detalhes adicionais.",
+    es: "Estos ejemplos se seleccionaron de las amplias listas de Pasión y hard por sus acciones sexuales concretas; algunos pueden tener un tono más suave. Úsalos para variar, pero nombra un acto sexual directo en cada tarea. La desnudez, tumbarse juntos, quitarse la ropa, besarse y las caricias generales solo pueden ser detalles secundarios.",
+  };
+  return `${category === "hard" ? hardIntro[lang] ?? hardIntro.en : intro[lang] ?? intro.en}\n${examples.map((example, index) => `${index + 1}. ${example}`).join("\n")}`;
 }
 
 function getFallback(cat: string, lang: string, mode: TaskMode, requestId: string): string {
@@ -447,7 +483,7 @@ function getFallback(cat: string, lang: string, mode: TaskMode, requestId: strin
     isTaskTextWellFormed(task, lang, mode)
     && !unsafeMarkers.test(task)
     && isTaskTextModeAppropriate(task, lang, mode)
-    && (!["passion", "hard"].includes(cat) || hasConcreteSexualAct(task, lang))
+    && hasCategorySexualAct(task, cat, lang)
     && isTaskExampleMediaAllowed(task, cat, lang)
   );
   if (wellFormed.length === 0) {
@@ -559,15 +595,15 @@ Keep anatomy and order physically plausible. Do not guarantee a bodily response.
 Create an original task based on varied ideas from the supplied examples without copying them: 1–3 connected steps, usually 1–2 sentences, up to ${MAX_TASK_CHARS} characters. Avoid formulaic endings and explanations; return only the task text.`,
   },
   hard: {
-    ru: `Ты создаёшь одно задание для категории «ХАРД» — конкретный полноценный секс в более грязной и прямой подаче для гетеросексуальной пары мужчина–женщина.
+    ru: `Ты создаёшь одно задание для категории «ХАРД» — конкретное полноценное сексуальное действие в более грязной и прямой подаче для гетеросексуальной пары мужчина–женщина.
 
-Используй весь диапазон больших исходных списков, а не только оральный/вагинальный секс и мастурбацию: конкретные сексуальные действия, стимуляцию, позиции, контроль ритма, игру с ощущениями и другие идеи из примеров. Съёмка порно допустима только вместе с конкретным сексуальным телесным действием и только если оба этого хотят; одна съёмка не заменяет действие. Не выдавай вместо действия только разговор о желании, просьбу «скажи, что хочешь», обещание, один поцелуй, общую ласку или фразу «делайте это». Используй прямую лексику и немного грязных слов; хард не требует боли, принуждения или опасных действий.
+Используй весь диапазон больших исходных списков, а не только оральный/вагинальный секс и мастурбацию: называй конкретный сексуальный акт, прямую стимуляцию гениталий или проникновение, добавляя другие действия и детали из примеров. Не считай заданием наготу, совместное лежание, раздевание, поцелуи, общий массаж, разговоры или съёмку без конкретного сексуального действия. Более мягкие идеи допустимы только как детали к прямому сексуальному акту. Съёмка порно допустима только вместе с конкретным сексуальным телесным действием и только если оба этого хотят; одна съёмка не заменяет действие. Используй прямую лексику и немного грязных слов; хард не требует боли, принуждения или опасных действий.
 Соблюдай анатомию и последовательность. Если предлагаешь эротическую съёмку, видео остаётся личным: не предлагай отправлять или публиковать его. Это короткая карточка, не ролевая сцена: без персонажей, сюжета и длинных реплик.
 
 Создай оригинальное задание, используя разные идеи из переданных примеров, но не копируя их: одно действие или 1–3 тесно связанных шага, обычно 1–2 предложения, до ${MAX_TASK_CHARS} символов. Верни только текст задания.`,
     en: `Create one task for the "HARD" category: a concrete full sexual act for a heterosexual man-woman couple, in a dirtier and more direct style than "PASSION".
 
-Use the full range of the large supplied task lists, not only oral/vaginal sex and masturbation: include concrete sexual actions, stimulation, positions, pace control, sensory play, and other ideas from the examples. Porn filming is allowed only alongside a concrete physical sexual act and only if both want it; filming alone does not replace the act. Keep it private. Do not make a task only about talking about desire, asking “what do you want,” promising, one kiss, general caresses, or saying “do it.” State the physical action. Use direct wording and a little dirty talk; hard does not mean pain, coercion, or danger.
+Use the full range of the large supplied task lists, not only oral/vaginal sex and masturbation: name a concrete sexual act, direct genital stimulation, or penetration, and draw on other actions and details from the examples. Nudity, lying together, undressing, kissing, general massage, talk, or filming without a concrete sexual act do not qualify. Lighter ideas may only support a direct sexual act, never replace it. Porn filming is allowed only alongside a concrete physical sexual act and only if both want it; filming alone does not replace the act. Keep it private. Do not make a task only about talking about desire, asking “what do you want,” promising, one kiss, general caresses, or saying “do it.” State the physical action. Use direct wording and a little dirty talk; hard does not mean pain, coercion, or danger.
 Keep anatomy and sequence plausible. If erotic filming appears, keep the video private and never suggest sending or posting it. This is a short task, not a roleplay scene: no characters, plot, or long dialogue.
 
 Create an original task from varied ideas in the supplied examples without copying them: one action or 1–3 closely connected steps, usually 1–2 sentences, up to ${MAX_TASK_CHARS} characters. Return only the task text.`,
@@ -736,7 +772,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           && matchesRequestedLanguage(candidate, lang)
           && isTaskTextWellFormed(candidate, lang, mode)
           && isTaskTextModeAppropriate(candidate, lang, mode)
-          && (!["passion", "hard"].includes(category) || hasConcreteSexualAct(candidate, lang))
+          && hasCategorySexualAct(candidate, category, lang)
           && !forbidden.some(f => candidate.toLowerCase().includes(f))) {
           task = candidate;
           source = "ai";

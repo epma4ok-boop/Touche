@@ -338,6 +338,7 @@ export default function WishMap({ lang, coupleId, refreshKey, onOpenTask }: Wish
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState(false);
   const [setupRequired, setSetupRequired] = useState(false);
+  const [loadDiagnosticCode, setLoadDiagnosticCode] = useState<string | null>(null);
   const [mutationError, setMutationError] = useState(false);
   const [pendingAction, setPendingAction] = useState<string | null>(null);
   const [wishText, setWishText] = useState("");
@@ -346,27 +347,36 @@ export default function WishMap({ lang, coupleId, refreshKey, onOpenTask }: Wish
 
   const refresh = useCallback(async () => {
     const request = ++requestId.current;
-    if (!coupleId || !getInitData()) {
+    const initData = getInitData();
+    if (!coupleId || !initData) {
       setData(null);
       setLoading(false);
       setLoadError(!!coupleId);
       setSetupRequired(false);
+      setLoadDiagnosticCode(coupleId ? "telegram_session_missing" : "no_couple");
       return;
     }
     setLoading(true);
     setLoadError(false);
     setSetupRequired(false);
+    setLoadDiagnosticCode(null);
+    let diagnosticCode = "network_error";
     try {
       const response = await fetch("/api/couple/intimacy?action=wish_map", {
-        headers: { "x-telegram-init-data": getInitData() },
+        headers: { "x-telegram-init-data": initData },
       });
       if (!response.ok) {
         const body = await response.json().catch(() => ({}));
+        diagnosticCode = typeof body.diagnosticCode === "string"
+          ? body.diagnosticCode
+          : typeof body.error === "string" ? body.error : `http_${response.status}`;
+        if (request === requestId.current) setLoadDiagnosticCode(diagnosticCode);
         if (body.error === "wish_map_setup_required" && request === requestId.current) {
           setSetupRequired(true);
         }
         throw new Error(body.error ?? "wish_map_unavailable");
       }
+      diagnosticCode = "invalid_response";
       const result = await response.json() as WishMapData;
       if (request !== requestId.current) return;
       setData({
@@ -377,8 +387,12 @@ export default function WishMap({ lang, coupleId, refreshKey, onOpenTask }: Wish
         sentWishes: Array.isArray(result.sentWishes) ? result.sentWishes : [],
         receivedWishes: Array.isArray(result.receivedWishes) ? result.receivedWishes : [],
       });
+      setLoadDiagnosticCode(null);
     } catch {
-      if (request === requestId.current) setLoadError(true);
+      if (request === requestId.current) {
+        setLoadError(true);
+        setLoadDiagnosticCode(diagnosticCode);
+      }
     } finally {
       if (request === requestId.current) setLoading(false);
     }
@@ -583,7 +597,13 @@ export default function WishMap({ lang, coupleId, refreshKey, onOpenTask }: Wish
             ) : null}
 
             {loadError && (
-              <div className="wm-alert" role="alert"><span>{setupRequired ? SETUP_REQUIRED_COPY[lang] : t.error}</span><button type="button" onClick={() => void refresh()}>{t.retry}</button></div>
+              <div className="wm-alert" role="alert">
+                <span>
+                  {setupRequired ? SETUP_REQUIRED_COPY[lang] : t.error}
+                  {!setupRequired && loadDiagnosticCode && <code style={{ marginInlineStart: 6 }}>{loadDiagnosticCode}</code>}
+                </span>
+                <button type="button" onClick={() => void refresh()}>{t.retry}</button>
+              </div>
             )}
             {mutationError && (
               <div className="wm-alert" role="alert"><span>{t.mutationError}</span><button type="button" onClick={() => setMutationError(false)}>{t.close}</button></div>

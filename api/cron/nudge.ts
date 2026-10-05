@@ -1,7 +1,7 @@
 // api/cron/nudge.ts — Vercel Cron, daily 15:00 UTC
 // 1. Scenario nudge (inactive 3-4 days)
 // 2. Subscription expiry reminder (~2 days left)
-// 3. One generic opt-in Wish Map check-in reminder per shared task/member
+// 3. One generic opt-in Wish Diary check-in reminder per shared task/member
 
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { createClient } from "@supabase/supabase-js";
@@ -101,7 +101,7 @@ async function runWishMapCheckins(appUrl:string) {
     .map((row) => `${row.couple_id}:${row.user_id}`));
   const target = new URL(appUrl);
   target.searchParams.set("wish_map", "1");
-  const text = "В Touché есть короткий вопрос по общему заданию. Откройте Карту желаний, чтобы ответить. / Touché has a quick question about a shared task. Open your Wish Map to answer.";
+  const text = "Ваш партнёр выполнил общее задание? Откройте Дневник желаний, чтобы ответить. / Did your partner complete the shared task? Open your Wish Diary to answer.";
   let sentCount = 0;
 
   for (const member of members) {
@@ -109,7 +109,7 @@ async function runWishMapCheckins(appUrl:string) {
     if (!optedIn.has(memberKey)) continue;
     let delivered = false;
     try {
-      delivered = await send(member.userId, text, "Открыть Touché / Open Touché", target.toString());
+      delivered = await send(member.userId, text, "Открыть дневник / Open diary", target.toString());
     } catch {
       delivered = false;
     }

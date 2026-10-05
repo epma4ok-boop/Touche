@@ -1,6 +1,6 @@
 const QUALITY_RULES: Record<string, string> = {
   ru: `Проверка качества — выполни её молча перед ответом:
-  - Верни одно общее задание с одной центральной идеей. Оно может разворачиваться в течение ближайших суток через 2–4 коротких момента в свободное время; не требуй постоянной переписки или присутствия рядом весь день.
+  - Верни одно задание с одной центральной идеей. Оно может разворачиваться в течение ближайших суток через 2–4 коротких момента в свободное время; не требуй постоянной переписки или присутствия рядом весь день.
   - Пиши прямо и естественно, обычно в 1–2 предложениях: конкретные действия плюс одна выразительная деталь. Не повторяй один и тот же финал «пусть почувствует».
  - Сохраняй заданные пол и роли мужчины и женщины. Проверяй, кто действует, на ком и какие части тела участвуют.
  - Расположи действия в физически выполнимом порядке. Не пропускай необходимый переход и не обещай автоматическую телесную реакцию.
@@ -8,9 +8,9 @@ const QUALITY_RULES: Record<string, string> = {
  - Не описывай принуждение, игнорирование боли или опасную механику. Не добавляй в текст задания пояснения о договорённостях, стоп-словах или безопасности.
  - Если упоминается оргазм, обычно заверши задание на нём; не начинай после него следующий сексуальный акт автоматически.
   - Не требуй интимных фото, видео или съёмки. Обычные личные селфи допустимы, если уместны для категории. Не добавляй реквизит по шаблону.
-  - Это реальное общее задание, не ролевая игра: без вымышленных персонажей, сюжета и длинных диалогов. Верни только текст задания, без вступления и пояснений.`,
+   - Это реальное задание, не ролевая игра: без вымышленных персонажей, сюжета и длинных диалогов. Верни только текст задания, без вступления и пояснений.`,
   en: `Quality check — do this silently before answering:
-  - Return one shared task with one central idea. It may unfold over the next 24 hours in 2–4 short moments during free time; do not require constant messaging or being together all day.
+  - Return one task with one central idea. It may unfold over the next 24 hours in 2–4 short moments during free time; do not require constant messaging or being together all day.
   - Write directly and naturally, usually in 1–2 sentences: concrete actions plus one vivid detail. Avoid repeating the same "let them feel" ending.
  - Keep the man-woman roles fixed. Check who acts, who receives the action, and which body parts are involved.
  - Put actions in a physically possible order. Do not skip necessary transitions or promise an automatic bodily response.
@@ -18,9 +18,9 @@ const QUALITY_RULES: Record<string, string> = {
  - Do not describe coercion, ignoring pain, or physically dangerous actions. Do not put explanations about agreements, safewords, or safety in the task text.
  - If orgasm is mentioned, usually make it the endpoint; do not automatically start another sexual act afterward.
   - Do not require intimate photos, video, or filming. Ordinary private selfies are allowed when relevant to the category. Do not add props by default.
-  - This is a real shared activity, not roleplay: no fictional characters, plot, or long dialogue. Return only the task text, with no introduction or explanation.`,
+   - This is a real activity, not roleplay: no fictional characters, plot, or long dialogue. Return only the task text, with no introduction or explanation.`,
   hi: `उत्तर देने से पहले चुपचाप जाँचें:
-  - एक साझा काम और एक मुख्य विचार दें। यह अगले 24 घंटों में खाली समय के 2–4 छोटे पलों में पूरा हो सकता है; लगातार संदेश भेजना या पूरे दिन साथ रहना आवश्यक न करें।
+   - एक काम और एक मुख्य विचार दें। यह अगले 24 घंटों में खाली समय के 2–4 छोटे पलों में पूरा हो सकता है; लगातार संदेश भेजना या पूरे दिन साथ रहना आवश्यक न करें।
   - सीधे और स्वाभाविक ढंग से लिखें, आम तौर पर 1–2 वाक्यों में: ठोस क्रियाएँ और एक खास विवरण। एक ही भावुक अंत बार-बार न दोहराएँ।
  - पुरुष और महिला की भूमिकाएँ स्थिर रखें। जाँचें कि कौन क्रिया कर रहा है, किस पर, और शरीर के कौन-से हिस्से शामिल हैं।
  - क्रियाओं का क्रम शारीरिक रूप से संभव हो। आवश्यक बदलाव न छोड़ें और शरीर की प्रतिक्रिया की गारंटी न दें।
@@ -28,9 +28,9 @@ const QUALITY_RULES: Record<string, string> = {
  - ज़बरदस्ती, दर्द की अनदेखी या खतरनाक क्रियाएँ न लिखें। कार्य में समझौते, सुरक्षित शब्द या सुरक्षा की व्याख्या न जोड़ें।
  - अगर चरमोत्कर्ष का उल्लेख हो, तो आम तौर पर वहीं कार्य समाप्त करें; उसके बाद अपने-आप अगली यौन क्रिया न जोड़ें।
   - अंतरंग फ़ोटो, वीडियो या रिकॉर्डिंग अनिवार्य न करें। श्रेणी के लिए उपयुक्त होने पर साधारण निजी सेल्फ़ी ठीक हैं। सामान अपने-आप न जोड़ें।
-  - यह वास्तविक साझा गतिविधि है, भूमिका-अभिनय नहीं: काल्पनिक पात्र, कहानी या लंबा संवाद नहीं। केवल कार्य का पाठ लौटाएँ।`,
+   - यह वास्तविक गतिविधि है, भूमिका-अभिनय नहीं: काल्पनिक पात्र, कहानी या लंबा संवाद नहीं। केवल कार्य का पाठ लौटाएँ।`,
   pt: `Verifique a qualidade em silêncio antes de responder:
-  - Escreva uma tarefa compartilhada com uma ideia central. Ela pode acontecer em 2–4 momentos curtos durante o tempo livre nas próximas 24 horas; não exija mensagens constantes nem que estejam juntos o dia todo.
+   - Escreva uma tarefa com uma ideia central. Ela pode acontecer em 2–4 momentos curtos durante o tempo livre nas próximas 24 horas; não exija mensagens constantes nem que estejam juntos o dia todo.
   - Use linguagem direta e natural, geralmente em 1–2 frases: ações concretas e um detalhe marcante. Evite repetir o mesmo fecho emocional.
  - Mantenha fixos os papéis do homem e da mulher. Confira quem age, quem recebe a ação e quais partes do corpo estão envolvidas.
  - Organize as ações em uma ordem fisicamente possível. Não pule transições nem prometa uma reação corporal automática.
@@ -38,9 +38,9 @@ const QUALITY_RULES: Record<string, string> = {
  - Não descreva coerção, ignorar dor ou ações fisicamente perigosas. Não inclua explicações sobre acordos, palavra de segurança ou segurança no texto.
  - Se mencionar orgasmo, normalmente encerre a tarefa ali; não comece automaticamente outro ato sexual depois.
   - Não exija fotos íntimas, vídeos ou gravações. Selfies comuns e privadas são permitidas quando fizerem sentido para a categoria. Não acrescente acessórios por padrão.
-  - Esta é uma atividade real compartilhada, não uma interpretação: sem personagens fictícios, enredo ou diálogos longos. Retorne somente o texto da tarefa.`,
+   - Esta é uma atividade real, não uma interpretação: sem personagens fictícios, enredo ou diálogos longos. Retorne somente o texto da tarefa.`,
   es: `Comprueba la calidad en silencio antes de responder:
-  - Escribe una tarea compartida con una idea central. Puede desarrollarse durante las próximas 24 horas en 2–4 momentos breves durante el tiempo libre; no exijas mensajes constantes ni estar juntos todo el día.
+   - Escribe una tarea con una idea central. Puede desarrollarse durante las próximas 24 horas en 2–4 momentos breves durante el tiempo libre; no exijas mensajes constantes ni estar juntos todo el día.
   - Usa un tono directo y natural, normalmente en 1–2 frases: acciones concretas y un detalle expresivo. Evita repetir el mismo cierre emocional.
  - Mantén fijos los papeles del hombre y la mujer. Comprueba quién actúa, quién recibe la acción y qué partes del cuerpo intervienen.
  - Ordena las acciones de forma físicamente posible. No omitas transiciones ni prometas una reacción corporal automática.
@@ -48,28 +48,28 @@ const QUALITY_RULES: Record<string, string> = {
  - No describas coerción, ignorar el dolor ni acciones físicamente peligrosas. No añadas explicaciones sobre acuerdos, palabras de seguridad o seguridad al texto.
  - Si mencionas el orgasmo, normalmente termina ahí la tarea; no empieces automáticamente otro acto sexual después.
   - No exijas fotos íntimas, vídeos ni grabaciones. Se permiten selfies normales y privados si encajan con la categoría. No añadas accesorios por defecto.
-  - Es una actividad real compartida, no una interpretación: sin personajes ficticios, trama ni diálogos largos. Devuelve solo el texto de la tarea.`,
+   - Es una actividad real, no una interpretación: sin personajes ficticios, trama ni diálogos largos. Devuelve solo el texto de la tarea.`,
 };
 
 const MODE_RULES: Record<string, Record<"solo" | "together", string>> = {
   ru: {
-    solo: "В режиме «один получает» задание адресовано инициатору, но выполняется им вместе со взрослым партнёром: описывай совместное действие пары, не самопомощь и не уход за собой.",
+    solo: "В одиночном режиме задание получает один пользователь. Обращайся к нему как к одному человеку и опиши одно действие, которое он может сделать для партнёра. Не требуй ответного действия от партнёра.",
     together: "В парном режиме один инициирует задание, а оба получают один и тот же текст. Опиши одно общее действие для совершеннолетних мужчины и женщины, не два отдельных задания.",
   },
   en: {
-    solo: "In one-person-start mode, the initiator receives the task, but does it with their adult partner: describe a shared couple activity, never self-care or an action performed alone.",
+    solo: "In solo mode, only the initiating user receives the task. Address that person individually and describe one action they can take for their partner; do not require a reply or a separate action from the partner.",
     together: "In together mode, one person starts and both receive the same text. Write one shared action for an adult man and woman, not two separate tasks.",
   },
   hi: {
-    solo: "एक व्यक्ति-शुरू मोड में उपयोगकर्ता को काम मिलता है, लेकिन वह इसे अपने वयस्क साथी के साथ करता है। जोड़े की साझा गतिविधि लिखें, अकेले की देखभाल या अकेली क्रिया नहीं।",
+    solo: "एकल मोड में केवल उपयोगकर्ता को काम मिलता है। उसी व्यक्ति को संबोधित करें और ऐसा एक काम बताएँ जो वह अपने साथी के लिए कर सकता है; साथी से जवाब या अलग काम की अपेक्षा न करें।",
     together: "साथी मोड में एक व्यक्ति शुरुआत करता है और दोनों को वही पाठ मिलता है। वयस्क पुरुष और महिला के लिए एक साझा गतिविधि लिखें, दो अलग काम नहीं।",
   },
   pt: {
-    solo: "No modo iniciado por uma pessoa, o usuário recebe a tarefa, mas a realiza com seu parceiro adulto: descreva uma atividade do casal, nunca autocuidado ou uma ação solitária.",
+    solo: "No modo solo, somente o usuário recebe a tarefa. Dirija-se a essa pessoa e descreva uma ação que ela pode fazer para o parceiro; não exija resposta nem uma ação separada do parceiro.",
     together: "No modo a dois, uma pessoa inicia e ambos recebem o mesmo texto. Escreva uma ação compartilhada por um homem e uma mulher adultos, não duas tarefas separadas.",
   },
   es: {
-    solo: "En el modo que inicia una persona, quien lo inicia recibe la tarea, pero la realiza con su pareja adulta: describe una actividad compartida, nunca autocuidado ni una acción en solitario.",
+    solo: "En modo individual, solo quien inicia recibe la tarea. Dirígete a esa persona y describe una acción que pueda hacer por su pareja; no exijas una respuesta ni una acción separada de la pareja.",
     together: "En modo en pareja, una persona inicia y ambos reciben el mismo texto. Escribe una acción compartida para un hombre y una mujer adultos, no dos tareas separadas.",
   },
 };
@@ -134,12 +134,20 @@ export function getTaskQualityRules(lang: string, mode: "solo" | "together" = "t
   const languageRules = QUALITY_RULES[lang] ?? QUALITY_RULES.en;
   const modeRule = MODE_RULES[lang]?.[mode] ?? MODE_RULES.en[mode];
   const sharedFormatRule = SHARED_TASK_FORMAT_RULES[lang] ?? SHARED_TASK_FORMAT_RULES.en;
-  return `${languageRules}\n - ${modeRule}\n - ${sharedFormatRule}`;
+  return mode === "together"
+    ? `${languageRules}\n - ${modeRule}\n - ${sharedFormatRule}`
+    : `${languageRules}\n - ${modeRule}`;
 }
 
 export function isSharedTaskText(text: string, lang: string): boolean {
   const marker = SHARED_TASK_MARKERS[lang] ?? SHARED_TASK_MARKERS.en;
   return marker.test(text.replace(/\s+/gu, " ").trim());
+}
+
+export function isTaskTextModeAppropriate(text: string, lang: string, mode: "solo" | "together"): boolean {
+  return mode === "together"
+    ? isSharedTaskText(text, lang)
+    : !isSharedTaskText(text, lang);
 }
 
 export function isTaskTextWellFormed(text: string, lang: string, mode?: "solo" | "together"): boolean {

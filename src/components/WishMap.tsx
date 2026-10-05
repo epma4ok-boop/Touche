@@ -45,17 +45,20 @@ interface WishMapProps {
 const COPY = {
   en: {
     eyebrow: "A private space for two",
-    title: "Your Wish Map",
-    intro: "Small acts of care make room for honest wishes.",
-    hearts: "hearts",
+    title: "Your Wish Diary",
+    intro: "Keep the small things you share and your private wishes in one place.",
+    stars: "stars",
     toNext: (n: number) => `${n} more to the next Wish Card`,
     cardReady: (n: number) => `${n} Wish Card${n === 1 ? "" : "s"} ready`,
-    howItWorks: "One card unlocks every 20 hearts. Hearts stay yours; nothing is spent.",
+    howItWorks: "One Wish Card unlocks every 20 stars. Stars stay yours; nothing is spent.",
     privateNote: "A wish is a request, never an obligation. Wish text stays here in the app.",
-    taskHeading: "A moment to check in",
+    taskHeading: "Daily task check-in",
     taskQuestion: "Did your partner complete this task?",
     yes: "Yes, they did",
     no: "Not this time",
+    starAwarded: "A star was added to your partner’s Wish Diary.",
+    noStar: "Your answer was saved. No star is added, and there is no penalty.",
+    alreadyAnswered: "You have already answered this check-in.",
     noAnswer: "No answer is okay. Nothing changes unless you choose.",
     noTasks: "No shared tasks need a check-in right now.",
     openTask: "Open task",
@@ -75,26 +78,29 @@ const COPY = {
     accept: "Accept",
     discuss: "Discuss or adjust",
     decline: "Not now",
-    unavailable: "Connect as a couple to open your shared Wish Map.",
-    loading: "Opening your private Wish Map…",
-    error: "Your Wish Map could not be loaded.",
+    unavailable: "Connect as a couple to open your shared Wish Diary.",
+    loading: "Opening your private Wish Diary…",
+    error: "Your Wish Diary could not be loaded.",
     retry: "Try again",
     mutationError: "That didn’t go through. Please try again.",
     close: "Dismiss",
   },
   ru: {
     eyebrow: "Личное пространство для двоих",
-    title: "Карта желаний",
-    intro: "Забота в мелочах помогает говорить о желаниях честно.",
-    hearts: "сердечек",
+    title: "Дневник желаний",
+    intro: "Собирайте ваши общие моменты и храните личные желания в одном месте.",
+    stars: "звёзд",
     toNext: (n: number) => `Ещё ${n} до следующей карточки желаний`,
     cardReady: (n: number) => `Доступно карточек желаний: ${n}`,
-    howItWorks: "Одна карточка за каждые 20 сердечек. Сердечки остаются — тратить их не нужно.",
+    howItWorks: "Одна карточка желания за каждые 20 звёзд. Звёзды сохраняются и не тратятся.",
     privateNote: "Желание — это просьба, а не обязанность. Текст карточки остаётся в приложении.",
-    taskHeading: "Минута внимания",
+    taskHeading: "Вопрос по заданию",
     taskQuestion: "Ваш партнёр выполнил это задание?",
     yes: "Да, выполнил",
     no: "В этот раз нет",
+    starAwarded: "Партнёру добавлена звезда в Дневник желаний.",
+    noStar: "Ответ сохранён. Звезда не начисляется, штрафа нет.",
+    alreadyAnswered: "Вы уже ответили на этот вопрос.",
     noAnswer: "Можно не отвечать. Ничего не изменится, пока вы сами не выберете.",
     noTasks: "Сейчас нет общих заданий, которые нужно подтвердить.",
     openTask: "Открыть задание",
@@ -114,26 +120,29 @@ const COPY = {
     accept: "Принять",
     discuss: "Обсудить или изменить",
     decline: "Не сейчас",
-    unavailable: "Создайте пару, чтобы открыть общую Карту желаний.",
-    loading: "Открываем вашу личную Карту желаний…",
-    error: "Не удалось загрузить Карту желаний.",
+    unavailable: "Создайте пару, чтобы открыть общий Дневник желаний.",
+    loading: "Открываем ваш Дневник желаний…",
+    error: "Не удалось загрузить Дневник желаний.",
     retry: "Попробовать снова",
     mutationError: "Не получилось сохранить. Попробуйте ещё раз.",
     close: "Скрыть",
   },
   hi: {
     eyebrow: "आप दोनों के लिए निजी जगह",
-    title: "आपका इच्छा मानचित्र",
-    intro: "छोटी-छोटी परवाह, सच्ची इच्छाओं के लिए जगह बनाती है।",
-    hearts: "दिल",
+    title: "आपकी इच्छा डायरी",
+    intro: "साथ बिताए छोटे पलों और निजी इच्छाओं को एक जगह सहेजें।",
+    stars: "तारे",
     toNext: (n: number) => `अगले इच्छा कार्ड के लिए ${n} और`,
     cardReady: (n: number) => `${n} इच्छा कार्ड उपलब्ध`,
-    howItWorks: "हर 20 दिलों पर एक कार्ड मिलता है। दिल आपके पास रहते हैं; कुछ खर्च नहीं होता।",
+    howItWorks: "हर 20 तारों पर एक इच्छा कार्ड मिलता है। तारे आपके पास रहते हैं; खर्च नहीं होते।",
     privateNote: "इच्छा एक अनुरोध है, कोई बाध्यता नहीं। इच्छा का पाठ ऐप में ही रहता है।",
-    taskHeading: "एक पल पूछने का",
+    taskHeading: "काम के बारे में सवाल",
     taskQuestion: "क्या आपके साथी ने यह काम पूरा किया?",
     yes: "हाँ, किया",
     no: "इस बार नहीं",
+    starAwarded: "आपके साथी की इच्छा डायरी में एक तारा जुड़ गया।",
+    noStar: "आपका जवाब सहेजा गया। कोई तारा नहीं जुड़ा और कोई दंड नहीं है।",
+    alreadyAnswered: "आप इस सवाल का जवाब पहले ही दे चुके हैं।",
     noAnswer: "जवाब न देना भी ठीक है। आपके चुनने तक कुछ नहीं बदलेगा।",
     noTasks: "अभी किसी साझा काम की पुष्टि बाकी नहीं है।",
     openTask: "काम खोलें",
@@ -153,26 +162,29 @@ const COPY = {
     accept: "स्वीकारें",
     discuss: "बात करें या बदलें",
     decline: "अभी नहीं",
-    unavailable: "साझा इच्छा मानचित्र खोलने के लिए पहले एक जोड़ी बनाएँ।",
-    loading: "आपका निजी इच्छा मानचित्र खुल रहा है…",
-    error: "इच्छा मानचित्र लोड नहीं हो सका।",
+    unavailable: "साझा इच्छा डायरी खोलने के लिए पहले जोड़ी बनाएँ।",
+    loading: "आपकी निजी इच्छा डायरी खुल रही है…",
+    error: "इच्छा डायरी लोड नहीं हो सकी।",
     retry: "फिर कोशिश करें",
     mutationError: "यह सेव नहीं हो सका। फिर कोशिश करें।",
     close: "हटाएँ",
   },
   pt: {
     eyebrow: "Um espaço privado para vocês",
-    title: "Mapa de Desejos",
-    intro: "Pequenos gestos de cuidado abrem espaço para desejos sinceros.",
-    hearts: "corações",
+    title: "Diário de Desejos",
+    intro: "Guardem os pequenos momentos juntos e os desejos privados em um só lugar.",
+    stars: "estrelas",
     toNext: (n: number) => `Faltam ${n} para o próximo Cartão de Desejo`,
     cardReady: (n: number) => `${n} Cartão${n === 1 ? "" : "ões"} de Desejo disponível`,
-    howItWorks: "Um cartão a cada 20 corações. Os corações continuam com vocês; nada é gasto.",
+    howItWorks: "Um Cartão de Desejo a cada 20 estrelas. As estrelas continuam com vocês; nada é gasto.",
     privateNote: "Um desejo é um pedido, nunca uma obrigação. O texto fica no app.",
-    taskHeading: "Um momento para perguntar",
+    taskHeading: "Pergunta sobre a tarefa",
     taskQuestion: "Seu parceiro concluiu esta tarefa?",
     yes: "Sim, concluiu",
     no: "Desta vez, não",
+    starAwarded: "Uma estrela foi adicionada ao Diário de Desejos do seu parceiro.",
+    noStar: "Sua resposta foi salva. Nenhuma estrela é adicionada e não há penalidade.",
+    alreadyAnswered: "Você já respondeu a esta pergunta.",
     noAnswer: "Tudo bem não responder. Nada muda até você escolher.",
     noTasks: "Nenhuma tarefa compartilhada precisa de confirmação agora.",
     openTask: "Abrir tarefa",
@@ -192,26 +204,29 @@ const COPY = {
     accept: "Aceitar",
     discuss: "Conversar ou ajustar",
     decline: "Agora não",
-    unavailable: "Conectem-se como casal para abrir o Mapa de Desejos compartilhado.",
-    loading: "Abrindo seu Mapa de Desejos privado…",
-    error: "Não foi possível carregar seu Mapa de Desejos.",
+    unavailable: "Conectem-se como casal para abrir o Diário de Desejos compartilhado.",
+    loading: "Abrindo seu Diário de Desejos…",
+    error: "Não foi possível carregar seu Diário de Desejos.",
     retry: "Tentar novamente",
     mutationError: "Não foi possível salvar. Tente novamente.",
     close: "Dispensar",
   },
   es: {
     eyebrow: "Un espacio privado para ustedes",
-    title: "Mapa de Deseos",
-    intro: "Los pequeños gestos de cuidado dan espacio a deseos sinceros.",
-    hearts: "corazones",
+    title: "Diario de Deseos",
+    intro: "Guarden sus pequeños momentos y deseos privados en un mismo lugar.",
+    stars: "estrellas",
     toNext: (n: number) => `Faltan ${n} para la próxima Tarjeta de Deseo`,
     cardReady: (n: number) => `${n} Tarjeta${n === 1 ? "" : "s"} de Deseo disponible${n === 1 ? "" : "s"}`,
-    howItWorks: "Una tarjeta por cada 20 corazones. Los corazones siguen ahí; no se gastan.",
+    howItWorks: "Una Tarjeta de Deseo por cada 20 estrellas. Las estrellas se conservan; no se gastan.",
     privateNote: "Un deseo es una petición, nunca una obligación. El texto se queda en la app.",
-    taskHeading: "Un momento para preguntar",
+    taskHeading: "Pregunta sobre la tarea",
     taskQuestion: "¿Tu pareja completó esta tarea?",
     yes: "Sí, la completó",
     no: "Esta vez, no",
+    starAwarded: "Se añadió una estrella al Diario de Deseos de tu pareja.",
+    noStar: "La respuesta se guardó. No se añade una estrella ni hay penalización.",
+    alreadyAnswered: "Ya respondiste a esta pregunta.",
     noAnswer: "No responder está bien. Nada cambia hasta que tú elijas.",
     noTasks: "Ahora no hay tareas compartidas que confirmar.",
     openTask: "Abrir tarea",
@@ -231,9 +246,9 @@ const COPY = {
     accept: "Aceptar",
     discuss: "Hablar o ajustar",
     decline: "Ahora no",
-    unavailable: "Conéctense como pareja para abrir su Mapa de Deseos compartido.",
-    loading: "Abriendo tu Mapa de Deseos privado…",
-    error: "No se pudo cargar el Mapa de Deseos.",
+    unavailable: "Conéctense como pareja para abrir su Diario de Deseos compartido.",
+    loading: "Abriendo tu Diario de Deseos…",
+    error: "No se pudo cargar el Diario de Deseos.",
     retry: "Intentar de nuevo",
     mutationError: "No se pudo guardar. Inténtalo de nuevo.",
     close: "Descartar",
@@ -242,7 +257,7 @@ const COPY = {
   eyebrow: string;
   title: string;
   intro: string;
-  hearts: string;
+  stars: string;
   toNext: (n: number) => string;
   cardReady: (n: number) => string;
   howItWorks: string;
@@ -251,6 +266,9 @@ const COPY = {
   taskQuestion: string;
   yes: string;
   no: string;
+  starAwarded: string;
+  noStar: string;
+  alreadyAnswered: string;
   noAnswer: string;
   noTasks: string;
   openTask: string;
@@ -286,11 +304,10 @@ function statusCopy(status: WishStatus, t: (typeof COPY)[Lang]): string {
   return t[status];
 }
 
-function HeartMark({ size = 19 }: { size?: number }) {
+function StarMark({ size = 19 }: { size?: number }) {
   return (
     <svg aria-hidden="true" width={size} height={size} viewBox="0 0 24 24" fill="none">
-      <path d="M20.8 8.7c0 5.2-8.8 10-8.8 10s-8.8-4.8-8.8-10A4.7 4.7 0 0 1 12 6.1a4.7 4.7 0 0 1 8.8 2.6Z" fill="currentColor" />
-      <path d="M7.1 8.4c.3-1.2 1.2-1.9 2.2-2" stroke="white" strokeOpacity=".75" strokeWidth="1.1" strokeLinecap="round" />
+      <path d="m12 2.8 2.82 5.72 6.31.92-4.57 4.45 1.08 6.28L12 17.2l-5.64 2.97 1.08-6.28-4.57-4.45 6.31-.92L12 2.8Z" fill="currentColor" />
     </svg>
   );
 }
@@ -300,7 +317,7 @@ function WishCard({ wish, t }: { wish: SentWish | ReceivedWish; t: (typeof COPY)
     <article className="wm-wish-card">
       <div className="wm-wish-top">
         <span className={`wm-status wm-status-${wish.status}`}>{statusCopy(wish.status, t)}</span>
-        <span className="wm-wish-mark"><HeartMark size={14} /></span>
+        <span className="wm-wish-mark"><StarMark size={14} /></span>
       </div>
       <p className="wm-wish-text">{wish.text}</p>
     </article>
@@ -315,6 +332,7 @@ export default function WishMap({ lang, coupleId, refreshKey, onOpenTask }: Wish
   const [mutationError, setMutationError] = useState(false);
   const [pendingAction, setPendingAction] = useState<string | null>(null);
   const [wishText, setWishText] = useState("");
+  const [attestMessage, setAttestMessage] = useState("");
   const requestId = useRef(0);
 
   const refresh = useCallback(async () => {
@@ -351,7 +369,16 @@ export default function WishMap({ lang, coupleId, refreshKey, onOpenTask }: Wish
 
   useEffect(() => {
     void refresh();
-    return () => { requestId.current += 1; };
+    const refreshWhenActive = () => {
+      if (document.visibilityState === "visible") void refresh();
+    };
+    window.addEventListener("focus", refreshWhenActive);
+    document.addEventListener("visibilitychange", refreshWhenActive);
+    return () => {
+      requestId.current += 1;
+      window.removeEventListener("focus", refreshWhenActive);
+      document.removeEventListener("visibilitychange", refreshWhenActive);
+    };
   }, [refresh, refreshKey]);
 
   const post = async (action: string, body: Record<string, string | boolean>): Promise<Record<string, unknown>> => {
@@ -371,8 +398,12 @@ export default function WishMap({ lang, coupleId, refreshKey, onOpenTask }: Wish
     const key = `task:${task.taskId}`;
     setPendingAction(key);
     setMutationError(false);
+    setAttestMessage("");
     try {
-      await post("attest", { task_id: task.taskId, partner_completed: partnerCompleted });
+      const result = await post("attest", { task_id: task.taskId, partner_completed: partnerCompleted });
+      setAttestMessage(result.heartAdded === true
+        ? t.starAwarded
+        : partnerCompleted ? t.alreadyAnswered : t.noStar);
       setData((current) => current ? {
         ...current,
         dueTasks: current.dueTasks.filter((item) => item.taskId !== task.taskId),
@@ -433,10 +464,10 @@ export default function WishMap({ lang, coupleId, refreshKey, onOpenTask }: Wish
     }
   };
 
-  const hearts = data?.hearts ?? 0;
+  const stars = data?.hearts ?? 0;
   const threshold = data?.threshold ?? 20;
-  const progress = Math.max(0, Math.min(100, (hearts % threshold) / threshold * 100));
-  const heartsToNext = threshold - (hearts % threshold);
+  const progress = Math.max(0, Math.min(100, (stars % threshold) / threshold * 100));
+  const starsToNext = threshold - (stars % threshold);
 
   return (
     <section className="wm-shell" aria-labelledby="wm-title">
@@ -457,7 +488,8 @@ export default function WishMap({ lang, coupleId, refreshKey, onOpenTask }: Wish
         .wm-availability{color:#a94f48;font-size:10px;font-weight:750;text-align:right}
         .wm-track{height:5px;margin-top:10px;overflow:hidden;border-radius:9px;background:#e3d9ce}
         .wm-track-fill{width:100%;height:100%;border-radius:9px;background:var(--wm-coral);transition:transform .35s ease;transform:scaleX(0);transform-origin:left center}
-        .wm-progress-note{margin:8px 0 0;color:var(--wm-muted);font-size:10px;line-height:1.4}
+         .wm-progress-note{margin:8px 0 0;color:var(--wm-muted);font-size:10px;line-height:1.4}
+         .wm-confirmation{margin-top:9px;padding:9px 10px;border:1px solid rgba(85,112,83,.18);border-radius:11px;background:#edf3e9;color:#486146;font-size:10px;line-height:1.45}
         .wm-privacy{display:flex;align-items:flex-start;gap:8px;margin:11px 1px 0;color:#626e7a;font-size:10px;line-height:1.45}
         .wm-privacy svg{flex:none;margin-top:1px;color:#bd655c}
         .wm-rule{height:1px;margin:14px 0;background:var(--wm-line)}
@@ -510,24 +542,24 @@ export default function WishMap({ lang, coupleId, refreshKey, onOpenTask }: Wish
             <h2 className="wm-title" id="wm-title">{t.title}</h2>
             <p className="wm-intro">{t.intro}</p>
           </div>
-          <span className="wm-seal"><HeartMark size={20} /></span>
+          <span className="wm-seal"><StarMark size={20} /></span>
         </header>
 
         {coupleId && (
           <>
             {data ? (
               <>
-                <div className="wm-progress" aria-label={`${hearts} ${t.hearts}`}>
+                <div className="wm-progress" aria-label={`${stars} ${t.stars}`}>
                   <div className="wm-progress-top">
-                    <div className="wm-count"><HeartMark size={17} /><strong>{hearts}</strong><span className="wm-count-label">{t.hearts}</span></div>
-                    <span className="wm-availability">{data.availableWishes > 0 ? t.cardReady(data.availableWishes) : t.toNext(heartsToNext)}</span>
+                    <div className="wm-count"><StarMark size={17} /><strong>{stars}</strong><span className="wm-count-label">{t.stars}</span></div>
+                    <span className="wm-availability">{data.availableWishes > 0 ? t.cardReady(data.availableWishes) : t.toNext(starsToNext)}</span>
                   </div>
-                  <div className="wm-track" role="progressbar" aria-label={t.toNext(heartsToNext)} aria-valuemin={0} aria-valuemax={threshold} aria-valuenow={hearts % threshold}>
+                  <div className="wm-track" role="progressbar" aria-label={t.toNext(starsToNext)} aria-valuemin={0} aria-valuemax={threshold} aria-valuenow={stars % threshold}>
                     <div className="wm-track-fill" style={{ transform: `scaleX(${progress / 100})` }} />
                   </div>
                   <p className="wm-progress-note">{t.howItWorks}</p>
                 </div>
-                <p className="wm-privacy"><HeartMark size={13} /> <span>{t.privateNote}</span></p>
+                <p className="wm-privacy"><StarMark size={13} /> <span>{t.privateNote}</span></p>
               </>
             ) : loading ? (
               <div className="wm-skeleton" aria-label={t.loading} role="status"><div className="wm-skeleton-line" /></div>
@@ -539,6 +571,7 @@ export default function WishMap({ lang, coupleId, refreshKey, onOpenTask }: Wish
             {mutationError && (
               <div className="wm-alert" role="alert"><span>{t.mutationError}</span><button type="button" onClick={() => setMutationError(false)}>{t.close}</button></div>
             )}
+            {attestMessage && <div className="wm-confirmation" role="status">{attestMessage}</div>}
 
             {data && (
               <>
@@ -567,7 +600,7 @@ export default function WishMap({ lang, coupleId, refreshKey, onOpenTask }: Wish
                         })}
                       </div>
                     ) : (
-                      <div className="wm-empty"><div className="wm-empty-mark"><HeartMark size={14} /><span>{t.taskHeading}</span></div>{t.noTasks}</div>
+                      <div className="wm-empty"><div className="wm-empty-mark"><StarMark size={14} /><span>{t.taskHeading}</span></div>{t.noTasks}</div>
                     )}
                   </section>
 
@@ -583,7 +616,7 @@ export default function WishMap({ lang, coupleId, refreshKey, onOpenTask }: Wish
                         </div>
                       </form>
                     ) : (
-                      <div className="wm-empty"><div className="wm-empty-mark"><HeartMark size={14} /><span>{t.cardReady(0)}</span></div>{t.toNext(heartsToNext)}</div>
+                      <div className="wm-empty"><div className="wm-empty-mark"><StarMark size={14} /><span>{t.cardReady(0)}</span></div>{t.toNext(starsToNext)}</div>
                     )}
                   </section>
                 </div>
@@ -623,7 +656,7 @@ export default function WishMap({ lang, coupleId, refreshKey, onOpenTask }: Wish
         )}
         {!coupleId && (
           <div className="wm-empty" role="status" style={{ marginTop: 15 }}>
-            <div className="wm-empty-mark"><HeartMark size={15} /><span>{t.eyebrow}</span></div>{t.unavailable}
+            <div className="wm-empty-mark"><StarMark size={15} /><span>{t.eyebrow}</span></div>{t.unavailable}
           </div>
         )}
       </div>

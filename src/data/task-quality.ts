@@ -114,10 +114,32 @@ const SEXUAL_CONTINUATION_AFTER_CLIMAX: Record<string, RegExp> = {
   es: /(?:después|cuando|una vez que).{0,50}(?:orgasmo|clímax|correrse|terminar).{0,80}(?:penetr\w*|entr\w*|introduc\w*|tener sexo|continu\w*|empezar otra ronda)/iu,
 };
 
+const SHARED_TASK_FORMAT_RULES: Record<string, string> = {
+  ru: "Обращайся к обоим партнёрам во множественном числе и включай обоих в действие: например, «вы вдвоём», «по очереди», «друг другу». Не давай задание только одному партнёру.",
+  en: "Address both partners as a unit and explicitly include both in the action, using wording such as “both of you,” “together,” “each other,” or “take turns.” Do not make one partner the only actor.",
+  hi: "दोनों साथियों को साथ संबोधित करें और दोनों को गतिविधि में शामिल करें; केवल एक साथी को काम करने का निर्देश न दें।",
+  pt: "Dirija-se aos dois parceiros e inclua ambos na atividade, com expressões como “vocês dois”, “juntos”, “um ao outro” ou “revezem-se”. Não deixe apenas uma pessoa como responsável pela ação.",
+  es: "Dirígete a ambos e inclúyelos en la actividad, con expresiones como «los dos», «juntos», «el uno al otro» o «por turnos». No dejes a una sola persona como única responsable.",
+};
+
+const SHARED_TASK_MARKERS: Record<string, RegExp> = {
+  ru: /(?<![\p{L}\p{N}])(?:оба|обе|вместе|вдво[её]м|друг\s+друга|друг\s+другу|по\s+очереди|каждый\s+из\s+вас|обменяйтесь|обменивайтесь|обнимитесь|обнимайтесь|поцелуйтесь|целуйтесь)(?![\p{L}\p{N}])/iu,
+  en: /\b(?:both of you|you both|each other|one another|together|take turns|both partners|each of you)\b/iu,
+  hi: /(?:आप दोनों|दोनों|एक-दूसरे|एक दूसरे|साथ में|मिलकर|बारी-बारी|आपस में)/u,
+  pt: /\b(?:vocês dois|ambos|ambas|juntos|juntas|um ao outro|um para o outro|cada um de vocês|por turnos|revezem-se|troquem|entre vocês)\b/iu,
+  es: /\b(?:ambos|ambas|los dos|ustedes dos|juntos|juntas|uno al otro|el uno al otro|mutuamente|por turnos|cada uno de ustedes|intercambien|entre ustedes)\b/iu,
+};
+
 export function getTaskQualityRules(lang: string, mode: "solo" | "together" = "together"): string {
   const languageRules = QUALITY_RULES[lang] ?? QUALITY_RULES.en;
   const modeRule = MODE_RULES[lang]?.[mode] ?? MODE_RULES.en[mode];
-  return `${languageRules}\n - ${modeRule}`;
+  const sharedFormatRule = SHARED_TASK_FORMAT_RULES[lang] ?? SHARED_TASK_FORMAT_RULES.en;
+  return `${languageRules}\n - ${modeRule}\n - ${sharedFormatRule}`;
+}
+
+export function isSharedTaskText(text: string, lang: string): boolean {
+  const marker = SHARED_TASK_MARKERS[lang] ?? SHARED_TASK_MARKERS.en;
+  return marker.test(text.replace(/\s+/gu, " ").trim());
 }
 
 export function isTaskTextWellFormed(text: string, lang: string, mode?: "solo" | "together"): boolean {

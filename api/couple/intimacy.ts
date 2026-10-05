@@ -170,15 +170,29 @@ function isWishMapSchemaMissing(error: unknown): boolean {
   const details = error as { code?: unknown; message?: unknown; details?: unknown; hint?: unknown };
   const code = String(details.code ?? "");
   const text = [details.message, details.details, details.hint].map((value) => String(value ?? "")).join(" ");
-  const missingSchemaCodes = new Set(["42P01", "42703", "PGRST202", "PGRST204", "PGRST205", "42883"]);
+  const missingSchemaCodes = new Set(["42P01", "PGRST202", "PGRST205", "42883"]);
   return missingSchemaCodes.has(code)
     && /wish_map_[a-z_]+|submit_wish_map_task_attestation|generated_tasks/iu.test(text);
+}
+
+function getWishMapDiagnosticCode(error: unknown): string {
+  if (!error || typeof error !== "object") return "unclassified";
+  const details = error as { code?: unknown; message?: unknown; details?: unknown; hint?: unknown };
+  const code = String(details.code ?? "");
+  if (!/^[A-Z0-9_]{1,24}$/iu.test(code)) return "unclassified";
+  if (code !== "42703" && code !== "PGRST204") return code;
+
+  const text = [details.message, details.details, details.hint].map((value) => String(value ?? "")).join(" ");
+  const postgresColumn = text.match(/column\s+["']?([a-z_][a-z0-9_$]*(?:\.[a-z_][a-z0-9_$]*)?)["']?\s+does not exist/iu);
+  const postgrestColumn = text.match(/could not find the '([a-z_][a-z0-9_$]*)' column of '([a-z_][a-z0-9_$]*)'/iu);
+  const column = postgresColumn?.[1] ?? (postgrestColumn ? `${postgrestColumn[2]}.${postgrestColumn[1]}` : null);
+  return column ? `${code}:${column}` : code;
 }
 
 async function handleWishMap(couple: Couple, userId: number) {
   const cutoff = new Date(Date.now() - TASK_CHECKIN_DELAY_MS).toISOString();
   const [heartResult, cardResult, taskResult] = await Promise.all([
-    sb.from("wish_map_hearts").select("id", { count: "exact", head: true }).eq("couple_id", couple.id).eq("user_id", userId),
+    sb.from("wish_map_hearts").select("couple_id", { count: "exact", head: true }).eq("couple_id", couple.id).eq("user_id", userId),
     sb.from("wish_map_cards")
       .select("id,couple_id,sender_user_id,recipient_user_id,milestone,wish_text,status,created_at")
       .eq("couple_id", couple.id)
@@ -289,7 +303,7 @@ async function handleCreateWish(couple: Couple, userId: number, body: Record<str
   }
 
   const [{ count, error: heartError }, { data: existingCards, error: cardsError }] = await Promise.all([
-    sb.from("wish_map_hearts").select("id", { count: "exact", head: true }).eq("couple_id", couple.id).eq("user_id", userId),
+    sb.from("wish_map_hearts").select("couple_id", { count: "exact", head: true }).eq("couple_id", couple.id).eq("user_id", userId),
     sb.from("wish_map_cards").select("milestone").eq("couple_id", couple.id).eq("sender_user_id", userId),
   ]);
   if (heartError || cardsError) throw heartError ?? cardsError;
@@ -683,9 +697,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(503).json({ error: "wish_map_setup_required" });
     }
     if (action === "wish_map") {
-      const details = error && typeof error === "object" ? error as { code?: unknown } : {};
-      const rawCode = String(details.code ?? "");
-      const diagnosticCode = /^[A-Z0-9_]{1,24}$/iu.test(rawCode) ? rawCode : "unclassified";
+      const diagnosticCode = getWishMapDiagnosticCode(error);
       console.error("Wish Diary load failed:", diagnosticCode);
       return res.status(500).json({ error: "wish_map_load_failed", diagnosticCode });
     }

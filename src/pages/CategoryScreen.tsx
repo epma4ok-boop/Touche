@@ -3,6 +3,7 @@ import type { Gender } from "@/components/GenderSelect";
 import type { AppMode } from "@/App";
 import HeartbeatCanvas from "@/components/HeartbeatCanvas";
 import { UI, CATEGORY_CONFIG, CATEGORIES_ORDER, type Lang, type Category } from "@/data/i18n";
+import { getTaskVariationTag, type TaskVariationTag } from "@/data/task-quality";
 import { playReveal } from "@/hooks/useSensualSound";
 import HistoryPanel, { type HistoryEntry } from "@/components/HistoryPanel";
 import type { SharedTaskSnapshot } from "@/data/sharedPair";
@@ -44,6 +45,7 @@ async function generateAITask(
   mode: AppMode,
   coupleId: string | null,
   requestId: string,
+  recentVariationTags: TaskVariationTag[],
 ): Promise<{ result?: TaskResult; error?: TaskError }> {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 25_000);
@@ -51,7 +53,7 @@ async function generateAITask(
     const response = await fetch("/api/tasks/generate", {
       method: "POST",
       headers: { "Content-Type": "application/json", "x-telegram-init-data": getInitData() },
-      body: JSON.stringify({ category, lang, gender, mode, coupleId, requestId }),
+      body: JSON.stringify({ category, lang, gender, mode, coupleId, requestId, recentVariationTags }),
       signal: controller.signal,
     });
     if (!response.ok) {
@@ -378,7 +380,14 @@ export default function CategoryScreen({ lang, gender, category, onBack, onCateg
       if (!requestIdRef.current) requestIdRef.current = crypto.randomUUID();
       try { sessionStorage.setItem(requestKey, requestIdRef.current); } catch { /* retry still works in this view */ }
     }
-    const generated = await generateAITask(category, lang, gender, mode, coupleId ?? null, requestIdRef.current);
+    const recentVariationTags = [...new Set(
+      history
+        .filter((entry) => entry.category === category)
+        .slice(-12)
+        .map((entry) => getTaskVariationTag(entry.text, lang))
+        .filter((tag): tag is TaskVariationTag => tag !== null),
+    )].slice(-8);
+    const generated = await generateAITask(category, lang, gender, mode, coupleId ?? null, requestIdRef.current, recentVariationTags);
     if (!generated.result) {
       setErrorKind(generated.error?.kind ?? "unknown"); setGeneratedErrorCode(generated.error?.message ?? null);
       setIsCasting(false); tg?.HapticFeedback?.notificationOccurred?.("error"); return;

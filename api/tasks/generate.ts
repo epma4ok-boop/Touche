@@ -8,7 +8,7 @@ import { createClient } from "@supabase/supabase-js";
 import { validateTelegramInitData } from "../couple/_auth.js";
 import { appDate } from "../limits.js";
 import { claimFriendInvite } from "../referrals/_claim.js";
-import { getTaskQualityRules, hasConcreteSexualAct, hasHardSexualAct, isSharedTaskText, isTaskTextModeAppropriate, isTaskTextWellFormed } from "../../src/data/task-quality.js";
+import { getTaskQualityRules, getTaskVariationTag, hasAnatomicallyClearOralAct, hasConcreteSexualAct, hasHardSexualAct, isSharedTaskText, isTaskTextModeAppropriate, isTaskTextWellFormed, isTaskVariationTag, type TaskVariationTag } from "../../src/data/task-quality.js";
 import { OWNER_TELEGRAM_ID } from "../../src/config.js";
 import { TASKS_RU } from "../../src/data/tasks-ru.js";
 import { TASKS_EN } from "../../src/data/tasks-en.js";
@@ -407,7 +407,7 @@ function hasCategorySexualAct(task: string, category: string, lang: string): boo
   return true;
 }
 
-function getTaskExamples(category: string, lang: string, requestId: string, mode: TaskMode): string[] {
+function getTaskExamples(category: string, lang: string, requestId: string, mode: TaskMode, gender: string): string[] {
   const sourcePool = category === "hard"
     ? [...(SOURCE_TASKS[lang]?.hard ?? []), ...(SOURCE_TASKS[lang]?.passion ?? [])]
     : SOURCE_TASKS[lang]?.[category] ?? [];
@@ -420,6 +420,7 @@ function getTaskExamples(category: string, lang: string, requestId: string, mode
     && !unsafeMarkers.test(example)
     && (category !== "hard" || hasHardSexualAct(example, lang))
     && isTaskExampleMediaAllowed(example, category, lang)
+    && hasAnatomicallyClearOralAct(example, lang, mode, gender === "female" ? "female" : "male")
   );
   const modeMatched = eligibleSource.filter((example) => isTaskTextModeAppropriate(example, lang, mode));
   const modeAdapted = eligibleSource.filter((example) => !isTaskTextModeAppropriate(example, lang, mode));
@@ -429,17 +430,21 @@ function getTaskExamples(category: string, lang: string, requestId: string, mode
     && hasCategorySexualAct(example, category, lang)
     && isTaskTextModeAppropriate(example, lang, mode)
     && isTaskExampleMediaAllowed(example, category, lang)
+    && hasAnatomicallyClearOralAct(example, lang, mode, gender === "female" ? "female" : "male")
   );
   const seed = hashSeed(`${requestId}:${lang}:${category}:examples`);
   const matchedOrder = seededShuffle(modeMatched, seed);
   const ordered = [
-    ...matchedOrder.slice(0, 4),
+    ...matchedOrder.slice(0, 8),
     ...seededShuffle(modeAdapted, seed ^ 0x5f3759df),
-    ...matchedOrder.slice(4),
+    ...matchedOrder.slice(8),
     ...seededShuffle(eligibleFallbacks, seed ^ 0x1b873593),
   ];
   const examples: string[] = [];
+  const familyCounts = new Map<string, number>();
   for (const candidate of ordered) {
+    const family = getTaskVariationTag(candidate, lang) ?? "unclassified";
+    if ((familyCounts.get(family) ?? 0) >= (family === "unclassified" ? 3 : 2)) continue;
     const candidateWords = new Set(candidate.toLowerCase().match(/[\p{L}\p{N}]{3,}/gu) ?? []);
     const tooSimilar = examples.some((selected) => {
       const selectedWords = new Set(selected.toLowerCase().match(/[\p{L}\p{N}]{3,}/gu) ?? []);
@@ -447,14 +452,17 @@ function getTaskExamples(category: string, lang: string, requestId: string, mode
       const union = new Set([...candidateWords, ...selectedWords]).size;
       return union > 0 && intersection / union > 0.55;
     });
-    if (!tooSimilar) examples.push(candidate);
-    if (examples.length === 8) break;
+    if (!tooSimilar) {
+      examples.push(candidate);
+      familyCounts.set(family, (familyCounts.get(family) ?? 0) + 1);
+    }
+    if (examples.length === 14) break;
   }
   return examples;
 }
 
-function getTaskExamplesPrompt(category: string, lang: string, requestId: string, mode: TaskMode): string {
-  const examples = getTaskExamples(category, lang, requestId, mode);
+function getTaskExamplesPrompt(category: string, lang: string, requestId: string, mode: TaskMode, gender: string): string {
+  const examples = getTaskExamples(category, lang, requestId, mode, gender);
   if (examples.length === 0) return "";
   const intro: Record<string, string> = {
     ru: "Ниже — разнообразные примеры из большого исходного списка этой категории. Используй сами идеи, не копируй формулировки. Часть примеров может быть написана для другого режима: перепиши роли строго по инструкции solo/together.",
@@ -473,7 +481,14 @@ function getTaskExamplesPrompt(category: string, lang: string, requestId: string
   return `${category === "hard" ? hardIntro[lang] ?? hardIntro.en : intro[lang] ?? intro.en}\n${examples.map((example, index) => `${index + 1}. ${example}`).join("\n")}`;
 }
 
-function getFallback(cat: string, lang: string, mode: TaskMode, requestId: string): string {
+function getFallback(
+  cat: string,
+  lang: string,
+  mode: TaskMode,
+  requestId: string,
+  gender: string,
+  recentVariationTags: TaskVariationTag[],
+): string {
   const sourceTasks = SOURCE_TASKS[lang]?.[cat] ?? [];
   const fallbackTasks = mode === "solo"
     ? SOLO_SEXUAL_FALLBACKS[lang]?.[cat as "passion" | "hard"] ?? []
@@ -485,34 +500,40 @@ function getFallback(cat: string, lang: string, mode: TaskMode, requestId: strin
     && isTaskTextModeAppropriate(task, lang, mode)
     && hasCategorySexualAct(task, cat, lang)
     && isTaskExampleMediaAllowed(task, cat, lang)
+    && hasAnatomicallyClearOralAct(task, lang, mode, gender === "female" ? "female" : "male")
   );
   if (wellFormed.length === 0) {
     throw new Error(`No valid ${mode}-task fallback for ${lang}/${cat}`);
   }
-  return seededShuffle(wellFormed, hashSeed(`${requestId}:${lang}:${cat}:${mode}:fallback`))[0];
+  const fresh = wellFormed.filter((task) => {
+    const tag = getTaskVariationTag(task, lang);
+    return !tag || !recentVariationTags.includes(tag);
+  });
+  const candidates = fresh.length > 0 ? fresh : wellFormed;
+  return seededShuffle(candidates, hashSeed(`${requestId}:${lang}:${cat}:${mode}:fallback`))[0];
 }
 
 function getGenderLine(lang: string, gender: string): string {
   const map: Record<string, Record<string, string>> = {
     ru: {
-      male: "Пара совершеннолетняя и гетеросексуальная: пользователь — мужчина, партнёрша — женщина. Обращайся к пользователю на «ты», называй партнёршу в женском роде. Сохраняй роли и анатомию до конца задания.",
-      female: "Пара совершеннолетняя и гетеросексуальная: пользователь — женщина, партнёр — мужчина. Обращайся к пользователю на «ты», называй партнёра в мужском роде. Сохраняй роли и анатомию до конца задания.",
+      male: "Пара совершеннолетняя и гетеросексуальная: пользователь — мужчина, партнёрша — женщина. Обращайся к пользователю на «ты», называй партнёршу в женском роде. Если в режиме solo выбрано оральное действие, мужчина выполняет куннилингус партнёрше — ласкает её вульву или клитор языком; не предлагай мужчине делать минет партнёру. В together точно называй получателя и анатомию. Не пиши неоднозначное «куни/минет».",
+      female: "Пара совершеннолетняя и гетеросексуальная: пользователь — женщина, партнёр — мужчина. Обращайся к пользователю на «ты», называй партнёра в мужском роде. Если в режиме solo выбрано оральное действие, женщина делает минет партнёру — ласкает его пенис ртом; не предлагай женщине делать куннилингус мужчине. В together точно называй получателя и анатомию. Не пиши неоднозначное «куни/минет».",
     },
     en: {
-      male: "This is an adult heterosexual couple: the user is a man and the partner is a woman. Address the user as 'you' and refer to the partner as she/her. Keep roles and anatomy consistent.",
-      female: "This is an adult heterosexual couple: the user is a woman and the partner is a man. Address the user as 'you' and refer to the partner as he/him. Keep roles and anatomy consistent.",
+      male: "This is an adult heterosexual couple: the user is a man and the partner is a woman. Address the user as 'you' and refer to the partner as she/her. For an oral act in solo mode, the man performs cunnilingus on her vulva or clitoris; do not assign fellatio to the male user. In together mode, name the recipient and anatomy precisely. Never write an ambiguous 'cunnilingus/blow job' choice.",
+      female: "This is an adult heterosexual couple: the user is a woman and the partner is a man. Address the user as 'you' and refer to the partner as he/him. For an oral act in solo mode, the woman performs fellatio on his penis; do not assign cunnilingus to the female user. In together mode, name the recipient and anatomy precisely. Never write an ambiguous 'cunnilingus/blow job' choice.",
     },
     hi: {
-      male: "यह वयस्क विषमलैंगिक जोड़ा है: उपयोगकर्ता पुरुष और साथी महिला है। भूमिकाएँ और शरीर-संबंधी विवरण पूरे कार्य में स्थिर रखें।",
-      female: "यह वयस्क विषमलैंगिक जोड़ा है: उपयोगकर्ता महिला और साथी पुरुष है। भूमिकाएँ और शरीर-संबंधी विवरण पूरे कार्य में स्थिर रखें।",
+      male: "यह वयस्क विषमलैंगिक जोड़ा है: उपयोगकर्ता पुरुष और साथी महिला है। अकेले वाले मोड में ओरल क्रिया हो तो पुरुष महिला की योनि या भगांकुर को जीभ से सहलाए; पुरुष उपयोगकर्ता को मुखमैथुन पाने वाला न लिखें। साथ वाले मोड में किसे क्रिया मिल रही है और शरीर का हिस्सा स्पष्ट लिखें। भूमिकाएँ और शरीर-संबंधी विवरण पूरे कार्य में स्थिर रखें।",
+      female: "यह वयस्क विषमलैंगिक जोड़ा है: उपयोगकर्ता महिला और साथी पुरुष है। अकेले वाले मोड में ओरल क्रिया हो तो महिला पुरुष के लिंग पर मुखमैथुन करे; महिला उपयोगकर्ता को पुरुष पर योनि-संबंधी क्रिया करते न लिखें। साथ वाले मोड में किसे क्रिया मिल रही है और शरीर का हिस्सा स्पष्ट लिखें। भूमिकाएँ और शरीर-संबंधी विवरण पूरे कार्य में स्थिर रखें।",
     },
     pt: {
-      male: "Este é um casal adulto e heterossexual: o usuário é homem e a parceira é mulher. Trate o usuário por 'você' e mantenha os papéis e a anatomia coerentes.",
-      female: "Este é um casal adulto e heterossexual: a usuária é mulher e o parceiro é homem. Trate a usuária por 'você' e mantenha os papéis e a anatomia coerentes.",
+      male: "Este é um casal adulto e heterossexual: o usuário é homem e a parceira é mulher. Trate o usuário por 'você'. No modo solo, se houver sexo oral, o homem faz cunnilingus na vulva ou no clitóris dela; não atribua fellatio ao usuário homem. No modo a dois, nomeie claramente quem recebe a ação e a anatomia. Nunca use a opção ambígua 'cunnilingus/boquete'.",
+      female: "Este é um casal adulto e heterossexual: a usuária é mulher e o parceiro é homem. Trate a usuária por 'você'. No modo solo, se houver sexo oral, a mulher faz fellatio no pênis dele; não atribua cunnilingus ao usuário mulher. No modo a dois, nomeie claramente quem recebe a ação e a anatomia. Nunca use a opção ambígua 'cunnilingus/boquete'.",
     },
     es: {
-      male: "Es una pareja adulta y heterosexual: el usuario es hombre y su pareja es mujer. Háblale de tú y mantén coherentes los papeles y la anatomía.",
-      female: "Es una pareja adulta y heterosexual: la usuaria es mujer y su pareja es hombre. Háblale de tú y mantén coherentes los papeles y la anatomía.",
+      male: "Es una pareja adulta y heterosexual: el usuario es hombre y su pareja es mujer. En modo individual, si hay sexo oral, el hombre hace cunnilingus en la vulva o el clítoris de ella; no asignes felación al usuario hombre. En modo en pareja, nombra con precisión quién recibe la acción y la anatomía. No uses la opción ambigua «cunnilingus/felación».",
+      female: "Es una pareja adulta y heterosexual: la usuaria es mujer y su pareja es hombre. En modo individual, si hay sexo oral, la mujer hace felación en el pene de él; no asignes cunnilingus a la usuaria. En modo en pareja, nombra con precisión quién recibe la acción y la anatomía. No uses la opción ambigua «cunnilingus/felación».",
     },
   };
   return map[lang]?.[gender] ?? map["en"]["male"];
@@ -527,11 +548,11 @@ const MODE_INSTRUCTIONS: Record<string, Record<string, string>> = {
     es: "Modo individual: solo una persona adulta recibe la tarea. Dirígete a esa persona y describe una acción que pueda hacer por su pareja. La pareja puede recibir el gesto, pero no debe tener una acción separada ni una respuesta obligatoria. En Pasión y hard, quien inicia realiza el acto nombrado para su pareja; no uses acciones mutuas ni turnos.",
   },
   together: {
-    ru: "Парный режим: одно и то же задание показывается обоим и при включённых уведомлениях отправляется партнёру в Telegram. Создай одно совместное действие для совершеннолетних мужчины и женщины, а не два отдельных задания и не ролевую сцену. Обращайся к обоим во множественном числе; явно укажи, что делают оба. В «Страсти» и «Харде» включи обоих в конкретный сексуальный акт.",
-    en: "Together mode: both partners see the same task, and the identical text is sent to the partner in Telegram when notifications are enabled. Create one shared activity for an adult man and woman, not two separate tasks or roleplay. Address both, explicitly include both in the action, and make both part of the named sexual act in Passion and Hard.",
-    hi: "साथी मोड: दोनों को एक ही काम दिखता है और सूचनाएँ चालू होने पर वही पाठ साथी को Telegram पर भेजा जाता है। वयस्क पुरुष और महिला के लिए एक साझा गतिविधि लिखें, दो अलग काम या भूमिका-अभिनय नहीं; दोनों को स्पष्ट रूप से शामिल करें। जुनून और हार्ड में दोनों को नामित यौन क्रिया में शामिल करें।",
-    pt: "Modo a dois: ambos veem a mesma tarefa, que é enviada ao parceiro pelo Telegram quando as notificações estão ativadas. Crie uma atividade compartilhada para um homem e uma mulher adultos, não duas tarefas nem uma encenação; inclua claramente os dois na ação sexual nomeada.",
-    es: "Modo en pareja: ambos ven la misma tarea y el mismo texto se envía a la pareja por Telegram si las notificaciones están activadas. Crea una actividad compartida para un hombre y una mujer adultos, no dos tareas ni una escena de rol; incluye claramente a ambos en el acto sexual nombrado.",
+    ru: "Парный режим: одно и то же задание показывается обоим и при включённых уведомлениях отправляется партнёру в Telegram. Создай одно совместное действие для совершеннолетних мужчины и женщины, а не два отдельных задания и не ролевую сцену. Обращайся к обоим во множественном числе; явно укажи, что делают оба. В «Страсти» и «Харде» включи обоих в конкретный сексуальный акт. Взаимная мастурбация — допустимое общее задание: прямо назови её и укажи, что оба ласкают друг друга руками; не своди её к действию только одного.",
+    en: "Together mode: both partners see the same task, and the identical text is sent to the partner in Telegram when notifications are enabled. Create one shared activity for an adult man and woman, not two separate tasks or roleplay. Address both, explicitly include both in the action, and make both part of the named sexual act in Passion and Hard. Mutual masturbation is a valid shared task: name it clearly and state that both use their hands on each other; do not reduce it to a one-person action.",
+    hi: "साथी मोड: दोनों को एक ही काम दिखता है और सूचनाएँ चालू होने पर वही पाठ साथी को Telegram पर भेजा जाता है। वयस्क पुरुष और महिला के लिए एक साझा गतिविधि लिखें, दो अलग काम या भूमिका-अभिनय नहीं; दोनों को स्पष्ट रूप से शामिल करें। जुनून और हार्ड में दोनों को नामित यौन क्रिया में शामिल करें। आपसी हस्तमैथुन भी एक मान्य साझा काम है: इसे स्पष्ट रूप से नाम दें और लिखें कि दोनों एक-दूसरे को हाथों से सहलाते हैं।",
+    pt: "Modo a dois: ambos veem a mesma tarefa, que é enviada ao parceiro pelo Telegram quando as notificações estão ativadas. Crie uma atividade compartilhada para um homem e uma mulher adultos, não duas tarefas nem uma encenação; inclua claramente os dois na ação sexual nomeada. Masturbação mútua é uma tarefa compartilhada válida: nomeie-a claramente e diga que ambos usam as mãos um no outro.",
+    es: "Modo en pareja: ambos ven la misma tarea y el mismo texto se envía a la pareja por Telegram si las notificaciones están activadas. Crea una actividad compartida para un hombre y una mujer adultos, no dos tareas ni una escena de rol; incluye claramente a ambos en el acto sexual nombrado. La masturbación mutua es una tarea compartida válida: nómbrala claramente e indica que ambos se acarician con las manos.",
   },
 };
 
@@ -655,21 +676,39 @@ const VARIATION_FOCI: Record<string, { ru: string[]; en: string[] }> = {
   },
 };
 
-function getVariationInstruction(category: string, lang: string, requestId: string, mode: TaskMode): string {
-  if (category === "passion" || category === "hard") {
-    return lang === "ru"
-      ? "Акцент разнообразия: используй широкий диапазон исходного списка этой категории, не своди его к трём привычным видам секса. Возьми одну новую конкретную идею из примеров и строго соблюдай роли выбранного режима."
-      : "Variation focus: use the broad range of this category's original task list; do not reduce it to three familiar sex acts. Choose one fresh concrete idea from the examples and follow the selected mode's roles.";
+function getVariationInstruction(
+  category: string,
+  lang: string,
+  requestId: string,
+  mode: TaskMode,
+  gender: string,
+  recentVariationTags: TaskVariationTag[],
+): string {
+  const examples = getTaskExamples(category, lang, requestId, mode, gender);
+  const firstExampleByFamily = new Map<TaskVariationTag, number>();
+  examples.forEach((example, index) => {
+    const tag = getTaskVariationTag(example, lang);
+    if (tag && !firstExampleByFamily.has(tag)) firstExampleByFamily.set(tag, index + 1);
+  });
+  const allFamilies = [...firstExampleByFamily.entries()].map(([tag, exampleNumber]) => ({ tag, exampleNumber }));
+  const freshFamilies = allFamilies.filter(({ tag }) => !recentVariationTags.includes(tag));
+  const choices = freshFamilies.length > 0 ? freshFamilies : allFamilies;
+  if (choices.length > 0) {
+    const focus = seededShuffle(choices, hashSeed(`${requestId}:${lang}:${category}:${mode}:focus`))[0];
+    const directions: Record<string, string> = {
+      ru: `Для разнообразия возьми центральную идею из примера №${focus.exampleNumber} в списке ниже, но не копируй его слова. Выбери только эту тему и добавь свежую конкретную деталь.`,
+      en: `For variety, use the central idea from example #${focus.exampleNumber} in the list below, but do not copy its wording. Choose only that theme and add one fresh concrete detail.`,
+      hi: `विविधता के लिए नीचे दी गई सूची के उदाहरण ${focus.exampleNumber} का मुख्य विचार लें, लेकिन उसके शब्द न दोहराएँ। उसी विषय को चुनें और एक नया ठोस विवरण जोड़ें।`,
+      pt: `Para variar, use a ideia central do exemplo ${focus.exampleNumber} da lista abaixo, sem copiar as palavras. Escolha apenas esse tema e acrescente um detalhe concreto novo.`,
+      es: `Para variar, usa la idea central del ejemplo ${focus.exampleNumber} de la lista, sin copiar sus palabras. Elige solo ese tema y añade un detalle concreto nuevo.`,
+    };
+    return directions[lang] ?? directions.en;
   }
+
   const focuses = VARIATION_FOCI[category];
   if (!focuses) return "";
-
   const options = lang === "ru" ? focuses.ru : focuses.en;
-  let hash = 0;
-  for (let i = 0; i < requestId.length; i += 1) {
-    hash = (Math.imul(hash, 31) + requestId.charCodeAt(i)) >>> 0;
-  }
-  const focus = options[hash % options.length];
+  const focus = seededShuffle(options, hashSeed(`${requestId}:${lang}:${category}:fallback-focus`))[0];
   return lang === "ru"
     ? `Акцент разнообразия для этого задания: ${focus}. Сделай его центральным, не складывай в задание остальные варианты.`
     : `Variation focus for this task: ${focus}. Make it central; do not stack in the other options.`;
@@ -711,7 +750,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const body = req.body ?? {};
   const category = String(body.category ?? "");
   const lang = String(body.lang ?? "en");
-  const gender = String(body.gender ?? "male");
+  const gender = String(body.gender ?? "");
   const mode = String(body.mode ?? "solo");
   const coupleId = typeof body.coupleId === "string" ? body.coupleId : null;
   if (!CATEGORIES.has(category)) return res.status(400).json({ error: "invalid_category" });
@@ -720,6 +759,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(400).json({ error: "invalid_request_id" });
   }
   const requestId: string = body.requestId ?? randomUUID();
+  const rawVariationTags: unknown[] = Array.isArray(body.recentVariationTags) ? body.recentVariationTags : [];
+  const recentVariationTags: TaskVariationTag[] = [...new Set(
+    rawVariationTags.filter((tag): tag is TaskVariationTag => isTaskVariationTag(tag)),
+  )].slice(0, 12);
   try {
     await claimFriendInvite(supabase, initData!, caller.id);
   } catch {
@@ -744,14 +787,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     if (credits < 1) return res.status(403).json({ error: "subscription_required" });
   }
 
-  let task = getFallback(category, lang, mode, requestId);
+  let task = getFallback(category, lang, mode, requestId, gender, recentVariationTags);
   let source: "ai" | "fallback" = "fallback";
   if (DEEPSEEK_API_KEY) {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 12_000);
     try {
         const roleInstruction = getGenderLine(lang, gender);
-        const systemPrompt = `${getPrompt(category, lang)}\n\n${MODE_INSTRUCTIONS[mode][lang]}\n\n${getVariationInstruction(category, lang, requestId, mode)}\n\n${roleInstruction}\n\n${getTaskQualityRules(lang, mode)}\n\n${LANGUAGE_INSTRUCTIONS[lang]}`;
+        const systemPrompt = `${getPrompt(category, lang)}\n\n${MODE_INSTRUCTIONS[mode][lang]}\n\n${getVariationInstruction(category, lang, requestId, mode, gender, recentVariationTags)}\n\n${roleInstruction}\n\n${getTaskQualityRules(lang, mode)}\n\n${LANGUAGE_INSTRUCTIONS[lang]}`;
       const aiRes = await fetch(DEEPSEEK_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${DEEPSEEK_API_KEY}` },
@@ -760,7 +803,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           { role: "system", content: systemPrompt },
           { role: "user", content: [
             LANGUAGE_INSTRUCTIONS[lang],
-            getTaskExamplesPrompt(category, lang, requestId, mode),
+            getTaskExamplesPrompt(category, lang, requestId, mode, gender),
           ].filter(Boolean).join("\n\n") },
         ], max_tokens: 180, temperature: 0.98 }),
       });
@@ -772,6 +815,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           && matchesRequestedLanguage(candidate, lang)
           && isTaskTextWellFormed(candidate, lang, mode)
           && isTaskTextModeAppropriate(candidate, lang, mode)
+          && hasAnatomicallyClearOralAct(candidate, lang, mode, gender === "female" ? "female" : "male")
           && hasCategorySexualAct(candidate, category, lang)
           && !forbidden.some(f => candidate.toLowerCase().includes(f))) {
           task = candidate;

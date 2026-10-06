@@ -74,6 +74,187 @@ const MODE_RULES: Record<string, Record<"solo" | "together", string>> = {
   },
 };
 
+export const TASK_VARIATION_TAGS = [
+  "mutual_masturbation",
+  "oral",
+  "sex_toy",
+  "sensory_play",
+  "edging",
+  "sexual_position",
+  "penetrative_sex",
+  "manual_stimulation",
+  "erotic_massage",
+  "kiss",
+  "hug",
+  "voice_note",
+  "selfie",
+  "shared_memory",
+  "message",
+  "touch",
+] as const;
+
+export type TaskVariationTag = (typeof TASK_VARIATION_TAGS)[number];
+
+const TASK_VARIATION_RULES: Record<string, Array<{ tag: TaskVariationTag; pattern: RegExp }>> = {
+  ru: [
+    { tag: "mutual_masturbation", pattern: /взаимн\p{L}*\s+мастурб|мастурбир\p{L}*.{0,30}друг\s+друга|ласка\p{L}*.{0,25}друг\s+друга\s+рук/iu },
+    { tag: "oral", pattern: /куни|куннилингус|минет|фелляци|оральн\p{L}*\s+секс|(?:клитор|вульв|пенис|член).{0,35}(?:язык|лиз|ртом)|(?:язык|лиз|ртом).{0,35}(?:клитор|вульв|пенис|член)/iu },
+    { tag: "sex_toy", pattern: /игрушк|вибратор|секс.?шоп/iu },
+    { tag: "sensory_play", pattern: /завяз\p{L}*.{0,20}глаз|маск\p{L}*.{0,20}сна|л[её]д|на\s+ощуп|зеркал|темнот|полумрак|свеч\p{L}*|музык\p{L}*/iu },
+    { tag: "edging", pattern: /до\s+края|на\s+краю|оргазм|не\s+давай.{0,35}законч|останов\p{L}*.{0,25}снова/iu },
+    { tag: "sexual_position", pattern: /позиц\p{L}*|в\s+позе|стоя.{0,25}(?:секс|заним)|поз[аы]\s+ложек|на\s+четвереньк|оседла\p{L}*/iu },
+    { tag: "penetrative_sex", pattern: /вагинальн\p{L}*\s+секс|проникнов\p{L}*|заним\p{L}*.{0,25}секс|секс.{0,25}проник/iu },
+    { tag: "manual_stimulation", pattern: /мастурб|пальц\p{L}*|ладон\p{L}*|рук\p{L}*.{0,25}(?:ласк|стимул)|стимулир\p{L}*.{0,25}(?:рук|пальц)/iu },
+    { tag: "erotic_massage", pattern: /массаж/iu },
+    { tag: "kiss", pattern: /поцел/iu },
+    { tag: "hug", pattern: /обним/iu },
+    { tag: "voice_note", pattern: /голосов\p{L}*.{0,20}(?:сообщ|запис)|аудио/iu },
+    { tag: "selfie", pattern: /селфи|фото.{0,20}себя|сним\p{L}*.{0,20}себя/iu },
+    { tag: "shared_memory", pattern: /воспоминан\p{L}*|вспомни\p{L}*|помнишь/iu },
+    { tag: "message", pattern: /напиши\p{L}*|сообщени\p{L}*|отправь.{0,15}сообщ/iu },
+    { tag: "touch", pattern: /прикосновен\p{L}*|касани\p{L}*|поглад\p{L}*|провед\p{L}*.{0,20}по\s+телу/iu },
+  ],
+  en: [
+    { tag: "mutual_masturbation", pattern: /mutual\s+masturb|masturb\w*.{0,30}each other|each other.{0,30}masturb/iu },
+    { tag: "oral", pattern: /cunnilingus|fellatio|blow\s?job|oral sex|(?:lick|suck|tongue).{0,35}(?:clitoris|vulva|vagina|penis|cock)|(?:clitoris|vulva|vagina|penis|cock).{0,35}(?:lick|suck|tongue)/iu },
+    { tag: "sex_toy", pattern: /sex toy|vibrator|sex shop/iu },
+    { tag: "sensory_play", pattern: /blindfold|ice cube|ice over|in the dark|darkness|mirror|candle|music|by touch/iu },
+    { tag: "edging", pattern: /edge(?:d|s|ing)?|orgasm|climax|stop.{0,25}start/iu },
+    { tag: "sexual_position", pattern: /position|spooning|on top|standing sex|on all fours|straddle/iu },
+    { tag: "penetrative_sex", pattern: /vaginal sex|penetrat\w*|intercourse|have sex/iu },
+    { tag: "manual_stimulation", pattern: /masturbat\w*|finger\w*|hand.{0,25}(?:genital|pleasure|clitoris|penis)|manual stimulation/iu },
+    { tag: "erotic_massage", pattern: /massage/iu },
+    { tag: "kiss", pattern: /kiss\w*/iu },
+    { tag: "hug", pattern: /hug\w*/iu },
+    { tag: "voice_note", pattern: /voice note|audio message/iu },
+    { tag: "selfie", pattern: /selfie|photo of yourself/iu },
+    { tag: "shared_memory", pattern: /shared memory|remember when|memory from/iu },
+    { tag: "message", pattern: /write.{0,20}message|send.{0,20}message|text your partner/iu },
+    { tag: "touch", pattern: /touch\w*|stroke\w*|caress\w*/iu },
+  ],
+  hi: [
+    { tag: "mutual_masturbation", pattern: /आपसी\s+हस्तमैथुन|एक-दूसरे.{0,30}(?:हस्तमैथुन|मास्टरबेशन)/u },
+    { tag: "oral", pattern: /मुखमैथुन|ओरल\s+सेक्स|भगांकुर|क्लिटोरिस|योनि.{0,30}(?:जीभ|चाट)|लिंग.{0,30}(?:जीभ|चाट)/u },
+    { tag: "sex_toy", pattern: /सेक्स\s*टॉय|वाइब्रेटर/u },
+    { tag: "sensory_play", pattern: /आँख.{0,15}बंद|आंख.{0,15}बंद|बर्फ|अंधेर|आईना|दर्पण|मोमबत्ती|संगीत/u },
+    { tag: "edging", pattern: /चरमोत्कर्ष|ऑर्गैज़्म|ऑर्गेज़्म|रोक.{0,20}फिर/u },
+    { tag: "sexual_position", pattern: /पोज़िशन|स्थिति|खड़े.{0,20}सेक्स|लेटे.{0,20}सेक्स/u },
+    { tag: "penetrative_sex", pattern: /प्रवेश|योनि.{0,20}सेक्स|संभोग/u },
+    { tag: "manual_stimulation", pattern: /हस्तमैथुन|उँगल|उंगली|हाथों से.{0,25}(?:सहल|उत्तेजित)/u },
+    { tag: "erotic_massage", pattern: /मालिश/u },
+    { tag: "kiss", pattern: /चूम/u },
+    { tag: "hug", pattern: /गले लग/u },
+    { tag: "voice_note", pattern: /वॉइस.{0,15}(?:नोट|संदेश)|आवाज़.{0,15}संदेश/u },
+    { tag: "selfie", pattern: /सेल्फ़ी|सेल्फी/u },
+    { tag: "shared_memory", pattern: /याद|स्मृति/u },
+    { tag: "message", pattern: /लिखो|लिखें|संदेश|मैसेज/u },
+    { tag: "touch", pattern: /स्पर्श|सहल/u },
+  ],
+  pt: [
+    { tag: "mutual_masturbation", pattern: /masturbaç\p{L}*.{0,30}(?:um ao outro|uma à outra|mutuamente)|masturbem.{0,25}um ao outro/iu },
+    { tag: "oral", pattern: /cunnilingus|fellatio|boquete|sexo oral|(?:língua|lambe|chupe).{0,35}(?:clitóris|vulva|vagina|pênis|penis)|(?:clitóris|vulva|vagina|pênis|penis).{0,35}(?:língua|lambe|chupe)/iu },
+    { tag: "sex_toy", pattern: /brinquedo sexual|vibrador|sex shop/iu },
+    { tag: "sensory_play", pattern: /venda.{0,15}(?:olhos|olho)|gelo|no escuro|espelho|vela|música|pelo toque/iu },
+    { tag: "edging", pattern: /limite do prazer|orgasmo|clímax|pare.{0,20}continue/iu },
+    { tag: "sexual_position", pattern: /posição|de conchinha|em pé.{0,20}sexo|de quatro|cavalg/iu },
+    { tag: "penetrative_sex", pattern: /sexo vaginal|penetraç\p{L}*|relação sexual/iu },
+    { tag: "manual_stimulation", pattern: /masturbaç\p{L}*|ded\p{L}*|mãos?.{0,25}(?:genitais|prazer|clitóris|pênis)/iu },
+    { tag: "erotic_massage", pattern: /massagem/iu },
+    { tag: "kiss", pattern: /beij\p{L}*/iu },
+    { tag: "hug", pattern: /abraç\p{L}*/iu },
+    { tag: "voice_note", pattern: /áudio|mensagem de voz/iu },
+    { tag: "selfie", pattern: /selfie|foto sua/iu },
+    { tag: "shared_memory", pattern: /lembrança|lembra quando|memória compartilhada/iu },
+    { tag: "message", pattern: /escrev\p{L}*.{0,20}mensagem|envie.{0,20}mensagem|mande.{0,20}mensagem/iu },
+    { tag: "touch", pattern: /toqu\p{L}*|acarici\p{L}*/iu },
+  ],
+  es: [
+    { tag: "mutual_masturbation", pattern: /masturbaci\p{L}*.{0,30}(?:mutuamente|el uno al otro|una a la otra)|mastúrben\p{L}*.{0,25}uno al otro/iu },
+    { tag: "oral", pattern: /cunnilingus|felaci[oó]n|mamad[ao]|sexo oral|(?:lengua|lame|chupa).{0,35}(?:cl[ií]toris|vulva|vagina|pene)|(?:cl[ií]toris|vulva|vagina|pene).{0,35}(?:lengua|lame|chupa)/iu },
+    { tag: "sex_toy", pattern: /juguete sexual|vibrador|sex.?shop/iu },
+    { tag: "sensory_play", pattern: /venda.{0,15}(?:ojos|ojo)|hielo|a oscuras|espejo|vela|música|por el tacto/iu },
+    { tag: "edging", pattern: /al borde|orgasmo|clímax|para.{0,20}y.{0,20}continúa/iu },
+    { tag: "sexual_position", pattern: /posición|de cucharita|de pie.{0,20}sexo|a cuatro patas|cabalga/iu },
+    { tag: "penetrative_sex", pattern: /sexo vaginal|penetraci\p{L}*|relaciones sexuales/iu },
+    { tag: "manual_stimulation", pattern: /masturbaci\p{L}*|ded\p{L}*|manos?.{0,25}(?:genitales|placer|cl[ií]toris|pene)/iu },
+    { tag: "erotic_massage", pattern: /masaje/iu },
+    { tag: "kiss", pattern: /bes\p{L}*/iu },
+    { tag: "hug", pattern: /abraz\p{L}*/iu },
+    { tag: "voice_note", pattern: /audio|nota de voz/iu },
+    { tag: "selfie", pattern: /selfi|selfie|foto tuya/iu },
+    { tag: "shared_memory", pattern: /recuerdo|¿te acuerdas|memoria compartida/iu },
+    { tag: "message", pattern: /escrib\p{L}*.{0,20}mensaje|env[ií]a.{0,20}mensaje|manda.{0,20}mensaje/iu },
+    { tag: "touch", pattern: /toc\p{L}*|acarici\p{L}*/iu },
+  ],
+};
+
+export function isTaskVariationTag(value: unknown): value is TaskVariationTag {
+  return typeof value === "string" && (TASK_VARIATION_TAGS as readonly string[]).includes(value);
+}
+
+export function getTaskVariationTag(text: string, lang: string): TaskVariationTag | null {
+  const rules = TASK_VARIATION_RULES[lang] ?? TASK_VARIATION_RULES.en;
+  return rules.find(({ pattern }) => pattern.test(text))?.tag ?? null;
+}
+
+interface OralActMarkers {
+  action: RegExp;
+  femaleRecipient: RegExp;
+  maleRecipient: RegExp;
+  ambiguous: RegExp;
+}
+
+const ORAL_ACT_MARKERS: Record<string, OralActMarkers> = {
+  ru: {
+    action: /куни|куннилингус|минет|фелляци|оральн\p{L}*\s+секс|(?:лиз\p{L}*|язык\p{L}*).{0,35}(?:клитор|вульв|пенис|член)|(?:клитор|вульв|пенис|член).{0,35}(?:лиз\p{L}*|язык\p{L}*)/iu,
+    femaleRecipient: /куни|куннилингус|клитор|вульв|влагалищ|вагин/iu,
+    maleRecipient: /минет|фелляци|пенис|член/iu,
+    ambiguous: /(?:куни|куннилингус|минет|фелляци)\s*[/|]\s*(?:куни|куннилингус|минет|фелляци)|(?:е[её]|ему|его)\s*[/|]\s*(?:е[её]|ему|его)|(?:она|он)\s*[/|]\s*(?:он|она)/iu,
+  },
+  en: {
+    action: /cunnilingus|fellatio|blow\s?job|oral sex|(?:lick\w*|tongue).{0,35}(?:clitoris|vulva|vagina|penis|cock)|(?:clitoris|vulva|vagina|penis|cock).{0,35}(?:lick\w*|tongue)/iu,
+    femaleRecipient: /cunnilingus|clitoris|vulva|vagina/iu,
+    maleRecipient: /fellatio|blow\s?job|penis|cock/iu,
+    ambiguous: /(?:cunnilingus|fellatio|blow\s?job|her|him)\s*[/|]\s*(?:cunnilingus|fellatio|blow\s?job|her|him)/iu,
+  },
+  hi: {
+    action: /मुखमैथुन|ओरल\s+सेक्स|(?:जीभ|चाट\p{L}*).{0,30}(?:भगांकुर|क्लिटोरिस|योनि|लिंग)|(?:भगांकुर|क्लिटोरिस|योनि|लिंग).{0,30}(?:जीभ|चाट\p{L}*)/u,
+    femaleRecipient: /भगांकुर|क्लिटोरिस|योनि|योनि-मुखमैथुन/u,
+    maleRecipient: /लिंग|पुरुष.{0,10}जननांग|मुखमैथुन.{0,20}लिंग/u,
+    ambiguous: /(?:मुखमैथुन|ओरल\s+सेक्स)\s*[/|]\s*(?:मुखमैथुन|ओरल\s+सेक्स)|(?:वह|उसके)\s*[/|]\s*(?:वह|उसके)/u,
+  },
+  pt: {
+    action: /cunnilingus|fellatio|boquete|sexo oral|(?:língua|lambe\p{L}*|chupe\p{L}*).{0,35}(?:clitóris|vulva|vagina|pênis|penis)|(?:clitóris|vulva|vagina|pênis|penis).{0,35}(?:língua|lambe\p{L}*|chupe\p{L}*)/iu,
+    femaleRecipient: /cunnilingus|clitóris|vulva|vagina/iu,
+    maleRecipient: /fellatio|boquete|pênis|penis|pau/iu,
+    ambiguous: /(?:cunnilingus|fellatio|boquete|ela|ele)\s*[/|]\s*(?:cunnilingus|fellatio|boquete|ela|ele)/iu,
+  },
+  es: {
+    action: /cunnilingus|felaci[oó]n|mamad[ao]|sexo oral|(?:lengua|lam\p{L}*|chup\p{L}*).{0,35}(?:cl[ií]toris|vulva|vagina|pene)|(?:cl[ií]toris|vulva|vagina|pene).{0,35}(?:lengua|lam\p{L}*|chup\p{L}*)/iu,
+    femaleRecipient: /cunnilingus|cl[ií]toris|vulva|vagina/iu,
+    maleRecipient: /felaci[oó]n|mamad[ao]|pene/iu,
+    ambiguous: /(?:cunnilingus|felaci[oó]n|mamad[ao]|ella|él|el)\s*[/|]\s*(?:cunnilingus|felaci[oó]n|mamad[ao]|ella|él|el)/iu,
+  },
+};
+
+export function hasAnatomicallyClearOralAct(
+  text: string,
+  lang: string,
+  mode: "solo" | "together",
+  gender: "male" | "female",
+): boolean {
+  const markers = ORAL_ACT_MARKERS[lang] ?? ORAL_ACT_MARKERS.en;
+  if (markers.ambiguous.test(text)) return false;
+  if (!markers.action.test(text)) return true;
+
+  const targetsFemaleAnatomy = markers.femaleRecipient.test(text);
+  const targetsMaleAnatomy = markers.maleRecipient.test(text);
+  if (mode === "together") return targetsFemaleAnatomy || targetsMaleAnatomy;
+  return gender === "male"
+    ? targetsFemaleAnatomy && !targetsMaleAnatomy
+    : targetsMaleAnatomy && !targetsFemaleAnatomy;
+}
+
 const META_PREFIXES: Record<string, RegExp> = {
   ru: /^(?:вот\s+(?:цитата|задание|вариант|текст)|(?:задание|ответ|цитата)\s*[:;—-])/iu,
   en: /^(?:here\s+(?:is|'s)\s+(?:the\s+)?(?:task|quote|text)|(?:task|answer|quote)\s*[:;—-])/iu,

@@ -903,8 +903,8 @@ export default function WishMap({ lang, coupleId, refreshKey, onOpenTask }: Wish
         .wm-entry-track{height:4px;overflow:hidden;border-radius:9px;background:rgba(108,67,74,.13)}
         .wm-entry-track span{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,#bd8190,#c79a74);transition:width .35s ease}
         .wm-entry-unavailable{margin-top:9px}
-        .wm-diary-backdrop{position:fixed;z-index:9990;inset:0;display:grid;place-items:center;overflow:auto;padding:14px;background:rgba(24,8,17,.72);backdrop-filter:blur(12px);animation:wm-dialog-fade .24s ease both}
-        .wm-diary-panel{--wm-paper:#27121e;--wm-ink:#fff2e5;--wm-muted:#d0b0b5;--wm-coral:#e3ad8b;--wm-line:rgba(255,233,219,.13);position:relative;width:min(100%,560px);max-height:calc(100dvh - 28px);overflow:auto;border:1px solid rgba(237,195,167,.28);border-radius:28px;background:radial-gradient(ellipse at 8% 0%,rgba(174,86,111,.28),transparent 40%),radial-gradient(ellipse at 100% 100%,rgba(148,91,76,.18),transparent 42%),linear-gradient(145deg,#351522 0%,#21101d 60%,#1b101c 100%);color:var(--wm-ink);box-shadow:0 30px 90px rgba(9,3,9,.48),inset 0 1px 0 rgba(255,230,210,.12);font-family:'DM Sans',sans-serif}
+        .wm-diary-backdrop{--wm-top-safe:max(74px,calc(env(safe-area-inset-top) + 58px));--wm-bottom-safe:max(14px,env(safe-area-inset-bottom));position:fixed;z-index:9990;inset:0;display:grid;place-items:center;overflow:auto;padding:var(--wm-top-safe) 14px var(--wm-bottom-safe);background:rgba(24,8,17,.72);backdrop-filter:blur(12px);animation:wm-dialog-fade .24s ease both}
+        .wm-diary-panel{--wm-paper:#27121e;--wm-ink:#fff2e5;--wm-muted:#d0b0b5;--wm-coral:#e3ad8b;--wm-line:rgba(255,233,219,.13);position:relative;width:min(100%,560px);max-height:calc(100dvh - var(--wm-top-safe) - var(--wm-bottom-safe));overflow:auto;border:1px solid rgba(237,195,167,.28);border-radius:28px;background:radial-gradient(ellipse at 8% 0%,rgba(174,86,111,.28),transparent 40%),radial-gradient(ellipse at 100% 100%,rgba(148,91,76,.18),transparent 42%),linear-gradient(145deg,#351522 0%,#21101d 60%,#1b101c 100%);color:var(--wm-ink);box-shadow:0 30px 90px rgba(9,3,9,.48),inset 0 1px 0 rgba(255,230,210,.12);font-family:'DM Sans',sans-serif}
         .wm-diary-panel .wm-inner{padding:25px 25px 22px}
         .wm-diary-close{position:absolute;z-index:3;top:14px;right:14px;display:grid;place-items:center;width:36px;height:36px;border:1px solid rgba(255,226,209,.18);border-radius:50%;background:rgba(255,245,232,.08);color:#f8e2d5;cursor:pointer}
         .wm-diary-close:hover{background:rgba(255,245,232,.15)}
@@ -965,7 +965,7 @@ export default function WishMap({ lang, coupleId, refreshKey, onOpenTask }: Wish
         .wm-dialog-text{color:#fff0e5}
         .wm-dialog-rule{background:linear-gradient(90deg,transparent,rgba(255,227,211,.2),transparent)}
         .wm-dialog-hint{color:#d5b7bb}
-        @media(max-width:560px){.wm-diary-panel{border-radius:23px}.wm-diary-panel .wm-inner{padding:23px 18px 18px}.wm-diary-backdrop{padding:9px}}
+        @media(max-width:560px){.wm-diary-panel{border-radius:23px}.wm-diary-panel .wm-inner{padding:23px 18px 18px}.wm-diary-backdrop{padding:var(--wm-top-safe) 9px var(--wm-bottom-safe)}}
         @media(prefers-reduced-motion:reduce){.wm-diary-trigger,.wm-diary-panel *,.wm-diary-backdrop{animation:none!important;transition:none!important}}
         /* Touché's paper-and-ink language: playful on the surface, intimate inside. */
         .wm-diary-trigger{gap:12px;border:2px solid #162238;border-radius:18px;background:linear-gradient(120deg,#fff2bd 0%,#ffe2d6 100%);color:#162238;box-shadow:4px 4px 0 #162238}

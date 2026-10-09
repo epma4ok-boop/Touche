@@ -4,7 +4,7 @@ import CategoryScreen from "@/pages/CategoryScreen";
 import ScenarioScreen from "@/pages/ScenarioScreen";
 import SplashScreen from "@/components/SplashScreen";
 import LanguageSelect from "@/components/LanguageSelect";
-import { type Gender, GENDER_KEY } from "@/components/GenderSelect";
+import GenderSelect, { type Gender, GENDER_KEY } from "@/components/GenderSelect";
 import OnboardingScreen from "@/components/OnboardingScreen";
 import { LANG_KEY, ONBOARDED_KEY, CATEGORIES_ORDER, type Lang, type Category } from "@/data/i18n";
 import { ACTIVE_SCENARIO_KEY, getActiveScenarioStorageKey, type ActiveScenario } from "@/pages/ScenarioScreen";
@@ -270,6 +270,7 @@ export default function App() {
     }, []);
 
     const [phase, setPhase] = useState<AppPhase>("splash");
+    const [phaseAfterGender, setPhaseAfterGender] = useState<"home" | "category" | "scenario">("home");
     const [lang, setLang] = useState<Lang>("ru");
   const [gender, setGender] = useState<Gender | undefined>(getSavedGender() ?? undefined);
     const [activeCategory, setActiveCategory] = useState<Category>("compliments");
@@ -377,7 +378,8 @@ export default function App() {
         setMode("together");
         setLang(savedLang ?? "ru");
         if (savedGender) setGender(savedGender);
-        setPhase(savedLang ? "category" : "lang");
+        setPhaseAfterGender("category");
+        setPhase(savedLang ? (savedGender ? "category" : "gender") : "lang");
         return;
       }
       const scenarioId = params.get("scenario");
@@ -388,7 +390,8 @@ export default function App() {
           saveActiveScenario(session);
           setLang(savedLang ?? "ru");
           if (savedGender) setGender(savedGender);
-          setPhase("scenario");
+          setPhaseAfterGender("scenario");
+          setPhase(savedLang ? (savedGender ? "scenario" : "gender") : "lang");
           return;
         }
       }
@@ -414,7 +417,8 @@ export default function App() {
               saveActiveScenario(restored);
               setLang(savedLang ?? "ru");
               if (savedGender) setGender(savedGender);
-              setPhase("scenario");
+              setPhaseAfterGender("scenario");
+              setPhase(savedLang ? (savedGender ? "scenario" : "gender") : "lang");
               return;
             }
           }
@@ -429,7 +433,7 @@ export default function App() {
       if (savedLang) {
         setLang(savedLang);
         if (savedGender) setGender(savedGender);
-        setPhase("home");
+        setPhase(savedGender ? "home" : "gender");
       } else {
         setPhase("lang");
       }
@@ -439,19 +443,19 @@ export default function App() {
       try { localStorage.setItem(LANG_KEY, chosen); } catch {}
       setLang(chosen);
       if (!isOnboarded()) setPhase("onboarding");
-      else setPhase(sharedTask ? "category" : "home");
-    }, [sharedTask]);
+      else setPhase(gender ? phaseAfterGender : "gender");
+    }, [gender, phaseAfterGender]);
 
     const handleOnboardingDone = useCallback(() => {
       markOnboarded();
-      setPhase(sharedTask ? "category" : "home");
-    }, [sharedTask]);
+      setPhase(gender ? phaseAfterGender : "gender");
+    }, [gender, phaseAfterGender]);
 
     const handleGenderSelect = useCallback((chosen: Gender) => {
       try { localStorage.setItem(GENDER_KEY, chosen); } catch {}
       setGender(chosen);
-      setPhase("home");
-    }, []);
+      setPhase(phaseAfterGender);
+    }, [phaseAfterGender]);
 
     const handleLanguageOpen = useCallback(() => setPhase("lang"), []);
     const handleLanguageCancel = useCallback(() => setPhase("home"), []);
@@ -543,6 +547,7 @@ export default function App() {
           />
         )}
         {phase === "onboarding"  && <OnboardingScreen lang={lang} onDone={handleOnboardingDone} />}
+        {phase === "gender"      && <GenderSelect lang={lang} onSelect={handleGenderSelect} />}
         {phase === "home"        && (
           <Home
             lang={lang}

@@ -348,11 +348,26 @@ export default function CategoryScreen({ lang, gender, category, onBack, onCateg
   }, [category]);
 
   useEffect(() => {
-    const refresh = () => { void refreshLimits(); };
-    refresh();
-    window.addEventListener("focus", refresh);
-    return () => window.removeEventListener("focus", refresh);
-  }, [refreshLimits]);
+    let active = true;
+    const refresh = async (checkInitialAccess: boolean) => {
+      const limits = await refreshLimits();
+      if (!active || !checkInitialAccess || !sensitive || initialSharedTask || !limits) return;
+      const startParam = window.Telegram?.WebApp?.initDataUnsafe?.start_param ?? "";
+      if (/^invite_[1-9][0-9]*$/.test(startParam) || limits.isPremium === true) return;
+      const count = Number(limits.remaining);
+      if (Number.isFinite(count) && count <= 0) {
+        setPaywallNotice(null);
+        setErrorKind("subscription_required");
+      }
+    };
+    void refresh(true);
+    const refreshOnFocus = () => { void refresh(false); };
+    window.addEventListener("focus", refreshOnFocus);
+    return () => {
+      active = false;
+      window.removeEventListener("focus", refreshOnFocus);
+    };
+  }, [initialSharedTask, refreshLimits, sensitive]);
 
   const goToCategory = useCallback((next: Category) => {
     window.Telegram?.WebApp?.HapticFeedback?.impactOccurred("light");

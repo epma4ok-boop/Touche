@@ -49,6 +49,8 @@ interface HomeProps {
   onLinkCouple: (refUserId: number) => Promise<boolean>;
   onUnlinkCouple: () => Promise<boolean>;
   onSubscribe: () => Promise<boolean>;
+  onTutorialPairFlow?: (open: boolean) => void;
+  onTutorialModeSelected?: () => void;
 }
 
 function useTelegramTopInset(): number {
@@ -169,11 +171,12 @@ function NeonIcon({ type }: { type: Category | "scenarios" | "invite" | "pair" }
 
 /* ─── Card ─────────────────────────────────────────────────────── */
 function Card({
-  type, title, sub, onClick, index, remaining, remainingLabel,
+  type, title, sub, onClick, index, remaining, remainingLabel, testId,
 }: {
   type: Category | "scenarios" | "invite" | "pair";
   title: string; sub?: string; onClick: () => void; index: number;
   remaining?: number | null; remainingLabel?: string;
+  testId?: string;
 }) {
   const [pressed, setPressed] = useState(false);
   const [visible, setVisible] = useState(false);
@@ -187,6 +190,7 @@ function Card({
     <button
       className={`pop-card pop-card-${type}`}
       onClick={onClick}
+      data-testid={testId}
       onPointerDown={() => { setPressed(true); window.Telegram?.WebApp?.HapticFeedback?.impactOccurred("light"); }}
       onPointerUp={() => setPressed(false)}
       onPointerLeave={() => setPressed(false)}
@@ -327,7 +331,7 @@ function ModeSwitcher({ lang, mode, coupleId, onChange }: {
 }) {
   const labels = MODE_LABELS[lang];
   return (
-    <div className="pop-mode" style={{
+    <div className="pop-mode" data-testid="tutorial-mode-switcher" style={{
       display: "grid", gridTemplateColumns: "1fr 1fr", gap: 4, padding: 4,
       borderRadius: 18, background: "#f0e9df",
       border: "none",
@@ -337,7 +341,7 @@ function ModeSwitcher({ lang, mode, coupleId, onChange }: {
         const title = item === "solo" ? labels.solo : labels.together;
         const subtitle = item === "solo" ? labels.soloSub : labels.togetherSub;
         return (
-          <button key={item} onClick={() => onChange(item)} style={{
+          <button key={item} data-testid={`button-mode-${item}`} onClick={() => onChange(item)} style={{
             minHeight: 56, border: "none",
             borderRadius: 14, cursor: "pointer", textAlign: "left",
             padding: "8px 12px", background: active ? "#fffaf3" : "transparent",
@@ -1189,7 +1193,7 @@ export default function Home({
   lang, gender, coupleId, mode, pendingRefUserId,
   onCategorySelect, onScenarioOpen, onOpenSharedTask, onLanguageOpen, onGenderSwitch,
   onModeChange,
-  onLinkCouple, onUnlinkCouple, onSubscribe,
+  onLinkCouple, onUnlinkCouple, onSubscribe, onTutorialPairFlow, onTutorialModeSelected,
 }: HomeProps) {
   const t = UI[lang];
   const [mounted, setMounted] = useState(false);
@@ -1225,14 +1229,22 @@ export default function Home({
     if (pendingRefUserId) setShowCoupleModal(true);
   }, [pendingRefUserId, coupleId]);
 
+  useEffect(() => {
+    onTutorialPairFlow?.(showCoupleModal);
+    return () => onTutorialPairFlow?.(false);
+  }, [onTutorialPairFlow, showCoupleModal]);
+
   const handleModeSelection = useCallback((nextMode: AppMode) => {
     if (nextMode === "together" && !coupleId) {
+      onTutorialPairFlow?.(true);
       setShowCoupleModal(true);
       window.Telegram?.WebApp?.HapticFeedback?.impactOccurred("light");
+      onTutorialModeSelected?.();
       return;
     }
     onModeChange(nextMode);
-  }, [coupleId, onModeChange]);
+    onTutorialModeSelected?.();
+  }, [coupleId, onModeChange, onTutorialModeSelected, onTutorialPairFlow]);
 
   useEffect(() => {
     let active = true;
@@ -1292,7 +1304,7 @@ export default function Home({
 
   const togetherCards = (
     <>
-      <Card type="compliments" title={t.catCompliments} sub={t.catComplimentsSub} onClick={() => onCategorySelect("compliments")} index={0} {...cardLimit("compliments")} />
+      <Card type="compliments" title={t.catCompliments} sub={t.catComplimentsSub} onClick={() => onCategorySelect("compliments")} index={0} testId="button-category-compliments" {...cardLimit("compliments")} />
       <Card type="tenderness" title={t.catTenderness} sub={t.catTendernessSub} onClick={() => onCategorySelect("tenderness")} index={1} {...cardLimit("tenderness")} />
       <Card type="desire" title={t.catDesire} sub={t.catDesireSub} onClick={() => onCategorySelect("desire")} index={2} {...cardLimit("desire")} />
       <Card type="passion" title={t.catPassion} sub={t.catPassionSub} onClick={() => onCategorySelect("passion")} index={3} {...cardLimit("passion")} />
@@ -1303,7 +1315,7 @@ export default function Home({
 
   const soloCards = (
     <>
-      <Card type="compliments" title={t.catCompliments} sub={t.catComplimentsSub} onClick={() => onCategorySelect("compliments")} index={0} {...cardLimit("compliments")} />
+      <Card type="compliments" title={t.catCompliments} sub={t.catComplimentsSub} onClick={() => onCategorySelect("compliments")} index={0} testId="button-category-compliments" {...cardLimit("compliments")} />
       <Card type="tenderness" title={t.catTenderness} sub={t.catTendernessSub} onClick={() => onCategorySelect("tenderness")} index={1} {...cardLimit("tenderness")} />
       <Card type="desire" title={t.catDesire} sub={t.catDesireSub} onClick={() => onCategorySelect("desire")} index={2} {...cardLimit("desire")} />
       <Card

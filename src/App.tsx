@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import Home from "@/pages/Home";
 import CategoryScreen from "@/pages/CategoryScreen";
 import ScenarioScreen from "@/pages/ScenarioScreen";
@@ -9,6 +9,7 @@ import OnboardingScreen from "@/components/OnboardingScreen";
 import { LANG_KEY, ONBOARDED_KEY, CATEGORIES_ORDER, type Lang, type Category } from "@/data/i18n";
 import { ACTIVE_SCENARIO_KEY, getActiveScenarioStorageKey, type ActiveScenario } from "@/pages/ScenarioScreen";
 import type { SharedTaskSnapshot } from "@/data/sharedPair";
+import FirstRunTutorial, { type TutorialStep } from "@/components/FirstRunTutorial";
 
 type AppPhase = "splash" | "lang" | "onboarding" | "gender" | "home" | "category" | "scenario" | "shared_task_error";
 export type AppMode = "solo" | "together";
@@ -17,6 +18,11 @@ const COUPLE_ID_KEY = "touche_couple_id";
 const MODE_KEY = "touche_mode";
 const USER_ID_KEY = "touche_user_id";
 const HISTORY_KEY = "touche_history_v2";
+const TUTORIAL_KEY = "touche_tutorial_v1";
+
+function getTutorialStorageKey(userId: number): string {
+  return `${TUTORIAL_KEY}_${userId}`;
+}
 
 function getTelegramStartParam(): string {
   const fromInitData = window.Telegram?.WebApp?.initDataUnsafe?.start_param;
@@ -280,6 +286,10 @@ export default function App() {
     const [pendingRefUserId, setPendingRefUserId] = useState<number | null>(null);
      const [sharedTask, setSharedTask] = useState<SharedTaskSnapshot | null>(null);
      const [failedSharedTaskId, setFailedSharedTaskId] = useState<string | null>(null);
+     const [tutorialStep, setTutorialStep] = useState<TutorialStep | null>(null);
+     const [tutorialPairFlowOpen, setTutorialPairFlowOpen] = useState(false);
+     const tutorialEligibleRef = useRef(true);
+     const tutorialSeenRef = useRef(false);
 
     useEffect(() => {
       const telegramUserId = window.Telegram?.WebApp?.initDataUnsafe?.user?.id;
@@ -351,6 +361,14 @@ export default function App() {
       const savedLang = getSavedLang();
       const savedGender = getSavedGender();
       const startParam = getTelegramStartParam();
+       const initialParams = new URLSearchParams(window.location.search);
+       if (
+         /^invite_[1-9][0-9]*$/.test(startParam) ||
+         /^ref_[1-9][0-9]*$/.test(startParam) ||
+         initialParams.has("shared_task") ||
+         initialParams.has("scenario") ||
+         initialParams.get("wish_map") === "1"
+       ) tutorialEligibleRef.current = false;
 
       const pairInvite = /^ref_([1-9][0-9]*)$/.exec(startParam);
       if (pairInvite) {
@@ -361,7 +379,7 @@ export default function App() {
         }
       }
 
-      const params = new URLSearchParams(window.location.search);
+       const params = initialParams;
       const sharedTaskId = params.get("shared_task");
       if (sharedTaskId && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(sharedTaskId)) {
         const loadedTask = await apiFetchSharedTask(sharedTaskId);
@@ -439,6 +457,34 @@ export default function App() {
       }
     }, []);
 
+     useEffect(() => {
+       if (phase !== "home" || !tutorialEligibleRef.current || tutorialSeenRef.current) return;
+       const telegramUserId = window.Telegram?.WebApp?.initDataUnsafe?.user?.id;
+       if (!telegramUserId) return;
+       try {
+         if (localStorage.getItem(getTutorialStorageKey(telegramUserId)) === "1") {
+           tutorialSeenRef.current = true;
+           return;
+         }
+       } catch {
+         // The tour remains skippable if Telegram storage is unavailable.
+       }
+       tutorialSeenRef.current = true;
+       setTutorialStep(1);
+     }, [phase]);
+
+     const completeTutorial = useCallback(() => {
+       const telegramUserId = window.Telegram?.WebApp?.initDataUnsafe?.user?.id;
+       if (telegramUserId) {
+         try { localStorage.setItem(getTutorialStorageKey(telegramUserId), "1"); } catch {}
+       }
+       tutorialSeenRef.current = true;
+       setTutorialStep(null);
+       setTutorialPairFlowOpen(false);
+       setSharedTask(null);
+       if (phase !== "home") setPhase("home");
+     }, [phase]);
+
     const handleLangSelect = useCallback((chosen: Lang) => {
       try { localStorage.setItem(LANG_KEY, chosen); } catch {}
       setLang(chosen);
@@ -466,8 +512,9 @@ export default function App() {
       setSwipeDir(newIdx >= curIdx ? "left" : "right");
       setActiveCategory(cat);
       setSharedTask(null);
+      if (tutorialStep === 3 && cat === "compliments") setTutorialStep(4);
       setPhase("category");
-    }, [activeCategory]);
+    }, [activeCategory, tutorialStep]);
 
     const handleCategorySelectWithAgeCheck = useCallback((cat: Category) => {
       handleCategorySelect(cat);
@@ -567,6 +614,8 @@ export default function App() {
             onLinkCouple={handleLinkCouple}
              onUnlinkCouple={handleUnlinkCouple}
              onSubscribe={() => apiSubscribe(lang)}
+            onTutorialPairFlow={setTutorialPairFlowOpen}
+             onTutorialModeSelected={() => setTutorialStep((current) => current === 2 ? 3 : current)}
           />
         )}
         {phase === "category"    && (
@@ -581,6 +630,8 @@ export default function App() {
             coupleId={coupleId}
              mode={mode}
              initialSharedTask={sharedTask}
+              tutorialDemo={tutorialStep === 4 || tutorialStep === 5}
+              onTutorialDemoComplete={() => setTutorialStep(5)}
              onUpgrade={() => apiSubscribe(lang)}
              onBuyPremiumTask={(category) => apiBuyPremiumTask(category, lang)}
           />
@@ -593,6 +644,16 @@ export default function App() {
             <button type="button" onClick={handleRetrySharedTask} style={{ padding: "13px 18px", borderRadius: 14, border: 0, background: "#ff6f61", color: "#162238", fontWeight: 700 }}>{lang === "ru" ? "Попробовать снова" : "Try again"}</button>
             <button type="button" onClick={() => setPhase("home")} style={{ padding: "10px 18px", borderRadius: 14, border: "1px solid rgba(255,250,243,.35)", background: "transparent", color: "#fffaf3" }}>{lang === "ru" ? "На главную" : "Go home"}</button>
           </main>
+        )}
+        {tutorialStep !== null && (
+          <FirstRunTutorial
+            lang={lang}
+            step={tutorialStep}
+            suspended={tutorialPairFlowOpen}
+            onStart={() => setTutorialStep(2)}
+            onFinish={completeTutorial}
+            onSkip={completeTutorial}
+          />
         )}
       </>
     );

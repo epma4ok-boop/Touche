@@ -10,6 +10,7 @@ import { LANG_KEY, ONBOARDED_KEY, CATEGORIES_ORDER, type Lang, type Category } f
 import { ACTIVE_SCENARIO_KEY, getActiveScenarioStorageKey, type ActiveScenario } from "@/pages/ScenarioScreen";
 import type { SharedTaskSnapshot } from "@/data/sharedPair";
 import FirstRunTutorial, { type TutorialStep } from "@/components/FirstRunTutorial";
+import { trackAnalyticsEvent } from "@/analytics";
 
 type AppPhase = "splash" | "lang" | "onboarding" | "gender" | "home" | "category" | "scenario" | "shared_task_error";
 export type AppMode = "solo" | "together";
@@ -290,6 +291,21 @@ export default function App() {
      const [tutorialPairFlowOpen, setTutorialPairFlowOpen] = useState(false);
      const tutorialEligibleRef = useRef(true);
      const tutorialSeenRef = useRef(false);
+    const analyticsOpenTrackedRef = useRef(false);
+    const analyticsScreenRef = useRef<AppPhase | null>(null);
+
+    useEffect(() => {
+      if (analyticsOpenTrackedRef.current) return;
+      analyticsOpenTrackedRef.current = true;
+      trackAnalyticsEvent("app_open");
+    }, []);
+
+    useEffect(() => {
+      if (!["home", "category", "scenario", "shared_task_error"].includes(phase)) return;
+      if (analyticsScreenRef.current === phase) return;
+      analyticsScreenRef.current = phase;
+      trackAnalyticsEvent("screen_view", phase as "home" | "category" | "scenario" | "shared_task_error");
+    }, [phase]);
 
     useEffect(() => {
       const telegramUserId = window.Telegram?.WebApp?.initDataUnsafe?.user?.id;

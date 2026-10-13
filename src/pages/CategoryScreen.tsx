@@ -5,6 +5,7 @@ import HeartbeatCanvas from "@/components/HeartbeatCanvas";
 import { UI, CATEGORY_CONFIG, CATEGORIES_ORDER, type Lang, type Category } from "@/data/i18n";
 import { getTaskVariationTag, type TaskVariationTag } from "@/data/task-quality";
 import { playReveal } from "@/hooks/useSensualSound";
+import { trackAnalyticsEvent } from "@/analytics";
 import HistoryPanel, { type HistoryEntry } from "@/components/HistoryPanel";
 import type { SharedTaskSnapshot } from "@/data/sharedPair";
 import "./CategoryPop.css";
@@ -448,6 +449,7 @@ export default function CategoryScreen({ lang, gender, category, onBack, onCateg
     requestIdRef.current = null;
     try { sessionStorage.removeItem(requestKey); } catch { /* storage unavailable */ }
     const picked = generated.result.task;
+    trackAnalyticsEvent("task_generated");
     if (typeof generated.result.remaining === "number") setRemaining(generated.result.remaining);
     const entry: HistoryEntry = { id: `${Date.now()}-${Math.random()}`, text: picked, category, date: new Date().toISOString() };
     const nextHistory = [...history, entry]; saveHistory(nextHistory); setHistory(nextHistory);

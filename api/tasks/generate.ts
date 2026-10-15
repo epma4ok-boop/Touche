@@ -6,7 +6,7 @@ import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { randomUUID } from "crypto";
 import { createClient } from "@supabase/supabase-js";
 import { validateTelegramInitData } from "../couple/_auth.js";
-import { appDate } from "../limits.js";
+import { appDate, PREMIUM_DAILY_LIMIT } from "../limits.js";
 import { claimFriendInvite } from "../referrals/_claim.js";
 import { getTaskQualityRules, getTaskVariationTag, hasAnatomicallyClearOralAct, hasConcreteSexualAct, hasHardSexualAct, isSharedTaskText, isTaskTextModeAppropriate, isTaskTextWellFormed, isTaskVariationTag, type TaskVariationTag } from "../../src/data/task-quality.js";
 import { OWNER_TELEGRAM_ID } from "../../src/config.js";
@@ -777,6 +777,18 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     partnerUserId = data.user_a_id === caller.id ? data.user_b_id : data.user_a_id;
   }
   const premium = caller.id === OWNER_ID || !!(await supabase.from("user_subscriptions").select("expires_at").eq("user_id", caller.id).gt("expires_at", new Date().toISOString()).maybeSingle()).data;
+  if (premium && PAID_CATEGORIES.has(category)) {
+    const { data: dailyUsage, error: dailyUsageError } = await supabase.from("user_daily_limits")
+      .select("count")
+      .eq("user_id", caller.id)
+      .eq("category", `premium_${category}`)
+      .eq("date", appDate())
+      .maybeSingle();
+    if (dailyUsageError) return res.status(500).json({ error: "limits_read_failed" });
+    if (Number(dailyUsage?.count ?? 0) >= PREMIUM_DAILY_LIMIT) {
+      return res.status(403).json({ error: "limit_exceeded", remaining: 0, isPremium: true });
+    }
+  }
   if (!premium && PAID_CATEGORIES.has(category)) {
     const [{ data: referralCredit, error: referralError }, { data: paidCredit, error: paidCreditError }] = await Promise.all([
       supabase.from("referral_task_credits").select("balance").eq("user_id", caller.id).eq("category", category).maybeSingle(),

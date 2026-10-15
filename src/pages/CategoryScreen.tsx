@@ -381,7 +381,7 @@ export default function CategoryScreen({ lang, gender, category, onBack, onCateg
       if (!res.ok) return null;
       const data = await res.json();
       setIsPremium(data.isPremium === true);
-      setRemaining(data.isPremium ? null : Number(data.remaining));
+      setRemaining(data.remaining === null || data.remaining === undefined ? null : Number(data.remaining));
       return data as { isPremium?: boolean; remaining?: number };
     } catch { return null; }
   }, [category]);
@@ -392,11 +392,11 @@ export default function CategoryScreen({ lang, gender, category, onBack, onCateg
       const limits = await refreshLimits();
       if (!active || !checkInitialAccess || !sensitive || initialSharedTask || !limits) return;
       const startParam = window.Telegram?.WebApp?.initDataUnsafe?.start_param ?? "";
-      if (/^invite_[1-9][0-9]*$/.test(startParam) || limits.isPremium === true) return;
+      if (/^invite_[1-9][0-9]*$/.test(startParam)) return;
       const count = Number(limits.remaining);
       if (Number.isFinite(count) && count <= 0) {
         setPaywallNotice(null);
-        setErrorKind("subscription_required");
+        setErrorKind(limits.isPremium === true ? "limit_exceeded" : "subscription_required");
       }
     };
     void refresh(true);
@@ -565,7 +565,7 @@ export default function CategoryScreen({ lang, gender, category, onBack, onCateg
               <button type="button" data-testid="button-reopen-shared-task" onClick={() => setShowReveal(true)} style={{ flexShrink: 0, padding: "9px 11px", border: "1px solid rgba(22,34,56,.18)", borderRadius: 11, background: "#fffaf3", color: "#162238", fontSize: 10, fontWeight: 700, cursor: "pointer" }}>{sharedCopy.openTask}</button>
             </div>
           )}
-        {(remaining !== null || isPremium) && <div className="category-pop__remaining" data-testid="status-remaining">{isPremium ? (lang === "ru" ? "Задания без ограничений" : "Unlimited tasks") : t.remaining(remaining!)}</div>}
+        {(remaining !== null || isPremium) && <div className="category-pop__remaining" data-testid="status-remaining">{remaining === null ? (lang === "ru" ? "Задания без ограничений" : "Unlimited tasks") : t.remaining(remaining)}</div>}
         <section className="category-pop__generator">
            <div className="category-pop__generator-head"><span>{t.hint}</span><b>{String(index + 1).padStart(2, "0")} / {String(CATEGORIES_ORDER.length).padStart(2, "0")}</b></div>
           <div className="category-pop__heartbeat" data-testid="tutorial-heartbeat-target">

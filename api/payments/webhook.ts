@@ -187,9 +187,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       && ["compliments", "tenderness", "desire", "passion", "hard"].includes(payload?.category)
       && payload?.count === 3;
     const isPremiumTask = payload?.type === "premium_task"
-      && ["passion", "hard"].includes(payload?.category)
-      && payload?.count === 1;
-    const expectedAmount = isSubscription ? 199 : isPremiumTask ? 20 : 10;
+      && ["compliments", "tenderness", "desire", "passion", "hard"].includes(payload?.category)
+      && payload?.count === 1
+      && (
+        (payload?.priceTier === "premium" && payload?.amount === 5)
+        || (payload?.priceTier === "standard" && payload?.amount === 20)
+        || (payload?.priceTier === undefined && payload?.amount === undefined)
+      );
+    const expectedAmount = isSubscription ? 199 : isPremiumTask ? (payload?.amount ?? 20) : 10;
     const valid = payload?.version === 1
       && Number.isSafeInteger(payload.userId)
       && payload.userId === Number(update.pre_checkout_query.from?.id)
@@ -220,15 +225,20 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const chatId   = msg.chat.id as number;
     const payment  = msg.successful_payment;
 
-    let payload: { version?: number; userId?: number; type?: string; category?: string; count?: number; date?: string; months?: number } = {};
+    let payload: { version?: number; userId?: number; type?: string; category?: string; count?: number; date?: string; months?: number; amount?: number; priceTier?: string } = {};
     try { payload = JSON.parse(payment.invoice_payload); } catch {}
 
     const userId = payload.userId;
     const chargeId = String(payment.telegram_payment_charge_id ?? "");
     const isPremiumTask = payload.type === "premium_task"
-      && ["passion", "hard"].includes(payload.category ?? "")
-      && payload.count === 1;
-    const expectedAmount = payload.type === "subscription" ? 199 : isPremiumTask ? 20 : 10;
+      && ["compliments", "tenderness", "desire", "passion", "hard"].includes(payload.category ?? "")
+      && payload.count === 1
+      && (
+        (payload.priceTier === "premium" && payload.amount === 5)
+        || (payload.priceTier === "standard" && payload.amount === 20)
+        || (payload.priceTier === undefined && payload.amount === undefined)
+      );
+    const expectedAmount = payload.type === "subscription" ? 199 : isPremiumTask ? (payload.amount ?? 20) : 10;
     const validPayload = payload.version === 1
       && Number.isSafeInteger(userId)
       && userId === chatId
@@ -308,7 +318,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     if (payload.type === "subscription") {
       await sendMessage(chatId,
-        `🔓 <b>Touché Premium активирован!</b>\n\nТеперь доступны Страсть, Хард, ИИ-сценарии и задания без дневного лимита.\n\nПодписка активна 30 дней 💕`,
+         `🔓 <b>Touché Premium активирован!</b>\n\nСтрасть и Хард — по 3 задания в день. ИИ-сценарии — 1 в день. Дополнительное задание стоит 5 ⭐.\n\nПодписка активна 30 дней 💕`,
         {
           reply_markup: {
             inline_keyboard: [[{
@@ -324,9 +334,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         `✨ <b>+${escapeHtml(String(count))} задания добавлено!</b>\n\nВозвращайся в приложение — они уже ждут тебя 💕`
       );
     } else if (payload.type === "premium_task") {
-      const category = payload.category === "passion" ? "Страсть" : "Хард";
       await sendMessage(chatId,
-        `✨ <b>Премиум-задание куплено!</b>\n\nДля категории «${escapeHtml(category)}» добавлен один доступ. Вернись в Touché и получи задание 💕`
+        `✨ <b>Дополнительное задание куплено!</b>\n\nДля выбранной категории добавлен один доступ. Вернись в Touché и получи задание 💕`
       );
     }
 

@@ -57,7 +57,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         ? "myid_command"
         : update?.message?.text?.startsWith("/start")
           ? "start_command"
-          : "other";
+          : update?.message
+            ? "incoming_message"
+            : "other";
   console.info("[telegram-webhook] update received", { update_id: updateId, kind: updateKind });
 
   // Admin-only private command: /send <Telegram ID> <message>
@@ -136,7 +138,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
       if (isValid) {
         await sendMessage(chatId,
-          `💝 Ты получил(а) приглашение от партнёра!\n\nОткрой <b>Touché</b> и принимай задания вместе:`,
+          `💝 Ты получил(а) приглашение от партнёра!\n\nОткрой <b>Touché</b> и принимай задания вместе.\n\nЕсли возникнет вопрос, напиши сюда — сообщение увидит администратор.`,
           {
             reply_markup: {
               inline_keyboard: [[{
@@ -148,7 +150,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         );
       } else {
         await sendMessage(chatId,
-          `Привет! Открой <b>Touché</b> — задания для пар на вечер 💕`,
+          `Привет! Открой <b>Touché</b> — задания для пар на вечер 💕\n\nЕсли возникнет вопрос, напиши сюда — сообщение увидит администратор.`,
           {
             reply_markup: {
               inline_keyboard: [[{
@@ -161,7 +163,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       }
     } else {
       await sendMessage(chatId,
-        `Привет! Открой <b>Touché</b> — задания для пар на вечер 💕`,
+        `Привет! Открой <b>Touché</b> — задания для пар на вечер 💕\n\nЕсли возникнет вопрос, напиши сюда — сообщение увидит администратор.`,
         {
           reply_markup: {
             inline_keyboard: [[{
@@ -328,6 +330,76 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       );
     }
 
+    return res.status(200).json({ ok: true });
+  }
+
+  // Forward private messages from users to the administrator. The existing
+  // /send command lets the administrator reply using the numeric Telegram ID.
+  const incomingMessage = update?.message;
+  if (
+    incomingMessage
+    && incomingMessage.chat?.type === "private"
+    && Number(incomingMessage.from?.id) !== ADMIN_TELEGRAM_ID
+  ) {
+    const senderId = Number(incomingMessage.from?.id);
+    const chatId = Number(incomingMessage.chat?.id);
+    const messageId = Number(incomingMessage.message_id);
+    if (
+      !Number.isSafeInteger(senderId) || senderId <= 0
+      || chatId !== senderId
+      || !Number.isSafeInteger(messageId) || messageId <= 0
+    ) {
+      return res.status(200).json({ ok: true });
+    }
+
+    const name = [
+      incomingMessage.from?.first_name,
+      incomingMessage.from?.last_name,
+    ].filter((part): part is string => typeof part === "string" && part.trim().length > 0).join(" ") || "Без имени";
+    const username = typeof incomingMessage.from?.username === "string"
+      ? `@${incomingMessage.from.username}`
+      : "не указан";
+
+    try {
+      const adminNotice = await sendMessage(
+        ADMIN_TELEGRAM_ID,
+        `📩 <b>Новое сообщение в Touché</b>\nИмя: ${escapeHtml(name)}\nUsername: ${escapeHtml(username)}\nTelegram ID: <code>${senderId}</code>`,
+      );
+      const adminNoticeResult = await adminNotice.json().catch(() => null);
+      if (!adminNotice.ok || adminNoticeResult?.ok !== true) {
+        console.error("[telegram-webhook] incoming message details failed", {
+          update_id: updateId,
+          sender_id: senderId,
+          http_status: adminNotice.status,
+        });
+        await sendMessage(chatId, "Не удалось передать сообщение администратору. Попробуйте ещё раз позже.");
+        return res.status(200).json({ ok: true });
+      }
+
+      const forwarded = await tgPost("forwardMessage", {
+        chat_id: ADMIN_TELEGRAM_ID,
+        from_chat_id: chatId,
+        message_id: messageId,
+      });
+      const forwardedResult = await forwarded.json().catch(() => null);
+      if (!forwarded.ok || forwardedResult?.ok !== true) {
+        console.error("[telegram-webhook] incoming message forward failed", {
+          update_id: updateId,
+          sender_id: senderId,
+          http_status: forwarded.status,
+        });
+        await sendMessage(chatId, "Не удалось передать сообщение администратору. Попробуйте ещё раз позже.");
+        return res.status(200).json({ ok: true });
+      }
+      await sendMessage(chatId, "Спасибо! Сообщение передано администратору. Ответ придёт сюда.");
+    } catch (error) {
+      console.error("[telegram-webhook] incoming message forwarding threw", {
+        update_id: updateId,
+        sender_id: senderId,
+        error: error instanceof Error ? error.message : "unknown_error",
+      });
+      await sendMessage(chatId, "Не удалось передать сообщение администратору. Попробуйте ещё раз позже.");
+    }
     return res.status(200).json({ ok: true });
   }
 

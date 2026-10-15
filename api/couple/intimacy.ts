@@ -8,6 +8,21 @@ const BOT = process.env.BOT_TOKEN!;
 const APP_URL = (process.env.APP_URL ?? "").replace(/\/$/, "");
 const LANGS = new Set(["ru", "en", "hi", "pt", "es"]);
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+const ANALYTICS_EVENTS = new Set(["app_open", "screen_view", "task_generated"]);
+const ANALYTICS_SCREENS = new Set(["home", "category", "scenario", "shared_task_error"]);
+
+function safeAnalyticsUtm(value: unknown): string | null {
+  if (typeof value !== "string") return null;
+  const trimmed = value.trim();
+  return trimmed && /^[a-zA-Z0-9_.-]{1,80}$/.test(trimmed) ? trimmed : null;
+}
+
+function classifyAnalyticsSource(startParam: string | null): string {
+  if (!startParam) return "direct";
+  if (/^invite_[1-9][0-9]*$/.test(startParam)) return "telegram_invite";
+  if (/^ref_[1-9][0-9]*$/.test(startParam)) return "telegram_referral";
+  return "telegram_startapp";
+}
 
 type Couple = {
   id: string;
@@ -700,6 +715,47 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (!user) return res.status(401).json({ error: "unauthorized" });
 
   const action = String(req.query.action ?? "");
+  if (req.method === "POST" && action === "analytics") {
+    const body = req.body && typeof req.body === "object"
+      ? req.body as Record<string, unknown>
+      : {};
+    const eventName = typeof body.event_name === "string" ? body.event_name : "";
+    const sessionId = typeof body.session_id === "string" ? body.session_id : "";
+    if (!ANALYTICS_EVENTS.has(eventName)) return res.status(400).json({ error: "invalid_event" });
+    if (!UUID.test(sessionId)) return res.status(400).json({ error: "invalid_session" });
+    const screen = typeof body.screen === "string" && ANALYTICS_SCREENS.has(body.screen)
+      ? body.screen
+      : null;
+    if (eventName === "screen_view" && !screen) {
+      return res.status(400).json({ error: "invalid_screen" });
+    }
+
+    try {
+      const signedStartParam = new URLSearchParams(
+        req.headers["x-telegram-init-data"] as string,
+      ).get("start_param");
+      const { error } = await sb.from("analytics_events").insert({
+        session_id: sessionId,
+        user_id: user.id,
+        username: user.username ?? null,
+        event_name: eventName,
+        screen: eventName === "screen_view" ? screen : null,
+        source: classifyAnalyticsSource(signedStartParam),
+        utm_source: safeAnalyticsUtm(body.utm_source),
+        utm_medium: safeAnalyticsUtm(body.utm_medium),
+        utm_campaign: safeAnalyticsUtm(body.utm_campaign),
+      });
+      if (error) {
+        console.error("Analytics event insert failed:", error.code);
+        return res.status(500).json({ error: "analytics_write_failed" });
+      }
+      return res.status(204).end();
+    } catch (error) {
+      console.error("Analytics event handling failed:", error);
+      return res.status(500).json({ error: "analytics_write_failed" });
+    }
+  }
+
   try {
     const couple = await getCouple(user.id);
     if (!couple) return res.status(404).json({ error: "no_couple" });

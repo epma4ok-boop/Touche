@@ -6,6 +6,7 @@ import { OWNER_TELEGRAM_ID } from "../src/config.js";
 const sb = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!);
 const BOT_TOKEN = process.env.BOT_TOKEN;
 export const FREE_LIMIT = 3;
+export const PREMIUM_DAILY_LIMIT = 3;
 const APP_TIMEZONE = process.env.APP_TIMEZONE || "Europe/Moscow";
 const CATEGORIES = new Set(["compliments", "tenderness", "desire", "passion", "hard"]);
 const PAID = new Set(["passion", "hard"]);
@@ -38,6 +39,25 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (!CATEGORIES.has(category)) return res.status(400).json({ error: "invalid_category" });
   const date = appDate();
   const premium = await isPremium(caller.id);
+  if (premium && PAID.has(category)) {
+    const { data, error } = await sb.from("user_daily_limits")
+      .select("count")
+      .eq("user_id", caller.id)
+      .eq("category", `premium_${category}`)
+      .eq("date", date)
+      .maybeSingle();
+    if (error) return res.status(500).json({ error: "limits_read_failed" });
+    const used = Number(data?.count ?? 0);
+    return res.status(200).json({
+      ok: true,
+      remaining: Math.max(0, PREMIUM_DAILY_LIMIT - used),
+      used,
+      total: PREMIUM_DAILY_LIMIT,
+      unlimited: false,
+      isPremium: true,
+      date,
+    });
+  }
   if (premium) return res.status(200).json({ ok: true, remaining: null, unlimited: true, isPremium: true, date });
 
   const [{ data, error }, { data: credits, error: creditsError }, { data: paidCredits, error: paidCreditsError }] = await Promise.all([

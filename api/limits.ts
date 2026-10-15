@@ -39,40 +39,33 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (!CATEGORIES.has(category)) return res.status(400).json({ error: "invalid_category" });
   const date = appDate();
   const premium = await isPremium(caller.id);
-  if (premium && PAID.has(category)) {
-    const { data, error } = await sb.from("user_daily_limits")
-      .select("count")
-      .eq("user_id", caller.id)
-      .eq("category", `premium_${category}`)
-      .eq("date", date)
-      .maybeSingle();
-    if (error) return res.status(500).json({ error: "limits_read_failed" });
-    const used = Number(data?.count ?? 0);
-    return res.status(200).json({
-      ok: true,
-      remaining: Math.max(0, PREMIUM_DAILY_LIMIT - used),
-      used,
-      total: PREMIUM_DAILY_LIMIT,
-      unlimited: false,
-      isPremium: true,
-      date,
-    });
-  }
-  if (premium) return res.status(200).json({ ok: true, remaining: null, unlimited: true, isPremium: true, date });
-
   const [{ data, error }, { data: credits, error: creditsError }, { data: paidCredits, error: paidCreditsError }] = await Promise.all([
-    sb.from("user_daily_limits").select("count,bonus").eq("user_id", caller.id).eq("category", category).eq("date", date).maybeSingle(),
+    sb.from("user_daily_limits")
+      .select("count,bonus")
+      .eq("user_id", caller.id)
+      .eq("category", premium && PAID.has(category) ? `premium_${category}` : category)
+      .eq("date", date)
+      .maybeSingle(),
     sb.from("referral_task_credits").select("balance").eq("user_id", caller.id).eq("category", category).maybeSingle(),
     sb.from("premium_task_credits").select("balance").eq("user_id", caller.id).eq("category", category).maybeSingle(),
   ]);
   if (error || creditsError || paidCreditsError) return res.status(500).json({ error: "limits_read_failed" });
-  const used = Number(data?.count ?? 0), bonus = Number(data?.bonus ?? 0);
+  const used = Number(data?.count ?? 0);
+  const bonus = Number(data?.bonus ?? 0);
   const creditBalance = Number(credits?.balance ?? 0);
   const premiumTaskCredits = Number(paidCredits?.balance ?? 0);
-  const base = PAID.has(category) ? 0 : FREE_LIMIT + bonus;
+  const base = PAID.has(category) && !premium
+    ? 0
+    : (PAID.has(category) ? PREMIUM_DAILY_LIMIT : FREE_LIMIT) + bonus;
+  const remaining = Math.max(0, base - used) + creditBalance + premiumTaskCredits;
+  if (premium && PAID.has(category)) {
+    return res.status(200).json({
+      ok: true, remaining, used, bonus, credits: creditBalance, premiumTaskCredits,
+      total: base + creditBalance + premiumTaskCredits, unlimited: false, isPremium: true, date,
+    });
+  }
   return res.status(200).json({
-    ok: true, remaining: Math.max(0, base - used) + creditBalance + premiumTaskCredits,
-    used, bonus, credits: creditBalance, premiumTaskCredits,
-    total: base + creditBalance + premiumTaskCredits, isPremium: false, date,
+    ok: true, remaining, used, bonus, credits: creditBalance, premiumTaskCredits,
+    total: base + creditBalance + premiumTaskCredits, unlimited: false, isPremium: premium, date,
   });
 }

@@ -1,6 +1,7 @@
 // api/payments/webhook.ts — Telegram bot webhook + Stars payments
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { createClient } from "@supabase/supabase-js";
+import { ADMIN_TELEGRAM_ID } from "../../src/config.js";
 
 const BOT_TOKEN      = process.env.BOT_TOKEN;
 const WEBHOOK_SECRET = process.env.WEBHOOK_SECRET ?? "";
@@ -50,12 +51,70 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     ? "successful_payment"
     : update?.pre_checkout_query
       ? "pre_checkout_query"
+      : update?.message?.text?.startsWith("/send")
+        ? "admin_send_command"
       : update?.message?.text?.startsWith("/myid")
         ? "myid_command"
         : update?.message?.text?.startsWith("/start")
           ? "start_command"
           : "other";
   console.info("[telegram-webhook] update received", { update_id: updateId, kind: updateKind });
+
+  // Admin-only private command: /send <Telegram ID> <message>
+  const text = update?.message?.text;
+  if (typeof text === "string" && /^\/send(?:@\w+)?(?:\s|$)/.test(text)) {
+    const message = update.message;
+    const senderId = Number(message.from?.id);
+    const chatId = Number(message.chat?.id);
+    if (
+      senderId !== ADMIN_TELEGRAM_ID
+      || chatId !== senderId
+      || message.chat?.type !== "private"
+    ) {
+      console.warn("[telegram-webhook] unauthorized admin send attempt", { sender_id: Number.isSafeInteger(senderId) ? senderId : null });
+      return res.status(200).json({ ok: true });
+    }
+
+    const match = text.match(/^\/send(?:@\w+)?\s+(\d+)\s+([\s\S]*\S)\s*$/);
+    if (!match) {
+      await sendMessage(chatId, "Формат команды: <code>/send Telegram_ID текст сообщения</code>");
+      return res.status(200).json({ ok: true });
+    }
+
+    const recipientId = Number(match[1]);
+    const messageText = match[2].trim();
+    if (
+      !Number.isSafeInteger(recipientId)
+      || recipientId <= 0
+      || recipientId === senderId
+      || Array.from(messageText).length > 3000
+    ) {
+      await sendMessage(chatId, "Проверьте ID получателя и длину сообщения (до 3000 символов).");
+      return res.status(200).json({ ok: true });
+    }
+
+    try {
+      const telegramResponse = await sendMessage(recipientId, escapeHtml(messageText));
+      const telegramResult = await telegramResponse.json().catch(() => null);
+      if (!telegramResponse.ok || telegramResult?.ok !== true) {
+        console.error("[telegram-webhook] admin message delivery failed", {
+          recipient_id: recipientId,
+          http_status: telegramResponse.status,
+        });
+        await sendMessage(chatId, "Telegram не доставил сообщение. Получатель должен сначала открыть чат с ботом.");
+        return res.status(200).json({ ok: true });
+      }
+      console.info("[telegram-webhook] admin message sent", { recipient_id: recipientId });
+      await sendMessage(chatId, "Сообщение отправлено.");
+    } catch (error) {
+      console.error("[telegram-webhook] admin message send threw", {
+        recipient_id: recipientId,
+        error: error instanceof Error ? error.message : "unknown_error",
+      });
+      await sendMessage(chatId, "Не удалось отправить сообщение из-за ошибки Telegram.");
+    }
+    return res.status(200).json({ ok: true });
+  }
 
   // Let a user retrieve their own Telegram ID for support and purchase recovery.
   if (update?.message?.text?.match(/^\/myid(?:@\w+)?(?:\s|$)/)) {

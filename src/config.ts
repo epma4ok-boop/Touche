@@ -6,3 +6,6 @@ export const TELEGRAM_MINI_APP_SHORT_NAME = "app";
 // Найти свой ID можно через @userinfobot в Telegram.
 // Поставь 0 чтобы отключить bypass.
 export const OWNER_TELEGRAM_ID = 0;
+
+// Отдельно от Premium-bypass: право отправлять сообщения из бота.
+export const ADMIN_TELEGRAM_ID = 499422790;

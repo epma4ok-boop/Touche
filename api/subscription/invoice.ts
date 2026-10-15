@@ -34,8 +34,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       body: JSON.stringify({
         title: isEn ? "Touché Premium — 1 month" : "Touché Premium — 1 месяц",
         description: isEn
-          ? "Passion, Hard & AI Scenarios unlocked, with unlimited daily tasks."
-          : "Страсть, Хард и ИИ-сценарии, без дневного лимита заданий.",
+          ? "Passion and Hard: 3 tasks each day. AI scenarios: 1 per day. One extra task costs 5 Stars for Premium members."
+          : "Страсть и Хард: по 3 задания в день. ИИ-сценарии: 1 в день. Дополнительное задание для Premium — 5 ⭐.",
         payload: JSON.stringify({ version: 1, userId: caller.id, type: "subscription", months: 1 }),
         provider_token: "",
         currency: "XTR",

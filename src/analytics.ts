@@ -33,7 +33,7 @@ export function trackAnalyticsEvent(
     utm_campaign: params.get("utm_campaign") ?? "",
   };
 
-  void fetch("/api/analytics/track", {
+  void fetch("/api/couple/intimacy?action=analytics", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

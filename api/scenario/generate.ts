@@ -469,13 +469,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const isOwner = caller.id === OWNER_ID;
   const premium = isOwner || !!(await supabase.from("user_subscriptions").select("expires_at").eq("user_id", caller.id).gt("expires_at", new Date().toISOString()).maybeSingle()).data;
   if (!premium) return res.status(403).json({ error: "subscription_required" });
-  if (!isOwner) {
-    const { data: allowance, error: allowanceError } = await supabase.rpc("consume_daily_limit", {
-      p_user_id: caller.id, p_category: "scenarios", p_date: appDate(), p_limit: 3,
-    });
-    if (allowanceError) return res.status(500).json({ error: "scenario_limit_failed" });
-    if (allowance?.allowed === false || allowance?.ok === false) return res.status(429).json({ error: "rate_limited" });
-  }
+  const { data: allowance, error: allowanceError } = await supabase.rpc("consume_daily_limit", {
+    p_user_id: caller.id, p_category: "scenarios", p_date: appDate(), p_limit: 1,
+  });
+  if (allowanceError) return res.status(500).json({ error: "scenario_limit_failed" });
+  if (allowance?.allowed === false || allowance?.ok === false) return res.status(429).json({ error: "daily_limit_exceeded" });
 
   let variationSignals: ScenarioVariationSignals;
   try {

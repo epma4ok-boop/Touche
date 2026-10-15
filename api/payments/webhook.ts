@@ -30,14 +30,40 @@ async function sendMessage(chatId: number, text: string, extra?: object) {
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
-  if (!BOT_TOKEN || !WEBHOOK_SECRET) return res.status(503).json({ error: "webhook_unconfigured" });
+  if (!BOT_TOKEN || !WEBHOOK_SECRET) {
+    console.error("[telegram-webhook] configuration missing", {
+      hasBotToken: Boolean(BOT_TOKEN),
+      hasWebhookSecret: Boolean(WEBHOOK_SECRET),
+    });
+    return res.status(503).json({ error: "webhook_unconfigured" });
+  }
 
   const secretHeader = req.headers["x-telegram-bot-api-secret-token"];
   if (secretHeader !== WEBHOOK_SECRET) {
+    console.warn("[telegram-webhook] secret validation failed");
     return res.status(403).json({ error: "Forbidden" });
   }
 
   const update = req.body;
+  const updateId = Number.isSafeInteger(update?.update_id) ? Number(update.update_id) : null;
+  const updateKind = update?.message?.successful_payment
+    ? "successful_payment"
+    : update?.pre_checkout_query
+      ? "pre_checkout_query"
+      : update?.message?.text?.startsWith("/myid")
+        ? "myid_command"
+        : update?.message?.text?.startsWith("/start")
+          ? "start_command"
+          : "other";
+  console.info("[telegram-webhook] update received", { update_id: updateId, kind: updateKind });
+
+  // Let a user retrieve their own Telegram ID for support and purchase recovery.
+  if (update?.message?.text?.match(/^\/myid(?:@\w+)?(?:\s|$)/)) {
+    const chatId = Number(update.message.chat?.id);
+    if (!Number.isSafeInteger(chatId)) return res.status(400).json({ error: "invalid_chat" });
+    await sendMessage(chatId, `Ваш Telegram ID: <code>${chatId}</code>`);
+    return res.status(200).json({ ok: true });
+  }
 
   // ── /start command — partner joining via invite link ────────────────────────
   if (update?.message?.text?.startsWith("/start")) {
@@ -109,6 +135,16 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       && update.pre_checkout_query.currency === "XTR"
       && Number(update.pre_checkout_query.total_amount) === expectedAmount
       && (isSubscription || isBonus || isPremiumTask);
+    if (!valid) {
+      console.warn("[telegram-webhook] pre-checkout rejected", {
+        update_id: updateId,
+        product: payload?.type ?? null,
+        user_id: Number.isSafeInteger(payload?.userId) ? payload.userId : null,
+        payer_id: Number(update.pre_checkout_query.from?.id) || null,
+        amount: Number(update.pre_checkout_query.total_amount) || null,
+        currency: update.pre_checkout_query.currency ?? null,
+      });
+    }
     await tgPost("answerPreCheckoutQuery", {
       pre_checkout_query_id: update.pre_checkout_query.id,
       ok: valid,
@@ -148,21 +184,65 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       && payment.currency === "XTR"
       && Number(payment.total_amount) === expectedAmount
       && chargeId.length > 0;
-    if (!validPayload) return res.status(400).json({ error: "invalid_payment" });
+    if (!validPayload) {
+      console.error("[telegram-webhook] successful payment rejected", {
+        update_id: updateId,
+        user_id: Number.isSafeInteger(userId) ? userId : null,
+        payer_id: chatId,
+        product: payload.type ?? null,
+        amount: Number(payment.total_amount) || null,
+        currency: payment.currency ?? null,
+        expected_amount: expectedAmount,
+        has_charge_id: chargeId.length > 0,
+      });
+      return res.status(400).json({ error: "invalid_payment" });
+    }
     const payerId = Number(userId);
 
-    const { data: paymentResult, error: paymentError } = await supabase.rpc("process_telegram_payment", {
-      p_charge_id: chargeId,
-      p_user_id: payerId,
-      p_product: payload.type!,
-      p_amount: Number(payment.total_amount),
-      p_currency: payment.currency,
-      p_payload: payload,
-      p_category: payload.category ?? null,
-      p_bonus: payload.type === "bonus_tasks" ? 3 : 0,
-      p_update_id: Number.isSafeInteger(update?.update_id) ? update.update_id : null,
+    let paymentResult: { already_processed?: boolean } | null = null;
+    try {
+      const result = await supabase.rpc("process_telegram_payment", {
+        p_charge_id: chargeId,
+        p_user_id: payerId,
+        p_product: payload.type!,
+        p_amount: Number(payment.total_amount),
+        p_currency: payment.currency,
+        p_payload: payload,
+        p_category: payload.category ?? null,
+        p_bonus: payload.type === "bonus_tasks" ? 3 : 0,
+        p_update_id: updateId,
+      });
+      paymentResult = result.data;
+      if (result.error) {
+        console.error("[telegram-webhook] payment RPC failed", {
+          update_id: updateId,
+          user_id: payerId,
+          product: payload.type,
+          amount: Number(payment.total_amount),
+          error_code: result.error.code ?? null,
+          error_message: result.error.message ?? null,
+        });
+        return res.status(500).json({ error: "payment_processing_failed" });
+      }
+    } catch (error) {
+      console.error("[telegram-webhook] payment RPC threw", {
+        update_id: updateId,
+        user_id: payerId,
+        product: payload.type,
+        amount: Number(payment.total_amount),
+        error: error instanceof Error ? error.message : "unknown_error",
+      });
+      return res.status(500).json({ error: "payment_processing_failed" });
+    }
+
+    console.info("[telegram-webhook] payment recorded", {
+      update_id: updateId,
+      user_id: payerId,
+      product: payload.type,
+      amount: Number(payment.total_amount),
+      currency: payment.currency,
+      duplicate: Boolean(paymentResult?.already_processed),
     });
-    if (paymentError) return res.status(500).json({ error: "payment_processing_failed" });
     if (paymentResult?.already_processed) return res.status(200).json({ ok: true, duplicate: true });
 
     if (payload.type === "subscription") {

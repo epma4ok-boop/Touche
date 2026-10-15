@@ -534,7 +534,7 @@ const SUBSCRIPTION: Record<Lang, { title: string; features: string[]; price: str
     features: [
       "✦ «Страсть» и «Хард» — откровенные задания 18+",
       "ИИ-сценарии — уникальные ролевые истории",
-      "♾️ Безлимитные задания каждый день",
+      "3 задания в каждой обычной категории и 3 в «Страсти» и «Харде» в день",
       "⚡ Приоритетная генерация",
       "Новые категории первыми",
     ],
@@ -547,7 +547,7 @@ const SUBSCRIPTION: Record<Lang, { title: string; features: string[]; price: str
     features: [
       "✦ Passion & Hard — explicit 18+ tasks",
       "AI scenarios — unique roleplay stories",
-      "♾️ Unlimited tasks every day",
+      "3 daily tasks in each regular category and 3 in Passion and Hard",
       "⚡ Priority generation",
       "Exclusive new categories first",
     ],
@@ -560,7 +560,7 @@ const SUBSCRIPTION: Record<Lang, { title: string; features: string[]; price: str
     features: [
       "✦ जुनून और साहसिक श्रेणियां — 18+ कार्य",
       "AI रोलप्ले — अनोखी कहानियां",
-      "♾️ हर दिन असीमित कार्य",
+      "हर नियमित श्रेणी में 3 और जुनून तथा साहसिक श्रेणियों में 3 दैनिक कार्य",
       "⚡ प्राथमिकता जनरेशन",
       "नई श्रेणियां पहले",
     ],
@@ -573,7 +573,7 @@ const SUBSCRIPTION: Record<Lang, { title: string; features: string[]; price: str
     features: [
       "✦ Paixão e Intenso — tarefas 18+",
       "Cenários de IA — histórias únicas",
-      "♾️ Tarefas ilimitadas todo dia",
+      "3 tarefas diárias em cada categoria normal e 3 em Paixão e Intenso",
       "⚡ Geração prioritária",
       "Novas categorias primeiro",
     ],
@@ -586,7 +586,7 @@ const SUBSCRIPTION: Record<Lang, { title: string; features: string[]; price: str
     features: [
       "✦ Pasión e Intenso — tareas 18+",
       "Escenarios de IA — historias únicas",
-      "♾️ Tareas ilimitadas cada día",
+      "3 tareas diarias en cada categoría normal y 3 en Pasión e Intenso",
       "⚡ Generación prioritaria",
       "Nuevas categorías primero",
     ],

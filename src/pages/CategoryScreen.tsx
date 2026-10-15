@@ -280,41 +280,41 @@ interface Props {
 
 const PREMIUM_GATE_COPY: Record<Lang, {
   title: string; description: string; premiumTitle: string; premiumDetails: string;
-  taskTitle: string; taskDetails: (category: string) => string; close: string;
+  taskTitle: (price: number) => string; taskDetails: (category: string) => string; close: string;
   processing: string; pending: string; unavailable: string; working: string;
 }> = {
   ru: {
-    title: "Откройте премиум-задание", description: "Выберите подходящий вариант для этой категории.",
+    title: "Получите ещё одно задание", description: "Выберите Premium или купите одно дополнительное задание.",
     premiumTitle: "Touché Premium · 199 ⭐", premiumDetails: "Доступ ко всем премиум-функциям на 30 дней",
-    taskTitle: "Одно задание · 20 ⭐", taskDetails: (category) => `Одно задание в категории «${category}»`,
+    taskTitle: (price) => `Одно задание · ${price} ⭐`, taskDetails: (category) => `Одно задание в категории «${category}»`,
     close: "Позже", processing: "Проверяем оплату…", pending: "Платёж обрабатывается. Задание появится здесь после подтверждения.",
     unavailable: "Оплата не завершена. Можно выбрать вариант ещё раз.", working: "Открываем оплату…",
   },
   en: {
-    title: "Unlock a premium task", description: "Choose how you want to access this category.",
+    title: "Get one more task", description: "Choose Premium or buy one extra task.",
     premiumTitle: "Touché Premium · 199 ⭐", premiumDetails: "All premium features for 30 days",
-    taskTitle: "One task · 20 ⭐", taskDetails: (category) => `One task in ${category}`,
+    taskTitle: (price) => `One task · ${price} ⭐`, taskDetails: (category) => `One task in ${category}`,
     close: "Not now", processing: "Checking payment…", pending: "Payment is processing. This task will be available here once confirmed.",
     unavailable: "Payment was not completed. You can choose an option again.", working: "Opening payment…",
   },
   hi: {
-    title: "प्रीमियम टास्क अनलॉक करें", description: "इस श्रेणी के लिए एक विकल्प चुनें।",
+    title: "एक और टास्क पाएं", description: "Premium चुनें या एक अतिरिक्त टास्क खरीदें।",
     premiumTitle: "Touché Premium · 199 ⭐", premiumDetails: "30 दिनों के लिए सभी प्रीमियम सुविधाएँ",
-    taskTitle: "एक टास्क · 20 ⭐", taskDetails: (category) => `${category} श्रेणी में एक टास्क`,
+    taskTitle: (price) => `एक टास्क · ${price} ⭐`, taskDetails: (category) => `${category} श्रेणी में एक टास्क`,
     close: "अभी नहीं", processing: "भुगतान जाँच रहे हैं…", pending: "भुगतान प्रक्रिया में है। पुष्टि के बाद टास्क यहाँ उपलब्ध होगा।",
     unavailable: "भुगतान पूरा नहीं हुआ। आप फिर से विकल्प चुन सकते हैं।", working: "भुगतान खोल रहे हैं…",
   },
   pt: {
-    title: "Desbloqueie uma tarefa Premium", description: "Escolha como acessar esta categoria.",
+    title: "Consiga mais uma tarefa", description: "Escolha o Premium ou compre uma tarefa extra.",
     premiumTitle: "Touché Premium · 199 ⭐", premiumDetails: "Todos os recursos Premium por 30 dias",
-    taskTitle: "Uma tarefa · 20 ⭐", taskDetails: (category) => `Uma tarefa na categoria ${category}`,
+    taskTitle: (price) => `Uma tarefa · ${price} ⭐`, taskDetails: (category) => `Uma tarefa na categoria ${category}`,
     close: "Agora não", processing: "Verificando o pagamento…", pending: "O pagamento está sendo processado. A tarefa ficará disponível após a confirmação.",
     unavailable: "O pagamento não foi concluído. Você pode escolher novamente.", working: "Abrindo o pagamento…",
   },
   es: {
-    title: "Desbloquea una tarea Premium", description: "Elige cómo acceder a esta categoría.",
+    title: "Consigue una tarea más", description: "Elige Premium o compra una tarea adicional.",
     premiumTitle: "Touché Premium · 199 ⭐", premiumDetails: "Todas las funciones Premium durante 30 días",
-    taskTitle: "Una tarea · 20 ⭐", taskDetails: (category) => `Una tarea en la categoría ${category}`,
+    taskTitle: (price) => `Una tarea · ${price} ⭐`, taskDetails: (category) => `Una tarea en la categoría ${category}`,
     close: "Ahora no", processing: "Comprobando el pago…", pending: "El pago se está procesando. La tarea estará disponible cuando se confirme.",
     unavailable: "El pago no se completó. Puedes elegir una opción de nuevo.", working: "Abriendo el pago…",
   },
@@ -354,7 +354,7 @@ export default function CategoryScreen({ lang, gender, category, onBack, onCateg
   const sharedTaskHint = sharedCopy.checkInHint;
   const errorCopy: Record<TaskError["kind"], string> = {
     subscription_required: lang === "ru" ? "Эта категория доступна в Premium." : "This category is available in Premium.",
-    limit_exceeded: lang === "ru" ? "Лимит на сегодня закончился." : "Today's limit is used.",
+    limit_exceeded: lang === "ru" ? "Лимит на сегодня закончился. Можно вернуться завтра или купить ещё одно задание." : "Today's limit is used. Come back tomorrow or buy one extra task.",
     rate_limited: lang === "ru" ? "Слишком много запросов. Попробуйте чуть позже." : "Too many requests. Try again shortly.",
     unauthorized: lang === "ru" ? "Откройте приложение из Telegram заново." : "Please reopen the app from Telegram.",
     timeout: lang === "ru" ? "Сервер отвечает слишком долго. Попробуйте ещё раз." : "The server took too long. Please try again.",
@@ -499,7 +499,7 @@ export default function CategoryScreen({ lang, gender, category, onBack, onCateg
       let accessReady = false;
       for (let attempt = 0; attempt < 16; attempt += 1) {
         const limits = await refreshLimits();
-        if (limits && (limits.isPremium === true || Number(limits.remaining ?? 0) > 0)) {
+        if (limits && (choice === "premium" ? limits.isPremium === true : Number(limits.remaining ?? 0) > 0)) {
           accessReady = true;
           break;
         }
@@ -571,7 +571,7 @@ export default function CategoryScreen({ lang, gender, category, onBack, onCateg
           <div className="category-pop__heartbeat" data-testid="tutorial-heartbeat-target">
               <HeartbeatCanvas onHoldComplete={tutorialDemo ? showTutorialSample : generate} isCasting={tutorialDemo ? false : isCasting} color={popColor} hintText={tutorialDemo ? TUTORIAL_SAMPLE[lang].holdHint : isCasting ? t.tapping : t.hint} holdDuration={2600} baseRScale={0.28} bgColor="#fffaf3" />
           </div>
-          {errorKind && errorKind !== "subscription_required" && <div className="category-pop__error" role="alert" data-testid="status-task-error"><strong>{errorCopy[errorKind]}</strong>{errorKind === "unknown" && generatedErrorCode && <small>{generatedErrorCode}</small>}<button onClick={() => setErrorKind(null)}>{lang === "ru" ? "Понятно" : "Dismiss"}</button></div>}
+          {errorKind && errorKind !== "subscription_required" && errorKind !== "limit_exceeded" && <div className="category-pop__error" role="alert" data-testid="status-task-error"><strong>{errorCopy[errorKind]}</strong>{errorKind === "unknown" && generatedErrorCode && <small>{generatedErrorCode}</small>}<button onClick={() => setErrorKind(null)}>{lang === "ru" ? "Понятно" : "Dismiss"}</button></div>}
         </section>
         <div className="category-pop__dots" aria-label="Categories">
            {CATEGORIES_ORDER.map((item) => <button key={item} data-testid={`button-category-${item}`} className={item === category ? "active" : ""} onClick={() => goToCategory(item)} style={{ background: item === category ? `rgb(${POP_COLORS[item].r},${POP_COLORS[item].g},${POP_COLORS[item].b})` : undefined }} aria-label={categoryLabel(item, t)} />)}
@@ -580,18 +580,18 @@ export default function CategoryScreen({ lang, gender, category, onBack, onCateg
           {sensitive && !isPremium && onUpgrade && onBuyPremiumTask && <button className="category-pop__premium" data-testid="button-premium-category" onClick={openPremiumGate}><span>P</span><strong>Touché Premium</strong><small>{t.subTagline}</small><b>→</b></button>}
          <footer className="category-pop__footer"><strong>Touché</strong><span>{t.appSub}</span></footer>
       </div>
-      {errorKind === "subscription_required" && (
+      {(errorKind === "subscription_required" || errorKind === "limit_exceeded") && (
         <div className="category-paywall-backdrop" role="presentation" onClick={() => { if (!paywallBusy) setErrorKind(null); }}>
           <section className="category-paywall" role="dialog" aria-modal="true" aria-labelledby="category-paywall-title" onClick={(event) => event.stopPropagation()}>
             <div className="category-paywall__topline"><span>18+ · Touché</span><button type="button" aria-label={paywallCopy.close} onClick={() => { setErrorKind(null); setPaywallNotice(null); }} disabled={!!paywallBusy}>×</button></div>
             <h2 id="category-paywall-title">{paywallCopy.title}</h2>
             <p>{paywallCopy.description}</p>
-            <button className="category-paywall__offer category-paywall__offer--premium" data-testid="button-buy-premium" onClick={() => void choosePremiumAccess("premium")} disabled={!!paywallBusy}>
+            {errorKind === "subscription_required" && !isPremium && <button className="category-paywall__offer category-paywall__offer--premium" data-testid="button-buy-premium" onClick={() => void choosePremiumAccess("premium")} disabled={!!paywallBusy}>
               <strong>{paywallBusy === "premium" ? paywallCopy.working : paywallCopy.premiumTitle}</strong>
               <small>{paywallCopy.premiumDetails}</small>
-            </button>
+            </button>}
             <button className="category-paywall__offer category-paywall__offer--single" data-testid="button-buy-premium-task" onClick={() => void choosePremiumAccess("single")} disabled={!!paywallBusy}>
-              <strong>{paywallBusy === "single" ? paywallCopy.working : paywallCopy.taskTitle}</strong>
+              <strong>{paywallBusy === "single" ? paywallCopy.working : paywallCopy.taskTitle(isPremium ? 5 : 20)}</strong>
               <small>{paywallCopy.taskDetails(label)}</small>
             </button>
             {paywallNotice && <div className="category-paywall__notice" role="status">{paywallNotice}</div>}

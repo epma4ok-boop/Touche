@@ -8,7 +8,7 @@ import { createClient } from "@supabase/supabase-js";
 import { validateTelegramInitData } from "../couple/_auth.js";
 import { appDate, FREE_LIMIT } from "../limits.js";
 import { claimFriendInvite } from "../referrals/_claim.js";
-import { getTaskQualityRules, getTaskVariationTag, hasAnatomicallyClearOralAct, hasConcreteSexualAct, hasHardSexualAct, isSharedTaskText, isTaskTextModeAppropriate, isTaskTextWellFormed, isTaskVariationTag, type TaskVariationTag } from "../../src/data/task-quality.js";
+import { getTaskQualityRules, getTaskVariationTag, hasAnatomicallyClearOralAct, hasConcreteSexualAct, hasHardSexualAct, isTaskTextCategoryAppropriate, isSharedTaskText, isTaskTextModeAppropriate, isTaskTextWellFormed, isTaskVariationTag, type TaskVariationTag } from "../../src/data/task-quality.js";
 import { OWNER_TELEGRAM_ID } from "../../src/config.js";
 import { TASKS_RU } from "../../src/data/tasks-ru.js";
 import { TASKS_EN } from "../../src/data/tasks-en.js";
@@ -360,6 +360,14 @@ const EXAMPLE_MEDIA_MARKERS: Record<string, RegExp> = {
   es: /(?:foto|selfi|selfie|imagen|grabación|grabar|filmación|vídeo|video|cámara|registrar)/iu,
 };
 
+const MUTUAL_ONLY_TASK_MARKERS: Record<string, RegExp> = {
+  ru: /(?:позици\p{L}*.{0,8}69|в\s+позе\s+69|взаимн\p{L}*.{0,25}(?:оральн|мастурб)|друг\s+друга.{0,25}ртом)/iu,
+  en: /(?:position\s+69|mutual\s+(?:oral|masturbation)|each other.{0,25}(?:orally|with their mouths))/iu,
+  hi: /(?:69\s*(?:स्थिति|पोज़िशन)|आपसी\s+(?:मुखमैथुन|हस्तमैथुन)|एक-दूसरे.{0,25}मुंह)/u,
+  pt: /(?:posição\s+69|sexo oral mútuo|masturbação mútua|um ao outro.{0,25}oralmente)/iu,
+  es: /(?:posición\s+69|sexo oral mutuo|masturbación mutua|el uno al otro.{0,25}oralmente)/iu,
+};
+
 const UNSAFE_TASK_MARKERS: Record<string, RegExp> = {
   ru: /(?:без\s+согласия|игнорир\w*\s+(?:отказ|боль)|не\s+может\s+(?:двигаться|отказаться)|не\s+двигается|не\s+(?:двигайся|шевелись|двигаться)|не\s+слышат\s+и\s+не\s+видят|делай\s+что\s+хочешь|без\s+вопросов|подчин\w*\s+без|застав\w*|принуд\w*|удуш\w*|души\s|не\s+спрашивай|насиль\w*)/iu,
   en: /(?:without consent|can't (?:move|refuse)|cannot (?:move|refuse)|at their mercy|do whatever you want|don't move|do not move|stay still|obey without question|can't hear (?:or|and) see|force(?:d)?|coerc|chok|strangl|ignore (?:their )?(?:no|stop|pain)|don't ask)/iu,
@@ -369,11 +377,11 @@ const UNSAFE_TASK_MARKERS: Record<string, RegExp> = {
 };
 
 const SEXUAL_FILMING_MARKERS: Record<string, RegExp> = {
-  ru: /(?:порно|видеосъ[её]м|видео|съ[её]мк\p{L}*|сним\p{L}*\s+(?:видео|сцену))/iu,
-  en: /(?:porn|video|filming|film|recording|record)/iu,
-  hi: /(?:पोर्न|वीडियो|रिकॉर्ड\p{L}*|फ़िल्म|फिल्म)/u,
-  pt: /(?:porn[oô]|vídeo|filmagem|gravaç\p{L}*|grav\p{L}*\s+(?:vídeo|cena))/iu,
-  es: /(?:porno|vídeo|video|filmación|grabaci\p{L}*|grab\p{L}*\s+(?:vídeo|video|escena))/iu,
+  ru: /(?:порно|эротическ\p{L}*\s+съ[её]мк|снять\p{L}*\s+порно|запис\p{L}*.{0,30}(?:секс|вагинальн|оральн))/iu,
+  en: /(?:porn|erotic filming|film.{0,30}(?:sex|intercourse|oral)|record.{0,30}(?:sex|intercourse|oral))/iu,
+  hi: /(?:पोर्न|कामुक.{0,20}(?:वीडियो|रिकॉर्ड)|रिकॉर्ड.{0,30}(?:सेक्स|संभोग))/u,
+  pt: /(?:porn[oô]|gravação erótica|film(?:ar|agem).{0,30}(?:sexo|oral)|grav(?:ar|ação).{0,30}(?:sexo|oral))/iu,
+  es: /(?:porno|grabación erótica|film(?:ar|ación).{0,30}(?:sexo|oral)|grab(?:ar|ación).{0,30}(?:sexo|oral))/iu,
 };
 
 const FILMING_CONSENT_MARKERS: Record<string, RegExp> = {
@@ -392,19 +400,29 @@ const PRIVATE_FILMING_MARKERS: Record<string, RegExp> = {
   es: /(?:privad\p{L}*|colección\s+personal|no\s+compart\p{L}*|no\s+publiqu\p{L}*|solo\s+para\s+ustedes)/iu,
 };
 
-function isTaskExampleMediaAllowed(task: string, category: string, lang: string): boolean {
+const INTIMATE_PHOTO_MARKERS: Record<string, RegExp> = {
+  ru: /(?:интимн\p{L}*.{0,20}(?:фото|сним)|(?:фото|сним).{0,20}интимн\p{L}*|нюдс|обнажённ\p{L}*\s+фото)/iu,
+  en: /(?:intimate.{0,20}(?:photo|picture)|(?:photo|picture).{0,20}intimate|nude photo|naked photo|erotic selfie)/iu,
+  hi: /(?:अंतरंग.{0,20}(?:फ़ोटो|फोटो|तस्वीर)|(?:फ़ोटो|फोटो|तस्वीर).{0,20}अंतरंग|नग्न.{0,15}(?:फ़ोटो|फोटो))/u,
+  pt: /(?:foto íntim[ao]|íntim[ao].{0,15}foto|foto nua|selfie erótic[ao])/iu,
+  es: /(?:foto íntim[ao]|íntim[ao].{0,15}foto|foto desnuda|selfi erótic[ao])/iu,
+};
+
+function isTaskExampleMediaAllowed(task: string, category: string, lang: string, mode: TaskMode): boolean {
   const mediaMarkers = EXAMPLE_MEDIA_MARKERS[lang] ?? EXAMPLE_MEDIA_MARKERS.en;
-  if (!mediaMarkers.test(task) || category === "compliments") return true;
-  if (category !== "hard" || !(SEXUAL_FILMING_MARKERS[lang] ?? SEXUAL_FILMING_MARKERS.en).test(task)) return false;
+  if (!mediaMarkers.test(task)) return true;
+  const intimatePhoto = (INTIMATE_PHOTO_MARKERS[lang] ?? INTIMATE_PHOTO_MARKERS.en).test(task);
+  if (intimatePhoto && category !== "desire") return false;
+  const sexualFilming = (SEXUAL_FILMING_MARKERS[lang] ?? SEXUAL_FILMING_MARKERS.en).test(task);
+  if (!sexualFilming) return true;
+  if (category !== "hard" || mode !== "together") return false;
   return hasHardSexualAct(task, lang)
     && (FILMING_CONSENT_MARKERS[lang] ?? FILMING_CONSENT_MARKERS.en).test(task)
     && (PRIVATE_FILMING_MARKERS[lang] ?? PRIVATE_FILMING_MARKERS.en).test(task);
 }
 
 function hasCategorySexualAct(task: string, category: string, lang: string): boolean {
-  if (category === "hard") return hasHardSexualAct(task, lang);
-  if (category === "passion") return hasConcreteSexualAct(task, lang);
-  return true;
+  return isTaskTextCategoryAppropriate(task, category, lang);
 }
 
 function getTaskExamples(category: string, lang: string, requestId: string, mode: TaskMode, gender: string): string[] {
@@ -418,8 +436,9 @@ function getTaskExamples(category: string, lang: string, requestId: string, mode
   const eligibleSource = sourcePool.filter((example) =>
     isTaskTextWellFormed(example, lang)
     && !unsafeMarkers.test(example)
-    && (category !== "hard" || hasHardSexualAct(example, lang))
-    && isTaskExampleMediaAllowed(example, category, lang)
+    && hasCategorySexualAct(example, category, lang)
+    && !(mode === "solo" && (MUTUAL_ONLY_TASK_MARKERS[lang] ?? MUTUAL_ONLY_TASK_MARKERS.en).test(example))
+    && isTaskExampleMediaAllowed(example, category, lang, mode)
     && hasAnatomicallyClearOralAct(example, lang, mode, gender === "female" ? "female" : "male")
   );
   const modeMatched = eligibleSource.filter((example) => isTaskTextModeAppropriate(example, lang, mode));
@@ -429,7 +448,7 @@ function getTaskExamples(category: string, lang: string, requestId: string, mode
     && !unsafeMarkers.test(example)
     && hasCategorySexualAct(example, category, lang)
     && isTaskTextModeAppropriate(example, lang, mode)
-    && isTaskExampleMediaAllowed(example, category, lang)
+    && isTaskExampleMediaAllowed(example, category, lang, mode)
     && hasAnatomicallyClearOralAct(example, lang, mode, gender === "female" ? "female" : "male")
   );
   const seed = hashSeed(`${requestId}:${lang}:${category}:examples`);
@@ -499,7 +518,8 @@ function getFallback(
     && !unsafeMarkers.test(task)
     && isTaskTextModeAppropriate(task, lang, mode)
     && hasCategorySexualAct(task, cat, lang)
-    && isTaskExampleMediaAllowed(task, cat, lang)
+    && !(mode === "solo" && (MUTUAL_ONLY_TASK_MARKERS[lang] ?? MUTUAL_ONLY_TASK_MARKERS.en).test(task))
+    && isTaskExampleMediaAllowed(task, cat, lang, mode)
     && hasAnatomicallyClearOralAct(task, lang, mode, gender === "female" ? "female" : "male")
   );
   if (wellFormed.length === 0) {
@@ -541,11 +561,11 @@ function getGenderLine(lang: string, gender: string): string {
 
 const MODE_INSTRUCTIONS: Record<string, Record<string, string>> = {
   solo: {
-    ru: "Одиночный режим: задание получает только один совершеннолетний пользователь. Обращайся к нему как к одному человеку и опиши одно действие, которое он может сделать для партнёра. Партнёр может быть адресатом, но не должен выполнять отдельную часть или отвечать. В «Страсти» и «Харде» пользователь выполняет конкретный названный акт для партнёра; не пиши о взаимных действиях и очередности.",
-    en: "Solo mode: only one adult user receives the task. Address that user individually and describe one action they can take for their partner. The partner may receive the gesture but must not be assigned a separate action or reply. In Passion and Hard, the user performs the named act for their partner; do not make the act mutual or alternate turns.",
-    hi: "एकल मोड: काम केवल एक वयस्क उपयोगकर्ता को मिलता है। उसी व्यक्ति को संबोधित करें और ऐसा एक काम बताएँ जो वह अपने साथी के लिए कर सकता है। साथी काम का प्राप्तकर्ता हो सकता है, लेकिन उससे अलग काम या जवाब की अपेक्षा न करें। जुनून और हार्ड में उपयोगकर्ता साथी के लिए नामित यौन क्रिया करे; आपसी क्रिया या बारी-बारी के निर्देश न दें।",
-    pt: "Modo solo: somente um adulto recebe a tarefa. Dirija-se a essa pessoa e descreva uma ação que ela pode fazer para o parceiro. O parceiro pode receber o gesto, mas não deve ter uma ação separada nem uma resposta como obrigação. Em Paixão e hard, o usuário executa o ato nomeado no parceiro; não use ações mútuas nem alternância.",
-    es: "Modo individual: solo una persona adulta recibe la tarea. Dirígete a esa persona y describe una acción que pueda hacer por su pareja. La pareja puede recibir el gesto, pero no debe tener una acción separada ni una respuesta obligatoria. En Pasión y hard, quien inicia realiza el acto nombrado para su pareja; no uses acciones mutuas ni turnos.",
+    ru: "Одиночный режим: задание получает только один совершеннолетний пользователь. Обращайся к нему как к одному человеку и опиши одно действие, которое он может сделать для партнёра. Партнёр может быть адресатом, но не должен выполнять отдельную часть или отвечать. В «Страсти» и «Харде» пользователь выполняет конкретный названный акт для партнёра; не пиши о взаимных действиях и очередности. Динамику подчинения в «Харде» в режиме Solo не используй.",
+    en: "Solo mode: only one adult user receives the task. Address that user individually and describe one action they can take for their partner. The partner may receive the gesture but must not be assigned a separate action or reply. In Passion and Hard, the user performs the named act for their partner; do not make the act mutual or alternate turns. Do not use a submission dynamic in Solo Hard tasks.",
+    hi: "एकल मोड: काम केवल एक वयस्क उपयोगकर्ता को मिलता है। उसी व्यक्ति को संबोधित करें और ऐसा एक काम बताएँ जो वह अपने साथी के लिए कर सकता है। साथी काम का प्राप्तकर्ता हो सकता है, लेकिन उससे अलग काम या जवाब की अपेक्षा न करें। जुनून और हार्ड में उपयोगकर्ता साथी के लिए नामित यौन क्रिया करे; आपसी क्रिया या बारी-बारी के निर्देश न दें। एकल हार्ड काम में समर्पण-आधारित भूमिका न रखें।",
+    pt: "Modo solo: somente um adulto recebe a tarefa. Dirija-se a essa pessoa e descreva uma ação que ela pode fazer para o parceiro. O parceiro pode receber o gesto, mas não deve ter uma ação separada nem uma resposta como obrigação. Em Paixão e hard, o usuário executa o ato nomeado no parceiro; não use ações mútuas nem alternância. Não use dinâmica de submissão em tarefas hard no modo solo.",
+    es: "Modo individual: solo una persona adulta recibe la tarea. Dirígete a esa persona y describe una acción que pueda hacer por su pareja. La pareja puede recibir el gesto, pero no debe tener una acción separada ni una respuesta obligatoria. En Pasión y hard, quien inicia realiza el acto nombrado para su pareja; no uses acciones mutuas ni turnos. No uses dinámicas de sumisión en tareas hard individuales.",
   },
   together: {
     ru: "Парный режим: одно и то же задание показывается обоим и при включённых уведомлениях отправляется партнёру в Telegram. Создай одно совместное действие для совершеннолетних мужчины и женщины, а не два отдельных задания и не ролевую сцену. Обращайся к обоим во множественном числе; явно укажи, что делают оба. В «Страсти» и «Харде» включи обоих в конкретный сексуальный акт. Взаимная мастурбация — допустимое общее задание: прямо назови её и укажи, что оба ласкают друг друга руками; не своди её к действию только одного.",
@@ -563,40 +583,38 @@ const PROMPTS: Record<string, Record<string, string>> = {
     ru: `Ты создаёшь одно задание для категории «КОМПЛИМЕНТЫ» в гетеросексуальной паре мужчина–женщина.
 
 Стиль: используй конкретный поступок или наблюдение и одну выразительную деталь. Задание должно звучать лично, а не как общий комплимент из открытки.
-Категория только про слова и знаки внимания: сказать или написать комплимент, поблагодарить за конкретную мелочь, напомнить об общем тёплом воспоминании. Можно предложить в течение дня обмениваться обычными личными селфи с короткими подписями-комплиментами; никаких интимных фото или публикаций.
+Категория только про слова и лёгкие знаки внимания: конкретные комплименты, благодарность, тёплые воспоминания, личные голосовые, ласковое фото с подписью или короткое доброе видеообращение. Не добавляй флирт, прикосновения или интимные фото.
 
 Придумай новое задание в духе приложенных примеров, не копируя их. Одно ясное действие; максимум 1–3 связанных шага, обычно 1–2 предложения. Не добавляй шаблонный финал «пусть почувствует». До ${MAX_TASK_CHARS} символов. Верни только текст задания.`,
     en: `Create one task for the "COMPLIMENTS" category for a heterosexual man-woman couple.
 
 Style: use one specific observation or gesture and one vivid detail. Make it personal rather than a generic greeting-card compliment.
-This category is about words and thoughtful gestures only: give a specific compliment, thank the partner for a small real thing, or recall a warm shared memory. One option is to exchange ordinary private selfies with short compliment captions during free moments through the day; never request intimate photos or public posts.
+This is the lightest level: specific compliments, thanks, warm shared memories, personal voice notes, affectionate photos with a caption, or a short loving video message. Do not add flirting, touch, or intimate photos.
 
 Create a new task in the style of the supplied examples without copying them. One clear action with at most 1–3 connected steps, usually 1–2 sentences. Avoid a formulaic "let them feel" ending. Up to ${MAX_TASK_CHARS} characters. Return only the task text.`,
   },
   tenderness: {
     ru: `Ты создаёшь одно задание для категории «НЕЖНОСТЬ» в гетеросексуальной паре мужчина–женщина.
 
-Категория — простая ласковая близость: объятие, поцелуй, прикосновение к руке, мягкий массаж плеч или спины. Задание остаётся нежным и не превращается в прелюдию или секс.
-Стиль — конкретный жест и одна чувственная деталь, без длинной сцены, реквизита и обязательной съёмки.
+Категория — ласковая, но не интимная близость: объятия, держаться за руки, поцелуй в лоб или щёку, массаж кистей/плеч/спины/стоп, расчесать волосы, нанести крем на руки, фото объятий или рук и видео с воздушным поцелуем. Не переходи к прикосновениям к интимным зонам, раздеванию или прелюдии.
 
 Создай новое задание в духе приложенных примеров, не копируя их. Одно ясное действие или 1–3 естественно связанных шага, обычно 1–2 предложения. Не повторяй один и тот же шаблонный финал. До ${MAX_TASK_CHARS} символов. Верни только текст задания.`,
     en: `Create one task for the "TENDERNESS" category for a heterosexual man-woman couple.
 
-Keep it to gentle affection: a hug, a kiss, a hand touch, or a soft shoulder/back massage. Stay tender; do not turn the task into foreplay or sex.
-Use one concrete gesture and one sensory detail. Avoid a long scene, props, and required recording.
+Keep it to non-intimate affection: hugs, holding hands, a forehead/cheek kiss, hand/shoulder/back/foot massage, brushing their hair, applying hand cream, a photo of your hands or embrace, or a short blown-kiss video. No intimate-area touch, undressing, or foreplay. Use one concrete gesture and one sensory detail; avoid a long scene or required recording.
 
 Create a new task in the style of the supplied examples without copying them. One clear action or 1–3 naturally connected steps, usually 1–2 sentences. Avoid repetitive formulaic endings. Up to ${MAX_TASK_CHARS} characters. Return only the task text.`,
   },
   desire: {
     ru: `Ты создаёшь одно задание для категории «ЖЕЛАНИЕ» — предвкушение и прелюдия до секса — в гетеросексуальной паре мужчина–женщина.
 
-Создавай напряжение через флирт, поцелуй, шёпот, прикосновение поверх одежды, игривое раздевание или чувственный массаж. Это граница перед сексом: не описывай оральный секс, проникновение или сам половой акт. Не требуй интимных фото, видео или съёмки.
+Создавай предвкушение через флирт, соблазнение, поцелуи, раздевание, нежное прикосновение к интимным зонам, чувственный массаж, сливки или лёд на коже, мягкую сенсорную игру с повязкой, совместную ванну/душ без секса, личное интимное селфи или короткое видео-приветствие для партнёра. Интимное фото/видео должно быть добровольным и только для партнёра; не снимай сам секс. Например, можно описать игривый образ в свободной футболке без белья или соблазняющий наклон. Не описывай оральные действия, проникновение или активную сексуальную стимуляцию.
 Соблюдай анатомию и естественную последовательность. Одно центральное действие, не длинная сцена.
 
 Придумай новое задание в духе примеров, не копируя их. 1–3 связанных шага, обычно 1–2 предложения; конкретно и чувственно, без повторяющегося «пусть почувствует». До ${MAX_TASK_CHARS} символов. Верни только текст задания.`,
     en: `Create one task for the "DESIRE" category—anticipation and foreplay before sex—for a heterosexual man-woman couple.
 
-Build tension through flirting, a kiss, a whisper, a touch over clothing, playful undressing, or sensual massage. Stay at the edge before sex: do not describe oral sex, penetration, or intercourse. Do not require intimate photos, video, or filming.
+Build anticipation through flirting, seduction, kisses, undressing, gentle intimate touch, sensual massage, whipped cream or ice on the skin, gentle blindfolded sensory play, a shared bath/shower without sex, a private intimate selfie, or a short intimate greeting video for the partner. Intimate media must be voluntary and addressed only to the partner; do not film sex. An oversized shirt without underwear or a teasing bend is one possible idea. Do not describe oral acts, penetration, or active sexual stimulation.
 Keep the anatomy and order of actions physically plausible. Use one central action, not a long scene.
 
 Create a new task in the style of the examples without copying them. Use 1–3 connected steps, usually 1–2 sentences; be concrete and sensual, and avoid repetitive "let them feel" endings. Up to ${MAX_TASK_CHARS} characters. Return only the task text.`,
@@ -604,30 +622,28 @@ Create a new task in the style of the examples without copying them. Use 1–3 c
   passion: {
     ru: `Ты создаёшь одно задание для категории «СТРАСТЬ» — конкретный чувственный секс в гетеросексуальной паре мужчина–женщина.
 
-Большой список заданий этой категории — основной источник разнообразия. Не своди её только к оральному/вагинальному сексу и мастурбации: используй и другие конкретные сексуальные действия и варианты из примеров — стимуляцию, ласки чувствительных зон, позиции, контроль ритма, раздевание и игру с ощущениями. Сохраняй категорию именно сексуальной: один поцелуй, общий массаж или разговор о желании сами по себе недостаточны. Возьми одно центральное действие или несколько тесно связанных действий и опиши их нежно, красиво и чувственно.
+Большой список — источник разнообразия. Используй разные конкретные сексуальные действия, а не только оральный/вагинальный секс и мастурбацию: ручную и оральную стимуляцию, ласки с игрушкой, взаимные оральные ласки в позиции 69, вагинальный секс в разных позициях и ритмах, чувственный массаж как часть секса, сливки или лёд как деталь, душ/ванну и секс в уединённой припаркованной машине. Тон нежный и чувственный. Сохраняй категорию именно сексуальной: один поцелуй, общий массаж или разговор о желании сами по себе недостаточны. Возьми одно центральное действие или несколько тесно связанных действий и опиши их нежно, красиво и чувственно.
 Соблюдай анатомию и выполнимый порядок. Не обещай конкретную реакцию тела. Если упоминается оргазм, он обычно завершает задание; не добавляй после него следующий акт автоматически. Не добавляй реквизит, музыку или съёмку по умолчанию.
 
 Создай оригинальное задание, опираясь на разные идеи в переданных примерах, но не копируя их. 1–3 связанных шага, обычно 1–2 предложения, до ${MAX_TASK_CHARS} символов. Без шаблонных концовок и пояснений; верни только текст задания.`,
     en: `Create one task for the "PASSION" category: a concrete, sensual sexual act for a heterosexual man-woman couple.
 
-The large supplied task list is the main source of variety. Do not reduce the category to oral/vaginal sex and masturbation: use the other concrete sexual actions and variations in the examples too, such as stimulation, sensitive-body-area play, positions, pace control, undressing, and sensory play. Keep the task clearly sexual: a kiss, general massage, or talk about desire alone is not enough. Choose one central action or a few closely connected actions and describe them tenderly and beautifully.
+Use the large supplied list for breadth, not just oral/vaginal sex and masturbation: include manual and oral stimulation, toy-assisted touch, mutual oral stimulation in position 69, vaginal sex in varied positions and rhythms, sensual massage within sex, cream or ice as an occasional detail, bath/shower sex, and sex in a secluded parked car. Use position 69 only in Together; name both actions and anatomy explicitly: he gives oral pleasure to her vulva/clitoris, and she to his penis. Keep the tone tender and sensual. Keep the task clearly sexual: a kiss, general massage, or talk about desire alone is not enough. Choose one central action or a few closely connected actions and describe them tenderly and beautifully.
 Keep anatomy and order physically plausible. Do not guarantee a bodily response. If orgasm is mentioned, it usually ends the task; do not automatically add another act afterward. Do not add props, music, or filming by default.
 
 Create an original task based on varied ideas from the supplied examples without copying them: 1–3 connected steps, usually 1–2 sentences, up to ${MAX_TASK_CHARS} characters. Avoid formulaic endings and explanations; return only the task text.`,
   },
   hard: {
-    ru: `Ты создаёшь одно задание для категории «ХАРД» — конкретное полноценное сексуальное действие в более грязной и прямой подаче для гетеросексуальной пары мужчина–женщина.
+    ru: `Ты создаёшь короткое задание категории «ХАРД» для совершеннолетней пары мужчина–женщина: конкретный сексуальный акт, поданный прямо и немного грязно.
 
-Используй весь диапазон больших исходных списков, а не только оральный/вагинальный секс и мастурбацию: называй конкретный сексуальный акт, прямую стимуляцию гениталий или проникновение, добавляя другие действия и детали из примеров. Не считай заданием наготу, совместное лежание, раздевание, поцелуи, общий массаж, разговоры или съёмку без конкретного сексуального действия. Более мягкие идеи допустимы только как детали к прямому сексуальному акту. Съёмка порно допустима только вместе с конкретным сексуальным телесным действием и только если оба этого хотят; одна съёмка не заменяет действие. Используй прямую лексику и немного грязных слов; хард не требует боли, принуждения или опасных действий.
-Соблюдай анатомию и последовательность. Если предлагаешь эротическую съёмку, видео остаётся личным: не предлагай отправлять или публиковать его. Это короткая карточка, не ролевая сцена: без персонажей, сюжета и длинных реплик.
+Используй разные акты и позиции из большого списка: оральный, вагинальный и ручной секс, игрушки, душ/ванну, уединённую припаркованную машину, более напористый ритм, грязные слова, повязку и мягкую фиксацию запястий. Временная роль подчинения допустима только во «Вместе»; назови короткую длительность и стоп-сигнал. Никакой боли, принуждения или опасности. Домашнее порно — только вместе с конкретным сексуальным актом, если оба этого хотят; видео остаётся приватным.
 
-Создай оригинальное задание, используя разные идеи из переданных примеров, но не копируя их: одно действие или 1–3 тесно связанных шага, обычно 1–2 предложения, до ${MAX_TASK_CHARS} символов. Верни только текст задания.`,
-    en: `Create one task for the "HARD" category: a concrete full sexual act for a heterosexual man-woman couple, in a dirtier and more direct style than "PASSION".
+Каждое задание обязано прямо назвать физический сексуальный акт. Нагота, раздевание, поцелуи, массаж, реквизит или съёмка без акта не подходят. Соблюдай анатомию и порядок действий. Это короткая карточка, не ролевая сцена: без персонажей, сюжета и длинных диалогов. 1–3 связанных шага, обычно 1–2 предложения, до ${MAX_TASK_CHARS} символов. Верни только текст задания.`,
+    en: `Create one short HARD task for an adult heterosexual man-woman couple: name a concrete sexual act in a direct, slightly dirty tone.
 
-Use the full range of the large supplied task lists, not only oral/vaginal sex and masturbation: name a concrete sexual act, direct genital stimulation, or penetration, and draw on other actions and details from the examples. Nudity, lying together, undressing, kissing, general massage, talk, or filming without a concrete sexual act do not qualify. Lighter ideas may only support a direct sexual act, never replace it. Porn filming is allowed only alongside a concrete physical sexual act and only if both want it; filming alone does not replace the act. Keep it private. Do not make a task only about talking about desire, asking “what do you want,” promising, one kiss, general caresses, or saying “do it.” State the physical action. Use direct wording and a little dirty talk; hard does not mean pain, coercion, or danger.
-Keep anatomy and sequence plausible. If erotic filming appears, keep the video private and never suggest sending or posting it. This is a short task, not a roleplay scene: no characters, plot, or long dialogue.
+Draw from the full list: oral, vaginal, and manual sex, toys, shower/bath or a secluded parked car, a firmer rhythm, dirty talk, a blindfold, and gentle wrist restraint. A time-bounded submission dynamic is Together-only; name its short duration and a stop signal. No pain, coercion, or danger. Homemade porn may accompany a concrete act only if both want it; keep the video private.
 
-Create an original task from varied ideas in the supplied examples without copying them: one action or 1–3 closely connected steps, usually 1–2 sentences, up to ${MAX_TASK_CHARS} characters. Return only the task text.`,
+Every task must explicitly name the physical sexual act. Nudity, undressing, kissing, massage, props, or filming without an act do not qualify. Keep anatomy and sequence plausible. This is a short task, not roleplay: no characters, plot, or long dialogue. Use 1–3 connected steps, usually 1–2 sentences, up to ${MAX_TASK_CHARS} characters. Return only the task text.`,
   },
 };
 
@@ -666,12 +682,20 @@ const VARIATION_FOCI: Record<string, { ru: string[]; en: string[] }> = {
       "короткие намёки о желании в разные моменты и один поцелуй позже",
       "игривое предвкушение через одежду после обмена сообщениями в течение дня",
       "один долгий поцелуй при встрече после коротких флиртующих сообщений",
+      "отправить партнёру одно добровольное личное интимное фото с короткой подписью",
+      "игриво пройти мимо партнёра в свободной футболке без белья и задержать взгляд",
+      "чувственный массаж, который постепенно переходит к нежным интимным прикосновениям",
+      "совместный душ как прелюдия без описания самого секса",
     ],
     en: [
       "flirty messages through the day and a kiss when you meet, staying at the edge of foreplay",
       "short hints about desire at separate moments and one kiss later",
       "playful anticipation through clothing after trading messages during the day",
       "one lingering kiss when you meet after brief flirty messages",
+      "send the partner one voluntary private intimate photo with a short caption",
+      "walk past the partner in an oversized shirt without underwear and hold their gaze",
+      "a sensual massage that gradually becomes gentle intimate touch",
+      "a shared shower as foreplay without describing sex itself",
     ],
   },
 };
@@ -822,6 +846,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           && isTaskTextModeAppropriate(candidate, lang, mode)
           && hasAnatomicallyClearOralAct(candidate, lang, mode, gender === "female" ? "female" : "male")
           && hasCategorySexualAct(candidate, category, lang)
+          && !(mode === "solo" && (MUTUAL_ONLY_TASK_MARKERS[lang] ?? MUTUAL_ONLY_TASK_MARKERS.en).test(candidate))
+          && isTaskExampleMediaAllowed(candidate, category, lang, mode)
           && !forbidden.some(f => candidate.toLowerCase().includes(f))) {
           task = candidate;
           source = "ai";

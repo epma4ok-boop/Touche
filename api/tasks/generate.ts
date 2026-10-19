@@ -112,8 +112,8 @@ const DAILY_TASK_FALLBACKS: Record<string, StaticPool> = {
   ru: {
     compliments: [
       "В ближайшие сутки в свободные минуты отправляйте друг другу обычные селфи с короткими личными комплиментами; фотографии остаются только между вами.",
-      "Вечером по очереди назовите друг другу одну черту, которой вы особенно дорожите, и вспомните конкретный момент, когда она проявилась.",
-      "Каждый из вас напишите партнёру одну короткую благодарность за недавнюю мелочь, которую обычно не замечают.",
+      "Вечером по очереди назовите одну черту партнёра, которую действительно цените. Добавьте реальный пример, только если он сам вспоминается; ничего не придумывайте.",
+      "Каждый отправьте партнёру короткое сообщение о том, что действительно цените в нём или ней сейчас; не обязательно привязывать благодарность к недавнему событию.",
     ],
     tenderness: [
       "В ближайшие сутки обнимайтесь при встрече, а если будете врозь — отправьте друг другу по одному короткому тёплому голосовому сообщению.",
@@ -141,8 +141,8 @@ const DAILY_TASK_FALLBACKS: Record<string, StaticPool> = {
   en: {
     compliments: [
       "Over the next day, take turns sending each other ordinary private selfies with specific compliment captions; keep every photo between the two of you.",
-      "Tonight, each of you name one small detail you appreciate about the other and share a real moment when it stood out.",
-      "Both of you send the other a short thank-you for a recent everyday gesture that might otherwise go unnoticed.",
+      "Tonight, each of you name one quality you genuinely appreciate in the other. Add a real example only if one comes to mind; do not invent one.",
+      "Each of you send a short note about something you genuinely appreciate about your partner now; it does not have to refer to a recent event.",
     ],
     tenderness: [
       "Whenever you meet over the next day, both of you share a brief hug; if apart, trade one warm voice note each.",
@@ -170,8 +170,8 @@ const DAILY_TASK_FALLBACKS: Record<string, StaticPool> = {
   hi: {
     compliments: [
       "अगले दिन खाली समय में आप दोनों एक-दूसरे को साधारण निजी सेल्फ़ी के साथ खास तारीफ़ भेजें; तस्वीरें केवल आप दोनों के बीच रहें।",
-      "आज शाम बारी-बारी से एक-दूसरे की वह छोटी बात बताएं जिसकी आप सबसे ज़्यादा कद्र करते हैं, और उससे जुड़ा एक सच्चा पल याद करें।",
-      "आप दोनों हाल की किसी छोटी मदद के लिए एक-दूसरे को छोटा-सा धन्यवाद संदेश भेजें।",
+      "आज शाम बारी-बारी से एक ऐसी बात बताएं जिसकी आप सचमुच अपने साथी में कद्र करते हैं। असली उदाहरण तभी दें जब वह खुद याद आए; कुछ गढ़ें नहीं।",
+      "आप दोनों अपने साथी को एक छोटा संदेश भेजें कि आप आज उनमें किस बात की सचमुच कद्र करते हैं; हाल की घटना का होना ज़रूरी नहीं।",
     ],
     tenderness: [
       "अगले दिन जब भी मिलें, आप दोनों एक-दूसरे को थोड़ी देर गले लगाएं; दूर हों तो एक-एक स्नेह भरा वॉइस नोट भेजें।",
@@ -199,8 +199,8 @@ const DAILY_TASK_FALLBACKS: Record<string, StaticPool> = {
   pt: {
     compliments: [
       "Nas próximas 24 horas, vocês dois enviem selfies comuns e privadas com elogios específicos; mantenham as fotos só entre vocês.",
-      "Hoje à noite, vocês dois digam um ao outro uma qualidade que admiram e lembrem um momento real em que ela apareceu.",
-      "Vocês dois enviem ao parceiro um agradecimento curto por um gesto cotidiano recente.",
+      "Hoje à noite, cada um diga uma qualidade do parceiro que realmente admira. Acrescente um exemplo real só se ele vier à memória; não invente.",
+      "Cada um envie uma mensagem curta dizendo o que realmente aprecia no parceiro agora; não é preciso mencionar um acontecimento recente.",
     ],
     tenderness: [
       "Quando se encontrarem amanhã, vocês dois compartilhem um abraço breve; se estiverem longe, troquem uma mensagem de voz carinhosa.",
@@ -228,8 +228,8 @@ const DAILY_TASK_FALLBACKS: Record<string, StaticPool> = {
   es: {
     compliments: [
       "Durante el próximo día, los dos envíense selfies normales y privados con un cumplido concreto; mantengan las fotos solo entre ustedes.",
-      "Esta noche, ambos díganse qué detalle del otro admiran y recuerden un momento real en que lo notaron.",
-      "Ambos envíense un agradecimiento breve por un gesto cotidiano reciente del otro.",
+      "Esta noche, cada uno nombre una cualidad del otro que de verdad aprecia. Añadan un ejemplo real solo si les viene a la mente; no inventen uno.",
+      "Cada uno envíe un mensaje breve sobre algo que de verdad aprecia de su pareja ahora; no hace falta mencionar algo reciente.",
     ],
     tenderness: [
       "Cuando se vean, los dos compartan un abrazo breve; si están lejos, intercambien una nota de voz cariñosa.",
@@ -484,11 +484,11 @@ function getTaskExamplesPrompt(category: string, lang: string, requestId: string
   const examples = getTaskExamples(category, lang, requestId, mode, gender);
   if (examples.length === 0) return "";
   const intro: Record<string, string> = {
-    ru: "Ниже — разнообразные примеры из большого исходного списка этой категории. Используй сами идеи, не копируй формулировки. Часть примеров может быть написана для другого режима: перепиши роли строго по инструкции solo/together.",
-    en: "Below are varied examples from the large original list for this category. Use the ideas, not the wording. Some examples may use a different mode; rewrite the roles to follow the solo/together instructions exactly.",
-    hi: "नीचे इस श्रेणी की बड़ी मूल सूची से विविध उदाहरण हैं। विचार लें, शब्दशः न दोहराएँ। कुछ उदाहरण दूसरे मोड के हो सकते हैं; भूमिकाएँ चुने हुए मोड के अनुसार बदलें।",
-    pt: "Abaixo estão exemplos variados da lista original extensa desta categoria. Use as ideias, não a redação. Alguns podem ter outro modo; adapte os papéis às instruções de solo/a dois.",
-    es: "A continuación hay ejemplos variados de la lista original amplia de esta categoría. Usa las ideas, no copies el texto. Algunos pueden usar otro modo; adapta los papeles a las instrucciones individual/en pareja.",
+    ru: "Ниже — разнообразные примеры из большого исходного списка этой категории. Используй идеи, не копируй формулировки. Часть примеров может быть написана для другого режима: перепиши роли строго по инструкции solo/together. Не предполагай конкретных прошлых событий, поступков или реакций, о которых пользователь не сообщил. Воспоминание можно упомянуть только как необязательную деталь, если оно действительно есть; задание должно оставаться выполнимым и без него.",
+    en: "Below are varied examples from the large original list for this category. Use the ideas, not the wording. Some examples may use a different mode; rewrite the roles to follow the solo/together instructions exactly. Do not assume past events, actions, or reactions the user did not provide. Mention a memory only as an optional detail if it genuinely exists; the task must remain doable without one.",
+    hi: "नीचे इस श्रेणी की बड़ी मूल सूची से विविध उदाहरण हैं। विचार लें, शब्दशः न दोहराएँ। कुछ उदाहरण दूसरे मोड के हो सकते हैं; भूमिकाएँ चुने हुए मोड के अनुसार बदलें। ऐसी पिछली घटनाओं, कामों या प्रतिक्रियाओं को सच न मानें जिनका उपयोगकर्ता ने उल्लेख नहीं किया। यादों का ज़िक्र केवल वैकल्पिक रूप में करें, अगर वे सचमुच मौजूद हों; उनके बिना भी काम किया जा सके।",
+    pt: "Abaixo estão exemplos variados da lista original desta categoria. Use as ideias, não copie a redação. Alguns podem usar outro modo; adapte os papéis às instruções de solo/a dois. Não presuma acontecimentos, gestos ou reações passados que o usuário não informou. Mencione uma lembrança apenas como detalhe opcional, se ela realmente existir; a tarefa deve continuar possível sem ela.",
+    es: "A continuación hay ejemplos variados de la lista original de esta categoría. Usa las ideas, no copies el texto. Algunos pueden usar otro modo; adapta los papeles a las instrucciones individual/en pareja. No des por hechos sucesos, gestos o reacciones pasados que el usuario no haya mencionado. Incluye un recuerdo solo como detalle opcional si realmente existe; la tarea debe poder hacerse sin él.",
   };
   const hardIntro: Record<string, string> = {
     ru: "Примеры ниже отобраны из больших списков «Страсть» и «Хард» по конкретным сексуальным действиям; некоторые формулировки могут быть мягче нужного тона. Используй их для разнообразия, но в каждом задании назови прямой сексуальный акт. Нагота, лежание, раздевание, поцелуи и общие ласки могут быть только дополнительными деталями.",
@@ -508,7 +508,10 @@ function getFallback(
   gender: string,
   recentVariationTags: TaskVariationTag[],
 ): string {
-  const sourceTasks = SOURCE_TASKS[lang]?.[cat] ?? [];
+  const allSourceTasks = SOURCE_TASKS[lang]?.[cat] ?? [];
+  const sourceTasks = cat === "compliments" || cat === "tenderness"
+    ? allSourceTasks.filter((task) => getTaskVariationTag(task, lang) !== "shared_memory")
+    : allSourceTasks;
   const fallbackTasks = mode === "solo"
     ? SOLO_SEXUAL_FALLBACKS[lang]?.[cat as "passion" | "hard"] ?? []
     : (DAILY_TASK_FALLBACKS[lang] ?? DAILY_TASK_FALLBACKS.en)[cat] ?? [];
@@ -582,26 +585,26 @@ const PROMPTS: Record<string, Record<string, string>> = {
   compliments: {
     ru: `Ты создаёшь одно задание для категории «КОМПЛИМЕНТЫ» в гетеросексуальной паре мужчина–женщина.
 
-Стиль: используй конкретный поступок или наблюдение и одну выразительную деталь. Задание должно звучать лично, а не как общий комплимент из открытки.
-Категория только про слова и лёгкие знаки внимания: конкретные комплименты, благодарность, тёплые воспоминания, личные голосовые, ласковое фото с подписью или короткое доброе видеообращение. Не добавляй флирт, прикосновения или интимные фото.
+Стиль: используй конкретную, правдивую деталь, которую пользователь может выбрать сам, и одну выразительную деталь. Задание должно звучать лично, а не как общий комплимент из открытки. Не приписывай партнёру события, поступки или реакции, о которых пользователь не сообщил.
+Категория только про слова и лёгкие знаки внимания: конкретные комплименты, благодарность, тёплые воспоминания, если реальный эпизод действительно приходит на ум, личные голосовые, ласковое фото с подписью или короткое доброе видеообращение. Не требуй конкретного воспоминания: если оно не вспоминается, комплимент должен быть выполнимым без него. Не добавляй флирт, прикосновения или интимные фото.
 
 Придумай новое задание в духе приложенных примеров, не копируя их. Одно ясное действие; максимум 1–3 связанных шага, обычно 1–2 предложения. Не добавляй шаблонный финал «пусть почувствует». До ${MAX_TASK_CHARS} символов. Верни только текст задания.`,
     en: `Create one task for the "COMPLIMENTS" category for a heterosexual man-woman couple.
 
-Style: use one specific observation or gesture and one vivid detail. Make it personal rather than a generic greeting-card compliment.
-This is the lightest level: specific compliments, thanks, warm shared memories, personal voice notes, affectionate photos with a caption, or a short loving video message. Do not add flirting, touch, or intimate photos.
+Style: use one truthful detail the user can choose and one vivid detail. Make it personal rather than a generic greeting-card compliment. Do not invent the partner's past actions or reactions.
+This is the lightest level: specific compliments, thanks, warm shared memories only when a real memory comes to mind, personal voice notes, affectionate photos with a caption, or a short loving video message. Never require a specific memory; the task must still work without one. Do not add flirting, touch, or intimate photos.
 
 Create a new task in the style of the supplied examples without copying them. One clear action with at most 1–3 connected steps, usually 1–2 sentences. Avoid a formulaic "let them feel" ending. Up to ${MAX_TASK_CHARS} characters. Return only the task text.`,
   },
   tenderness: {
     ru: `Ты создаёшь одно задание для категории «НЕЖНОСТЬ» в гетеросексуальной паре мужчина–женщина.
 
-Категория — ласковая, но не интимная близость: объятия, держаться за руки, поцелуй в лоб или щёку, массаж кистей/плеч/спины/стоп, расчесать волосы, нанести крем на руки, фото объятий или рук и видео с воздушным поцелуем. Не переходи к прикосновениям к интимным зонам, раздеванию или прелюдии.
+Категория — ласковая, но не интимная близость: объятия, держаться за руки, поцелуй в лоб или щёку, массаж кистей/плеч/спины/стоп, расчесать волосы, нанести крем на руки, фото объятий или рук и видео с воздушным поцелуем. Не переходи к прикосновениям к интимным зонам, раздеванию или прелюдии. Описывай действие, которое можно сделать сейчас; не предполагай, что пара уже пережила конкретный момент или сейчас находится рядом.
 
 Создай новое задание в духе приложенных примеров, не копируя их. Одно ясное действие или 1–3 естественно связанных шага, обычно 1–2 предложения. Не повторяй один и тот же шаблонный финал. До ${MAX_TASK_CHARS} символов. Верни только текст задания.`,
     en: `Create one task for the "TENDERNESS" category for a heterosexual man-woman couple.
 
-Keep it to non-intimate affection: hugs, holding hands, a forehead/cheek kiss, hand/shoulder/back/foot massage, brushing their hair, applying hand cream, a photo of your hands or embrace, or a short blown-kiss video. No intimate-area touch, undressing, or foreplay. Use one concrete gesture and one sensory detail; avoid a long scene or required recording.
+Keep it to non-intimate affection: hugs, holding hands, a forehead/cheek kiss, hand/shoulder/back/foot massage, brushing their hair, applying hand cream, a photo of your hands or embrace, or a short blown-kiss video. No intimate-area touch, undressing, or foreplay. Use one concrete gesture and one sensory detail; avoid a long scene or required recording. Describe something the user can do now; do not assume a specific past moment or that the couple is currently together.
 
 Create a new task in the style of the supplied examples without copying them. One clear action or 1–3 naturally connected steps, usually 1–2 sentences. Avoid repetitive formulaic endings. Up to ${MAX_TASK_CHARS} characters. Return only the task text.`,
   },
@@ -653,13 +656,13 @@ const VARIATION_FOCI: Record<string, { ru: string[]; en: string[] }> = {
       "обмен обычными личными селфи с короткими комплиментами в свободные моменты дня",
       "два конкретных тёплых сообщения, отправленных в разные моменты дня",
       "короткие голосовые комплименты, которыми пара обменивается в течение дня",
-      "вспомнить в сообщении о маленьком общем воспоминании и вернуться к нему позже",
+      "обменяться сообщениями о том, что каждый действительно ценит в партнёре сейчас, без обязательной привязки к общему воспоминанию",
     ],
     en: [
       "exchange ordinary private selfies with short compliment captions in free moments through the day",
       "send two specific warm messages at separate moments during the day",
       "trade short voice-note compliments throughout the day",
-      "recall a small shared memory in a message and return to it later",
+      "exchange messages about what each genuinely appreciates about the other now, without requiring a shared memory",
     ],
   },
   tenderness: {

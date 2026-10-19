@@ -29,6 +29,58 @@ async function sendMessage(chatId: number, text: string, extra?: object) {
   return tgPost("sendMessage", { chat_id: chatId, text, parse_mode: "HTML", ...extra });
 }
 
+async function sendStartStats(chatId: number) {
+  const { count, error } = await supabase
+    .from("telegram_start_users")
+    .select("telegram_id", { count: "exact", head: true });
+  if (error) {
+    console.error("[telegram-webhook] start stats query failed", { error: error.message });
+    await sendMessage(chatId, "Не удалось получить статистику. Проверьте миграцию Supabase.");
+    return;
+  }
+  await sendMessage(chatId, `Нажали Start: <b>${count ?? 0}</b> уникальных пользователей.`);
+}
+
+async function sendStartUsers(chatId: number, page: number) {
+  const pageSize = 20;
+  const from = (page - 1) * pageSize;
+  const { data, count, error } = await supabase
+    .from("telegram_start_users")
+    .select("telegram_id,username,first_tracked_start_at", { count: "exact" })
+    .order("first_tracked_start_at", { ascending: false })
+    .range(from, from + pageSize - 1);
+
+  if (error) {
+    console.error("[telegram-webhook] start users query failed", { error: error.message });
+    await sendMessage(chatId, "Не удалось получить список. Проверьте миграцию Supabase.");
+    return;
+  }
+
+  const total = count ?? 0;
+  const pages = Math.max(1, Math.ceil(total / pageSize));
+  if (page > pages) {
+    await sendMessage(chatId, `Такой страницы нет. Всего страниц: ${pages}. Команда: <code>/users ${pages}</code>`);
+    return;
+  }
+
+  const rows = (data ?? []).map((user) => {
+    const label = typeof user.username === "string" && user.username
+      ? `@${escapeHtml(user.username)}`
+      : `ID <code>${user.telegram_id}</code>`;
+    const startedAt = new Intl.DateTimeFormat("ru-RU", {
+      dateStyle: "short",
+      timeStyle: "short",
+      timeZone: "Europe/Moscow",
+    }).format(new Date(user.first_tracked_start_at));
+    return `• ${label} — ${startedAt}`;
+  });
+
+  await sendMessage(
+    chatId,
+    `Пользователи, нажавшие Start: <b>${total}</b>\nСтраница ${page}/${pages}\n\n${rows.length ? rows.join("\n") : "Пока записей нет."}`,
+  );
+}
+
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
   if (!BOT_TOKEN || !WEBHOOK_SECRET) {
@@ -118,6 +170,36 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(200).json({ ok: true });
   }
 
+  // Admin-only commands for the tracked /start list.
+  const statsCommand = typeof text === "string" && /^\/stats(?:@\w+)?(?:\s|$)/.test(text);
+  const usersCommand = typeof text === "string" && /^\/users(?:@\w+)?(?:\s|$)/.test(text);
+  if (statsCommand || usersCommand) {
+    const message = update.message;
+    const senderId = Number(message.from?.id);
+    const chatId = Number(message.chat?.id);
+    if (
+      senderId !== ADMIN_TELEGRAM_ID
+      || chatId !== senderId
+      || message.chat?.type !== "private"
+    ) {
+      return res.status(200).json({ ok: true });
+    }
+
+    if (statsCommand) {
+      await sendStartStats(chatId);
+      return res.status(200).json({ ok: true });
+    }
+
+    const match = text.match(/^\/users(?:@\w+)?(?:\s+(\d+))?\s*$/);
+    const page = match?.[1] ? Number(match[1]) : 1;
+    if (!match || !Number.isSafeInteger(page) || page < 1 || page > 100_000) {
+      await sendMessage(chatId, "Укажите номер страницы: <code>/users 1</code>");
+      return res.status(200).json({ ok: true });
+    }
+    await sendStartUsers(chatId, page);
+    return res.status(200).json({ ok: true });
+  }
+
   // Let a user retrieve their own Telegram ID for support and purchase recovery.
   if (update?.message?.text?.match(/^\/myid(?:@\w+)?(?:\s|$)/)) {
     const chatId = Number(update.message.chat?.id);
@@ -131,6 +213,39 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const msg    = update.message;
     const chatId = msg.chat.id as number;
     const param  = (msg.text as string).replace("/start", "").trim();
+    const telegramId = Number(msg.from?.id);
+
+    if (
+      msg.chat?.type === "private"
+      && Number.isSafeInteger(telegramId)
+      && telegramId > 0
+      && chatId === telegramId
+    ) {
+      const username = typeof msg.from?.username === "string" ? msg.from.username : null;
+      try {
+        const { error } = await supabase
+          .from("telegram_start_users")
+          .upsert(
+            {
+              telegram_id: telegramId,
+              username,
+              start_parameter: param.slice(0, 64) || null,
+            },
+            { onConflict: "telegram_id", ignoreDuplicates: true },
+          );
+        if (error) {
+          console.error("[telegram-webhook] start user tracking failed", {
+            update_id: updateId,
+            error: error.message,
+          });
+        }
+      } catch (error) {
+        console.error("[telegram-webhook] start user tracking failed", {
+          update_id: updateId,
+          error: error instanceof Error ? error.message : "unknown_error",
+        });
+      }
+    }
 
     if (param.startsWith("ref_")) {
       const refUserId = parseInt(param.replace("ref_", ""), 10);

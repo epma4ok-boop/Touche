@@ -11,8 +11,9 @@ import { ACTIVE_SCENARIO_KEY, getActiveScenarioStorageKey, type ActiveScenario }
 import type { SharedTaskSnapshot } from "@/data/sharedPair";
 import FirstRunTutorial, { type TutorialStep } from "@/components/FirstRunTutorial";
 import { trackAnalyticsEvent } from "@/analytics";
+import LovePathScreen from "@/pages/LovePathScreen";
 
-type AppPhase = "splash" | "lang" | "onboarding" | "gender" | "home" | "category" | "scenario" | "shared_task_error";
+type AppPhase = "splash" | "lang" | "onboarding" | "gender" | "home" | "category" | "scenario" | "shared_task_error" | "love_path";
 export type AppMode = "solo" | "together";
 
 const COUPLE_ID_KEY = "touche_couple_id";
@@ -632,6 +633,13 @@ export default function App() {
              onSubscribe={() => apiSubscribe(lang)}
             onTutorialPairFlow={setTutorialPairFlowOpen}
              onTutorialModeSelected={() => setTutorialStep((current) => current === 2 ? 3 : current)}
+            onLovePathOpen={() => setPhase("love_path")}
+          />
+        )}
+        {phase === "love_path" && (
+          <LovePathScreen
+            lang={lang}
+            onBack={() => setPhase("home")}
           />
         )}
         {phase === "category"    && (

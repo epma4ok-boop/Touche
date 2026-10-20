@@ -278,7 +278,7 @@ export default function App() {
     }, []);
 
     const [phase, setPhase] = useState<AppPhase>("splash");
-    const [phaseAfterGender, setPhaseAfterGender] = useState<"home" | "category" | "scenario">("home");
+    const [phaseAfterGender, setPhaseAfterGender] = useState<"home" | "category" | "scenario" | "love_path">("home");
     const [lang, setLang] = useState<Lang>("ru");
   const [gender, setGender] = useState<Gender | undefined>(getSavedGender() ?? undefined);
     const [activeCategory, setActiveCategory] = useState<Category>("compliments");
@@ -384,7 +384,8 @@ export default function App() {
          /^ref_[1-9][0-9]*$/.test(startParam) ||
          initialParams.has("shared_task") ||
          initialParams.has("scenario") ||
-         initialParams.get("wish_map") === "1"
+          initialParams.get("wish_map") === "1" ||
+          initialParams.get("love_path") === "1"
        ) tutorialEligibleRef.current = false;
 
       const pairInvite = /^ref_([1-9][0-9]*)$/.exec(startParam);
@@ -397,6 +398,8 @@ export default function App() {
       }
 
        const params = initialParams;
+      const openLovePath = params.get("love_path") === "1";
+      if (openLovePath) setPhaseAfterGender("love_path");
       const sharedTaskId = params.get("shared_task");
       if (sharedTaskId && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(sharedTaskId)) {
         const loadedTask = await apiFetchSharedTask(sharedTaskId);
@@ -468,7 +471,7 @@ export default function App() {
       if (savedLang) {
         setLang(savedLang);
         if (savedGender) setGender(savedGender);
-        setPhase(savedGender ? "home" : "gender");
+        setPhase(savedGender ? (openLovePath ? "love_path" : "home") : "gender");
       } else {
         setPhase("lang");
       }

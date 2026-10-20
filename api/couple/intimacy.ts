@@ -2,6 +2,7 @@ import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { createClient } from "@supabase/supabase-js";
 import { validateTelegramInitData } from "./_auth.js";
 import { appDate } from "../limits.js";
+import { handleLovePath } from "./_love-path.js";
 
 const sb = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!);
 const BOT = process.env.BOT_TOKEN!;
@@ -761,6 +762,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     if (!couple) return res.status(404).json({ error: "no_couple" });
 
     if (req.method === "GET") {
+      if (action === "love_path") {
+        const result = await handleLovePath(couple, user.id, "GET");
+        return res.status(result.status).json(result.body);
+      }
       if (action === "preferences") {
         return res.status(200).json(await handleGetPreferences(couple, user.id));
       }
@@ -785,6 +790,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(400).json({ error: "unknown_action" });
     }
 
+    if (req.method === "POST" && action === "love_path") {
+      const result = await handleLovePath(couple, user.id, "POST", req.body ?? {});
+      return res.status(result.status).json(result.body);
+    }
     if (req.method === "POST" && action === "complete") {
       const result = await handleCompleteTask(couple, user.id, req.body ?? {});
       return res.status(result.status).json(result.body);

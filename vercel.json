@@ -7,6 +7,10 @@
     {
       "path": "/api/cron/nudge",
       "schedule": "0 15 * * *"
+    },
+    {
+      "path": "/api/cron/nudge?scope=love_path",
+      "schedule": "0 12 * * *"
     }
   ]
 }

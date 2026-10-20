@@ -83,6 +83,103 @@
 .pop-home-hero p { max-width: 280px; margin: 0; color: var(--pop-muted); font-size: 13px; line-height: 1.42; }
 .pop-home .pop-list > * { flex-shrink: 0; }
 
+/* Third home destination: the seven-day Love Path game. */
+.love-path-home-card {
+  position: relative;
+  display: flex;
+  min-height: 300px;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-end;
+  overflow: hidden;
+  padding: 21px;
+  border: 2px solid var(--pop-ink);
+  border-radius: 22px;
+  background:
+    radial-gradient(circle at 82% 24%, rgba(255,212,93,.72), transparent 25%),
+    linear-gradient(145deg, #ffe5e1 0%, #fffaf3 65%);
+  box-shadow: 4px 5px 0 rgba(22,34,56,.12);
+}
+.love-path-home-art {
+  position: absolute;
+  top: 10px;
+  right: 11px;
+  display: grid;
+  width: 170px;
+  height: 155px;
+  place-items: center;
+  color: var(--pop-wine);
+  opacity: .94;
+}
+.love-path-home-art span {
+  position: absolute;
+  font-size: 118px;
+  line-height: 1;
+  filter: drop-shadow(4px 5px 0 rgba(22,34,56,.12));
+  transform: rotate(-8deg);
+}
+.love-path-home-art i {
+  position: absolute;
+  z-index: 1;
+  width: 8px;
+  height: 8px;
+  border: 2px solid var(--pop-ink);
+  border-radius: 50%;
+  background: var(--pop-yellow);
+}
+.love-path-home-art i:nth-of-type(1) { top: 96px; left: 53px; }
+.love-path-home-art i:nth-of-type(2) { top: 75px; left: 39px; }
+.love-path-home-art i:nth-of-type(3) { top: 50px; left: 48px; }
+.love-path-home-art i:nth-of-type(4) { top: 34px; left: 72px; }
+.love-path-home-art i:nth-of-type(5) { top: 65px; left: 89px; }
+.love-path-home-kicker {
+  position: relative;
+  margin-bottom: 7px;
+  color: var(--pop-wine);
+  font: 700 10px "Space Grotesk", sans-serif;
+  letter-spacing: .13em;
+}
+.love-path-home-card h2 {
+  position: relative;
+  margin: 0;
+  color: var(--pop-ink);
+  font: 700 clamp(27px, 8vw, 37px)/1 "Space Grotesk", sans-serif;
+  letter-spacing: -.06em;
+}
+.love-path-home-card > p:not(.love-path-home-kicker) {
+  position: relative;
+  max-width: 320px;
+  margin: 8px 0 16px;
+  color: #5c5360;
+  font-size: 12px;
+  line-height: 1.48;
+}
+.love-path-home-button {
+  position: relative;
+  display: flex;
+  min-height: 45px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  width: 100%;
+  padding: 11px 14px;
+  border: 2px solid var(--pop-ink);
+  border-radius: 14px;
+  background: var(--pop-wine);
+  color: #fffaf3 !important;
+  box-shadow: 3px 3px 0 var(--pop-ink);
+  font: 700 12px "DM Sans", sans-serif;
+  cursor: pointer;
+  transition: transform .16s ease, box-shadow .16s ease;
+}
+.love-path-home-button:hover { transform: translate(-1px,-1px); box-shadow: 4px 4px 0 var(--pop-ink); }
+.love-path-home-button:active { transform: translate(2px,2px); box-shadow: 1px 1px 0 var(--pop-ink); }
+
+@media (max-width: 380px) {
+  .pop-home .pop-mode button { padding-inline: 6px !important; }
+  .pop-home .pop-mode button > div:first-child { gap: 4px !important; font-size: 11px !important; }
+}
+
 /* Mode switch */
 .pop-home .pop-mode {
   background: #f0e9df !important;

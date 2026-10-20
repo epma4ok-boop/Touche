@@ -51,6 +51,7 @@ interface HomeProps {
   onSubscribe: () => Promise<boolean>;
   onTutorialPairFlow?: (open: boolean) => void;
   onTutorialModeSelected?: () => void;
+  onLovePathOpen: () => void;
 }
 
 function useTelegramTopInset(): number {
@@ -318,39 +319,43 @@ const INVITE_MSG: Record<Lang, string> = {
 
 const MODE_LABELS: Record<Lang, {
   solo: string; soloSub: string; together: string; togetherSub: string; connected: string;
+  game: string; gameSub: string;
 }> = {
-  ru: { solo: "Один получает", soloSub: "выполнить вдвоём", together: "Вместе", togetherSub: "то же задание обоим", connected: "пара подключена" },
-  en: { solo: "One starts", soloSub: "do it together", together: "Together", togetherSub: "same task for both", connected: "pair connected" },
-  hi: { solo: "एक शुरुआत करे", soloSub: "दोनों साथ करें", together: "साथ में", togetherSub: "दोनों को वही काम", connected: "जोड़ी जुड़ी है" },
-  pt: { solo: "Uma pessoa inicia", soloSub: "façam juntos", together: "A dois", togetherSub: "mesma tarefa para ambos", connected: "casal conectado" },
-  es: { solo: "Uno inicia", soloSub: "háganlo juntos", together: "En pareja", togetherSub: "misma tarea para ambos", connected: "pareja conectada" },
+  ru: { solo: "Соло", soloSub: "выбирай задание", together: "Вместе", togetherSub: "одно на двоих", connected: "пара подключена", game: "Игра", gameSub: "Путь любви" },
+  en: { solo: "Solo", soloSub: "choose a task", together: "Together", togetherSub: "one for two", connected: "pair connected", game: "Game", gameSub: "Love Path" },
+  hi: { solo: "अकेले", soloSub: "एक काम चुनें", together: "साथ में", togetherSub: "दोनों के लिए", connected: "जोड़ी जुड़ी है", game: "खेल", gameSub: "प्यार का रास्ता" },
+  pt: { solo: "Solo", soloSub: "escolha uma tarefa", together: "A dois", togetherSub: "uma para ambos", connected: "casal conectado", game: "Jogo", gameSub: "Caminho do amor" },
+  es: { solo: "Solo", soloSub: "elige una tarea", together: "En pareja", togetherSub: "una para ambos", connected: "pareja conectada", game: "Juego", gameSub: "Camino del amor" },
 };
 
-function ModeSwitcher({ lang, mode, coupleId, onChange }: {
-  lang: Lang; mode: AppMode; coupleId: string | null; onChange: (mode: AppMode) => void;
+type HomeSection = AppMode | "game";
+
+function ModeSwitcher({ lang, section, coupleId, onChange }: {
+  lang: Lang; section: HomeSection; coupleId: string | null; onChange: (mode: HomeSection) => void;
 }) {
   const labels = MODE_LABELS[lang];
   return (
     <div className="pop-mode" data-testid="tutorial-mode-switcher" style={{
-      display: "grid", gridTemplateColumns: "1fr 1fr", gap: 4, padding: 4,
+      display: "grid", gridTemplateColumns: "repeat(3,minmax(0,1fr))", gap: 4, padding: 4,
       borderRadius: 18, background: "#f0e9df",
       border: "none",
     }}>
-      {(["solo", "together"] as AppMode[]).map((item) => {
-        const active = item === mode;
-        const title = item === "solo" ? labels.solo : labels.together;
-        const subtitle = item === "solo" ? labels.soloSub : labels.togetherSub;
+      {(["solo", "together", "game"] as HomeSection[]).map((item) => {
+        const active = item === section;
+        const title = item === "solo" ? labels.solo : item === "together" ? labels.together : labels.game;
+        const subtitle = item === "solo" ? labels.soloSub : item === "together" ? labels.togetherSub : labels.gameSub;
         return (
           <button key={item} data-testid={`button-mode-${item}`} onClick={() => onChange(item)} style={{
             minHeight: 56, border: "none",
             borderRadius: 14, cursor: "pointer", textAlign: "left",
-            padding: "8px 12px", background: active ? "#fffaf3" : "transparent",
+            padding: "8px 9px", background: active ? "#fffaf3" : "transparent",
             boxShadow: active ? "0 3px 0 rgba(22,34,56,.10)" : "none",
             transition: "all .24s ease",
           }}>
             <div style={{
               display: "flex", alignItems: "center", gap: 7,
-              fontFamily: "'Plus Jakarta Sans',sans-serif", fontWeight: 700, fontSize: 14,
+              fontFamily: "'Plus Jakarta Sans',sans-serif", fontWeight: 700, fontSize: 12,
+              whiteSpace: "nowrap",
               color: active ? "#162238" : "#667085",
             }}>
               <span style={{
@@ -362,7 +367,7 @@ function ModeSwitcher({ lang, mode, coupleId, onChange }: {
             </div>
             <div style={{
               marginTop: 3, paddingLeft: 14, fontFamily: "'Plus Jakarta Sans',sans-serif",
-              fontSize: 10, color: "#667085",
+              fontSize: 9, color: "#667085", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
               letterSpacing: "0.02em",
             }}>
               {subtitle}{item === "together" && coupleId ? ` · ${labels.connected}` : ""}
@@ -1194,6 +1199,7 @@ export default function Home({
   onCategorySelect, onScenarioOpen, onOpenSharedTask, onLanguageOpen, onGenderSwitch,
   onModeChange,
   onLinkCouple, onUnlinkCouple, onSubscribe, onTutorialPairFlow, onTutorialModeSelected,
+  onLovePathOpen,
 }: HomeProps) {
   const t = UI[lang];
   const [mounted, setMounted] = useState(false);
@@ -1202,6 +1208,7 @@ export default function Home({
   const [showMenu, setShowMenu] = useState(false);
   const [wishMapKey, setWishMapKey] = useState(0);
   const [showScenarioGate, setShowScenarioGate] = useState(false);
+  const [homeSection, setHomeSection] = useState<HomeSection>(mode);
   const [limits, setLimits] = useState<Partial<Record<Category, number | null>>>({});
   const topPx = useTelegramTopInset();
 
@@ -1245,6 +1252,16 @@ export default function Home({
     onModeChange(nextMode);
     onTutorialModeSelected?.();
   }, [coupleId, onModeChange, onTutorialModeSelected, onTutorialPairFlow]);
+
+  useEffect(() => {
+    if (homeSection !== "game" && homeSection !== mode) setHomeSection(mode);
+  }, [mode, homeSection]);
+
+  const handleHomeSectionChange = useCallback((nextSection: HomeSection) => {
+    setHomeSection(nextSection);
+    if (nextSection !== "game") handleModeSelection(nextSection);
+    else onTutorialModeSelected?.();
+  }, [handleModeSelection, onTutorialModeSelected]);
 
   useEffect(() => {
     let active = true;
@@ -1397,18 +1414,32 @@ export default function Home({
         </section>
 
         <div className="pop-mode-wrap" style={{ padding: "8px 14px 4px", position: "relative", zIndex: 1, flexShrink: 0 }}>
-          <ModeSwitcher lang={lang} mode={mode} coupleId={coupleId} onChange={handleModeSelection} />
+          <ModeSwitcher lang={lang} section={homeSection} coupleId={coupleId} onChange={handleHomeSectionChange} />
         </div>
 
         {/* ── List ── */}
         <div className="pop-list" style={{ flex: 1, overflowY: "auto", overflowX: "hidden", padding: `10px 14px max(28px,env(safe-area-inset-bottom))`, display: "flex", flexDirection: "column", gap: 10, position: "relative", zIndex: 1, scrollbarWidth: "none" as const }}>
-          {(mode === "together" || coupleId) && <WishMap lang={lang} coupleId={coupleId} onOpenTask={onOpenSharedTask} refreshKey={wishMapKey} />}
-          <div className="pop-tiles" style={{ display: "grid", gridTemplateColumns: "repeat(2,minmax(0,1fr))", gap: 10 }}>
-            {mode === "together" ? togetherCards : soloCards}
-          </div>
-          {mode === "solo"
-            ? <Card type="invite" title={INVITE_LABELS[lang].title} sub={INVITE_LABELS[lang].sub} onClick={handleInvite} index={5} />
-            : <Card type="pair" title={coupleId ? t.linked : PAIR_LABELS[lang].title} sub={PAIR_LABELS[lang].sub} onClick={() => setShowCoupleModal(true)} index={6} />}
+          {homeSection === "game" ? (
+            <section className="love-path-home-card" data-testid="card-love-path-entry">
+              <div className="love-path-home-art" aria-hidden="true"><span>♥</span><i /><i /><i /><i /><i /></div>
+              <p className="love-path-home-kicker">{lang === "ru" ? "7 ДНЕЙ · ОДИН ПУТЬ" : "7 DAYS · ONE PATH"}</p>
+              <h2>{lang === "ru" ? "Путь любви" : "The Love Path"}</h2>
+              <p>{lang === "ru" ? "Ходите по очереди, выбирайте одно из трёх заданий и встречайтесь в центре сердца." : "Take turns, choose one of three tasks, and meet at the heart’s center."}</p>
+              <button type="button" className="love-path-home-button" onClick={onLovePathOpen} data-testid="button-open-love-path">
+                {lang === "ru" ? "Открыть игровое поле" : "Open the game board"} <span aria-hidden="true">→</span>
+              </button>
+            </section>
+          ) : (
+            <>
+              {(homeSection === "together" || !!coupleId) && <WishMap lang={lang} coupleId={coupleId} onOpenTask={onOpenSharedTask} refreshKey={wishMapKey} />}
+              <div className="pop-tiles" style={{ display: "grid", gridTemplateColumns: "repeat(2,minmax(0,1fr))", gap: 10 }}>
+                {homeSection === "together" ? togetherCards : soloCards}
+              </div>
+              {homeSection === "solo"
+                ? <Card type="invite" title={INVITE_LABELS[lang].title} sub={INVITE_LABELS[lang].sub} onClick={handleInvite} index={5} />
+                : <Card type="pair" title={coupleId ? t.linked : PAIR_LABELS[lang].title} sub={PAIR_LABELS[lang].sub} onClick={() => setShowCoupleModal(true)} index={6} />}
+            </>
+          )}
         </div>
       </div>
 

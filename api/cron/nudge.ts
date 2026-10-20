@@ -67,7 +67,10 @@ async function runWishMapCheckins(appUrl:string) {
     throw coupleError ?? attestationError ?? reminderError;
   }
 
-  const coupleById = new Map((couples ?? []).map((couple) => [String(couple.id), couple]));
+  type CoupleRow = { id: string; user_a_id: number; user_b_id: number };
+  const coupleById = new Map<string, CoupleRow>(
+    (couples ?? []).map((couple: CoupleRow) => [String(couple.id), couple]),
+  );
   const answered = new Set((attestations ?? []).map((row) => `${row.generated_task_id}:${row.evaluator_user_id}`));
   const alreadyReminded = new Set((sentReminders ?? []).map((row) => `${row.generated_task_id}:${row.user_id}`));
   const pendingByMember = new Map<string, { coupleId: string; userId: number; taskIds: string[] }>();
@@ -128,11 +131,71 @@ async function runWishMapCheckins(appUrl:string) {
   return sentCount;
 }
 
+async function runLovePathReminders(appUrl: string) {
+  const today = appDate();
+  const { data: games, error: gameError } = await sb.from("love_path_games")
+    .select("id,couple_id,starter_user_id");
+  if (gameError) throw gameError;
+  if (!games?.length) return 0;
+  const gameIds = games.map((game) => String(game.id));
+  const coupleIds = [...new Set(games.map((game) => String(game.couple_id)))];
+  const [{ data: moves, error: moveError }, { data: couples, error: coupleError }, { data: prefs, error: prefError }, { data: sent, error: sentError }] = await Promise.all([
+    sb.from("love_path_moves").select("game_id,game_date,day_no,actor_user_id").in("game_id", gameIds).order("day_no", { ascending: true }),
+    sb.from("couples").select("id,user_a_id,user_b_id").in("id", coupleIds),
+    sb.from("couple_member_preferences").select("couple_id,user_id,telegram_notifications_enabled").in("couple_id", coupleIds),
+    sb.from("love_path_reminders").select("game_id,game_date").in("game_id", gameIds).eq("game_date", today),
+  ]);
+  if (moveError || coupleError || prefError || sentError) throw moveError ?? coupleError ?? prefError ?? sentError;
+  type CoupleRow = { id: string; user_a_id: number; user_b_id: number };
+  const coupleById = new Map<string, CoupleRow>(
+    (couples ?? []).map((couple: CoupleRow) => [String(couple.id), couple]),
+  );
+  const movesByGame = new Map<string, typeof moves>();
+  for (const move of moves ?? []) {
+    const rows = movesByGame.get(String(move.game_id)) ?? [];
+    rows.push(move);
+    movesByGame.set(String(move.game_id), rows);
+  }
+  const optedIn = new Set((prefs ?? []).filter((row) => row.telegram_notifications_enabled === true)
+    .map((row) => `${row.couple_id}:${row.user_id}`));
+  const alreadySent = new Set((sent ?? []).map((row) => String(row.game_id)));
+  const target = new URL(appUrl);
+  target.searchParams.set("love_path", "1");
+  let sentCount = 0;
+
+  for (const game of games) {
+    const gameId = String(game.id);
+    if (alreadySent.has(gameId)) continue;
+    const gameMoves = movesByGame.get(gameId) ?? [];
+    if (gameMoves.length >= 7 || gameMoves.some((move) => move.game_date === today)) continue;
+    const couple = coupleById.get(String(game.couple_id));
+    if (!couple?.user_b_id) continue;
+    const last = gameMoves[gameMoves.length - 1];
+    const actorId = last
+      ? (Number(last.actor_user_id) === Number(couple.user_a_id) ? Number(couple.user_b_id) : Number(couple.user_a_id))
+      : Number(game.starter_user_id);
+    if (!optedIn.has(`${game.couple_id}:${actorId}`)) continue;
+    const delivered = await send(actorId, "Сегодня ваш ход в «Пути любви». Откройте Touché, чтобы сделать ход. / It’s your turn in The Love Path today. Open Touché to play.", "Открыть игру / Open game", target.toString());
+    if (!delivered) continue;
+    const { error } = await sb.from("love_path_reminders").upsert(
+      { game_id: gameId, game_date: today, user_id: actorId },
+      { onConflict: "game_id,game_date", ignoreDuplicates: true },
+    );
+    if (error) throw error;
+    sentCount += 1;
+  }
+  return sentCount;
+}
+
 export default async function handler(req:VercelRequest,res:VercelResponse){
   if(!CRON_SECRET||req.headers.authorization!==`Bearer ${CRON_SECRET}`)return res.status(401).json({error:"Unauthorized"});
   if(req.method!=="GET"&&req.method!=="POST")return res.status(405).json({error:"Method not allowed"});
   const appUrl=process.env.APP_URL;
   if(!BOT||!appUrl)return res.status(503).json({error:"service_unconfigured"});
+  if (String(req.query.scope ?? "") === "love_path") {
+    const lovePathReminders = await runLovePathReminders(appUrl);
+    return res.status(200).json({ ok: true, lovePathReminders });
+  }
   const[nudged,reminded,wishCheckins]=await Promise.all([runNudge(appUrl),runExpiry(appUrl),runWishMapCheckins(appUrl)]);
   return res.status(200).json({ok:true,nudged,reminded,wishCheckins});
 }

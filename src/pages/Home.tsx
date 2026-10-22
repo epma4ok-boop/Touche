@@ -52,6 +52,7 @@ interface HomeProps {
   onTutorialPairFlow?: (open: boolean) => void;
   onTutorialModeSelected?: () => void;
   onLovePathOpen: () => void;
+  onLotteryOpen: () => void;
 }
 
 function useTelegramTopInset(): number {
@@ -1199,7 +1200,7 @@ export default function Home({
   onCategorySelect, onScenarioOpen, onOpenSharedTask, onLanguageOpen, onGenderSwitch,
   onModeChange,
   onLinkCouple, onUnlinkCouple, onSubscribe, onTutorialPairFlow, onTutorialModeSelected,
-  onLovePathOpen,
+  onLovePathOpen, onLotteryOpen,
 }: HomeProps) {
   const t = UI[lang];
   const [mounted, setMounted] = useState(false);
@@ -1432,6 +1433,34 @@ export default function Home({
           ) : (
             <>
               {(homeSection === "together" || !!coupleId) && <WishMap lang={lang} coupleId={coupleId} onOpenTask={onOpenSharedTask} refreshKey={wishMapKey} />}
+              <button
+                type="button"
+                onClick={onLotteryOpen}
+                data-testid="button-open-pose-lottery"
+                style={{
+                  width: "100%", minHeight: 78, display: "flex", alignItems: "center", gap: 14,
+                  padding: "12px 16px", borderRadius: 20, textAlign: "left", cursor: "pointer",
+                  color: "#fff7ef", border: "1px solid rgba(255,203,170,.34)",
+                  background: "linear-gradient(110deg,rgba(104,34,45,.94),rgba(35,13,24,.98))",
+                  boxShadow: "0 10px 28px rgba(0,0,0,.20),inset 0 1px 0 rgba(255,255,255,.08)",
+                }}
+              >
+                <span aria-hidden="true" style={{
+                  width: 48, height: 48, flexShrink: 0, display: "grid", placeItems: "center",
+                  borderRadius: "50%", color: "#6b2931", fontSize: 23,
+                  background: "radial-gradient(circle at 34% 28%,#fff7e8 0 12%,#f3d5b3 38%,#b97b70 72%,#63343b 100%)",
+                  boxShadow: "inset -5px -7px 12px rgba(52,12,23,.28),0 0 18px rgba(255,180,137,.18)",
+                }}>♥</span>
+                <span style={{ flex: 1, minWidth: 0 }}>
+                  <strong style={{ display: "block", fontSize: 15, letterSpacing: "-.2px" }}>
+                    {lang === "ru" ? "Лототрон поз" : lang === "hi" ? "पोज़ लॉटरी" : lang === "pt" ? "Roleta de poses" : lang === "es" ? "Lotería de poses" : "Pose lottery"}
+                  </strong>
+                  <span style={{ display: "block", marginTop: 4, fontSize: 11, color: "rgba(255,239,227,.65)" }}>
+                    {lang === "ru" ? "Крутите шар и ловите момент" : lang === "hi" ? "गेंद घुमाएँ और पल चुनें" : lang === "pt" ? "Gire a esfera e descubra a pose" : lang === "es" ? "Gira la bola y descubre la pose" : "Roll the ball and reveal a pose"}
+                  </span>
+                </span>
+                <span aria-hidden="true" style={{ color: "#efb496", fontSize: 22, lineHeight: 1 }}>›</span>
+              </button>
               <div className="pop-tiles" style={{ display: "grid", gridTemplateColumns: "repeat(2,minmax(0,1fr))", gap: 10 }}>
                 {homeSection === "together" ? togetherCards : soloCards}
               </div>

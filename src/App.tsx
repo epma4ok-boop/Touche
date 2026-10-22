@@ -12,8 +12,9 @@ import type { SharedTaskSnapshot } from "@/data/sharedPair";
 import FirstRunTutorial, { type TutorialStep } from "@/components/FirstRunTutorial";
 import { trackAnalyticsEvent } from "@/analytics";
 import LovePathScreen from "@/pages/LovePathScreen";
+import LotteryScreen from "@/pages/LotteryScreen";
 
-type AppPhase = "splash" | "lang" | "onboarding" | "gender" | "home" | "category" | "scenario" | "shared_task_error" | "love_path";
+type AppPhase = "splash" | "lang" | "onboarding" | "gender" | "home" | "category" | "scenario" | "shared_task_error" | "love_path" | "lottery";
 export type AppMode = "solo" | "together";
 
 const COUPLE_ID_KEY = "touche_couple_id";
@@ -637,7 +638,11 @@ export default function App() {
             onTutorialPairFlow={setTutorialPairFlowOpen}
              onTutorialModeSelected={() => setTutorialStep((current) => current === 2 ? 3 : current)}
             onLovePathOpen={() => setPhase("love_path")}
+            onLotteryOpen={() => setPhase("lottery")}
           />
+        )}
+        {phase === "lottery" && (
+          <LotteryScreen lang={lang} onBack={() => setPhase("home")} />
         )}
         {phase === "love_path" && (
           <LovePathScreen

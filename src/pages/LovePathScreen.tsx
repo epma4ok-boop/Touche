@@ -13,6 +13,28 @@ type GameState = {
   finale?: { myChoice: string | null; partnerHasChosen: boolean; matched: boolean; sharedChoice: string | null };
 };
 
+function useTelegramTopInset(): number {
+  const [top, setTop] = useState(() => window.Telegram?.WebApp ? 96 : 18);
+  useEffect(() => {
+    const tg = window.Telegram?.WebApp as any;
+    const update = () => {
+      const safe = tg?.safeAreaInset?.top ?? 0;
+      const content = tg?.contentSafeAreaInset?.top ?? 0;
+      setTop(tg ? Math.max(96, safe + 72, content + safe + 16) : 18);
+    };
+    update();
+    tg?.onEvent?.("safeAreaChanged", update);
+    tg?.onEvent?.("contentSafeAreaInsetChanged", update);
+    const timer = window.setTimeout(update, 700);
+    return () => {
+      tg?.offEvent?.("safeAreaChanged", update);
+      tg?.offEvent?.("contentSafeAreaInsetChanged", update);
+      window.clearTimeout(timer);
+    };
+  }, []);
+  return top;
+}
+
 async function gameRequest(method: "GET" | "POST", body?: Record<string, string>): Promise<GameState> {
   const response = await fetch("/api/couple/intimacy?action=love_path", {
     method,
@@ -121,6 +143,7 @@ const DAY_POINTS = [
 
 export default function LovePathScreen({ lang, onBack }: { lang: Lang; onBack: () => void }) {
   const isRu = lang === "ru";
+  const topInset = useTelegramTopInset();
   const days = isRu ? DAYS : EN_DAYS;
   const finale = isRu ? FINALE : EN_FINALE;
   const [game, setGame] = useState<GameState | null>(null);
@@ -243,13 +266,13 @@ export default function LovePathScreen({ lang, onBack }: { lang: Lang; onBack: (
   }, [completedDays, game, isRu, dayNumber]);
 
   return (
-    <main className="love-path-screen" data-testid="screen-love-path">
+    <main className="love-path-screen" data-testid="screen-love-path" style={{ paddingTop: topInset }}>
       <header className="lp-header">
         <button className="lp-back" type="button" onClick={step === "board" ? onBack : () => setStep("board")} data-testid="button-love-path-back">
           <span aria-hidden="true">←</span> {labels.back}
         </button>
         <span className="lp-kicker">{labels.kicker}</span>
-        <span className="lp-header-mark" aria-hidden="true">♥</span>
+         <span className="lp-header-mark" aria-hidden="true" />
       </header>
 
       <section className="lp-intro">
@@ -281,7 +304,7 @@ export default function LovePathScreen({ lang, onBack }: { lang: Lang; onBack: (
                 return (
                   <g key={index} className={completed ? "is-complete" : current ? "is-current" : finalePoint && completedDays >= 7 ? "is-current is-final" : ""}>
                     <circle className="lp-node" cx={point.x} cy={point.y} r={finalePoint ? 16 : 13} />
-                    <text className="lp-node-label" x={point.x} y={point.y + 4}>{finalePoint ? "♥" : index + 1}</text>
+                    <text className="lp-node-label" x={point.x} y={point.y + 4}>{index + 1}</text>
                   </g>
                 );
               })}
@@ -294,7 +317,7 @@ export default function LovePathScreen({ lang, onBack }: { lang: Lang; onBack: (
             <span><i className="lp-legend-dot lp-legend-final" /> {isRu ? "Финал" : "Finale"}</span>
           </div>
           <div className="lp-day-summary">
-            <div><span className="lp-day-number">{completedDays >= 7 ? "♥" : String(dayNumber).padStart(2, "0")}</span><div><strong>{completedDays >= 7 ? labels.finalTitle : activeDay.category}</strong><small>{completedDays >= 7 ? labels.finalText : currentTurn}</small></div></div>
+            <div><span className="lp-day-number">{completedDays >= 7 ? "07" : String(dayNumber).padStart(2, "0")}</span><div><strong>{completedDays >= 7 ? labels.finalTitle : activeDay.category}</strong><small>{completedDays >= 7 ? labels.finalText : currentTurn}</small></div></div>
             <button type="button" className="lp-primary" disabled={loading || busy || (!!game?.started && completedDays < 7 && !game.todayMove?.cardId && !game.canChoose)} onClick={() => {
               if (!game?.started) void startGame();
               else if (completedDays >= 7) setStep("final");
@@ -335,7 +358,7 @@ export default function LovePathScreen({ lang, onBack }: { lang: Lang; onBack: (
 
       {step === "final" && (
         <section className="lp-panel lp-final-panel">
-          <div className="lp-section-heading"><div><p className="lp-eyebrow">{isRu ? "ЦЕНТР СЕРДЦА" : "HEART CENTER"}</p><h2>{labels.finalTitle}</h2></div><span className="lp-final-heart">♥</span></div>
+          <div className="lp-section-heading"><div><p className="lp-eyebrow">{isRu ? "ЦЕНТР СЕРДЦА" : "HEART CENTER"}</p><h2>{labels.finalTitle}</h2></div><span className="lp-final-heart" aria-hidden="true" /></div>
           <p className="lp-muted">{labels.finalText}</p>
           <div className="lp-choice-list lp-finale-choices">
             {finale.map((option, index) => (
@@ -358,7 +381,7 @@ export default function LovePathScreen({ lang, onBack }: { lang: Lang; onBack: (
 
       {step === "scenario" && matchedFinal && finalChoiceNumber !== null && (
         <section className="lp-panel lp-scenario-panel">
-          <span className="lp-scenario-mark">♥</span>
+          <span className="lp-scenario-mark" aria-hidden="true" />
           <p className="lp-eyebrow">{labels.scenario}</p>
           <h2>{finale[finalChoiceNumber].title}</h2>
           <p className="lp-scenario-copy">{finale[finalChoiceNumber].scenario}</p>

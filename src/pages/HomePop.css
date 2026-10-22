@@ -381,3 +381,191 @@
   .pop-home .pop-mode-wrap { max-width: 560px; margin: 0 auto; width: 100%; }
   .pop-home .pop-list { max-width: 560px; margin: 0 auto; width: 100%; }
 }
+
+/* Four-way Touché front door: each choice is a destination, not a mode toggle. */
+.pop-home .pop-home-entry {
+  width: 100%;
+  max-width: 560px;
+  margin-inline: auto;
+  scrollbar-width: none;
+}
+.pop-home .pop-home-entry::-webkit-scrollbar,
+.pop-home .pop-home-subpage::-webkit-scrollbar { display: none; }
+.pop-home .pop-home-hero {
+  width: 100%;
+  padding: 10px 0 22px;
+}
+.pop-home .pop-home-hero__stamp {
+  border: 1px solid rgba(120,24,61,.34);
+  background: rgba(255,250,243,.72);
+  color: var(--pop-wine);
+  transform: none;
+  letter-spacing: .16em;
+}
+.pop-home .pop-home-hero__orb {
+  top: 31px;
+  right: 2px;
+  width: 72px;
+  height: 72px;
+  border: 1px solid rgba(120,24,61,.22);
+  border-radius: 50%;
+  background: radial-gradient(circle at 32% 25%, #fff8ec 0 8%, #efb3ad 30%, #a74868 70%, #78183d 100%);
+  box-shadow: 0 12px 30px rgba(120,24,61,.18), inset -8px -10px 15px rgba(47,15,37,.16);
+}
+.pop-home .pop-home-hero__orb i {
+  width: 20px;
+  height: 20px;
+  border: 1px solid rgba(255,250,243,.75);
+  border-radius: 50%;
+  background: rgba(255,250,243,.14);
+  box-shadow: 16px 13px 0 -7px rgba(255,250,243,.8);
+  transform: translate(-7px,-5px);
+}
+.pop-home .pop-home-hero h1 {
+  max-width: 390px;
+  margin: 18px 0 10px;
+  font-size: clamp(36px, 10vw, 49px);
+  letter-spacing: -.075em;
+}
+.pop-home .pop-home-hero p { max-width: 300px; }
+.pop-entry-actions { display: grid; gap: 10px; padding-bottom: 8px; }
+.pop-home .pop-entry-action {
+  position: relative;
+  display: grid;
+  grid-template-columns: 38px 1fr 28px;
+  align-items: center;
+  gap: 12px;
+  min-height: 83px;
+  width: 100%;
+  padding: 13px 15px;
+  overflow: hidden;
+  border: 1px solid rgba(69,35,54,.15);
+  border-radius: 19px;
+  color: var(--pop-ink);
+  text-align: left;
+  cursor: pointer;
+  box-shadow: 0 5px 16px rgba(69,35,54,.055), inset 0 1px 0 rgba(255,255,255,.7);
+  transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+}
+.pop-home .pop-entry-action::after {
+  content: "";
+  position: absolute;
+  top: -55px;
+  right: 34px;
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  border: 1px solid rgba(120,24,61,.09);
+  pointer-events: none;
+}
+.pop-home .pop-entry-action:hover { transform: translateY(-2px); box-shadow: 0 9px 20px rgba(69,35,54,.1); }
+.pop-home .pop-entry-action:active { transform: translateY(1px) scale(.99); }
+.pop-home .pop-entry-action:focus-visible,
+.pop-home .pop-subpage-back:focus-visible { outline: 3px solid rgba(120,24,61,.4); outline-offset: 3px; }
+.pop-entry-action--solo { background: #fff1d2; }
+.pop-entry-action--together { background: #f3e4e8; }
+.pop-entry-action--path { background: #e9e9f2; }
+.pop-entry-action--lottery { background: #f7ddd3; }
+.pop-entry-action__index {
+  align-self: stretch;
+  display: grid;
+  place-items: center;
+  border-right: 1px solid rgba(69,35,54,.14);
+  color: rgba(69,35,54,.55);
+  font: 700 11px "Space Grotesk", sans-serif;
+  letter-spacing: .08em;
+}
+.pop-entry-action__copy { position: relative; z-index: 1; display: block; min-width: 0; }
+.pop-entry-action__copy strong {
+  display: block;
+  font: 700 17px/1.2 "Space Grotesk", sans-serif;
+  letter-spacing: -.035em;
+  color: var(--pop-ink);
+}
+.pop-entry-action__copy small {
+  display: block;
+  margin-top: 5px;
+  color: rgba(22,34,56,.68);
+  font-size: 11px;
+  line-height: 1.35;
+}
+.pop-entry-action__arrow {
+  display: grid;
+  width: 27px;
+  height: 27px;
+  place-items: center;
+  border: 1px solid rgba(69,35,54,.18);
+  border-radius: 50%;
+  color: var(--pop-wine);
+  font-size: 15px;
+  transition: transform .18s ease;
+}
+.pop-entry-action:hover .pop-entry-action__arrow { transform: translate(2px,-2px); }
+.pop-home-subpage { max-width: 560px; margin-inline: auto; width: 100%; }
+.pop-home .pop-subpage-back {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 38px;
+  padding: 5px 10px 5px 0;
+  border: 0;
+  color: var(--pop-wine);
+  background: transparent;
+  font: 700 13px "DM Sans", sans-serif;
+  cursor: pointer;
+}
+.pop-subpage-back span { font-size: 19px; }
+.pop-subpage-heading { padding: 5px 3px 6px; }
+.pop-subpage-heading > span {
+  color: var(--pop-wine);
+  font: 700 10px "Space Grotesk", sans-serif;
+  letter-spacing: .16em;
+}
+.pop-subpage-heading h1 {
+  margin: 8px 0 5px;
+  font: 700 clamp(27px,8vw,36px)/1.05 "Space Grotesk", sans-serif;
+  letter-spacing: -.06em;
+}
+.pop-subpage-heading p { margin: 0; color: var(--pop-muted); font-size: 12px; line-height: 1.5; }
+.pop-connect-panel {
+  position: relative;
+  padding: 20px;
+  border: 1px solid rgba(120,24,61,.2);
+  border-radius: 20px;
+  background: linear-gradient(145deg, rgba(255,250,243,.96), rgba(248,229,231,.88));
+  box-shadow: 0 8px 24px rgba(69,35,54,.07);
+}
+.pop-connect-mark {
+  display: block;
+  width: 35px;
+  height: 35px;
+  margin-bottom: 16px;
+  border: 1px solid rgba(120,24,61,.3);
+  border-radius: 50%;
+  background: radial-gradient(circle at 34% 30%, #fff8ef, #d8798c 60%, #78183d);
+  box-shadow: inset -4px -5px 8px rgba(47,15,37,.12);
+}
+.pop-connect-panel p { margin: 0 0 5px; font: 700 18px "Space Grotesk", sans-serif; }
+.pop-connect-panel small { display: block; color: var(--pop-muted); font-size: 12px; line-height: 1.5; }
+.pop-connect-panel button {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  min-height: 44px;
+  margin-top: 17px;
+  padding: 10px 13px;
+  border: 1px solid var(--pop-wine);
+  border-radius: 13px;
+  background: var(--pop-wine);
+  color: var(--pop-paper) !important;
+  font: 700 12px "DM Sans", sans-serif;
+  cursor: pointer;
+}
+.pop-home-subpage .pop-tiles { margin-top: 2px; }
+@media (max-width: 380px) {
+  .pop-home .pop-entry-action { grid-template-columns: 32px 1fr 25px; gap: 9px; padding-inline: 12px; }
+  .pop-entry-action__copy strong { font-size: 15px; }
+  .pop-home .pop-home-hero__orb { width: 60px; height: 60px; }
+}

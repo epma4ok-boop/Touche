@@ -113,6 +113,17 @@
   height: 100%;
   transition: opacity .35s ease, transform .35s ease;
 }
+.is-rolling .pose-lottery__machine {
+  animation: lottery-machine-shake .42s ease-in-out infinite;
+}
+.is-rolling .pose-lottery__dome {
+  box-shadow:
+    inset 0 0 38px rgba(255, 214, 180, .16),
+    inset 0 -14px 27px rgba(6, 2, 9, .3),
+    0 0 0 7px rgba(225, 164, 129, .08),
+    0 0 42px rgba(226, 144, 125, .24),
+    0 18px 50px rgba(0, 0, 0, .24);
+}
 .pose-lottery__dome {
   position: absolute;
   top: 4%;
@@ -297,7 +308,7 @@
   box-shadow: inset -7px -9px 13px rgba(45, 13, 34, .37), 0 7px 18px rgba(0,0,0,.38), 0 0 18px rgba(255,190,150,.22);
 }
 .pose-lottery__drawn-ball img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
-.pose-lottery__drawn-ball.is-drawn { animation: lottery-draw 2.65s cubic-bezier(.19,.78,.16,1) both; }
+.pose-lottery__drawn-ball.is-drawn { animation: lottery-draw 2.3s cubic-bezier(.19,.78,.16,1) both; }
 .pose-lottery__drawn-ball.is-hidden { opacity: 0; }
 .pose-lottery__spark {
   position: absolute;
@@ -323,7 +334,7 @@
   align-items: center;
   gap: 10px;
   transform: translate(-50%, -50%);
-  animation: lottery-result-arrive .82s cubic-bezier(.18,.78,.18,1) both;
+  animation: lottery-result-impact .64s cubic-bezier(.16,1.42,.34,1) both;
 }
 .pose-lottery__result-image {
   position: relative;
@@ -334,6 +345,7 @@
   border-radius: 35px;
   background: linear-gradient(145deg,#fff8ee,#f1d9ca);
   box-shadow: 0 25px 65px rgba(0, 0, 0, .43), 0 0 45px rgba(227, 151, 119, .2), inset 0 1px 0 rgba(255,255,255,.85);
+  animation: lottery-image-flash .64s ease-out both;
 }
 .pose-lottery__result-image img { display: block; width: 100%; height: 100%; object-fit: contain; }
 .pose-lottery__result-number {
@@ -399,17 +411,30 @@
   to { transform: translate3d(3px, -5px, 0) rotate(14deg); }
 }
 @keyframes lottery-draw {
-  0% { top: 44%; left: 50%; opacity: 0; transform: translate(-50%,-50%) scale(.55) rotate(-65deg); }
-  16% { opacity: 1; }
-  35% { top: 59%; left: 58%; transform: translate(-50%,-50%) scale(.88) rotate(275deg); }
-  54% { top: 76%; left: 50%; transform: translate(-50%,-50%) scale(.92) rotate(610deg); }
-  69% { top: 82%; left: 50%; transform: translate(-50%,-50%) scale(.95) rotate(760deg); }
-  82% { top: 72%; left: 50%; opacity: 1; transform: translate(-50%,-50%) scale(1.25) rotate(930deg); }
-  100% { top: 48%; left: 50%; opacity: 0; transform: translate(-50%,-50%) scale(3.4) rotate(1100deg); }
+  0% { top: 76%; left: 50%; opacity: 0; transform: translate(-50%,-50%) scale(.28) rotate(-90deg); }
+  12% { opacity: 1; }
+  31% { top: 78%; left: 52%; transform: translate(-50%,-50%) scale(.7) rotate(165deg); }
+  48% { top: 65%; left: 55%; transform: translate(-50%,-50%) scale(.82) rotate(390deg); }
+  63% { top: 51%; left: 50%; transform: translate(-50%,-50%) scale(1.08) rotate(570deg); }
+  75% { top: 48%; left: 50%; opacity: 1; transform: translate(-50%,-50%) scale(1.25) rotate(690deg); }
+  88% { top: 48%; left: 50%; opacity: 1; transform: translate(-50%,-50%) scale(4.6) rotate(780deg); filter: blur(0); }
+  100% { top: 48%; left: 50%; opacity: 0; transform: translate(-50%,-50%) scale(7.5) rotate(820deg); filter: blur(5px); }
 }
-@keyframes lottery-result-arrive {
-  from { opacity: 0; transform: translate(-50%,-42%) scale(.56); filter: blur(4px); }
-  to { opacity: 1; transform: translate(-50%,-50%) scale(1); filter: blur(0); }
+@keyframes lottery-result-impact {
+  0% { opacity: 0; transform: translate(-50%,-50%) scale(.08); filter: blur(14px); }
+  56% { opacity: 1; transform: translate(-50%,-50%) scale(1.12); filter: blur(1px); }
+  76% { transform: translate(-50%,-50%) scale(.96); filter: blur(0); }
+  100% { opacity: 1; transform: translate(-50%,-50%) scale(1); filter: blur(0); }
+}
+@keyframes lottery-image-flash {
+  0% { box-shadow: 0 0 0 rgba(255, 199, 161, 0), inset 0 1px 0 rgba(255,255,255,.85); }
+  36% { box-shadow: 0 0 90px 28px rgba(255, 195, 151, .82), 0 25px 65px rgba(0,0,0,.43), inset 0 1px 0 rgba(255,255,255,.85); }
+  100% { box-shadow: 0 25px 65px rgba(0,0,0,.43), 0 0 45px rgba(227,151,119,.2), inset 0 1px 0 rgba(255,255,255,.85); }
+}
+@keyframes lottery-machine-shake {
+  0%, 100% { transform: translateX(0) rotate(0); }
+  25% { transform: translateX(-2px) rotate(-.35deg); }
+  75% { transform: translateX(2px) rotate(.35deg); }
 }
 @keyframes lottery-spark { from { opacity: .05; transform: scale(.6); } to { opacity: .9; transform: scale(1.5); } }
 @keyframes lottery-spin { to { transform: rotate(360deg); } }

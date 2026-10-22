@@ -45,7 +45,7 @@ export default function LotteryScreen({ lang, onBack }: Props) {
     timer.current = setTimeout(() => {
       setPhase("revealed");
       window.Telegram?.WebApp?.HapticFeedback?.notificationOccurred?.("success");
-    }, 2650);
+    }, 2300);
   }
 
   function usePoseFallback(event: SyntheticEvent<HTMLImageElement>, poseSrc: string) {

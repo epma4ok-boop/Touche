@@ -52,7 +52,7 @@ interface HomeProps {
   onTutorialPairFlow?: (open: boolean) => void;
   onTutorialModeSelected?: () => void;
   onLovePathOpen: () => void;
-  onLotteryOpen: () => void;
+  onGamesOpen: () => void;
 }
 
 function useTelegramTopInset(): number {
@@ -1140,7 +1140,7 @@ export default function Home({
   onCategorySelect, onScenarioOpen, onOpenSharedTask, onLanguageOpen, onGenderSwitch,
   onModeChange,
   onLinkCouple, onUnlinkCouple, onSubscribe, onTutorialPairFlow, onTutorialModeSelected,
-  onLovePathOpen, onLotteryOpen,
+  onLovePathOpen, onGamesOpen,
 }: HomeProps) {
   const t = UI[lang];
   const [mounted, setMounted] = useState(false);
@@ -1362,9 +1362,9 @@ export default function Home({
                 <img className="pop-entry-action__art" src="/images/cat-invite-art.svg" alt="" aria-hidden="true" />
                 <span className="pop-entry-action__index">03</span><span className="pop-entry-action__copy"><strong>{lang === "ru" ? "Путь любви" : lang === "hi" ? "प्यार का путь" : lang === "pt" ? "Caminho do amor" : lang === "es" ? "Camino del amor" : "Love Path"}</strong><small>{lang === "ru" ? "Семь шагов навстречу друг другу" : lang === "hi" ? "एक-दूसरे के करीब सात कदम" : lang === "pt" ? "Sete passos para se aproximarem" : lang === "es" ? "Siete pasos para acercarse" : "Seven small steps closer"}</small></span><span className="pop-entry-action__arrow" aria-hidden="true">↗</span>
               </button>
-              <button type="button" className="pop-entry-action pop-entry-action--lottery" onClick={onLotteryOpen} data-testid="button-open-pose-lottery">
+              <button type="button" className="pop-entry-action pop-entry-action--lottery" onClick={onGamesOpen} data-testid="button-open-games">
                 <img className="pop-entry-action__art" src="/images/home-wheel-art.svg" alt="" aria-hidden="true" />
-                <span className="pop-entry-action__index">04</span><span className="pop-entry-action__copy"><strong>{lang === "ru" ? "Колесо поз" : lang === "hi" ? "पोज़ व्हील" : lang === "pt" ? "Roda de poses" : lang === "es" ? "Rueda de poses" : "Pose wheel"}</strong><small>18+ · {lang === "ru" ? "Крутите и найдите идею для двоих" : lang === "hi" ? "घुमाएँ और साथ के लिए एक विचार पाएँ" : lang === "pt" ? "Girem e encontrem uma ideia a dois" : lang === "es" ? "Giren y descubran una idea para dos" : "Spin for a fresh idea for two"}</small></span><span className="pop-entry-action__arrow" aria-hidden="true">↗</span>
+                <span className="pop-entry-action__index">04</span><span className="pop-entry-action__copy"><strong>{lang === "ru" ? "Игры" : lang === "hi" ? "खेल" : lang === "pt" ? "Jogos" : lang === "es" ? "Juegos" : "Games"}</strong><small>18+ · {lang === "ru" ? "Колесо и кости для двоих" : lang === "hi" ? "आप दोनों के लिए व्हील और पासे" : lang === "pt" ? "Roda e dados para dois" : lang === "es" ? "Rueda y dados para dos" : "Wheel and dice for two"}</small></span><span className="pop-entry-action__arrow" aria-hidden="true">↗</span>
               </button>
             </div>
           </div>

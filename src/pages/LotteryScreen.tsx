@@ -7,7 +7,7 @@ type Props = { lang: Lang; onBack: () => void };
 type Phase = "idle" | "spinning" | "revealed";
 const POSES = Array.from({ length: 20 }, (_, index) => {
   const id = String(index + 1).padStart(2, "0");
-  return { id, src: `/images/lottery-poses/pose-cutout-${id}.png` };
+  return { id, src: `/images/lottery-poses/pose-${id}.svg` };
 });
 
 const COPY: Record<Lang, {
@@ -21,7 +21,7 @@ const COPY: Record<Lang, {
   es: { back: "Volver", title: "Rueda de poses", subtitle: "Veinte ideas. Un momento para dos.", spin: "Girar la rueda", spinning: "La rueda está girando…", again: "Girar otra vez", hint: "Encuentren una idea para esta noche", result: "Tu pose", status: n => `Pose ${n} seleccionada` },
 };
 
-const SECTOR_COLORS = ["#F07870", "#F3B851", "#A9BF79", "#7698C0", "#D17E98", "#F0A16C", "#E3C45D", "#84A984", "#E78B84", "#B497B8", "#E9B66C", "#78AAA7", "#F18479", "#D69CA8", "#E8C56B", "#9BB681", "#D77983", "#EBA06C", "#819ABD", "#D7A1A8"];
+const SECTOR_COLORS = ["#78183d", "#983956", "#b65b76", "#8a294b"];
 const REDUCED_MOTION = "(prefers-reduced-motion: reduce)";
 
 export default function LotteryScreen({ lang, onBack }: Props) {
@@ -60,7 +60,7 @@ export default function LotteryScreen({ lang, onBack }: Props) {
 
   const wheelStyle = {
     "--wheel-rotation": `${rotation}deg`,
-    "--wheel-sectors": `conic-gradient(${POSES.map((pose, index) => `${SECTOR_COLORS[index]} ${index * 18}deg ${(index + 1) * 18}deg`).join(",")})`,
+    "--wheel-sectors": `conic-gradient(${POSES.map((_, index) => `${SECTOR_COLORS[index % SECTOR_COLORS.length]} ${index * 18}deg ${(index + 1) * 18}deg`).join(",")})`,
   } as CSSProperties;
 
   return (
@@ -88,7 +88,7 @@ export default function LotteryScreen({ lang, onBack }: Props) {
                 <span
                   className="pose-lottery__sector-number"
                   key={pose.id}
-                  style={{ transform: `translate(-50%,-50%) rotate(${index * 18 + 9}deg) translateY(calc(clamp(122px, 35vw, 158px) * -1)) rotate(${-(index * 18 + 9)}deg)` }}
+                  style={{ transform: `translate(-50%,-50%) rotate(${index * 18 + 9}deg) translateY(calc(var(--wheel-radius) * -.81)) rotate(${-(index * 18 + 9)}deg)` }}
                 >{pose.id}</span>
               ))}
               <span className="pose-lottery__wheel-center">Touché</span>
@@ -97,7 +97,6 @@ export default function LotteryScreen({ lang, onBack }: Props) {
           {phase === "revealed" && chosen && (
             <section className="pose-lottery__result" aria-label={copy.result}>
               <img src={chosen.src} alt={copy.result} className="pose-lottery__pose-image" />
-              <span className="pose-lottery__result-label">{copy.result}</span>
             </section>
           )}
         </div>

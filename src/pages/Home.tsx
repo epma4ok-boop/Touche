@@ -1346,9 +1346,8 @@ export default function Home({
           <div className="pop-list pop-home-entry" style={{ flex: 1, overflowY: "auto", padding: `14px 18px max(28px,env(safe-area-inset-bottom))`, position: "relative", zIndex: 1 }}>
             <section className="pop-home-hero" aria-label={t.chooseNow}>
               <span className="pop-home-hero__stamp">{lang === "ru" ? "ВЕЧЕР ДЛЯ ДВОИХ" : t.appSub}</span>
-              <span className="pop-home-hero__orb" aria-hidden="true"><i /></span>
-              <h1>{lang === "ru" ? <>Ближе —<br /><span>с каждым шагом.</span></> : <>{HERO_COPY[lang].first}<br /><span>{HERO_COPY[lang].last}</span></>}</h1>
-              <p>{lang === "ru" ? "Выберите, каким будет ваш момент сегодня." : HERO_COPY[lang].sub}</p>
+              <h1>{HERO_COPY[lang].first}<br /><span>{HERO_COPY[lang].last}</span></h1>
+              <p>{HERO_COPY[lang].sub}</p>
             </section>
             <div className="pop-entry-actions">
               <button type="button" className="pop-entry-action pop-entry-action--solo" onClick={() => openHomeSection("solo")} data-testid="button-mode-solo">

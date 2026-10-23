@@ -2,9 +2,9 @@
 .pose-lottery * { box-sizing: border-box; }
 
 .pose-lottery {
-  --wheel-ink: #452336;
-  --wheel-paper: #fff8eb;
-  --wheel-muted: #76616b;
+  --wheel-ink: #162238;
+  --wheel-paper: #fffaf3;
+  --wheel-muted: #6d6470;
   position: fixed;
   inset: 0;
   z-index: 20;
@@ -17,7 +17,7 @@
   background:
     radial-gradient(ellipse 340px 250px at 95% 18%, rgba(240,120,112,.19), transparent 75%),
     radial-gradient(ellipse 300px 320px at 0% 88%, rgba(118,152,192,.16), transparent 74%),
-    #fbf3e7;
+    #fffaf3;
   font-family: "DM Sans", sans-serif;
 }
 .pose-lottery::before {
@@ -103,8 +103,9 @@
   flex: 0 0 auto;
 }
 .pose-lottery__wheel-wrap {
+  --wheel-radius: min(39vw, 169px);
   position: relative;
-  width: min(78vw, 338px);
+  width: calc(var(--wheel-radius) * 2);
   aspect-ratio: 1;
   display: grid;
   place-items: center;
@@ -142,9 +143,8 @@
   top: 50%;
   left: 50%;
   z-index: 1;
-  color: #452336;
-  font: 700 9px "Space Grotesk", sans-serif;
-  text-shadow: 0 1px 0 rgba(255,248,235,.75);
+  color: #fffaf3;
+  font: 700 10px "Space Grotesk", sans-serif;
   pointer-events: none;
 }
 .pose-lottery__wheel-center {
@@ -227,13 +227,13 @@
   border: 1.5px solid var(--wheel-ink);
   border-radius: 17px;
   color: var(--wheel-paper);
-  background: #a64c63;
+  background: #78183d;
   box-shadow: 4px 4px 0 var(--wheel-ink);
   font: 700 14px "DM Sans", sans-serif;
   cursor: pointer;
   transition: transform .18s ease, box-shadow .18s ease, background .18s ease;
 }
-.pose-lottery__button:hover { transform: translate(-1px,-1px); box-shadow: 5px 5px 0 var(--wheel-ink); background: #b6576c; }
+.pose-lottery__button:hover { transform: translate(-1px,-1px); box-shadow: 5px 5px 0 var(--wheel-ink); background: #8a294b; }
 .pose-lottery__button:active { transform: translate(2px,2px); box-shadow: 1px 1px 0 var(--wheel-ink); }
 .pose-lottery__button:disabled { opacity: .78; cursor: wait; }
 .pose-lottery__button-mark {
@@ -251,13 +251,13 @@
   .pose-lottery__header { padding-inline: 14px; }
   .pose-lottery__body { padding-inline: 15px; padding-top: 10px; }
   .pose-lottery__scene { height: 310px; }
-  .pose-lottery__wheel-wrap { width: min(78vw, 300px); }
+  .pose-lottery__wheel-wrap { --wheel-radius: min(39vw, 150px); }
    .pose-lottery__sector-number { font-size: 8px; }
 }
 @media (max-height: 700px) {
   .pose-lottery__body { padding-top: 8px; }
   .pose-lottery__scene { height: min(78vw, 310px); }
-  .pose-lottery__wheel-wrap { width: min(70vw, 282px); }
+  .pose-lottery__wheel-wrap { --wheel-radius: min(35vw, 141px); }
   .pose-lottery__pose-image { height: min(60vw, 250px); }
 }
 @media (prefers-reduced-motion: reduce) {

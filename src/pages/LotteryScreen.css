@@ -100,50 +100,65 @@
   place-items: center;
   width: min(100%, 400px);
   height: clamp(320px, 94vw, 400px);
-  margin-top: 4px;
+  margin-top: 24px;
   flex: 0 0 auto;
 }
 .pose-lottery__dial {
-  --dial: min(80vw, 338px);
+  --dial: min(86vw, 350px);
   position: relative;
   width: var(--dial);
   aspect-ratio: 1;
   border-radius: 50%;
-  box-shadow: 0 1px 0 rgba(255,255,255,.8), 0 22px 40px -18px rgba(69,35,54,.38), 0 3px 8px rgba(69,35,54,.12);
+  filter: drop-shadow(0 22px 18px rgba(120,24,61,.22));
   transition: transform .7s cubic-bezier(.4,0,.2,1), opacity .6s ease;
 }
-.pose-lottery__dial::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: 50%;
-  pointer-events: none;
-  background: radial-gradient(circle at 50% 8%, rgba(255,255,255,.28), transparent 45%);
-}
+.is-spinning .pose-lottery__dial { transform: scale(1.025); }
 .pose-lottery__wheel {
   width: 100%;
   height: 100%;
   border-radius: 50%;
   transform: rotate(var(--wheel-rotation, 0deg));
-  transition: transform 4.6s cubic-bezier(.17,.67,.1,1);
+  transition: transform 5s cubic-bezier(.17,.67,.1,1);
   will-change: transform;
 }
 .pose-lottery__wheel.is-instant { transition: none; }
 .pose-lottery__svg { display: block; width: 100%; height: 100%; }
-.pose-lottery__numeral { fill: #162238; font: 600 13px "Space Grotesk", sans-serif; letter-spacing: .04em; }
-.pose-lottery__hub-mark { fill: #f2dccb; font: 700 15px "Space Grotesk", sans-serif; }
-/* Index: a fine burgundy needle with a small diamond, resting on the rim. */
+/* Fixed light over the turning lacquer: the disc moves, the reflection does not. */
+.pose-lottery__sheen {
+  position: absolute;
+  inset: 2%;
+  border-radius: 50%;
+  pointer-events: none;
+  background: conic-gradient(from 210deg, transparent 0 8%, rgba(255,236,226,.22) 14%, transparent 24% 56%, rgba(255,236,226,.12) 64%, transparent 74%);
+}
+.pose-lottery__hub {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  display: grid;
+  width: 25%;
+  aspect-ratio: 1;
+  place-items: center;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 25%, #fffdf8, #f4e4dc);
+  box-shadow: 0 2px 4px rgba(255,250,243,.5) inset, 0 5px 18px rgba(52,9,31,.32);
+  transform: translate(-50%,-50%);
+}
+.pose-lottery__hub b { color: #162238; font: 700 clamp(14px, 4.2vw, 18px) "Space Grotesk", sans-serif; letter-spacing: -.06em; }
+.pose-lottery__hub em { color: #78183d; font-style: normal; }
+/* Pointer: a confident ink tab seated over the rim. */
 .pose-lottery__index {
   position: absolute;
   z-index: 4;
-  top: -13px;
+  top: -8px;
   left: 50%;
-  width: 11px;
-  height: 25px;
+  width: 14px;
+  height: 24px;
   transform: translateX(-50%);
-  background: var(--wheel-wine);
-  clip-path: polygon(50% 100%, 0 38%, 22% 0, 78% 0, 100% 38%);
-  filter: drop-shadow(0 2px 2px rgba(69,35,54,.25));
+  background: #78183d;
+  border-radius: 9px 9px 5px 5px;
+  clip-path: polygon(0 0, 100% 0, 100% 45%, 50% 100%, 0 45%);
+  filter: drop-shadow(0 3px 3px rgba(22,34,56,.3));
 }
 .is-done .pose-lottery__dial { transform: scale(.94); opacity: 0; transition-delay: .1s; }
 .pose-lottery__result {
@@ -199,12 +214,12 @@
   .pose-lottery__header { padding-inline: 14px; }
   .pose-lottery__body { padding-inline: 15px; padding-top: 10px; }
   .pose-lottery__scene { height: 310px; }
-  .pose-lottery__dial { --dial: min(78vw, 290px); }
+  .pose-lottery__dial { --dial: min(82vw, 300px); }
 }
 @media (max-height: 700px) {
   .pose-lottery__body { padding-top: 8px; }
   .pose-lottery__scene { height: min(78vw, 310px); }
-  .pose-lottery__dial { --dial: min(74vw, 284px); }
+  .pose-lottery__dial { --dial: min(76vw, 290px); }
   .pose-lottery__pose-image { height: min(60vw, 250px); }
 }
 @media (prefers-reduced-motion: reduce) {

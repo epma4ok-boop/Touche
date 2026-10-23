@@ -5,7 +5,7 @@ import "./LotteryScreen.css";
 
 type Props = { lang: Lang; onBack: () => void };
 type Phase = "idle" | "spinning" | "revealed";
-const SPIN_MS = 4600;
+const SPIN_MS = 5000;
 const POSES = Array.from({ length: 20 }, (_, index) => {
   const id = String(index + 1).padStart(2, "0");
   return { id, src: `/images/lottery-poses/pose-${id}.svg` };
@@ -51,18 +51,13 @@ const polar = (r: number, deg: number) => {
   return [200 + r * Math.cos(a), 200 + r * Math.sin(a)] as const;
 };
 
-/* Static dial markings: hairline ticks on sector boundaries, fine minor ticks, numerals at sector centres. */
-const MARKS = POSES.map((pose, index) => {
-  const edge = index * 18;
-  const [x1, y1] = polar(172, edge);
-  const [x2, y2] = polar(150, edge);
-  const minors = [6, 12].map(o => {
-    const [a, b] = polar(172, edge + o);
-    const [c, d] = polar(165, edge + o);
-    return { a, b, c, d };
-  });
-  return { id: pose.id, x1, y1, x2, y2, minors, angle: edge + 9 };
-});
+/* Twenty curved petals share their boundaries; their outer centres retain the pose mapping. */
+const petal = (i: number) => {
+  const a = i * 18;
+  const point = (r: number, angle: number) => polar(r, a + angle).join(" ");
+  return `M${point(52, -48)}C${point(104, -44)} ${point(158, -12)} ${point(188, 0)}Q${point(202, 9)} ${point(188, 18)}C${point(158, 6)} ${point(104, -26)} ${point(52, -30)}Z`;
+};
+const MARKS = POSES.map((pose, index) => ({ id: pose.id, index, d: petal(index), angle: index * 18 + 9 }));
 
 export default function LotteryScreen({ lang, onBack }: Props) {
   const copy = COPY[lang];
@@ -130,28 +125,30 @@ export default function LotteryScreen({ lang, onBack }: Props) {
             <div className={`pose-lottery__wheel${instant ? " is-instant" : ""}`} style={wheelStyle}>
               <svg viewBox="0 0 400 400" className="pose-lottery__svg" focusable="false">
                 <defs>
-                  <radialGradient id="dial-face" cx="50%" cy="38%" r="70%">
-                    <stop offset="0" stopColor="#fffdf8" />
-                    <stop offset="1" stopColor="#f3e9dd" />
-                  </radialGradient>
+                  <linearGradient id="petal-wine" x1="150" y1="200" x2="215" y2="10" gradientUnits="userSpaceOnUse">
+                    <stop stopColor="#350c24" />
+                    <stop offset=".48" stopColor="#78183d" />
+                    <stop offset=".82" stopColor="#ad4160" />
+                    <stop offset="1" stopColor="#df9caa" />
+                  </linearGradient>
+                  <linearGradient id="petal-rose" x1="150" y1="200" x2="215" y2="10" gradientUnits="userSpaceOnUse">
+                    <stop stopColor="#460e2a" />
+                    <stop offset=".48" stopColor="#8c2349" />
+                    <stop offset=".82" stopColor="#bf5a73" />
+                    <stop offset="1" stopColor="#f0bcc3" />
+                  </linearGradient>
+                  {MARKS.map(m => (
+                    <linearGradient key={m.id} id={`petal-${m.id}`} href={m.index % 2 ? "#petal-wine" : "#petal-rose"} gradientTransform={`rotate(${m.index * 18} 200 200)`} />
+                  ))}
                 </defs>
-                <circle cx="200" cy="200" r="196" fill="#162238" />
-                <circle cx="200" cy="200" r="193" fill="url(#dial-face)" />
-                <circle cx="200" cy="200" r="186" fill="none" stroke="#78183d" strokeWidth="1.2" />
-                <circle cx="200" cy="200" r="110" fill="none" stroke="#78183d" strokeOpacity=".28" strokeWidth=".8" />
-                <circle cx="200" cy="200" r="62" fill="none" stroke="#162238" strokeOpacity=".14" strokeWidth=".8" />
+                <circle cx="200" cy="200" r="186" fill="#4a102c" />
                 {MARKS.map(m => (
-                  <g key={m.id}>
-                    <line x1={m.x1} y1={m.y1} x2={m.x2} y2={m.y2} stroke="#78183d" strokeWidth="1.4" />
-                    {m.minors.map((k, i) => <line key={i} x1={k.a} y1={k.b} x2={k.c} y2={k.d} stroke="#162238" strokeOpacity=".4" strokeWidth=".8" />)}
-                    <text x="200" y="72" transform={`rotate(${m.angle} 200 200)`} textAnchor="middle" className="pose-lottery__numeral">{m.id}</text>
-                  </g>
+                  <path key={m.id} d={m.d} fill={`url(#petal-${m.id})`} stroke="#f8d8d8" strokeOpacity=".32" strokeWidth=".85" strokeLinejoin="round" />
                 ))}
-                <circle cx="200" cy="200" r="30" fill="#162238" />
-                <circle cx="200" cy="200" r="26" fill="none" stroke="#e8c4ae" strokeOpacity=".5" strokeWidth=".8" />
-                <text x="200" y="203.5" textAnchor="middle" className="pose-lottery__hub-mark">T</text>
               </svg>
             </div>
+            <span className="pose-lottery__sheen" />
+            <span className="pose-lottery__hub"><b>Touch<em>é</em></b></span>
           </div>
           {phase === "revealed" && chosen && (
             <section className="pose-lottery__result" aria-label={copy.result}>
@@ -161,7 +158,7 @@ export default function LotteryScreen({ lang, onBack }: Props) {
         </div>
 
         <p className="pose-lottery__status" aria-live="polite" role="status" data-testid="status-pose-wheel">
-          {busy ? copy.spinning : phase === "revealed" && chosen ? copy.status(Number(chosen.id)) : copy.hint}
+          {busy ? copy.spinning : phase === "revealed" && chosen ? copy.result : copy.hint}
         </p>
         <button type="button" className="pose-lottery__button" onClick={spin} disabled={busy} data-testid="button-pose-wheel-spin">
           <span className="pose-lottery__button-mark" aria-hidden="true" />

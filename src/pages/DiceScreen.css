@@ -56,6 +56,7 @@
 .touche-dice__join::after { transform: translateY(-3px); }
 .touche-dice__status { min-height: 25px; margin: 23px 0 0; color: var(--dice-muted); font-size: 12px; text-align: center; transition: opacity .2s ease; }
 .touche-dice__status.is-result { color: var(--dice-wine); font-weight: 700; }
+.touche-dice__joke { width: min(100%, 360px); min-height: 38px; margin: 5px auto 0; color: var(--dice-wine); font-size: 13px; font-style: italic; line-height: 1.45; text-align: center; }
 .touche-dice__button { min-height: 54px; width: min(100%, 350px); flex: 0 0 auto; display: flex; align-items: center; justify-content: center; gap: 11px; margin-top: 14px; border: 1px solid var(--dice-wine); border-radius: 16px; color: var(--dice-paper); background: var(--dice-wine); box-shadow: 0 10px 22px -10px rgba(120,24,61,.6); font: 700 14px "DM Sans", sans-serif; cursor: pointer; transition: transform .2s ease, background .2s ease; }
 .touche-dice__button:hover { transform: translateY(-1px); background: #8a294b; }
 .touche-dice__button:active { transform: translateY(1px); }
@@ -75,6 +76,7 @@
   .touche-dice__die-stage { --cube-edge: clamp(118px, 32vw, 150px); }
   .touche-dice__player { gap: 9px; }
   .touche-dice__status { margin-top: 12px; }
+  .touche-dice__joke { min-height: 34px; font-size: 12px; }
   .touche-dice__button { min-height: 50px; margin-top: 8px; }
 }
 @media (prefers-reduced-motion: reduce) {

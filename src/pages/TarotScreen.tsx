@@ -248,10 +248,7 @@ export default function TarotScreen({ lang, onBack }: Props) {
         {!session.revealed ? (
           <div className="tarot-enter">
             <button type="button" className="tarot-cardback" onClick={() => update({ revealed: true })} aria-label={`${copy.reveal}. ${copy.cardBack}`} data-testid="button-tarot-cardback">
-              <span className="tarot-cardback__inner" aria-hidden="true">
-                <svg viewBox="0 0 100 160"><rect x="8" y="8" width="84" height="144" rx="6" /><circle cx="50" cy="80" r="22" /><path d="M50 52v56M28 80h44M34 64l32 32M66 64 34 96" /></svg>
-                <span>0{session.step + 1}</span>
-              </span>
+              <img className="tarot-cardback__image" src={tarotImageUrl("card-back.png")} alt="" aria-hidden="true" draggable={false} />
             </button>
             <p className="tarot__hint">{copy.cardBack}</p>
             <button type="button" className="tarot-btn" onClick={() => update({ revealed: true })} data-testid="button-tarot-reveal">{copy.reveal}</button>

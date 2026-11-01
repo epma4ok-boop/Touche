@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import type { CSSProperties } from "react";
 import type { Lang } from "@/data/i18n";
-import { TAROT_POSITIONS, drawTarotSpread, getTarotCard, isTarotSpread, tarotImageUrl } from "@/data/tarot";
+import { TAROT_POSITIONS, drawTarotSpread, getTarotCard, getTarotText, isTarotSpread, tarotImageUrl } from "@/data/tarot";
 import type { TarotDraw } from "@/data/tarot";
 import useTelegramTopInset from "./useTelegramTopInset";
 import "./TarotScreen.css";
@@ -38,7 +38,7 @@ type Copy = {
   confirmReset: string; confirmYes: string; confirmNo: string; cardOf: string; cardBack: string; reveal: string;
   pause: string; discussed: string; toReflection: string; reflectionHead: string; reflectionNote: string; finish: string;
   doneHead: string; doneNote: string; newSpread: string; toGames: string; loading: string; imgError: string; retry: string;
-  ruOnly: string; artAlt: string;
+  authorNote: string; artAlt: string;
 };
 
 const COPY: Record<Lang, Copy> = {
@@ -57,7 +57,7 @@ const COPY: Record<Lang, Copy> = {
     discussed: "Мы обсудили — дальше", toReflection: "Мы обсудили — к итогу",
     reflectionHead: "Последний вопрос", reflectionNote: "Ответьте вслух, каждый по очереди. Ничего не нужно записывать.",
     finish: "Завершить", doneHead: "Ваш расклад", doneNote: "Спасибо, что выслушали друг друга.", newSpread: "Новый расклад", toGames: "К играм",
-    loading: "Загружаем изображение", imgError: "Изображение не загрузилось.", retry: "Повторить", ruOnly: "", artAlt: "Иллюстрация карты",
+    loading: "Загружаем изображение", imgError: "Изображение не загрузилось.", retry: "Повторить", authorNote: "", artAlt: "Иллюстрация карты",
   },
   en: {
     title: "Tarot for two", back: "Back to games",
@@ -75,7 +75,7 @@ const COPY: Record<Lang, Copy> = {
     reflectionHead: "Closing question", reflectionNote: "Answer aloud, one at a time. Nothing is recorded.",
     finish: "Finish", doneHead: "Your spread", doneNote: "Thank you for hearing each other.", newSpread: "New spread", toGames: "To games",
     loading: "Loading image", imgError: "The image didn't load.", retry: "Retry",
-    ruOnly: "Card texts are available in Russian only for now; no translation is provided.", artAlt: "Card illustration",
+    authorNote: "Card names and the closing question remain in Russian, as in the original.", artAlt: "Card illustration",
   },
   hi: {
     title: "दो के लिए टैरो", back: "खेलों पर वापस",
@@ -93,7 +93,7 @@ const COPY: Record<Lang, Copy> = {
     reflectionHead: "अंतिम प्रश्न", reflectionNote: "बारी-बारी से ज़ोर से जवाब दें। कुछ भी दर्ज नहीं होता।",
     finish: "समाप्त", doneHead: "आपका स्प्रेड", doneNote: "एक-दूसरे को सुनने के लिए धन्यवाद।", newSpread: "नया स्प्रेड", toGames: "खेलों पर",
     loading: "छवि लोड हो रही है", imgError: "छवि लोड नहीं हुई।", retry: "फिर कोशिश करें",
-    ruOnly: "कार्ड के पाठ अभी केवल रूसी में उपलब्ध हैं; अनुवाद नहीं है।", artAlt: "कार्ड चित्र",
+    authorNote: "मूल रूप में कार्डों के नाम और अंतिम प्रश्न रूसी में ही रखे गए हैं।", artAlt: "कार्ड चित्र",
   },
   pt: {
     title: "Tarô para dois", back: "Voltar aos jogos",
@@ -111,7 +111,7 @@ const COPY: Record<Lang, Copy> = {
     reflectionHead: "Pergunta final", reflectionNote: "Respondam em voz alta, um de cada vez. Nada é registrado.",
     finish: "Concluir", doneHead: "Sua tiragem", doneNote: "Obrigado por se ouvirem.", newSpread: "Nova tiragem", toGames: "Aos jogos",
     loading: "Carregando imagem", imgError: "A imagem não carregou.", retry: "Tentar de novo",
-    ruOnly: "Os textos das cartas estão disponíveis apenas em russo por enquanto; não há tradução.", artAlt: "Ilustração da carta",
+    authorNote: "Os nomes das cartas e a pergunta final permanecem em russo, como no original.", artAlt: "Ilustração da carta",
   },
   es: {
     title: "Tarot para dos", back: "Volver a juegos",
@@ -129,7 +129,7 @@ const COPY: Record<Lang, Copy> = {
     reflectionHead: "Pregunta final", reflectionNote: "Respondan en voz alta, por turnos. No se guarda nada.",
     finish: "Terminar", doneHead: "Su tirada", doneNote: "Gracias por escucharse.", newSpread: "Nueva tirada", toGames: "A juegos",
     loading: "Cargando imagen", imgError: "La imagen no se cargó.", retry: "Reintentar",
-    ruOnly: "Los textos de las cartas solo están en ruso por ahora; no hay traducción.", artAlt: "Ilustración de la carta",
+    authorNote: "Los nombres de las cartas y la pregunta final se mantienen en ruso, como en el original.", artAlt: "Ilustración de la carta",
   },
 };
 
@@ -186,7 +186,7 @@ export default function TarotScreen({ lang, onBack }: Props) {
     </header>
   );
 
-  const ruNote = copy.ruOnly && <p className="tarot__ru-note" data-testid="text-tarot-ru-only">{copy.ruOnly}</p>;
+  const authorNote = copy.authorNote && <p className="tarot__ru-note" data-testid="text-tarot-original-language">{copy.authorNote}</p>;
 
   let body;
   if (view === "intro" || !session) {
@@ -208,7 +208,7 @@ export default function TarotScreen({ lang, onBack }: Props) {
           <ul className="tarot__rules">{copy.rules.map(r => <li key={r}>{r}</li>)}</ul>
         </div>
         <p className="tarot__notice">{copy.notice}</p>
-        {ruNote}
+        {authorNote}
         <div className="tarot__actions">
           {unfinished ? (
             <>
@@ -257,8 +257,8 @@ export default function TarotScreen({ lang, onBack }: Props) {
           <div className="tarot-reveal">
             <CardArt image={draw.image} alt={`${copy.artAlt}: ${card.title}`} copy={copy} />
             <h2 lang="ru" className="tarot__card-title" data-testid="text-tarot-card-title">{card.title}</h2>
-            <p lang="ru" className="tarot__card-text" data-testid="text-tarot-card-text">{card.text[pos.layer]}</p>
-            {ruNote}
+            <p lang={lang} className="tarot__card-text" data-testid="text-tarot-card-text">{getTarotText(card, pos.layer, lang)}</p>
+            {authorNote}
             <p className="tarot__pause" role="note">{copy.pause}</p>
             <button type="button" className="tarot-btn" data-testid="button-tarot-next"
               onClick={() => (last ? update({ phase: "reflection" }) : update({ step: (session.step + 1) as 1 | 2, revealed: false }))}>
@@ -273,7 +273,7 @@ export default function TarotScreen({ lang, onBack }: Props) {
       <section className="tarot__stage tarot-enter">
         <p className="tarot__pos-index">{copy.reflectionHead}</p>
         <h1 ref={headingRef} tabIndex={-1} lang="ru" className="tarot__question" data-testid="text-tarot-final-question">{FINAL_QUESTION}</h1>
-        {ruNote}
+        {authorNote}
         <p className="tarot__hint">{copy.reflectionNote}</p>
         <button type="button" className="tarot-btn" onClick={() => update({ phase: "done" })} data-testid="button-tarot-finish">{copy.finish}</button>
       </section>

@@ -128,3 +128,5 @@
 @media (prefers-reduced-motion: reduce) {
   .touche-games *, .touche-games *::before, .touche-games *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
 }
+.touche-games__choice--tarot { background: linear-gradient(135deg, #2f2340, #5b2c4f 62%, #8b4a63); }
+.touche-games__tarot-mark { width: 88px; fill: rgba(255,240,228,.16); stroke: rgba(255,236,222,.75); stroke-width: 1.6; }

@@ -3,21 +3,22 @@ import type { CSSProperties } from "react";
 import type { Lang } from "@/data/i18n";
 import WheelScreen from "./LotteryScreen";
 import DiceScreen from "./DiceScreen";
+import TarotScreen from "./TarotScreen";
 import useTelegramTopInset from "./useTelegramTopInset";
 import "./GamesScreen.css";
 
-type Game = "wheel" | "dice";
+type Game = "wheel" | "dice" | "tarot";
 type Props = { lang: Lang; onBack: () => void };
 
 const COPY: Record<Lang, {
   title: string; subtitle: string; wheel: string; wheelNote: string; dice: string; diceNote: string;
-  back: string; number: string;
+  back: string; number: string; tarot: string; tarotNote: string;
 }> = {
-  ru: { title: "Игры", subtitle: "Выберите, с чего начнётся ваш вечер.", wheel: "Колесо", wheelNote: "Двадцать вариантов — один выбор", dice: "Кости", diceNote: "Бросьте две кости одновременно", back: "Назад", number: "Игра" },
-  en: { title: "Games", subtitle: "Choose how your evening begins.", wheel: "Wheel", wheelNote: "Twenty possibilities, one choice", dice: "Dice", diceNote: "Roll two dice at once", back: "Back", number: "Game" },
-  hi: { title: "खेल", subtitle: "चुनें, आपकी शाम कैसे शुरू होगी।", wheel: "व्हील", wheelNote: "बीस विकल्प, एक चुनाव", dice: "पासे", diceNote: "दो पासे एक साथ फेंकें", back: "वापस", number: "खेल" },
-  pt: { title: "Jogos", subtitle: "Escolham como a noite vai começar.", wheel: "Roleta", wheelNote: "Vinte possibilidades, uma escolha", dice: "Dados", diceNote: "Jogue dois dados de uma vez", back: "Voltar", number: "Jogo" },
-  es: { title: "Juegos", subtitle: "Elijan cómo empieza su noche.", wheel: "Ruleta", wheelNote: "Veinte posibilidades, una elección", dice: "Dados", diceNote: "Lancen dos dados a la vez", back: "Volver", number: "Juego" },
+  ru: { title: "Игры", subtitle: "Выберите, с чего начнётся ваш вечер.", wheel: "Колесо", wheelNote: "Двадцать вариантов — один выбор", dice: "Кости", diceNote: "Бросьте две кости одновременно", back: "Назад", number: "Игра", tarot: "Таро для двоих", tarotNote: "Три карты для честного разговора" },
+  en: { title: "Games", subtitle: "Choose how your evening begins.", wheel: "Wheel", wheelNote: "Twenty possibilities, one choice", dice: "Dice", diceNote: "Roll two dice at once", back: "Back", number: "Game", tarot: "Tarot for two", tarotNote: "Three cards for an honest talk" },
+  hi: { title: "खेल", subtitle: "चुनें, आपकी शाम कैसे शुरू होगी।", wheel: "व्हील", wheelNote: "बीस विकल्प, एक चुनाव", dice: "पासे", diceNote: "दो पासे एक साथ फेंकें", back: "वापस", number: "खेल", tarot: "दो के लिए टैरो", tarotNote: "सच्ची बातचीत के लिए तीन कार्ड" },
+  pt: { title: "Jogos", subtitle: "Escolham como a noite vai começar.", wheel: "Roleta", wheelNote: "Vinte possibilidades, uma escolha", dice: "Dados", diceNote: "Jogue dois dados de uma vez", back: "Voltar", number: "Jogo", tarot: "Tarô para dois", tarotNote: "Três cartas para uma conversa sincera" },
+  es: { title: "Juegos", subtitle: "Elijan cómo empieza su noche.", wheel: "Ruleta", wheelNote: "Veinte posibilidades, una elección", dice: "Dados", diceNote: "Lancen dos dados a la vez", back: "Volver", number: "Juego", tarot: "Tarot para dos", tarotNote: "Tres cartas para una charla sincera" },
 };
 
 function WheelMark() {
@@ -40,11 +41,22 @@ function CubeMark() {
   );
 }
 
+function TarotMark() {
+  return (
+    <svg viewBox="0 0 100 100" aria-hidden="true" className="touche-games__tarot-mark">
+      <rect x="20" y="16" width="38" height="62" rx="5" transform="rotate(-12 39 47)" />
+      <rect x="42" y="22" width="38" height="62" rx="5" transform="rotate(10 61 53)" />
+      <circle cx="61" cy="53" r="9" />
+    </svg>
+  );
+}
+
 export default function GamesScreen({ lang, onBack }: Props) {
   const [game, setGame] = useState<Game | null>(null);
   const top = useTelegramTopInset();
   const copy = COPY[lang];
   if (game === "wheel") return <WheelScreen lang={lang} onBack={() => setGame(null)} />;
+  if (game === "tarot") return <TarotScreen lang={lang} onBack={() => setGame(null)} />;
   if (game === "dice") return <DiceScreen lang={lang} onBack={() => setGame(null)} />;
 
   return (
@@ -73,6 +85,12 @@ export default function GamesScreen({ lang, onBack }: Props) {
             <span className="touche-games__choice-index">02 <small>{copy.number}</small></span>
             <span className="touche-games__art-wrap"><CubeMark /></span>
             <span className="touche-games__choice-copy"><strong>{copy.dice}</strong><small>{copy.diceNote}</small></span>
+            <span className="touche-games__arrow" aria-hidden="true">↗</span>
+          </button>
+          <button type="button" className="touche-games__choice touche-games__choice--tarot" onClick={() => setGame("tarot")} data-testid="button-game-tarot">
+            <span className="touche-games__choice-index">03 <small>{copy.number}</small></span>
+            <span className="touche-games__art-wrap"><TarotMark /></span>
+            <span className="touche-games__choice-copy"><strong>{copy.tarot}</strong><small>{copy.tarotNote}</small></span>
             <span className="touche-games__arrow" aria-hidden="true">↗</span>
           </button>
         </section>

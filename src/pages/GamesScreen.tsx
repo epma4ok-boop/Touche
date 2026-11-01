@@ -11,14 +11,47 @@ type Game = "wheel" | "dice" | "tarot";
 type Props = { lang: Lang; onBack: () => void };
 
 const COPY: Record<Lang, {
-  title: string; subtitle: string; wheel: string; wheelNote: string; dice: string; diceNote: string;
-  back: string; number: string; tarot: string; tarotNote: string;
+  title: string; subtitle: string;
+  wheel: string; wheelNote: string; wheelMood: string;
+  dice: string; diceNote: string; diceMood: string;
+  back: string; number: string;
+  tarot: string; tarotNote: string; tarotMood: string;
 }> = {
-  ru: { title: "Игры", subtitle: "Выберите, с чего начнётся ваш вечер.", wheel: "Колесо", wheelNote: "Двадцать вариантов — один выбор", dice: "Кости", diceNote: "Бросьте две кости одновременно", back: "Назад", number: "Игра", tarot: "Таро для двоих", tarotNote: "Три карты для честного разговора" },
-  en: { title: "Games", subtitle: "Choose how your evening begins.", wheel: "Wheel", wheelNote: "Twenty possibilities, one choice", dice: "Dice", diceNote: "Roll two dice at once", back: "Back", number: "Game", tarot: "Tarot for two", tarotNote: "Three cards for an honest talk" },
-  hi: { title: "खेल", subtitle: "चुनें, आपकी शाम कैसे शुरू होगी।", wheel: "व्हील", wheelNote: "बीस विकल्प, एक चुनाव", dice: "पासे", diceNote: "दो पासे एक साथ फेंकें", back: "वापस", number: "खेल", tarot: "दो के लिए टैरो", tarotNote: "सच्ची बातचीत के लिए तीन कार्ड" },
-  pt: { title: "Jogos", subtitle: "Escolham como a noite vai começar.", wheel: "Roleta", wheelNote: "Vinte possibilidades, uma escolha", dice: "Dados", diceNote: "Jogue dois dados de uma vez", back: "Voltar", number: "Jogo", tarot: "Tarô para dois", tarotNote: "Três cartas para uma conversa sincera" },
-  es: { title: "Juegos", subtitle: "Elijan cómo empieza su noche.", wheel: "Ruleta", wheelNote: "Veinte posibilidades, una elección", dice: "Dados", diceNote: "Lancen dos dados a la vez", back: "Volver", number: "Juego", tarot: "Tarot para dos", tarotNote: "Tres cartas para una charla sincera" },
+  ru: {
+    title: "Игры", subtitle: "Выберите, с чего начнётся ваш вечер.",
+    wheel: "Колесо поз", wheelNote: "Двадцать вариантов — один выбор", wheelMood: "ДВИЖЕНИЕ",
+    dice: "Кубики действий", diceNote: "Два броска — новый повод сблизиться", diceMood: "ИМПУЛЬС",
+    back: "Назад", number: "Игра",
+    tarot: "Таро для двоих", tarotNote: "Три карты. Один честный разговор.", tarotMood: "БЛИЗОСТЬ",
+  },
+  en: {
+    title: "Games", subtitle: "Choose how your evening begins.",
+    wheel: "Wheel of poses", wheelNote: "Twenty possibilities, one shared choice", wheelMood: "MOVEMENT",
+    dice: "Action dice", diceNote: "Two rolls to bring you closer", diceMood: "SPONTANEITY",
+    back: "Back", number: "Game",
+    tarot: "Tarot for two", tarotNote: "Three cards. One honest conversation.", tarotMood: "CONNECTION",
+  },
+  hi: {
+    title: "खेल", subtitle: "चुनें, आपकी शाम कैसे शुरू होगी।",
+    wheel: "पोज़ का पहिया", wheelNote: "बीस विकल्प, एक साझा चुनाव", wheelMood: "क़रीबी",
+    dice: "क्रिया के पासे", diceNote: "दो दाँव, और भी क़रीब आने का नया बहाना", diceMood: "रोमांच",
+    back: "वापस", number: "खेल",
+    tarot: "दो के लिए टैरो", tarotNote: "तीन कार्ड। एक सच्ची बातचीत।", tarotMood: "जुड़ाव",
+  },
+  pt: {
+    title: "Jogos", subtitle: "Escolham como a noite vai começar.",
+    wheel: "Roleta das poses", wheelNote: "Vinte opções, uma escolha a dois", wheelMood: "MOVIMENTO",
+    dice: "Dados de ação", diceNote: "Dois lançamentos para aproximar vocês", diceMood: "SURPRESA",
+    back: "Voltar", number: "Jogo",
+    tarot: "Tarô para dois", tarotNote: "Três cartas. Uma conversa sincera.", tarotMood: "CONEXÃO",
+  },
+  es: {
+    title: "Juegos", subtitle: "Elijan cómo empieza su noche.",
+    wheel: "Ruleta de posturas", wheelNote: "Veinte opciones, una elección compartida", wheelMood: "MOVIMIENTO",
+    dice: "Dados de acción", diceNote: "Dos lanzamientos para acercarse", diceMood: "SORPRESA",
+    back: "Volver", number: "Juego",
+    tarot: "Tarot para dos", tarotNote: "Tres cartas. Una conversación sincera.", tarotMood: "CONEXIÓN",
+  },
 };
 
 function WheelMark() {
@@ -78,19 +111,19 @@ export default function GamesScreen({ lang, onBack }: Props) {
           <button type="button" className="touche-games__choice touche-games__choice--wheel" onClick={() => setGame("wheel")} data-testid="button-game-wheel">
             <span className="touche-games__choice-index">01 <small>{copy.number}</small></span>
             <span className="touche-games__art-wrap"><WheelMark /></span>
-            <span className="touche-games__choice-copy"><strong>{copy.wheel}</strong><small>{copy.wheelNote}</small></span>
+            <span className="touche-games__choice-copy"><small className="touche-games__choice-mood">{copy.wheelMood}</small><strong>{copy.wheel}</strong><small>{copy.wheelNote}</small></span>
             <span className="touche-games__arrow" aria-hidden="true">↗</span>
           </button>
           <button type="button" className="touche-games__choice touche-games__choice--dice" onClick={() => setGame("dice")} data-testid="button-game-dice">
             <span className="touche-games__choice-index">02 <small>{copy.number}</small></span>
             <span className="touche-games__art-wrap"><CubeMark /></span>
-            <span className="touche-games__choice-copy"><strong>{copy.dice}</strong><small>{copy.diceNote}</small></span>
+            <span className="touche-games__choice-copy"><small className="touche-games__choice-mood">{copy.diceMood}</small><strong>{copy.dice}</strong><small>{copy.diceNote}</small></span>
             <span className="touche-games__arrow" aria-hidden="true">↗</span>
           </button>
           <button type="button" className="touche-games__choice touche-games__choice--tarot" onClick={() => setGame("tarot")} data-testid="button-game-tarot">
             <span className="touche-games__choice-index">03 <small>{copy.number}</small></span>
             <span className="touche-games__art-wrap"><TarotMark /></span>
-            <span className="touche-games__choice-copy"><strong>{copy.tarot}</strong><small>{copy.tarotNote}</small></span>
+            <span className="touche-games__choice-copy"><small className="touche-games__choice-mood">{copy.tarotMood}</small><strong>{copy.tarot}</strong><small>{copy.tarotNote}</small></span>
             <span className="touche-games__arrow" aria-hidden="true">↗</span>
           </button>
         </section>

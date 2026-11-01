@@ -33,7 +33,7 @@ const COPY: Record<Lang, {
   captions: string[];
 }> = {
   ru: {
-    back: "Назад", title: "Кости", subtitle: "Два броска. Один общий выбор.", throw: "Бросить кости", rolling: "Кости бросаются…", again: "Бросить ещё раз", hint: "Пусть случай решит, с чего начать",
+    back: "Назад", title: "Кубики действий", subtitle: "Два броска. Один общий выбор.", throw: "Бросить кости", rolling: "Кости бросаются…", again: "Бросить ещё раз", hint: "Пусть случай решит, с чего начать",
     male: "Мужская кость", female: "Женская кость", result: "Результат броска", status: (m, f) => `${m} · ${f}`,
     captions: [
       "Рука и ягодицы — осторожный намёк на шлепок?",
@@ -75,7 +75,7 @@ const COPY: Record<Lang, {
     ],
   },
   en: {
-    back: "Back", title: "Dice", subtitle: "Two rolls. One shared choice.", throw: "Roll the dice", rolling: "Rolling the dice…", again: "Roll again", hint: "Let chance choose where to begin",
+    back: "Back", title: "Action dice", subtitle: "Two rolls. One shared choice.", throw: "Roll the dice", rolling: "Rolling the dice…", again: "Roll again", hint: "Let chance choose where to begin",
     male: "Male die", female: "Female die", result: "Roll result", status: (m, f) => `${m} · ${f}`,
     captions: [
       "Hand + buttocks: a gentle hint from the dice?",
@@ -117,7 +117,7 @@ const COPY: Record<Lang, {
     ],
   },
   hi: {
-    back: "वापस", title: "पासे", subtitle: "दो पासे। एक साझा चुनाव।", throw: "पासे फेंकें", rolling: "पासे घूम रहे हैं…", again: "फिर फेंकें", hint: "शुरुआत का चुनाव संयोग पर छोड़ें",
+    back: "वापस", title: "क्रिया के पासे", subtitle: "दो पासे। एक साझा चुनाव।", throw: "पासे फेंकें", rolling: "पासे घूम रहे हैं…", again: "फिर फेंकें", hint: "शुरुआत का चुनाव संयोग पर छोड़ें",
     male: "पुरुष पासा", female: "महिला पासा", result: "पासे का परिणाम", status: (m, f) => `${m} · ${f}`,
     captions: [
       "हाथ और नितंब — पासे हल्के से थपकी देने का इशारा कर रहे हैं?",
@@ -159,7 +159,7 @@ const COPY: Record<Lang, {
     ],
   },
   pt: {
-    back: "Voltar", title: "Dados", subtitle: "Dois lançamentos. Uma escolha a dois.", throw: "Lançar os dados", rolling: "Os dados estão rolando…", again: "Lançar novamente", hint: "Deixem o acaso escolher por onde começar",
+    back: "Voltar", title: "Dados de ação", subtitle: "Dois lançamentos. Uma escolha a dois.", throw: "Lançar os dados", rolling: "Os dados estão rolando…", again: "Lançar novamente", hint: "Deixem o acaso escolher por onde começar",
     male: "Dado masculino", female: "Dado feminino", result: "Resultado dos dados", status: (m, f) => `${m} · ${f}`,
     captions: [
       "Mão e bumbum: os dados sugerem um tapinha de leve?",
@@ -201,7 +201,7 @@ const COPY: Record<Lang, {
     ],
   },
   es: {
-    back: "Volver", title: "Dados", subtitle: "Dos lanzamientos. Una elección compartida.", throw: "Lanzar los dados", rolling: "Los dados están rodando…", again: "Lanzar otra vez", hint: "Dejen que el azar elija por dónde empezar",
+    back: "Volver", title: "Dados de acción", subtitle: "Dos lanzamientos. Una elección compartida.", throw: "Lanzar los dados", rolling: "Los dados están rodando…", again: "Lanzar otra vez", hint: "Dejen que el azar elija por dónde empezar",
     male: "Dado masculino", female: "Dado femenino", result: "Resultado de los dados", status: (m, f) => `${m} · ${f}`,
     captions: [
       "Mano y trasero: ¿los dados sugieren una palmada suave?",

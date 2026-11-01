@@ -1,0 +1,508 @@
+{
+  "wall": {
+    "en": {
+      "see": "A wall. One of you keeps hitting it; the other cannot hear. And somehow, this has become normal.",
+      "feel": "Lonely together. Each of you on your own, though you are close. The nearer you are, the farther apart you feel.",
+      "want": "To hear and be seen. To stop hitting the wall and take it apart together. And you are afraid to admit it is already there."
+    },
+    "hi": {
+      "see": "एक दीवार। एक उस पर चोट करता है, दूसरा सुनता नहीं। और अब यह बात नज़र भी नहीं आती।",
+      "feel": "साथ होकर भी अकेलापन। पास होते हुए भी, हर कोई अपने में। जितने करीब, उतने ही दूर।",
+      "want": "सुना और देखा जाना। दीवार पर चोट करने के बजाय उसे मिलकर हटाना। और आपको डर है कि कहीं आप यह मान न लें कि वह दीवार पहले से मौजूद है।"
+    },
+    "pt": {
+      "see": "Uma parede. Um de vocês bate nela; o outro não escuta. E isso já virou algo que nem se percebe.",
+      "feel": "Solidão a dois. Cada um por si, embora estejam perto. Quanto mais perto, mais distantes.",
+      "want": "Ser ouvido e visto. Parar de bater na parede e desmontá-la juntos. E vocês têm medo de admitir que ela já está aí."
+    },
+    "es": {
+      "see": "Un muro. Uno de ustedes golpea; el otro no escucha. Y ya ni siquiera se dan cuenta.",
+      "feel": "Soledad de a dos. Cada quien por su lado, aunque estén cerca. Cuanto más cerca, más lejos.",
+      "want": "Que los escuchen y los vean. Dejar de golpear el muro y desmontarlo juntos. Y les da miedo admitir que ya está ahí."
+    }
+  },
+  "mirror": {
+    "en": {
+      "see": "A reflection. Each of you sees yourself; the other is nowhere in it. And somehow, this has become normal.",
+      "feel": "Invisibility. You are not seen, even when you are close—especially then. This is not about attention. It is about a presence that is missing.",
+      "want": "To be seen—not a reflection, not a role, but you. And you are afraid of becoming invisible again."
+    },
+    "hi": {
+      "see": "एक प्रतिबिंब। हर कोई खुद को देखता है; उसमें दूसरा दिखाई नहीं देता। और अब यह बात नज़र भी नहीं आती।",
+      "feel": "अनदेखा रह जाना। पास होने पर भी कोई आपको नहीं देखता—खासकर तब। बात ध्यान की नहीं, उस मौजूदगी की है जो वहाँ नहीं है।",
+      "want": "कि कोई आपको देखे—प्रतिबिंब या भूमिका को नहीं, आपको। और आपको डर है कि आप फिर से अदृश्य हो जाएँगे।"
+    },
+    "pt": {
+      "see": "Um reflexo. Cada um vê a si mesmo; o outro não aparece nele. E isso já virou algo que nem se percebe.",
+      "feel": "Invisibilidade. Você não é visto, mesmo quando está perto — principalmente quando está. Não é falta de atenção. É falta de presença.",
+      "want": "Ser visto. Não o reflexo, não o papel que você representa: você. E dá medo de voltar a ser invisível."
+    },
+    "es": {
+      "see": "Un reflejo. Cada quien se ve a sí mismo; el otro no aparece. Y ya ni siquiera se dan cuenta.",
+      "feel": "Invisibilidad. No te ven ni cuando estás cerca; sobre todo entonces. No se trata de atención, sino de una presencia que falta.",
+      "want": "Que te vean a ti, no a un reflejo ni a un papel. Y te da miedo volver a ser invisible."
+    }
+  },
+  "judge": {
+    "en": {
+      "see": "The habit of correcting. Not harshly—just out of habit. And the judgment no longer even registers.",
+      "feel": "Unfairness. The sense that what you do does not matter: it goes unseen, unappreciated, only corrected. Each time, you want to do a little less.",
+      "want": "To be accepted, not corrected or judged—to be seen and chosen. And you are afraid of being made to feel small again."
+    },
+    "hi": {
+      "see": "हर बात सुधारने की आदत। रूखेपन से नहीं, बस आदतन। और अब इसमें छिपा मूल्यांकन महसूस भी नहीं होता।",
+      "feel": "अन्याय का एहसास। लगता है आपके प्रयास मायने नहीं रखते—उन्हें देखा या सराहा नहीं जाता, बस सुधारा जाता है। और हर बार कुछ करने का मन थोड़ा कम होता है।",
+      "want": "स्वीकार किए जाना—न कि सुधारा या परखा जाना। देखा जाना, और चुना जाना। और आपको डर है कि फिर आपका महत्व कम कर दिया जाएगा।"
+    },
+    "pt": {
+      "see": "O hábito de corrigir. Não com grosseria, mas por costume. E isso já nem é percebido como julgamento.",
+      "feel": "Injustiça. A sensação de que o que você faz não importa: ninguém vê, ninguém valoriza, só corrigem. E, a cada vez, dá menos vontade de tentar.",
+      "want": "Ser aceito, não corrigido nem avaliado. Ser visto e escolhido. E você tem medo de ser desvalorizado de novo."
+    },
+    "es": {
+      "see": "La costumbre de corregir. No con dureza, sino por costumbre. Y ya ni se percibe como un juicio.",
+      "feel": "Injusticia. Sientes que lo que haces no importa: no lo ven ni lo valoran, solo lo corrigen. Y cada vez dan menos ganas de intentarlo.",
+      "want": "Que te acepten, no que te corrijan ni te evalúen. Que te vean y te elijan. Y te da miedo volver a sentir que no vales."
+    }
+  },
+  "clown": {
+    "en": {
+      "see": "The habit of dismissing things. A dream, a feeling, a wish—anything important is met with a familiar, almost casual smirk. And it goes unnoticed.",
+      "feel": "Dismissal. What you bring into the relationship does not matter. That hurts deeper than criticism: criticism is about what you did; a smirk is about who you are.",
+      "want": "For what matters to you to be taken seriously—not met with laughter or a smirk, but with attention. And you are afraid of being made to feel ridiculous again."
+    },
+    "hi": {
+      "see": "किसी बात को हल्के में लेने की आदत। सपना, भावना या चाहत—हर अहम बात पर वही परिचित, सहज-सी मुस्कान। और अब यह दिखता भी नहीं।",
+      "feel": "आपकी बात को महत्व न मिलना। जो आप रिश्ते में लाते हैं, वह मानो मायने नहीं रखता। यह आलोचना से भी गहरा दुख देता है: आलोचना आपके काम पर है, मुस्कान आपके होने पर।",
+      "want": "आपकी बात को गंभीरता से लिया जाए—हँसी या ताने से नहीं, ध्यान से। और आपको डर है कि फिर आपको हास्यास्पद समझा जाएगा।"
+    },
+    "pt": {
+      "see": "O hábito de desmerecer as coisas. Um sonho, um sentimento, um desejo: tudo que importa recebe o mesmo sorrisinho automático. E isso já passa despercebido.",
+      "feel": "Desvalorização. O que você traz para a relação parece não importar. Dói mais que uma crítica: a crítica fala de uma atitude; o deboche, de quem você é.",
+      "want": "Que levem a sério o que importa para você. Sem risos ou ironias, mas com atenção. E você tem medo de voltar a se sentir ridículo."
+    },
+    "es": {
+      "see": "La costumbre de restarle importancia a todo. Un sueño, un sentimiento, un deseo: cada cosa importante recibe la misma sonrisa burlona de siempre. Y ya ni se nota.",
+      "feel": "Desvalorización. Lo que aportas a la relación parece no importar. Duele más que una crítica: la crítica habla de algo que hiciste; la burla, de quién eres.",
+      "want": "Que tomen en serio lo que te importa, sin risas ni ironías, con atención. Y te da miedo volver a sentir que haces el ridículo."
+    }
+  },
+  "shield": {
+    "en": {
+      "see": "Instead of listening, one of you strikes back. A complaint brings another complaint. Attack becomes a way to protect yourself.",
+      "feel": "A closed loop. Neither of you is heard. Each defends themselves by attacking; the stronger the defense, the louder the attack—and the quieter the closeness.",
+      "want": "To listen and be heard, without counterclaims or “what about you?” Just to hear each other. And you are afraid you will never leave this loop."
+    },
+    "hi": {
+      "see": "सुनने के बजाय, एक पलटकर वार करता है। एक शिकायत के जवाब में दूसरी शिकायत आती है। बचाव भी हमले से होता है।",
+      "feel": "एक बंद चक्र। कोई किसी की नहीं सुनता। हर कोई हमले से अपना बचाव करता है; बचाव जितना तेज़, हमला उतना ऊँचा—और नज़दीकी उतनी ख़ामोश।",
+      "want": "एक-दूसरे को सुनना और सुना जाना—बिना पलटकर शिकायत किए, बिना «और तुम?» कहे। बस सुनना। और आपको डर है कि आप इस चक्र से बाहर नहीं निकल पाएँगे।"
+    },
+    "pt": {
+      "see": "Em vez de escutar, um de vocês revida. Uma queixa puxa outra. Atacar vira uma forma de se proteger.",
+      "feel": "Um ciclo fechado. Ninguém se escuta. Cada um se defende atacando; quanto mais forte a defesa, mais alto o ataque — e mais distante a intimidade.",
+      "want": "Escutar e ser ouvido, sem contra-ataques nem «e você?». Apenas escutar. E vocês têm medo de não conseguir sair desse ciclo."
+    },
+    "es": {
+      "see": "En vez de escuchar, uno responde con un ataque. A una queja le sigue otra. Atacar se vuelve una forma de protegerse.",
+      "feel": "Un círculo cerrado. Nadie escucha a nadie. Cada quien se defiende atacando; cuanto más fuerte la defensa, más fuerte el ataque, y más silenciosa la cercanía.",
+      "want": "Escucharse y ser escuchados, sin reproches de vuelta ni «¿y tú?». Solo escucharse. Y les da miedo no salir nunca de ese círculo."
+    }
+  },
+  "porcelain": {
+    "en": {
+      "see": "A false front. A smile for everyone else, with anger kept out of sight. And this has become easy not to notice.",
+      "feel": "Pretending. You play a part, and so does your partner. It is hard to tell where the role ends and you begin. Without the real you, there is no closeness—only porcelain.",
+      "want": "For the smile to become real—not for everyone else, but for each other. And you are afraid there may be nothing behind it."
+    },
+    "hi": {
+      "see": "बनावटीपन। दूसरों के लिए मुस्कान, भीतर छिपा गुस्सा। और अब यह बात नज़र भी नहीं आती।",
+      "feel": "एक भूमिका निभाना। आप भी, आपका साथी भी। समझना मुश्किल है कि भूमिका कहाँ खत्म होती है और आप कहाँ शुरू होते हैं। असली आप न हों तो नज़दीकी भी नहीं—बस चीनी-मिट्टी का मुखौटा।",
+      "want": "कि मुस्कान सचमुच की हो—दूसरों के लिए नहीं, एक-दूसरे के लिए। और आपको डर है कि उसके पीछे शायद कुछ भी न हो।"
+    },
+    "pt": {
+      "see": "Falsidade. Um sorriso para os outros, enquanto a raiva fica escondida por dentro. E isso já passa despercebido.",
+      "feel": "Uma encenação. Você representa um papel, e a outra pessoa também. Fica difícil saber onde termina o papel e começa você. Sem vocês de verdade, não há intimidade — só porcelana.",
+      "want": "Que o sorriso seja verdadeiro. Não para os outros, mas para vocês. E dá medo de não haver nada por trás dele."
+    },
+    "es": {
+      "see": "Falsedad. Una sonrisa para los demás, mientras el enojo queda escondido. Y ya ni siquiera se nota.",
+      "feel": "Fingir. Tú interpretas un papel y tu pareja también. Cuesta saber dónde termina el papel y dónde empiezas tú. Sin ustedes de verdad, no hay intimidad: solo porcelana.",
+      "want": "Que la sonrisa sea de verdad, no para los demás, sino para ustedes. Y les da miedo que detrás no haya nada."
+    }
+  },
+  "crack": {
+    "en": {
+      "see": "A crack. It is already there—thin, but growing. You both pretend it is not. And it keeps growing.",
+      "feel": "Broken for a long time. You both know it, yet you hold on because letting go is frightening. Letting go would mean admitting it; admitting it would mean looking at it.",
+      "want": "To mend it. To tend to a wound you share. But until you admit it is there, you cannot find the place that needs mending."
+    },
+    "hi": {
+      "see": "एक दरार। पहले से मौजूद—बारीक, पर बढ़ती हुई। आप दोनों दिखावा करते हैं कि वह है ही नहीं। और वह बढ़ती रहती है।",
+      "feel": "लंबे समय से टूटा हुआ। आप दोनों जानते हैं, फिर भी थामे हुए हैं—क्योंकि छोड़ना डराता है। छोड़ना मान लेना होगा; मानना उसे देखना होगा।",
+      "want": "इसे जोड़ना। अपने साझा घाव को भरना। मगर जब तक आप मानेंगे नहीं कि दरार है, उसे जोड़ने की जगह भी नहीं खोज पाएँगे।"
+    },
+    "pt": {
+      "see": "Uma rachadura. Ela já existe — fina, mas crescendo. Vocês dois fingem que não está ali. E ela continua crescendo.",
+      "feel": "Algo quebrado há muito tempo. Vocês dois sabem, mas continuam se segurando porque soltar dá medo. Soltar seria admitir; admitir seria olhar de frente.",
+      "want": "Consertar. Cuidar da ferida que vocês compartilham. Mas, enquanto não admitirem que ela existe, não vão encontrar o lugar que precisa ser reparado."
+    },
+    "es": {
+      "see": "Una grieta. Ya está ahí: fina, pero creciendo. Ambos fingen que no existe. Y sigue creciendo.",
+      "feel": "Algo roto desde hace tiempo. Ambos lo saben, pero se aferran porque soltar da miedo. Soltar sería admitirlo; admitirlo sería mirarlo de frente.",
+      "want": "Repararla. Cuidar la herida que comparten. Pero mientras no acepten que existe, no encontrarán el lugar que necesita sanar."
+    }
+  },
+  "timer": {
+    "en": {
+      "see": "An imbalance. One of you is always pulling ahead; the other is always slowing things down. And these roles no longer stand out.",
+      "feel": "Exhaustion for the one who pulls, resistance for the one being pulled. It stops being about “together” and turns into “who is moving whom?” Closeness is walking side by side.",
+      "want": "To find a rhythm that belongs to both of you—not “you pull” or “you keep up,” but moving together. And you are afraid you will never find it."
+    },
+    "hi": {
+      "see": "तालमेल बिगड़ा हुआ। एक हमेशा आगे खींचता है, दूसरा हमेशा धीमा करता है। और अब ये भूमिकाएँ नज़र भी नहीं आतीं।",
+      "feel": "खींचने वाले की थकान, खींचे जाने वाले का विरोध। बात «साथ होने» की नहीं रहती, «कौन किसे खींच रहा है» की हो जाती है। नज़दीकी तो साथ-साथ चलना है।",
+      "want": "अपनी साझा लय ढूँढ़ना—न «तुम खींचो», न «तुम धीमे मत पड़ो», बस साथ चलना। और आपको डर है कि यह लय कभी नहीं मिलेगी।"
+    },
+    "pt": {
+      "see": "Um desequilíbrio. Um está sempre puxando para a frente; o outro, sempre freando. E esses papéis já nem são percebidos.",
+      "feel": "Cansaço de quem puxa e resistência de quem é puxado. Deixa de ser «juntos» e vira «quem está levando quem?». Intimidade é caminhar lado a lado.",
+      "want": "Encontrar um ritmo dos dois — sem «você puxa» nem «você não atrasa», mas seguindo juntos. E vocês têm medo de nunca encontrar esse ritmo."
+    },
+    "es": {
+      "see": "Un desequilibrio. Uno siempre tira hacia delante; el otro siempre frena. Y ya ni se dan cuenta de esos papeles.",
+      "feel": "Cansancio de quien tira y resistencia de quien es arrastrado. Deja de tratarse de estar «juntos» y pasa a ser «¿quién lleva a quién?». La cercanía es caminar lado a lado.",
+      "want": "Encontrar un ritmo compartido: sin «tú tira» ni «tú no frenes», simplemente caminar juntos. Y les da miedo no encontrarlo."
+    }
+  },
+  "roots": {
+    "en": {
+      "see": "One root, two trunks. It holds you together against your will—not because you chose each other, but because you grew intertwined.",
+      "feel": "Unable to leave or stay. Too deeply bound, yet too different. This is not love; it is roots. Roots hold you fast, but they do not keep you warm.",
+      "want": "To be joined by a feeling you choose, consciously and willingly—not by roots. And you are afraid that without them, nothing will remain."
+    },
+    "hi": {
+      "see": "एक जड़, दो तने। वह आपकी इच्छा के विरुद्ध थामे हुए है—चुनने से नहीं, बल्कि एक-दूसरे में उलझ जाने से।",
+      "feel": "न जा पाना, न रह पाना। बंधन बहुत गहरा, और फ़र्क भी बहुत। यह प्रेम नहीं—जड़ें हैं। जड़ें बाँधती हैं, पर गर्माहट नहीं देतीं।",
+      "want": "कि आपको एक ऐसा एहसास जोड़े जिसे आप सोच-समझकर, अपनी इच्छा से चुनें—जड़ें नहीं। और आपको डर है कि उनके बिना कुछ भी नहीं बचेगा।"
+    },
+    "pt": {
+      "see": "Uma raiz, dois troncos. Ela mantém vocês unidos contra a vontade — não por escolha, mas porque se entrelaçaram.",
+      "feel": "Não conseguir ir embora nem ficar. O vínculo é profundo demais, e vocês são diferentes demais. Isso não é amor: são raízes. Elas prendem, mas não aquecem.",
+      "want": "Que um sentimento escolhido, consciente e livremente, una vocês — não as raízes. E vocês têm medo de que, sem elas, não reste nada."
+    },
+    "es": {
+      "see": "Una raíz, dos troncos. Los mantiene unidos contra su voluntad, no porque se eligieran, sino porque se enredaron.",
+      "feel": "No poder irse ni quedarse. Están demasiado unidos y son demasiado distintos. Esto no es amor: son raíces. Las raíces sujetan, pero no dan calor.",
+      "want": "Que los una un sentimiento elegido con conciencia y libertad, no las raíces. Y les da miedo que, sin ellas, no quede nada."
+    }
+  },
+  "third": {
+    "en": {
+      "see": "There is much less time for each other now. Everything else takes the attention: work, the phone, a child, the endless things to do.",
+      "feel": "An emptiness. There is not enough of you for each other—not because love is gone, but because everything else has taken up the space.",
+      "want": "To delight in each other again. To bring back time and attention. And you are afraid there will never be enough left for the two of you."
+    },
+    "hi": {
+      "see": "अब एक-दूसरे के लिए समय बहुत कम रह गया है। सारा ध्यान दूसरी चीज़ें ले जाती हैं—काम, फ़ोन, बच्चा, रोज़ के काम।",
+      "feel": "एक खालीपन। आप एक-दूसरे के लिए कम पड़ रहे हैं—प्यार न होने से नहीं, बल्कि बाकी सब कुछ जगह घेर लेने से।",
+      "want": "फिर से एक-दूसरे का आनंद लेना। समय और ध्यान लौटाना। और आपको डर है कि एक-दूसरे के लिए कभी पर्याप्त समय नहीं बचेगा।"
+    },
+    "pt": {
+      "see": "Vocês têm muito menos tempo um para o outro. O trabalho, o celular, os filhos e os afazeres ocupam toda a atenção.",
+      "feel": "Um vazio. Falta um ao outro — não porque deixaram de amar, mas porque todo o resto tomou o espaço.",
+      "want": "Voltar a aproveitar um ao outro. Recuperar o tempo e a atenção. E vocês têm medo de nunca mais ter tempo suficiente para os dois."
+    },
+    "es": {
+      "see": "Ahora tienen mucho menos tiempo para ustedes. El trabajo, el teléfono, los hijos y las obligaciones se llevan toda la atención.",
+      "feel": "Un vacío. Se hacen falta el uno al otro, no porque ya no se quieran, sino porque todo lo demás ocupó el espacio.",
+      "want": "Volver a disfrutar el uno del otro. Recuperar el tiempo y la atención. Y les da miedo que nunca quede suficiente para ustedes."
+    }
+  },
+  "mask": {
+    "en": {
+      "see": "Expectation. You hoped for one thing, but the person beside you is different. Not worse—just different.",
+      "feel": "Disappointment—not in the person, but in the expectation you created. The real person is not the image you imagined, and they do not have to become it.",
+      "want": "To accept the real person, not an image or an expectation, but someone alive and here as they are. And you are afraid they are not who you hoped for."
+    },
+    "hi": {
+      "see": "उम्मीद। आपने किसी और रूप की आशा की थी, लेकिन सामने का इंसान अलग निकला। बुरा नहीं—बस अलग।",
+      "feel": "निराशा, मगर उस इंसान से नहीं—अपनी बनाई हुई उम्मीद से। असली इंसान आपकी कल्पना की तस्वीर जैसा नहीं है, और उसे वैसा होना भी नहीं चाहिए।",
+      "want": "असली इंसान को स्वीकार करना—तस्वीर या उम्मीद को नहीं, बल्कि जैसे वह है वैसे जीवित व्यक्ति को। और आपको डर है कि वह वैसा नहीं जिसे आपने चाहा था।"
+    },
+    "pt": {
+      "see": "Expectativa. Você esperava uma coisa, mas a pessoa ao seu lado é diferente. Não pior — apenas diferente.",
+      "feel": "Decepção, mas não com a pessoa: com a expectativa que você criou. A pessoa real não é a imagem que você imaginou, e não precisa corresponder a ela.",
+      "want": "Aceitar a pessoa de verdade — não a imagem nem a expectativa, mas alguém vivo, como é. E você tem medo de que ela não seja quem esperava."
+    },
+    "es": {
+      "see": "Expectativa. Esperabas una cosa, pero la persona que tienes al lado es distinta. No peor, solo distinta.",
+      "feel": "Decepción, pero no con la persona, sino con la expectativa que inventaste. La persona real no es la imagen que imaginaste y no tiene por qué serlo.",
+      "want": "Aceptar a la persona real, no una imagen ni una expectativa, sino a alguien vivo tal como es. Y te da miedo que no sea quien esperabas."
+    }
+  },
+  "ash": {
+    "en": {
+      "see": "Ash. Everything has burned; only embers remain. You hold on to them, though they are no longer a fire. They are ash.",
+      "feel": "Lost. You are holding on to what is no longer here. There was warmth, and you remember it. But it belongs to the past. Now there is only ash.",
+      "want": "To burn again, not smolder. To stop holding on to what was and kindle something anew. And you are afraid it will never catch fire again."
+    },
+    "hi": {
+      "see": "राख। सब कुछ जल चुका है; बस अंगारे बचे हैं। आप उन्हें थामे हैं, जबकि अब वे आग नहीं—राख हैं।",
+      "feel": "खो जाने का एहसास। आप उस चीज़ को पकड़े हुए हैं जो अब नहीं रही। कभी गर्माहट थी, याद भी है; मगर वह बीते समय में है। आज बस राख है।",
+      "want": "फिर से जलना, बस सुलगना नहीं। जो बीत चुका उसे थामे रहने के बजाय नई आग जगाना। और आपको डर है कि वह फिर कभी नहीं जलेगी।"
+    },
+    "pt": {
+      "see": "Cinzas. Tudo queimou; só restaram brasas. Vocês se agarram a elas, embora já não sejam fogo. São cinzas.",
+      "feel": "Perdidos. Vocês seguram algo que já não existe. Houve calor, e vocês se lembram dele. Mas ficou no passado. Agora, só há cinzas.",
+      "want": "Voltar a arder, não apenas fumegar. Parar de se prender ao que passou e reacender algo. E vocês têm medo de que o fogo não volte."
+    },
+    "es": {
+      "see": "Cenizas. Todo se quemó; solo quedan brasas. Se aferran a ellas, aunque ya no son fuego: son cenizas.",
+      "feel": "Desorientación. Se aferran a algo que ya no existe. Hubo calor y lo recuerdan, pero quedó en el pasado. Ahora solo hay cenizas.",
+      "want": "Volver a arder, no solo a humear. Soltar lo que fue y encender algo de nuevo. Y les da miedo que el fuego ya no regrese."
+    }
+  },
+  "hunger": {
+    "en": {
+      "see": "Hunger. One of you reaches out while the other holds back. Or you both reach, but not toward each other. The hunger is there; satisfaction is not.",
+      "feel": "Unfulfilled. One of you wants, or is wanted, yet something gets in the way. Not a wall or distance, but something within—stronger than what lies between you.",
+      "want": "To be sated. Not teased or made to wait, but to receive what you long for. And you are afraid of being refused."
+    },
+    "hi": {
+      "see": "भूख। एक आगे बढ़ता है, दूसरा रोकता है। या दोनों हाथ बढ़ाते हैं, मगर एक-दूसरे की ओर नहीं। भूख है, तृप्ति नहीं।",
+      "feel": "असंतोष। आप चाहें या आपका साथी—फिर भी कुछ बीच में अटकता है। दीवार या दूरी नहीं, बल्कि भीतर की कोई चीज़, जो आपके बीच की दूरी से भी बड़ी है।",
+      "want": "तृप्त होना। न तरसना, न इंतज़ार करना—जो चाहते हैं उसे पाना। और आपको अस्वीकार किए जाने का डर है।"
+    },
+    "pt": {
+      "see": "Fome. Um se aproxima, o outro não deixa. Ou os dois se aproximam, mas não um do outro. A fome existe, mas não vem a satisfação.",
+      "feel": "Insatisfação. Você deseja ou é desejado, mas algo impede. Não é uma parede nem a distância: é algo dentro de você, mais forte do que o espaço entre vocês.",
+      "want": "Satisfação. Sem provocar nem esperar, mas receber o que deseja. E você tem medo de ouvir um não."
+    },
+    "es": {
+      "see": "Hambre. Uno se acerca y el otro no lo permite. O ambos se acercan, pero no el uno al otro. Hay hambre, pero no satisfacción.",
+      "feel": "Insatisfacción. Tú deseas o te desean, pero algo lo impide. No es un muro ni la distancia: es algo dentro, más fuerte que lo que hay entre ustedes.",
+      "want": "Satisfacción. No provocar ni esperar, sino recibir lo que deseas. Y te da miedo que te rechacen."
+    }
+  },
+  "jealousy": {
+    "en": {
+      "see": "Jealousy without a reason. Suspicion appears on its own—not from facts, but from fear.",
+      "feel": "Betrayal, even when no one has betrayed anyone. Fear feels stronger than facts because it lives in your mind.",
+      "want": "Peace. To stop searching, comparing, and being afraid. And you fear this may not be fear at all, but the truth."
+    },
+    "hi": {
+      "see": "बिना वजह की जलन। शक अपने आप जन्म लेता है—तथ्यों से नहीं, डर से।",
+      "feel": "धोखा दिए जाने का एहसास, भले ही किसी ने धोखा न दिया हो। डर तथ्यों से बड़ा लगता है, क्योंकि वह आपके मन में है।",
+      "want": "सुकून। तलाशना, तुलना करना और डरना बंद करना। और आपको डर है कि कहीं यह सिर्फ़ डर नहीं, सच हो।"
+    },
+    "pt": {
+      "see": "Ciúme sem motivo. A desconfiança nasce sozinha — não de fatos, mas do medo.",
+      "feel": "Traição, mesmo que ninguém tenha traído ninguém. O medo parece mais forte que os fatos porque mora na sua cabeça.",
+      "want": "Paz. Parar de procurar, comparar e temer. E você tem medo de que talvez não seja só medo — talvez seja verdade."
+    },
+    "es": {
+      "see": "Celos sin motivo. La sospecha nace sola, no de los hechos, sino del miedo.",
+      "feel": "Traición, aunque nadie haya traicionado a nadie. El miedo pesa más que los hechos porque vive en tu cabeza.",
+      "want": "Paz. Dejar de buscar, comparar y tener miedo. Y te da miedo que no sea solo miedo, sino la verdad."
+    }
+  },
+  "fog": {
+    "en": {
+      "see": "Assumptions. Suspicions arise by themselves, without facts or reason—just fog in your thoughts, clouding everything.",
+      "feel": "Suspicion. You are suspected, or you suspect someone else. Reality no longer seems to matter; what is in your mind matters more. And your mind is foggy.",
+      "want": "Clarity. Not assumptions or fear, but the truth. And you are afraid of what you might see."
+    },
+    "hi": {
+      "see": "मनगढ़ंत बातें। बिना तथ्य, बिना वजह शक जन्म लेते हैं—विचारों में बस धुंध, जो सब कुछ ढक लेती है।",
+      "feel": "शक। आप पर शक किया जाता है, या आप किसी पर करते हैं। सच से ज़्यादा अहम मन की बातें हो जाती हैं—और मन में धुंध छाई है।",
+      "want": "स्पष्टता। मनगढ़ंत बातों और डर के बजाय सच। और आपको डर है कि कहीं वह सच दिख न जाए।"
+    },
+    "pt": {
+      "see": "Suposições. As desconfianças surgem sozinhas, sem fatos nem motivo — apenas uma névoa nos pensamentos que encobre tudo.",
+      "feel": "Desconfiança. Você é questionado ou questiona o outro. A realidade deixa de importar; o que está na cabeça parece mais importante. E ali só há névoa.",
+      "want": "Clareza. Nada de suposições nem medo: a verdade. E você tem medo do que pode encontrar."
+    },
+    "es": {
+      "see": "Suposiciones. Las sospechas aparecen solas, sin hechos ni motivo: solo niebla en los pensamientos que lo cubre todo.",
+      "feel": "Desconfianza. Sospechan de ti o tú sospechas de alguien. La realidad deja de importar; importa más lo que tienes en la cabeza, y ahí hay niebla.",
+      "want": "Claridad. Ni suposiciones ni miedo, sino la verdad. Y te da miedo verla."
+    }
+  },
+  "boredom": {
+    "en": {
+      "see": "Habit. Everything has become normal, everyday. Not a fight, not a spark—just another evening. And that has become the norm.",
+      "feel": "Boredom, and shame for feeling it because “everything is fine.” But “fine” is no longer “alive.” Being alive means wanting, and wanting no longer comes easily.",
+      "want": "To live, not just exist. To want again. And you are afraid you want different things."
+    },
+    "hi": {
+      "see": "आदत। सब कुछ सामान्य, रोज़मर्रा का हो गया है। न झगड़ा, न जुनून—बस एक और शाम। और यही सामान्य बन गया है।",
+      "feel": "ऊब, और उससे शर्म क्योंकि «सब तो ठीक है»। मगर «ठीक» अब «ज़िंदा» नहीं लगता। ज़िंदा होने का अर्थ है चाहना—और अब चाहना आसान नहीं।",
+      "want": "सिर्फ़ गुज़ारा नहीं, सचमुच जीना। फिर से चाहना। और आपको डर है कि आप दोनों अलग-अलग चीज़ें चाहते हैं।"
+    },
+    "pt": {
+      "see": "Hábito. Tudo virou normal, cotidiano. Não há briga nem paixão: só mais uma noite. E isso virou o normal.",
+      "feel": "Tédio — e vergonha por senti-lo, porque «está tudo bem». Mas «bem» já não significa «vivo». Estar vivo é desejar, e desejar já não vem tão fácil.",
+      "want": "Viver, não apenas existir. Voltar a desejar. E vocês têm medo de querer coisas diferentes."
+    },
+    "es": {
+      "see": "Costumbre. Todo se volvió normal, cotidiano. Ni pelea ni pasión: solo otra noche. Y eso se convirtió en lo habitual.",
+      "feel": "Aburrimiento y vergüenza por sentirlo, porque «todo está bien». Pero «bien» ya no significa «vivo». Estar vivo es desear, y ahora cuesta.",
+      "want": "Vivir, no solo existir. Volver a desear. Y les da miedo querer cosas distintas."
+    }
+  },
+  "laugh": {
+    "en": {
+      "see": "The good feelings have faded. You have stopped laughing together—not after a fight or a tragedy, but little by little, as the lightness disappeared.",
+      "feel": "Emptiness. It used to feel good; now there are chores, errands, silence. Joy seems to be somewhere back in the past.",
+      "want": "To bring back the good feelings—not just fun, but the feeling of being glad together. And you are afraid it may not return."
+    },
+    "hi": {
+      "see": "अच्छी भावनाएँ खो गई हैं। आप साथ में हँसना भूल गए—झगड़े या हादसे से नहीं, बस धीरे-धीरे हल्कापन चला गया।",
+      "feel": "खालीपन। पहले अच्छा लगता था; अब बस रोज़ के काम और ख़ामोशी हैं। खुशी कहीं अतीत में रह गई है।",
+      "want": "अच्छी भावनाएँ लौटाना—सिर्फ़ हँसी नहीं, साथ होने की खुशी। और आपको डर है कि शायद वह वापस न आए।"
+    },
+    "pt": {
+      "see": "As emoções boas foram embora. Vocês deixaram de rir juntos — sem briga nem tragédia; a leveza apenas desapareceu.",
+      "feel": "Um vazio. Antes era bom; agora há rotina, afazeres e silêncio. A alegria parece ter ficado no passado.",
+      "want": "Trazer de volta as boas emoções — não só a diversão, mas a alegria de estarem juntos. E vocês têm medo de que ela não volte."
+    },
+    "es": {
+      "see": "Las emociones bonitas se fueron. Dejaron de reír juntos, no por una pelea ni una tragedia; simplemente se perdió la ligereza.",
+      "feel": "Un vacío. Antes se sentía bien; ahora hay rutina, pendientes y silencio. La alegría parece haberse quedado en el pasado.",
+      "want": "Recuperar las emociones bonitas, no solo la diversión, sino la alegría de estar juntos. Y les da miedo que no vuelva."
+    }
+  },
+  "home": {
+    "en": {
+      "see": "Home has stopped feeling like home. You can no longer be yourself beside each other—not because you are forbidden, but because it no longer feels comfortable.",
+      "feel": "Tension. It used to be easy; now you have to be someone, or disappear. And this has become easy not to notice.",
+      "want": "To find yourselves again. To be yourselves beside each other and feel at ease. And you are afraid this may no longer be possible."
+    },
+    "hi": {
+      "see": "घर अब घर जैसा नहीं रहा। पास होकर भी आप अपने जैसे नहीं रह पाते—मना करने से नहीं, बस सहजता नहीं रही।",
+      "feel": "तनाव। पहले सहज था; अब या तो कुछ बनकर रहना पड़ता है या ख़ामोश हो जाना। और अब यह बात नज़र भी नहीं आती।",
+      "want": "खुद को फिर से पाना। एक-दूसरे के पास अपने जैसा होना और सहज महसूस करना। और आपको डर है कि यह शायद अब संभव नहीं।"
+    },
+    "pt": {
+      "see": "A casa deixou de parecer um lar. Vocês já não conseguem ser vocês mesmos juntos — não porque alguém proíba, mas porque deixou de ser confortável.",
+      "feel": "Tensão. Antes era fácil; agora é preciso ser de um jeito ou deixar de ser. E isso já passa despercebido.",
+      "want": "Voltar a ser vocês mesmos. Estar juntos sem deixar de ser quem são e sentir conforto. E vocês têm medo de que isso não seja mais possível."
+    },
+    "es": {
+      "see": "El hogar dejó de sentirse como hogar. Ya no pueden ser ustedes mismos juntos, no porque se los prohíban, sino porque dejó de ser cómodo.",
+      "feel": "Tensión. Antes todo era fácil; ahora hay que ser alguien distinto o dejar de ser. Y ya ni se nota.",
+      "want": "Volver a encontrarse. Ser ustedes mismos juntos y sentirse cómodos. Y les da miedo que ya no sea posible."
+    }
+  },
+  "adventure": {
+    "en": {
+      "see": "The spark has gone, and so has the rush. Everything is predictable now: routine, one day much like the last.",
+      "feel": "Boredom—not the quiet, peaceful kind, but the lifeless kind. You both know it, yet pretend this is how things should be.",
+      "want": "To bring back the rush. Not a plan or a schedule, but a spark. And you are afraid it will never return."
+    },
+    "hi": {
+      "see": "चिंगारी खो गई, रोमांच भी। सब कुछ अनुमानित है—रोज़मर्रा, हर दिन पिछले जैसा।",
+      "feel": "ऊब—वह नहीं जो शांत और सुकून भरी हो, बल्कि बेजान-सी। आप दोनों जानते हैं, फिर भी ऐसे दिखाते हैं जैसे सब ठीक है।",
+      "want": "रोमांच वापस लाना। योजना या समय-सारणी नहीं, बस चिंगारी। और आपको डर है कि वह फिर कभी नहीं लौटेगी।"
+    },
+    "pt": {
+      "see": "A faísca desapareceu, e a adrenalina também. Tudo ficou previsível: rotina, cada dia igual ao anterior.",
+      "feel": "Tédio — não o tranquilo e sereno, mas o que parece sem vida. Vocês dois sabem, mas fingem que é assim mesmo.",
+      "want": "Trazer de volta a adrenalina. Não um plano nem um cronograma, mas uma faísca. E vocês têm medo de que ela não volte."
+    },
+    "es": {
+      "see": "La chispa desapareció, y también la emoción. Todo se volvió predecible: rutina, cada día igual al anterior.",
+      "feel": "Aburrimiento, no del tranquilo y sereno, sino del que se siente sin vida. Ambos lo saben, pero fingen que así debe ser.",
+      "want": "Recuperar la emoción. No un plan ni un horario, sino una chispa. Y les da miedo que no vuelva."
+    }
+  },
+  "forgiveness": {
+    "en": {
+      "see": "Pride is stronger now. Apologizing gets harder each time. Each of you has a position, and neither wants to move first.",
+      "feel": "Firmness. Not anger, but an unwillingness to bend. You are both right, and neither of you will budge.",
+      "want": "To resolve things sooner, without long grudges or days of silence. Sometimes all it takes is an apology—or forgiveness. And you are afraid pride will win."
+    },
+    "hi": {
+      "see": "अहंकार भारी पड़ रहा है। हर बार माफ़ी माँगना और कठिन हो जाता है। दोनों अपनी जगह अड़े हैं; कोई पहले झुकना नहीं चाहता।",
+      "feel": "अड़ियलपन—गुस्सा नहीं, बस टस से मस न होना। आप दोनों सही हैं, और कोई भी हिलने को तैयार नहीं।",
+      "want": "बातें जल्दी सुलझें—लंबी नाराज़गी और दिनों की ख़ामोशी के बिना। कभी बस माफ़ी माँगना या माफ़ करना काफ़ी होता है। और आपको डर है कि अहंकार जीत जाएगा।"
+    },
+    "pt": {
+      "see": "O orgulho está falando mais alto. A cada vez, fica mais difícil pedir desculpas. Cada um tem sua posição, e ninguém quer ceder primeiro.",
+      "feel": "Rigidez. Não raiva, mas inflexibilidade. Vocês dois têm razão e nenhum quer sair do lugar.",
+      "want": "Resolver as coisas mais rápido, sem mágoas longas nem dias de silêncio. Às vezes basta pedir desculpas ou perdoar. E vocês têm medo de que o orgulho fale mais alto."
+    },
+    "es": {
+      "see": "El orgullo pesa más. Cada vez cuesta más pedir perdón. Cada quien sostiene su postura y nadie quiere ceder primero.",
+      "feel": "Rigidez. No es enojo, sino inflexibilidad. Ambos tienen razón y ninguno quiere moverse.",
+      "want": "Resolverlo pronto, sin rencores largos ni días de silencio. A veces basta con pedir perdón o perdonar. Y les da miedo que gane el orgullo."
+    }
+  },
+  "faith": {
+    "en": {
+      "see": "Trust has been shaken—not by facts, but by doubt. You no longer believe each other, not because there is proof, but because you cannot.",
+      "feel": "Suspicion. Every word is questioned, every action doubted. And this has become easy not to notice.",
+      "want": "To trust again. Not to demand proof, but to believe. And you are afraid it may no longer be possible."
+    },
+    "hi": {
+      "see": "भरोसा कमज़ोर हुआ है—तथ्यों से नहीं, शक से। अब आप एक-दूसरे पर विश्वास नहीं कर पाते, किसी सबूत के कारण नहीं, बस कर नहीं पाते।",
+      "feel": "संदेह। हर शब्द पर सवाल, हर काम पर शक। और अब यह बात नज़र भी नहीं आती।",
+      "want": "फिर से भरोसा करना। सबूत माँगना नहीं, विश्वास करना। और आपको डर है कि शायद अब यह संभव न हो।"
+    },
+    "pt": {
+      "see": "A confiança foi abalada — não pelos fatos, mas pela dúvida. Vocês já não acreditam um no outro, não por haver provas, mas porque não conseguem.",
+      "feel": "Desconfiança. Cada palavra é questionada, cada gesto colocado em dúvida. E isso já passa despercebido.",
+      "want": "Voltar a confiar. Não pedir provas, mas acreditar. E vocês têm medo de que isso não seja mais possível."
+    },
+    "es": {
+      "see": "La confianza se debilitó, no por los hechos, sino por la duda. Ya no se creen, no porque haya pruebas, sino porque no pueden.",
+      "feel": "Desconfianza. Cada palabra se cuestiona, cada gesto se pone en duda. Y ya ni se nota.",
+      "want": "Volver a confiar. No pedir pruebas, sino creer. Y les da miedo que ya no sea posible."
+    }
+  },
+  "hope": {
+    "en": {
+      "see": "The light has gone out. You can no longer see where you are headed. A tunnel with no end—and this has become normal.",
+      "feel": "Hopelessness. It used to be “tomorrow will be better”; now it is “tomorrow will be just like today.” That is worse than pain.",
+      "want": "To believe in the future again. Not a plan, but hope. And you are afraid it is gone."
+    },
+    "hi": {
+      "see": "रोशनी बुझ गई है। अब आगे का रास्ता दिखाई नहीं देता। बिना अंत की सुरंग—और अब यह बात नज़र भी नहीं आती।",
+      "feel": "निराशा। पहले लगता था «कल बेहतर होगा»; अब लगता है «कल भी आज जैसा होगा»। यह दर्द से भी बुरा है।",
+      "want": "भविष्य पर फिर भरोसा करना। योजना नहीं, उम्मीद। और आपको डर है कि वह उम्मीद अब नहीं रही।"
+    },
+    "pt": {
+      "see": "A luz se apagou. Vocês já não veem para onde estão indo. Um túnel sem fim — e isso já virou normal.",
+      "feel": "Desesperança. Antes era «amanhã vai ser melhor»; agora, «amanhã vai ser igual a hoje». E isso dói mais que a dor.",
+      "want": "Voltar a acreditar no futuro. Não em um plano, mas na esperança. E vocês têm medo de que ela tenha acabado."
+    },
+    "es": {
+      "see": "La luz se apagó. Ya no ven hacia dónde van. Un túnel sin fin, y ya ni se dan cuenta.",
+      "feel": "Desesperanza. Antes pensaban «mañana será mejor»; ahora, «mañana será igual que hoy». Y eso es peor que el dolor.",
+      "want": "Volver a creer en el futuro. No en un plan, sino en la esperanza. Y les da miedo que ya no quede."
+    }
+  },
+  "love": {
+    "en": {
+      "see": "Love has become a habit—not passion, warmth, or a choice, just “we are together.” And this has become easy not to notice.",
+      "feel": "Emptiness. It used to be “I cannot live without you”; now it is “I can.” And that is more frightening than a fight.",
+      "want": "To find love again—not habit, but a choice, every day. And you are afraid you no longer choose each other."
+    },
+    "hi": {
+      "see": "प्रेम आदत बन गया है। न जुनून, न गर्माहट, न चुनाव—बस «हम साथ हैं»। और अब यह बात नज़र भी नहीं आती।",
+      "feel": "खालीपन। पहले था «तुम्हारे बिना नहीं रह सकता»; अब है «रह सकता हूँ»। और यह झगड़े से भी ज़्यादा डरावना है।",
+      "want": "प्रेम लौटाना—आदत नहीं, बल्कि हर दिन एक-दूसरे को चुनना। और आपको डर है कि अब आप ऐसा नहीं करते।"
+    },
+    "pt": {
+      "see": "O amor virou hábito. Não é mais paixão, calor nem escolha — é só «continuamos juntos». E isso já passa despercebido.",
+      "feel": "Vazio. Antes era «não consigo viver sem você»; agora é «consigo». E isso dá mais medo do que uma briga.",
+      "want": "Trazer o amor de volta. Não como hábito, mas como escolha, todos os dias. E vocês têm medo de já não se escolherem."
+    },
+    "es": {
+      "see": "El amor se volvió costumbre. Ya no es pasión, calidez ni elección, sino «seguimos juntos». Y ya ni se nota.",
+      "feel": "Vacío. Antes era «no puedo vivir sin ti»; ahora es «sí puedo». Y eso asusta más que una pelea.",
+      "want": "Recuperar el amor. No como costumbre, sino como una elección diaria. Y les da miedo haber dejado de elegirse."
+    }
+  }
+}

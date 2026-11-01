@@ -1,4 +1,6 @@
 import catalogue from "./tarot-cards.json";
+import localizedText from "./tarot-translations.json";
+import type { Lang } from "./i18n";
 
 export type TarotLayer = "see" | "feel" | "want";
 export type TarotCard = {
@@ -9,6 +11,14 @@ export type TarotCard = {
 };
 export type TarotDraw = { cardId: string; image: string };
 export const TAROT_CARDS: readonly TarotCard[] = catalogue;
+type LocalizedTarotLayers = Record<TarotLayer, string>;
+const LOCALIZED_TEXT = localizedText as Partial<Record<string, Partial<Record<Lang, LocalizedTarotLayers>>>>;
+
+/** Preserve the original Russian card names; localize only the authored meanings. */
+export function getTarotText(card: TarotCard, layer: TarotLayer, lang: Lang): string {
+  return LOCALIZED_TEXT[card.id]?.[lang]?.[layer] ?? card.text[layer];
+}
+
 export const TAROT_POSITIONS = [
   { layer: "see", title: "Что видите", subtitle: "Но не говорите" },
   { layer: "feel", title: "Что чувствуете", subtitle: "Но не показываете" },

@@ -1,14 +1,16 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { CSSProperties } from "react";
-import type { Lang } from "@/data/i18n";
+import type { Lang } from "../data/i18n";
 import useTelegramTopInset from "./useTelegramTopInset";
 import "./StripGameScreen.css";
 import "./StripGameScreenPremium.css";
+import { StripCharacter, StripMiniGame } from "./StripGameVisuals";
+import { applyStripOutcome, createMiniRound, validMiniRound, rpsOutcome, type MiniRound, type RpsChoice } from "./stripGameRules";
 
 type PlayerIndex = 0 | 1;
 type Phase = "playing" | "finished";
 type Card = { id: string; category: string; task: string; criteria: string };
-type Player = { layersRemoved: number };
+type Player = { layersRemoved: number; finalCompleted?: number };
 type Session = {
   v: 1;
   phase: Phase;
@@ -17,13 +19,14 @@ type Session = {
   card: Card | null;
   used: Record<string, string[]>;
   winner: PlayerIndex | null;
+  mini?: MiniRound | null;
 };
 type Props = { lang: Lang; onBack: () => void };
 
 const STORAGE_KEY = "touche.strip.session.v1";
 const LAYER_SETS: [string[], string[]] = [
-  ["Носки", "Верх", "Низ", "Бюстгальтер", "Трусы"],
-  ["Носки", "Верх", "Низ", "Футболка", "Трусы"],
+  ["Жакет", "Юбка", "Бюстгальтер", "Колготки", "Трусы"],
+  ["Пиджак", "Брюки", "Рубашка", "Нижний слой", "Бельё"],
 ];
 
 const CARDS: Card[][] = [
@@ -42,8 +45,8 @@ const CARDS: Card[][] = [
     { id: "l2-balance", category: "Спорт", task: "Постой на одной ноге, пока партнёр медленно считает до двадцати.", criteria: "Удержи равновесие все 20 секунд, не касаясь второй ногой пола." },
     { id: "l2-story", category: "История по буквам", task: "Расскажи о вашем первом свидании в двух предложениях. Второе начни с последней буквы первого.", criteria: "Скажи ровно два связанных предложения; второе начинается на нужную букву." },
     { id: "l2-phone", category: "Телефонные трюки", task: "Набери носом сообщение «Я скучаю по тебе» и покажи его партнёру.", criteria: "Сообщение должно читаться без исправлений." },
-    { id: "l2-number", category: "Угадай число", task: "Партнёр загадывает число от 1 до 10. Назови одну догадку.", criteria: "Задача выполнена, если названное число совпало с загаданным." },
-    { id: "l2-rps", category: "Камень, ножницы, бумага", task: "Сыграйте один раунд в камень, ножницы, бумагу.", criteria: "Победа или ничья — выполнено; поражение — провал. При ничьей повторите раунд." },
+    { id: "l2-number", category: "Угадай число", task: "Приложение загадало число от 1 до 10. Назови одну догадку вслух и открой изображение.", criteria: "Совпадение с ответом приложения — выполнено; другой ответ — провал." },
+    { id: "l2-rps", category: "Угадай предмет", task: "Приложение спрятало камень, ножницы или лист бумаги. Назови один вариант вслух, затем открой картинку.", criteria: "Угадай предмет приложения. Это угадывание, а не поединок с партнёром." },
     { id: "l2-squat", category: "Спорт", task: "Сделай десять приседаний подряд в комфортном темпе.", criteria: "Выполни 10 приседаний без паузы." },
     { id: "l2-memory", category: "История по буквам", task: "Расскажи в двух предложениях о вашем самом смешном общем моменте. Второе предложение начни с последней буквы первого.", criteria: "Скажи два предложения и начни второе с правильной буквы." },
     { id: "l2-whisper", category: "Телефонные трюки", task: "Запиши короткое голосовое сообщение шёпотом: «Я хочу провести этот вечер рядом с тобой».", criteria: "Отправь партнёру голосовое, в котором слышна вся фраза." },
@@ -52,7 +55,7 @@ const CARDS: Card[][] = [
     { id: "l3-pose", category: "Изобрази позу", task: "Прими выразительную позу, в которой ты чувствуешь себя особенно привлекательным или привлекательной.", criteria: "Удерживай позу 20 секунд, не смеясь." },
     { id: "l3-selfie", category: "Селфи с намёком", task: "Сделай селфи с пальцем у губ, томным взглядом и приоткрытым ртом. Отправь партнёру.", criteria: "Сделай кадр с указанными жестом и выражением лица и отправь его партнёру." },
     { id: "l3-message", category: "Эротичное сообщение", task: "Напиши партнёру три предложения о том, чего тебе хочется от вашего сегодняшнего вечера — чувственно, без спешки.", criteria: "Сообщение состоит ровно из трёх законченных предложений и показано партнёру." },
-    { id: "l3-guess", category: "Угадай часть тела", task: "Партнёр молча загадывает одну из частей тела: губы, шея, плечи, ладони или спина. Назови одну догадку.", criteria: "Названная часть тела должна совпасть с загаданной." },
+    { id: "l3-guess", category: "Угадай часть тела", task: "Приложение выбрало часть тела. Назови одну догадку вслух, затем открой размытую картинку.", criteria: "Названная часть тела должна совпасть с ответом приложения." },
     { id: "l3-compliment", category: "Комплимент", task: "Скажи партнёру, что именно в его или её взгляде, голосе или руках кажется тебе особенно привлекательным.", criteria: "Скажи один конкретный комплимент, глядя партнёру в глаза, не рассмеявшись." },
     { id: "l3-anticipation", category: "Намёк", task: "Напиши партнёру три предложения о том, чего хочешь сегодня вечером.", criteria: "Напиши ровно три законченных предложения и покажи сообщение партнёру." },
     { id: "l3-breath", category: "Комплимент", task: "Глядя партнёру в глаза, скажи, что именно в его или её теле тебе нравится.", criteria: "Назови одну конкретную часть тела и скажи о ней один законченный комплимент." },
@@ -75,7 +78,6 @@ const CARDS: Card[][] = [
     { id: "l5-photo", category: "Эротичное фото", task: "Сделай эротичное фото груди без лица и отправь партнёру.", criteria: "Сделай кадр без лица и отправь его партнёру." },
     { id: "l5-words", category: "Грязные вещи шёпотом", task: "Шёпотом скажи партнёру у уха три пошлые фразы о том, что хочешь сделать сегодня.", criteria: "Произнеси три законченные фразы шёпотом; оценивать их тон не нужно." },
     { id: "l5-video", category: "Эротичное видео", task: "Запиши видео на 5–10 секунд с рукой под бельём и отправь партнёру.", criteria: "Отправь один непрерывный ролик длительностью от пяти до десяти секунд." },
-    { id: "l5-rps", category: "Камень, ножницы, бумага", task: "Сыграйте в камень, ножницы, бумагу. При ничьей переиграйте; проигрыш означает провал задания.", criteria: "Победа означает выполнение; при проигрыше нажми «Провалил»." },
     { id: "l5-underwear", category: "Эротичное действие", task: "Положи руку на свои трусы и нежно поглаживай 20 секунд.", criteria: "Продолжай действие 20 секунд." },
     { id: "l5-wish", category: "Эротичное действие", task: "Запусти руку себе под трусы и погладь себя 20 секунд.", criteria: "Продолжай действие 20 секунд." },
     { id: "l5-hand", category: "Эротичное действие", task: "Возьми руку партнёра, положи её себе на грудь и веди ею, массируя грудь 20 секунд.", criteria: "Продолжай действие 20 секунд." },
@@ -83,6 +85,12 @@ const CARDS: Card[][] = [
     { id: "l5-video-legs", category: "Эротичное видео", task: "Запиши видео на 5–10 секунд с раздвинутыми ногами в белье и отправь партнёру.", criteria: "Отправь один непрерывный ролик длительностью от пяти до десяти секунд." },
   ],
 ];
+
+const FINAL_CARD: Card = {
+  id: "l5-rps", category: "Финальный поединок с приложением",
+  task: "Пять заданий на последнем уровне выполнены. Теперь сыграй с приложением в камень, ножницы, бумагу.",
+  criteria: "Ничья — переиграй без штрафа. Победа — одежда остаётся, ход переходит партнёру. Поражение — снимается последний слой, игра заканчивается.",
+};
 
 type Copy = {
   back: string; title: string; subtitle: string; kicker: string; playKicker: string; start: string;
@@ -205,9 +213,18 @@ function loadSession(): Session | null {
       (value.winner !== null && value.winner !== 0 && value.winner !== 1) ||
       (value.phase === "finished" && (value.winner === null || !value.players.some(p => p.layersRemoved === 5))) ||
       (value.phase === "playing" && (value.winner !== null || value.players.some(p => p.layersRemoved === 5)))) return null;
+    const players = value.players.map(p => ({
+      layersRemoved: p.layersRemoved,
+      finalCompleted: Number.isInteger(p.finalCompleted) && (p.finalCompleted ?? 0) >= 0 && (p.finalCompleted ?? 0) <= 5 ? p.finalCompleted : 0,
+    })) as [Player, Player];
+    const ready = players[value.turn].layersRemoved === 4 && (players[value.turn].finalCompleted ?? 0) >= 5;
+    let card = value.card ? CARDS.flat().find(item => item.id === value.card?.id) ?? value.card : null;
+    if (ready) card = FINAL_CARD;
+    else if (card?.id === "l5-rps") card = null;
+    const mini = card ? validMiniRound(value.mini, card.id) ? value.mini : createMiniRound(card.id) : null;
     return {
-      v: 1, phase: value.phase, players: value.players as [Player, Player], turn: value.turn,
-      card: value.card ?? null, used: value.used as Record<string, string[]>, winner: value.winner ?? null,
+      v: 1, phase: value.phase, players, turn: value.turn, mini,
+      card, used: value.used as Record<string, string[]>, winner: value.winner ?? null,
     };
   } catch {
     return null;
@@ -225,7 +242,7 @@ function BackIcon() {
   return <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 18 9 12l6-6" /></svg>;
 }
 
-function DollArt({ player, removed }: { player: PlayerIndex; removed: number }) {
+export function DollArt({ player, removed }: { player: PlayerIndex; removed: number }) {
   const woman = player === 0;
   const key = woman ? "her" : "him";
   const hairFill = `url(#doll-${key}-hair)`;
@@ -334,13 +351,13 @@ function DollArt({ player, removed }: { player: PlayerIndex; removed: number }) 
   );
 }
 
-function PlayerFigure({ player, removed, active, copy }: { player: PlayerIndex; removed: number; active: boolean; copy: Copy }) {
+function PlayerFigure({ player, removed, active, copy, fromStage }: { player: PlayerIndex; removed: number; active: boolean; copy: Copy; fromStage?: number }) {
   const name = player === 0 ? copy.woman : copy.man;
   const layers = LAYER_SETS[player];
   const nextLayer = layers[removed];
   return (
     <article className="strip-player" data-active={active} data-testid={`card-strip-player-${player}`}>
-      <div className="strip-player__figure"><DollArt player={player} removed={removed} /></div>
+      <div className="strip-player__figure"><StripCharacter player={player} stage={removed} fromStage={fromStage} /></div>
       <div className="strip-player__heading">
         <strong>{name}</strong>
         <span>{removed} / 5 {copy.removed}</span>
@@ -368,9 +385,10 @@ export default function StripGameScreen({ lang, onBack }: Props) {
   const [first, setFirst] = useState<PlayerIndex>(0);
   const [confirming, setConfirming] = useState(false);
   const [lastResult, setLastResult] = useState("");
+  const [removal, setRemoval] = useState<{ player: PlayerIndex; from: number } | null>(null);
   const challengeHeadingRef = useRef<HTMLHeadingElement | null>(null);
   const currentLevel = session ? Math.min(session.players[session.turn].layersRemoved, 4) : 0;
-  const levelCards = useMemo(() => session ? CARDS[currentLevel] : [], [session, currentLevel]);
+  const levelCards = useMemo(() => session ? CARDS[currentLevel].filter(card => card.id !== "l5-rps") : [], [session, currentLevel]);
 
   useEffect(() => { saveSession(session); }, [session]);
   useEffect(() => {
@@ -381,42 +399,50 @@ export default function StripGameScreen({ lang, onBack }: Props) {
 
   const playerNames = [copy.woman, copy.man] as const;
   const startGame = () => {
+    setRemoval(null);
     setSession(createSession(first));
     setConfirming(false);
     setLastResult("");
   };
   const drawCard = () => {
     if (!session || session.card || session.phase !== "playing") return;
+    setRemoval(null);
+    if (currentLevel === 4 && (session.players[session.turn].finalCompleted ?? 0) >= 5) {
+      setSession({ ...session, card: FINAL_CARD, mini: createMiniRound(FINAL_CARD.id) });
+      return;
+    }
     const key = String(currentLevel);
     const alreadyUsed = session.used[key] ?? [];
     const available = levelCards.filter(card => !alreadyUsed.includes(card.id));
     const pool = available.length ? available : levelCards;
     const card = pool[Math.floor(Math.random() * pool.length)];
     const used = { ...session.used, [key]: available.length ? [...alreadyUsed, card.id] : [card.id] };
-    setSession({ ...session, card, used });
+    setSession({ ...session, card, used, mini: createMiniRound(card.id) });
     setLastResult("");
   };
   const resolveTurn = (completed: boolean) => {
     if (!session || !session.card || session.phase !== "playing") return;
+    if (session.mini && !session.mini.revealed) return;
+    const final = session.card.id === FINAL_CARD.id;
+    if (final) {
+      if (!session.mini?.choice || !session.mini.revealed) return;
+      const outcome = rpsOutcome(session.mini.choice, session.mini.target as RpsChoice);
+      if (outcome === "tie" || completed !== (outcome === "win")) return;
+    }
     const current = session.turn;
-    const nextTurn: PlayerIndex = current === 0 ? 1 : 0;
-    if (completed) {
-      setSession({ ...session, card: null, turn: nextTurn });
-      setLastResult(copy.completed);
-      return;
-    }
-    const players = [...session.players] as [Player, Player];
-    const removedLayer = LAYER_SETS[current][players[current].layersRemoved];
-    players[current] = { layersRemoved: Math.min(5, players[current].layersRemoved + 1) };
-    if (players[current].layersRemoved >= 5) {
-      setSession({ ...session, players, card: null, phase: "finished", winner: nextTurn });
-      setLastResult("");
-      return;
-    }
-    setSession({ ...session, players, card: null, turn: nextTurn });
-    setLastResult(copy.layerChanged.replace("{layer}", removedLayer));
+    if (!completed) setRemoval({ player: current, from: session.players[current].layersRemoved });
+    const removedLayer = LAYER_SETS[current][session.players[current].layersRemoved];
+    const next = applyStripOutcome(session.players, current, completed, final);
+    setSession({
+      ...session, players: next.players, turn: next.turn,
+      card: next.needsFinal ? FINAL_CARD : null,
+      mini: next.needsFinal ? createMiniRound(FINAL_CARD.id) : null,
+      phase: next.finished ? "finished" : "playing", winner: next.winner,
+    });
+    setLastResult(next.finished ? "" : completed ? copy.completed : copy.layerChanged.replace("{layer}", removedLayer));
   };
   const restart = () => {
+    setRemoval(null);
     saveSession(null);
     setSession(null);
     setConfirming(false);
@@ -444,7 +470,7 @@ export default function StripGameScreen({ lang, onBack }: Props) {
         <div className="strip-premium__intro-stage" aria-hidden="true">
           {[0, 1].map(index => (
             <div className="strip-premium__intro-doll" key={index}>
-              <DollArt player={index as PlayerIndex} removed={0} />
+              <StripCharacter player={index as PlayerIndex} stage={0} />
             </div>
           ))}
         </div>
@@ -476,7 +502,7 @@ export default function StripGameScreen({ lang, onBack }: Props) {
         <div className="strip-premium__intro-stage strip-premium__finish-stage" aria-hidden="true">
           {session.players.map((player, index) => (
             <div className="strip-premium__intro-doll" key={index}>
-              <DollArt player={index as PlayerIndex} removed={player.layersRemoved} />
+              <StripCharacter player={index as PlayerIndex} stage={player.layersRemoved} fromStage={removal?.player === index ? removal.from : undefined} />
             </div>
           ))}
         </div>
@@ -516,9 +542,10 @@ export default function StripGameScreen({ lang, onBack }: Props) {
         <div className="strip__players">
           {session.players.map((player, index) => (
             <PlayerFigure key={index} player={index as PlayerIndex} removed={player.layersRemoved}
-              active={session.turn === index} copy={copy} />
+              active={session.turn === index} copy={copy} fromStage={removal?.player === index ? removal.from : undefined} />
           ))}
         </div>
+        {session.players[session.turn].layersRemoved === 4 && <p className="strip-final-counter">Задания на последнем уровне: {session.players[session.turn].finalCompleted ?? 0} / 5 · затем поединок с приложением</p>}
         <div className="strip__play-area" aria-live="polite">
           {!session.card ? (
             <>
@@ -568,10 +595,17 @@ export default function StripGameScreen({ lang, onBack }: Props) {
             <strong>{copy.criteria}</strong>
             <p lang="ru" data-testid="text-strip-criteria">{session.card.criteria}</p>
           </div>
-          <div className="strip-premium__reveal-actions">
-            <button type="button" className="strip-btn" onClick={() => resolveTurn(true)} data-testid="button-strip-complete">{copy.completed}</button>
-            <button type="button" className="strip-btn strip-btn--fail" onClick={() => resolveTurn(false)} data-testid="button-strip-fail">{copy.failed} <span>· {copy.removeLayer}</span></button>
-          </div>
+          {session.mini && <StripMiniGame round={session.mini} onChange={mini => setSession(previous => previous && previous.card ? { ...previous, mini } : previous)} />}
+          {session.mini?.kind === "final" ? (
+            session.mini.revealed && session.mini.choice && rpsOutcome(session.mini.choice, session.mini.target as RpsChoice) !== "tie" && (
+              <div className="strip-premium__reveal-actions">
+                <button type="button" className="strip-btn" onClick={() => resolveTurn(rpsOutcome(session.mini!.choice!, session.mini!.target as RpsChoice) === "win")}>Продолжить</button>
+              </div>
+            )
+          ) : <div className="strip-premium__reveal-actions">
+            <button type="button" className="strip-btn" disabled={!!session.mini && !session.mini.revealed} onClick={() => resolveTurn(true)} data-testid="button-strip-complete">{copy.completed}</button>
+            <button type="button" className="strip-btn strip-btn--fail" disabled={!!session.mini && !session.mini.revealed} onClick={() => resolveTurn(false)} data-testid="button-strip-fail">{copy.failed} <span>· {copy.removeLayer}</span></button>
+          </div>}
           <p className="strip-premium__reveal-foot">{copy.kicker}</p>
         </section>
       )}

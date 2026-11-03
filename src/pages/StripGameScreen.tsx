@@ -1,8 +1,9 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { CSSProperties } from "react";
 import type { Lang } from "@/data/i18n";
 import useTelegramTopInset from "./useTelegramTopInset";
 import "./StripGameScreen.css";
+import "./StripGameScreenPremium.css";
 
 type PlayerIndex = 0 | 1;
 type Phase = "playing" | "finished";
@@ -88,7 +89,8 @@ type Copy = {
   rulesTitle: string; rules: string[]; age: string; firstTurn: string; woman: string; man: string;
   chooseFirst: string; startGame: string; restart: string; restartConfirm: string; confirm: string; cancel: string;
   turn: string; level: string; draw: string; card: string; criteria: string; completed: string; failed: string;
-  layers: string; removed: string; left: string; winner: string; loser: string; wish: string; finishNote: string;
+  layers: string; removed: string; left: string; nextLayer: string; removeLayer: string;
+  winner: string; loser: string; wish: string; finishNote: string;
   newGame: string; toGames: string; russianNote: string; layerChanged: string;
 };
 
@@ -103,11 +105,12 @@ const COPY: Record<Lang, Copy> = {
     startGame: "Начать раунд", restart: "Начать заново", restartConfirm: "Сбросить сохранённую игру и начать заново?",
     confirm: "Сбросить игру", cancel: "Оставить игру", turn: "Ваш ход", level: "Уровень", draw: "Тянуть карту",
     card: "Задание", criteria: "Критерий выполнения", completed: "Выполнил", failed: "Провалил",
-    layers: "Слои", removed: "снято", left: "осталось", winner: "Победитель", loser: "Проигравший",
+    layers: "Слои", removed: "снято", left: "осталось", nextLayer: "Следующий слой", removeLayer: "снять слой",
+    winner: "Победитель", loser: "Проигравший",
     wish: "Победитель сразу загадывает желание. Проигравший его выполняет.",
     finishNote: "Игра завершена.",
     newGame: "Новая игра", toGames: "К играм", russianNote: "Карточки и задания остаются на русском языке.",
-    layerChanged: "Слой снят. Теперь ход партнёра.",
+    layerChanged: "Снят слой: {layer}. Теперь ход партнёра.",
   },
   en: {
     back: "Back to games", title: "Стрип или действие", subtitle: "A two-player game for one phone",
@@ -118,12 +121,13 @@ const COPY: Record<Lang, Copy> = {
     firstTurn: "Who goes first?", woman: "Woman", man: "Man", chooseFirst: "Choose the first player",
     startGame: "Start round", restart: "Start over", restartConfirm: "Reset the saved game and start over?",
     confirm: "Reset game", cancel: "Keep game", turn: "Your turn", level: "Level", draw: "Draw a card",
-    card: "Challenge", criteria: "Completion criteria", completed: "Completed", failed: "Not completed",
-    layers: "Layers", removed: "removed", left: "left", winner: "Winner", loser: "Lost",
+    card: "Challenge", criteria: "Completion criteria", completed: "Completed", failed: "Failed",
+    layers: "Layers", removed: "removed", left: "left", nextLayer: "Next layer", removeLayer: "remove one layer",
+    winner: "Winner", loser: "Lost",
     wish: "The winner makes a wish right away. The loser carries it out.",
     finishNote: "The game is over.",
     newGame: "New game", toGames: "Back to games", russianNote: "Cards and challenges remain in Russian.",
-    layerChanged: "Layer removed. The other player is up.",
+    layerChanged: "Removed: {layer}. The other player is up.",
   },
   hi: {
     back: "खेलों पर वापस", title: "Стрип или действие", subtitle: "एक फ़ोन पर दो लोगों का खेल",
@@ -134,12 +138,13 @@ const COPY: Record<Lang, Copy> = {
     firstTurn: "पहली बारी किसकी?", woman: "महिला", man: "पुरुष", chooseFirst: "पहला खिलाड़ी चुनें",
     startGame: "राउंड शुरू करें", restart: "फिर से शुरू करें", restartConfirm: "सहेजा खेल रीसेट करके फिर शुरू करें?",
     confirm: "खेल रीसेट करें", cancel: "खेल रहने दें", turn: "आपकी बारी", level: "स्तर", draw: "कार्ड लें",
-    card: "चुनौती", criteria: "पूरा करने का मानदंड", completed: "पूरा हुआ", failed: "पूरा नहीं हुआ",
-    layers: "परतें", removed: "हटीं", left: "बाकी", winner: "विजेता", loser: "हारे", 
+    card: "चुनौती", criteria: "पूरा करने का मानदंड", completed: "पूरा हुआ", failed: "असफल",
+    layers: "परतें", removed: "हटीं", left: "बाकी", nextLayer: "अगली परत", removeLayer: "एक परत हटाएँ",
+    winner: "विजेता", loser: "हारे",
     wish: "विजेता तुरंत एक इच्छा बताएगा। हारने वाला उसे पूरा करेगा।",
     finishNote: "खेल समाप्त हुआ।",
     newGame: "नया खेल", toGames: "खेलों पर वापस", russianNote: "कार्ड और चुनौतियाँ रूसी में ही रहेंगी।",
-    layerChanged: "एक परत हटी। अब साथी की बारी है।",
+    layerChanged: "परत हटी: {layer}। अब साथी की बारी है।",
   },
   pt: {
     back: "Voltar aos jogos", title: "Стрип или действие", subtitle: "Um jogo para dois em um só celular",
@@ -150,12 +155,13 @@ const COPY: Record<Lang, Copy> = {
     firstTurn: "Quem começa?", woman: "Mulher", man: "Homem", chooseFirst: "Escolha quem começa",
     startGame: "Começar rodada", restart: "Recomeçar", restartConfirm: "Apagar o jogo salvo e recomeçar?",
     confirm: "Reiniciar jogo", cancel: "Manter jogo", turn: "Sua vez", level: "Nível", draw: "Tirar uma carta",
-    card: "Desafio", criteria: "Critério de conclusão", completed: "Cumprido", failed: "Não cumprido",
-    layers: "Camadas", removed: "removidas", left: "restantes", winner: "Vencedor", loser: "Perdeu",
+    card: "Desafio", criteria: "Critério de conclusão", completed: "Cumprido", failed: "Falhei",
+    layers: "Camadas", removed: "removidas", left: "restantes", nextLayer: "Próxima camada", removeLayer: "remover uma camada",
+    winner: "Vencedor", loser: "Perdeu",
     wish: "O vencedor faz um pedido imediatamente. Quem perdeu o realiza.",
     finishNote: "O jogo terminou.",
     newGame: "Novo jogo", toGames: "Voltar aos jogos", russianNote: "As cartas e os desafios continuam em russo.",
-    layerChanged: "Camada removida. Agora é a vez da outra pessoa.",
+    layerChanged: "Camada removida: {layer}. Agora é a vez da outra pessoa.",
   },
   es: {
     back: "Volver a juegos", title: "Стрип или действие", subtitle: "Un juego para dos en un solo móvil",
@@ -166,12 +172,13 @@ const COPY: Record<Lang, Copy> = {
     firstTurn: "¿Quién empieza?", woman: "Mujer", man: "Hombre", chooseFirst: "Elijan quién empieza",
     startGame: "Empezar ronda", restart: "Empezar de nuevo", restartConfirm: "¿Borrar la partida guardada y empezar de nuevo?",
     confirm: "Reiniciar juego", cancel: "Conservar partida", turn: "Tu turno", level: "Nivel", draw: "Sacar una carta",
-    card: "Reto", criteria: "Criterio para completarlo", completed: "Completado", failed: "No completado",
-    layers: "Capas", removed: "quitadas", left: "restantes", winner: "Ganador", loser: "Perdió",
+    card: "Reto", criteria: "Criterio para completarlo", completed: "Completado", failed: "Fallé",
+    layers: "Capas", removed: "quitadas", left: "restantes", nextLayer: "Siguiente capa", removeLayer: "quitar una capa",
+    winner: "Ganador", loser: "Perdió",
     wish: "Quien gana pide un deseo en el acto. Quien pierde lo cumple.",
     finishNote: "La partida ha terminado.",
     newGame: "Nueva partida", toGames: "Volver a juegos", russianNote: "Las cartas y los retos siguen en ruso.",
-    layerChanged: "Capa quitada. Le toca a la otra persona.",
+    layerChanged: "Capa quitada: {layer}. Le toca a la otra persona.",
   },
 };
 
@@ -218,25 +225,122 @@ function BackIcon() {
   return <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 18 9 12l6-6" /></svg>;
 }
 
+function DollArt({ player, removed }: { player: PlayerIndex; removed: number }) {
+  const woman = player === 0;
+  const key = woman ? "her" : "him";
+  const hairFill = `url(#doll-${key}-hair)`;
+  const skinFill = `url(#doll-${key}-skin)`;
+  const outerFill = `url(#doll-${key}-outer)`;
+  const bottomFill = `url(#doll-${key}-bottom)`;
+  const baseFill = `url(#doll-${key}-base)`;
+  const underFill = `url(#doll-${key}-under)`;
+  return (
+    <svg
+      className={`strip-premium__doll strip-premium__figure-${woman ? "woman" : "man"}`}
+      viewBox="0 0 180 370"
+      role="img"
+      aria-label={woman ? "Взрослая кукла в женском образе" : "Взрослая кукла в мужском образе"}
+    >
+      <defs>
+        <linearGradient id={`doll-${key}-skin`} x1="0" x2="1" y1="0" y2="1">
+          <stop stopColor={woman ? "#f7dcc7" : "#efc8aa"} />
+          <stop offset=".58" stopColor={woman ? "#e9b49b" : "#d99b7d"} />
+          <stop offset="1" stopColor={woman ? "#d58d7b" : "#bd795f"} />
+        </linearGradient>
+        <linearGradient id={`doll-${key}-hair`} x1=".08" x2=".92" y1="0" y2="1">
+          <stop stopColor={woman ? "#4b1e3c" : "#252037"} />
+          <stop offset=".48" stopColor={woman ? "#9e4b70" : "#5e5069"} />
+          <stop offset="1" stopColor={woman ? "#3c1b37" : "#211b2c"} />
+        </linearGradient>
+        <linearGradient id={`doll-${key}-outer`} x1="0" x2="1" y1="0" y2="1">
+          <stop stopColor={woman ? "#e67f92" : "#7e9ca0"} />
+          <stop offset="1" stopColor={woman ? "#8b2e59" : "#3e5265"} />
+        </linearGradient>
+        <linearGradient id={`doll-${key}-bottom`} x1="0" x2=".2" y1="0" y2="1">
+          <stop stopColor={woman ? "#e6b273" : "#846078"} />
+          <stop offset="1" stopColor={woman ? "#b46d4f" : "#493349"} />
+        </linearGradient>
+        <linearGradient id={`doll-${key}-base`} x1="0" x2="1" y1="0" y2="1">
+          <stop stopColor={woman ? "#f4c8c3" : "#e8ddd6"} />
+          <stop offset="1" stopColor={woman ? "#df9ca5" : "#cfc5c4"} />
+        </linearGradient>
+        <linearGradient id={`doll-${key}-under`} x1="0" x2="1" y1="0" y2="1">
+          <stop stopColor={woman ? "#ac4168" : "#596979"} />
+          <stop offset="1" stopColor={woman ? "#7b294e" : "#344755"} />
+        </linearGradient>
+        <filter id={`doll-${key}-shadow`} x="-30%" y="-20%" width="160%" height="150%">
+          <feGaussianBlur stdDeviation="3" />
+        </filter>
+      </defs>
+      <ellipse cx="90" cy="355" rx="43" ry="7" fill="#582d48" opacity=".15" filter={`url(#doll-${key}-shadow)`} />
+
+      {/* Sculpted hair sits behind the articulated fashion-doll body. */}
+      {woman ? (
+        <path className="strip-premium__hair-back" fill={hairFill} d="M48 69C38 30 55 8 88 9c37 1 54 24 47 69l10 93-20 9-13-92H62l-10 91-21-11z" />
+      ) : (
+        <path className="strip-premium__hair-back" fill={hairFill} d="M49 60C46 25 63 9 91 9c31 0 45 18 39 52-12-11-25-16-40-15-15 1-28 6-41 14z" />
+      )}
+
+      {/* Long legs and articulated arms remain modestly covered by an opaque base suit. */}
+      <path className="strip-premium__skin" style={{ fill: skinFill }} d="M76 198 68 329l14 2 9-93 10 93 14-2-8-131z" />
+      <path className="strip-premium__skin" style={{ fill: "none", stroke: skinFill }} d="M67 119 48 184l9 6 26-50m31-21 19 65-9 6-26-49" strokeWidth="15" strokeLinecap="round" />
+      <path className="strip-premium__joints" d="M48 178a7 7 0 1 0 0 14 7 7 0 0 0 0-14zm82 0a7 7 0 1 0 0 14 7 7 0 0 0 0-14zM76 274a6 6 0 1 0 0 12 6 6 0 0 0 0-12zm28 0a6 6 0 1 0 0 12 6 6 0 0 0 0-12z" />
+      <path className="strip-premium__bodysuit" d="M70 111q20-11 40 0l13 80-14 15H71l-14-15zM68 198h44l7 47-29 13-29-13z" />
+      <path className="strip-premium__skin" style={{ fill: skinFill }} d="M73 326q10-4 19 0l3 15H67zm18 0q10-4 19 0l4 15H88z" />
+
+      {/* Layer four: the inner top remains after the outer top comes off. */}
+      <path className="strip-premium__garment strip-premium__garment--base" fill={baseFill} data-gone={removed >= 4} d="M70 117q20 12 40 0l6 31q-26 13-52 0z" />
+      {woman && <path className="strip-premium__stitch" d="M79 122q11 8 22 0m-24 20q13 6 26 0" />}
+      {!woman && <path className="strip-premium__stitch" d="m82 119 8 11 8-11m-10 11v14" />}
+
+      {/* The final underwear layer sits beneath the skirt or trousers. */}
+      <path className="strip-premium__garment strip-premium__garment--under" fill={underFill} data-gone={removed >= 5} d="M68 239q22 10 44 0l-3 19q-19 10-38 0z" />
+      <path className="strip-premium__stitch" d="M79 244q11 7 22 0" />
+
+      {/* Layer two: statement jacket / blouse. */}
+      <path className="strip-premium__garment strip-premium__garment--outer" fill={outerFill} data-gone={removed >= 2} d="M68 111q22-13 44 0l17 65-15 8-16-38-1 40H83l-1-40-15 38-15-8z" />
+      <path className="strip-premium__garment strip-premium__garment--outer" fill={outerFill} data-gone={removed >= 2} d="m68 113-15 65 12 6 15-37zm44-2 17 67-12 6-15-37z" />
+      <path className="strip-premium__stitch" d="m90 116 0 55m-18-43-6 30m42-30 6 30" />
+      <circle cx="96" cy="143" r="2" fill="#f7d89a" />
+      <circle cx="96" cy="155" r="2" fill="#f7d89a" />
+
+      {/* Layer three: skirt or tailored trousers. */}
+      {woman ? (
+          <path className="strip-premium__garment strip-premium__garment--bottom" fill={bottomFill} data-gone={removed >= 3} d="M61 190h58l-8 53q-20 12-42 0z" />
+      ) : (
+        <>
+          <path className="strip-premium__garment strip-premium__garment--bottom" fill={bottomFill} data-gone={removed >= 3} d="M61 190h58l-7 53-20 3-3-38-4 38-21-3z" />
+          <path className="strip-premium__stitch" d="m90 197 0 48m-19-43 4 34m34-34-4 34" />
+        </>
+      )}
+      {woman && <path className="strip-premium__stitch" d="M67 202q23 8 46 0m-44 25q21 7 42 0" />}
+
+      {/* Layer one: socks and miniature shoes disappear first. */}
+      <path className="strip-premium__sock" fill={woman ? "#8f345c" : "#3e354d"} data-gone={removed >= 1} d="M67 326h18l-1 15H62q0-8 5-15zm30 0h18l8 15H98z" />
+
+      {/* Head, painted eyes and glossy details. */}
+      <path className="strip-premium__skin" style={{ fill: skinFill }} d="M79 91h22v25H79z" />
+      <ellipse className="strip-premium__skin" style={{ fill: skinFill }} cx="90" cy="59" rx="29" ry="36" />
+      <path className="strip-premium__hair-front" style={{ fill: hairFill }} d={woman ? "M61 48Q65 12 95 17q23 4 31 29-16-7-27-20-12 15-38 22z" : "M61 45Q65 10 95 16q19 4 27 20-18-6-30-2-14 1-31 11z"} />
+      <path className="strip-premium__face-detail" d="M69 52q7-5 14-1m15 0q7-4 14 1" />
+      <ellipse className="strip-premium__eye" cx="77" cy="57" rx="2.5" ry="3" />
+      <ellipse className="strip-premium__eye" cx="105" cy="57" rx="2.5" ry="3" />
+      <circle cx="77.7" cy="56" r=".8" fill="#fff9f3" /><circle cx="105.7" cy="56" r=".8" fill="#fff9f3" />
+      <path className="strip-premium__blush" d="M66 69q9-5 17 0-7 8-15 4zm22-1q9-5 17 0-7 8-15 4z" />
+      <path d="M85 72q5 3 10 0" fill="none" stroke="#9f4965" strokeWidth="2" strokeLinecap="round" />
+      <path className="strip-premium__hair-shine" d={woman ? "M54 49q4-26 23-34m48 61 4 37" : "M63 34q8-19 25-20"} />
+      {woman && <><circle className="strip-premium__earring" cx="61" cy="73" r="3" /><circle className="strip-premium__earring" cx="119" cy="73" r="3" /></>}
+    </svg>
+  );
+}
+
 function PlayerFigure({ player, removed, active, copy }: { player: PlayerIndex; removed: number; active: boolean; copy: Copy }) {
   const name = player === 0 ? copy.woman : copy.man;
   const layers = LAYER_SETS[player];
+  const nextLayer = layers[removed];
   return (
     <article className="strip-player" data-active={active} data-testid={`card-strip-player-${player}`}>
-      <div className={`strip-player__figure strip-player__figure--${player === 0 ? "woman" : "man"}`} aria-hidden="true">
-        <svg viewBox="0 0 100 190" role="presentation">
-          <path className="strip-figure__hair" d="M36 20c0-11 6-18 15-18 11 0 16 8 15 19-4-5-8-7-14-7-5 0-10 2-16 6z" />
-          <circle className="strip-figure__skin" cx="50" cy="20" r="13" />
-          <path className="strip-figure__skin strip-figure__torso" d="M39 34h22l8 43-8 35H39l-8-35z" />
-          <path className="strip-figure__skin" d="M35 42 22 83l6 3 18-32M65 42l13 41-6 3-18-32" />
-          <path className="strip-figure__skin" d="M40 108 34 173h8l10-45 8 45h8l-6-65z" />
-          <path className="strip-figure__garment strip-figure__garment--top" data-gone={removed >= 2} d="M39 35h22l6 37H33z" />
-          <path className="strip-figure__garment strip-figure__garment--bottom" data-gone={removed >= 3} d="M34 74h32l-5 34H39z" />
-          <path className="strip-figure__garment strip-figure__garment--base" data-gone={removed >= 4} d="M34 56q16 10 32 0l2 15H32z" />
-          <path className="strip-figure__garment strip-figure__garment--under" data-gone={removed >= 5} d="M39 107h22l-2 11H41z" />
-          <path className="strip-figure__sock" data-gone={removed >= 1} d="M34 165h9l-1 13H29q0-7 5-13zm23 0h9l5 13H57z" />
-        </svg>
-      </div>
+      <div className="strip-player__figure"><DollArt player={player} removed={removed} /></div>
       <div className="strip-player__heading">
         <strong>{name}</strong>
         <span>{removed} / 5 {copy.removed}</span>
@@ -244,14 +348,15 @@ function PlayerFigure({ player, removed, active, copy }: { player: PlayerIndex; 
       <div className="strip-player__level" aria-label={`${copy.level} ${Math.min(removed + 1, 5)}`}>
         <span>{copy.level}</span><b>{Math.min(removed + 1, 5)}</b>
       </div>
-      <div className="strip-layers" aria-label={copy.layers}>
-        {layers.map((layer, index) => (
-          <span className="strip-layer" data-removed={index < removed} key={layer}>
-            <i aria-hidden="true">{index < removed ? "×" : String(index + 1).padStart(2, "0")}</i>
-            <span>{layer}</span>
-          </span>
-        ))}
+      <div className="strip-premium__progress" role="img" aria-label={`${copy.layers}: ${removed} ${copy.removed} / 5`}>
+        {layers.map((layer, index) => <span key={layer} data-removed={index < removed} />)}
       </div>
+      <p className="strip-premium__next">
+        {nextLayer ? <>{copy.nextLayer}: <strong>{nextLayer}</strong></> : copy.removed}
+      </p>
+      <ol className="strip-premium__sr-only">
+        {layers.map((layer, index) => <li key={layer} aria-current={index === removed ? "step" : undefined}>{layer}</li>)}
+      </ol>
     </article>
   );
 }
@@ -263,10 +368,16 @@ export default function StripGameScreen({ lang, onBack }: Props) {
   const [first, setFirst] = useState<PlayerIndex>(0);
   const [confirming, setConfirming] = useState(false);
   const [lastResult, setLastResult] = useState("");
+  const challengeHeadingRef = useRef<HTMLHeadingElement | null>(null);
   const currentLevel = session ? Math.min(session.players[session.turn].layersRemoved, 4) : 0;
   const levelCards = useMemo(() => session ? CARDS[currentLevel] : [], [session, currentLevel]);
 
   useEffect(() => { saveSession(session); }, [session]);
+  useEffect(() => {
+    if (!session?.card) return;
+    const frame = window.requestAnimationFrame(() => challengeHeadingRef.current?.focus());
+    return () => window.cancelAnimationFrame(frame);
+  }, [session?.card?.id]);
 
   const playerNames = [copy.woman, copy.man] as const;
   const startGame = () => {
@@ -295,6 +406,7 @@ export default function StripGameScreen({ lang, onBack }: Props) {
       return;
     }
     const players = [...session.players] as [Player, Player];
+    const removedLayer = LAYER_SETS[current][players[current].layersRemoved];
     players[current] = { layersRemoved: Math.min(5, players[current].layersRemoved + 1) };
     if (players[current].layersRemoved >= 5) {
       setSession({ ...session, players, card: null, phase: "finished", winner: nextTurn });
@@ -302,7 +414,7 @@ export default function StripGameScreen({ lang, onBack }: Props) {
       return;
     }
     setSession({ ...session, players, card: null, turn: nextTurn });
-    setLastResult(copy.layerChanged);
+    setLastResult(copy.layerChanged.replace("{layer}", removedLayer));
   };
   const restart = () => {
     saveSession(null);
@@ -326,13 +438,20 @@ export default function StripGameScreen({ lang, onBack }: Props) {
     body = (
       <section className="strip__intro strip-enter">
         <span className="strip__eyebrow">18+ <i /> TOUCHÉ</span>
-          <p className="strip__kicker">{copy.kicker}</p>
+        <p className="strip__kicker">{copy.kicker}</p>
         <h1 tabIndex={-1} data-testid="text-strip-title">{copy.title}</h1>
         <p className="strip__lead">{copy.subtitle}</p>
-        <div className="strip__panel">
-          <h2>{copy.rulesTitle}</h2>
-          <ol className="strip__rules">{copy.rules.map((rule, index) => <li key={rule}><i>0{index + 1}</i><span>{rule}</span></li>)}</ol>
+        <div className="strip-premium__intro-stage" aria-hidden="true">
+          {[0, 1].map(index => (
+            <div className="strip-premium__intro-doll" key={index}>
+              <DollArt player={index as PlayerIndex} removed={0} />
+            </div>
+          ))}
         </div>
+        <details className="strip-premium__rules">
+          <summary>{copy.rulesTitle}</summary>
+          <ol className="strip__rules">{copy.rules.map((rule, index) => <li key={rule}><i>0{index + 1}</i><span>{rule}</span></li>)}</ol>
+        </details>
         <div className="strip__age-note" role="note"><span>18+</span><p>{copy.age}</p></div>
         {lang !== "ru" && <p className="strip__language-note" lang={lang}>{copy.russianNote}</p>}
         <fieldset className="strip__first">
@@ -354,6 +473,13 @@ export default function StripGameScreen({ lang, onBack }: Props) {
     body = (
       <section className="strip__finish strip-enter" data-testid="panel-strip-finish">
         <span className="strip__eyebrow">18+ <i /> TOUCHÉ</span>
+        <div className="strip-premium__intro-stage strip-premium__finish-stage" aria-hidden="true">
+          {session.players.map((player, index) => (
+            <div className="strip-premium__intro-doll" key={index}>
+              <DollArt player={index as PlayerIndex} removed={player.layersRemoved} />
+            </div>
+          ))}
+        </div>
         <div className="strip__finish-mark" aria-hidden="true">
           <svg viewBox="0 0 40 40"><path d="M20 3 23.5 16.5 37 20l-13.5 3.5L20 37l-3.5-13.5L3 20l13.5-3.5L20 3Z" /></svg>
         </div>
@@ -401,18 +527,7 @@ export default function StripGameScreen({ lang, onBack }: Props) {
               <button type="button" className="strip-btn" onClick={drawCard} data-testid="button-strip-draw">{copy.draw}</button>
             </>
           ) : (
-            <article className="strip__challenge" data-testid="card-strip-challenge">
-              <div className="strip__challenge-top"><span>{copy.card} · {copy.level} {Math.min(session.players[session.turn].layersRemoved + 1, 5)}</span><b lang="ru">{session.card.category}</b></div>
-              <p lang="ru" className="strip__task" data-testid="text-strip-task">{session.card.task}</p>
-              <div className="strip__criteria">
-                <span>{copy.criteria}</span>
-                <p lang="ru" data-testid="text-strip-criteria">{session.card.criteria}</p>
-              </div>
-              <div className="strip__outcomes">
-                <button type="button" className="strip-btn" onClick={() => resolveTurn(true)} data-testid="button-strip-complete">{copy.completed}</button>
-                <button type="button" className="strip-btn strip-btn--fail" onClick={() => resolveTurn(false)} data-testid="button-strip-fail">{copy.failed}</button>
-              </div>
-            </article>
+            <p className="strip-premium__waiting" role="status">{copy.card} · {playerNames[session.turn]}</p>
           )}
         </div>
         {confirming ? (
@@ -429,9 +544,37 @@ export default function StripGameScreen({ lang, onBack }: Props) {
   }
 
   return (
-    <main className="strip" style={{ "--strip-top": `${top}px` } as CSSProperties}>
-      {header}
-      <div className="strip__body">{body}</div>
+    <main className="strip strip-premium" style={{ "--strip-top": `${top}px` } as CSSProperties}>
+      {!session?.card && (
+        <>
+          {header}
+          <div className="strip__body">{body}</div>
+        </>
+      )}
+      {session?.card && session.phase === "playing" && (
+        <section className="strip-premium__reveal strip-enter" role="dialog" aria-modal="true" aria-labelledby="text-strip-task" data-testid="card-strip-challenge">
+          <div className="strip-premium__reveal-top">
+            <div className="strip-premium__reveal-brand">
+              <strong>18+ · TOUCHÉ</strong>
+              <span className="strip-premium__reveal-level">{copy.card}<b>{copy.level} {Math.min(session.players[session.turn].layersRemoved + 1, 5)}</b></span>
+            </div>
+            <span className="strip-premium__reveal-turn">{copy.turn}<br /><strong>{playerNames[session.turn]}</strong></span>
+          </div>
+          <div className="strip-premium__reveal-cardno" lang="ru">{session.card.category}</div>
+          <h2 id="text-strip-task" ref={challengeHeadingRef} tabIndex={-1} lang="ru" className="strip-premium__reveal-task" data-testid="text-strip-task">
+            {session.card.task}
+          </h2>
+          <div className="strip-premium__reveal-criteria">
+            <strong>{copy.criteria}</strong>
+            <p lang="ru" data-testid="text-strip-criteria">{session.card.criteria}</p>
+          </div>
+          <div className="strip-premium__reveal-actions">
+            <button type="button" className="strip-btn" onClick={() => resolveTurn(true)} data-testid="button-strip-complete">{copy.completed}</button>
+            <button type="button" className="strip-btn strip-btn--fail" onClick={() => resolveTurn(false)} data-testid="button-strip-fail">{copy.failed} <span>· {copy.removeLayer}</span></button>
+          </div>
+          <p className="strip-premium__reveal-foot">{copy.kicker}</p>
+        </section>
+      )}
     </main>
   );
 }

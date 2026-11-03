@@ -1,27 +1,29 @@
-@import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800;900&family=Syne:wght@500;600;700;800&display=swap");
 @import "tailwindcss";
 
 :root {
-  --bg: #fffaf3;
-  --surface: #ffffff;
-  --text-primary: #162238;
-  --text-secondary: #667085;
-  --text-tertiary: #81899a;
-  --border: #162238;
-  --divider: #e6dfd5;
-  --accent-wine: #78183d;
-  --accent-champagne: #ffd45d;
-  --focus-ring: #3e5bff;
-  --pop-ink: #162238;
-  --pop-muted: #667085;
-  --pop-paper: #fffaf3;
-  --pop-coral: #ff6f61;
-  --pop-blue: #3e5bff;
-  --pop-lime: #d8f36a;
-  --pop-yellow: #ffd45d;
-  --pop-wine: #78183d;
-  --pop-blush: #ffe5e1;
-  --pop-plum: #291b36;
+  color-scheme: light;
+  --bg: #fff8ec;
+  --surface: #fffaf1;
+  --text-primary: #221d2d;
+  --text-secondary: #625b66;
+  --text-tertiary: #817984;
+  --border: #221d2d;
+  --divider: #e8dfd1;
+  --accent-wine: #6852f4;
+  --accent-champagne: #d9fb4a;
+  --focus-ring: #6852f4;
+  --pop-ink: #221d2d;
+  --pop-muted: #625b66;
+  --pop-paper: #fff9ed;
+  --pop-coral: #ff477e;
+  --pop-blue: #6852f4;
+  --pop-lime: #d9fb4a;
+  --pop-yellow: #ffb849;
+  --pop-wine: #563fcb;
+  --pop-blush: #ffe2e9;
+  --pop-plum: #30283a;
+  --touche-shadow: 4px 4px 0 rgba(34, 29, 45, .94);
 }
 
 * {
@@ -42,7 +44,7 @@ body,
 }
 
 body {
-  font-family: 'DM Sans', sans-serif;
+  font-family: "DM Sans", sans-serif;
 }
 
 button:focus-visible {

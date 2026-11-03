@@ -14,6 +14,7 @@ import { trackAnalyticsEvent } from "@/analytics";
 import LovePathScreen from "@/pages/LovePathScreen";
 import GamesScreen from "@/pages/GamesScreen";
 import TarotScreen from "@/pages/TarotScreen";
+import "./interface.css";
 
 type AppPhase = "splash" | "lang" | "onboarding" | "gender" | "home" | "category" | "scenario" | "shared_task_error" | "love_path" | "games" | "tarot";
 export type AppMode = "solo" | "together";
@@ -675,11 +676,11 @@ export default function App() {
         )}
         {phase === "scenario"    && <ScenarioScreen lang={lang} gender={gender} onBack={handleBack} onUpgrade={() => apiSubscribe(lang)} />}
         {phase === "shared_task_error" && (
-          <main style={{ minHeight: "100dvh", display: "grid", placeContent: "center", gap: 16, padding: 24, textAlign: "center", background: "#0d0610", color: "#fffaf3", fontFamily: "sans-serif" }}>
+          <main className="shared-task-error">
             <h1 style={{ fontSize: 22 }}>{lang === "ru" ? "Не удалось открыть общее задание" : "Could not open the shared task"}</h1>
             <p style={{ maxWidth: 320, lineHeight: 1.5, opacity: 0.75 }}>{lang === "ru" ? "Проверьте подключение и попробуйте ещё раз. Задание доступно только участникам этой пары." : "Check your connection and try again. This task is only available to members of this pair."}</p>
-            <button type="button" onClick={handleRetrySharedTask} style={{ padding: "13px 18px", borderRadius: 14, border: 0, background: "#ff6f61", color: "#162238", fontWeight: 700 }}>{lang === "ru" ? "Попробовать снова" : "Try again"}</button>
-            <button type="button" onClick={() => setPhase("home")} style={{ padding: "10px 18px", borderRadius: 14, border: "1px solid rgba(255,250,243,.35)", background: "transparent", color: "#fffaf3" }}>{lang === "ru" ? "На главную" : "Go home"}</button>
+            <button className="shared-task-error__retry" type="button" onClick={handleRetrySharedTask}>{lang === "ru" ? "Попробовать снова" : "Try again"}</button>
+            <button className="shared-task-error__home" type="button" onClick={() => setPhase("home")}>{lang === "ru" ? "На главную" : "Go home"}</button>
           </main>
         )}
         {tutorialStep !== null && (

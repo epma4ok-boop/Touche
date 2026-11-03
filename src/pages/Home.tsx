@@ -1344,13 +1344,14 @@ export default function Home({
         </div>
 
         {homeSection === "home" ? (
-          <div className="pop-list pop-home-entry" style={{ flex: 1, overflowY: "auto", padding: `14px 18px max(28px,env(safe-area-inset-bottom))`, position: "relative", zIndex: 1 }}>
-            <section className="pop-home-hero" aria-label={t.chooseNow}>
-              <span className="pop-home-hero__stamp">{lang === "ru" ? "ВЕЧЕР ДЛЯ ДВОИХ" : t.appSub}</span>
-              <h1>{HERO_COPY[lang].first}<br /><span>{HERO_COPY[lang].last}</span></h1>
-              <p>{HERO_COPY[lang].sub}</p>
-            </section>
-            <div className="pop-entry-actions">
+          <main className="pop-list pop-home-entry" style={{ flex: 1, overflowY: "auto", padding: `14px 18px max(28px,env(safe-area-inset-bottom))`, position: "relative", zIndex: 1 }}>
+            <div className="pop-home-presentation">
+              <section className="pop-home-hero" aria-label={t.chooseNow}>
+                <span className="pop-home-hero__stamp">{lang === "ru" ? "ВЕЧЕР ДЛЯ ДВОИХ" : t.appSub}</span>
+                <h1>{HERO_COPY[lang].first}<br /><span>{HERO_COPY[lang].last}</span></h1>
+                <p>{HERO_COPY[lang].sub}</p>
+              </section>
+              <div className="pop-entry-actions">
               <button type="button" className="pop-entry-action pop-entry-action--solo" onClick={() => openHomeSection("solo")} data-testid="button-mode-solo">
                 <img className="pop-entry-action__art" src="/images/cat-tenderness-art.svg" alt="" aria-hidden="true" />
                 <span className="pop-entry-action__index">01</span><span className="pop-entry-action__copy"><strong>{lang === "ru" ? "Соло" : lang === "hi" ? "अकेले" : lang === "pt" ? "Solo" : lang === "es" ? "A solas" : "Solo"}</strong><small>{lang === "ru" ? "Нежное задание только для себя" : lang === "hi" ? "सिर्फ़ अपने लिए एक कोमल चुनौती" : lang === "pt" ? "Um convite delicado só para você" : lang === "es" ? "Un reto íntimo solo para ti" : "A little moment, just for you"}</small></span><span className="pop-entry-action__arrow" aria-hidden="true">↗</span>
@@ -1371,8 +1372,9 @@ export default function Home({
                 <img className="pop-entry-action__art" src="/images/home-wheel-art.svg" alt="" aria-hidden="true" />
                 <span className="pop-entry-action__index">05</span><span className="pop-entry-action__copy"><strong>{lang === "ru" ? "Игры" : lang === "hi" ? "खेल" : lang === "pt" ? "Jogos" : lang === "es" ? "Juegos" : "Games"}</strong><small>18+ · {lang === "ru" ? "Колесо, кубики и игра для двоих" : lang === "hi" ? "व्हील, पासे और आप दोनों के लिए खेल" : lang === "pt" ? "Roleta, dados e jogo para dois" : lang === "es" ? "Ruleta, dados y juego para dos" : "Wheel, dice and a two-player game"}</small></span><span className="pop-entry-action__arrow" aria-hidden="true">↗</span>
               </button>
+              </div>
             </div>
-          </div>
+          </main>
         ) : (
           <div className="pop-list pop-home-subpage" style={{ flex: 1, overflowY: "auto", overflowX: "hidden", padding: `10px 14px max(28px,env(safe-area-inset-bottom))`, display: "flex", flexDirection: "column", gap: 12, position: "relative", zIndex: 1, scrollbarWidth: "none" as const }}>
             <button type="button" className="pop-subpage-back" onClick={() => setHomeSection("home")} data-testid="button-home-back">

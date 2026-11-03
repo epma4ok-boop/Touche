@@ -303,7 +303,12 @@ export default function TarotScreen({ lang, onBack }: Props) {
   return (
     <main className="tarot" style={{ "--tarot-top": `${top}px` } as CSSProperties}>
       {header}
-      <div className="tarot__body">{body}</div>
+      <div className="tarot__body">
+        <div className={`tarot__composition tarot__composition--${view}`}>
+          <div className="tarot__folio" aria-hidden="true"><span>TOUCHÉ / 18+</span><span>01 — 03</span></div>
+          {body}
+        </div>
+      </div>
     </main>
   );
 }

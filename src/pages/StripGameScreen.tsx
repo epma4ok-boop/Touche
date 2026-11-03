@@ -461,6 +461,7 @@ export default function StripGameScreen({ lang, onBack }: Props) {
     body = (
       <section className="strip__intro strip-enter">
         <span className="strip__eyebrow">18+ <i /> TOUCHÉ</span>
+        <span className="strip__sequence" aria-hidden="true">03 / 03</span>
         <p className="strip__kicker">{copy.kicker}</p>
         <h1 tabIndex={-1} data-testid="text-strip-title">{copy.title}</h1>
         <p className="strip__lead">{copy.subtitle}</p>
@@ -530,6 +531,7 @@ export default function StripGameScreen({ lang, onBack }: Props) {
     body = (
       <section className="strip__play strip-enter" data-testid="panel-strip-play">
         <div className="strip__play-heading">
+          <span className="strip__sequence" aria-hidden="true">03 / 03</span>
           <p className="strip__kicker">{copy.playKicker}</p>
           <h1>{copy.title}</h1>
           <div className="strip__turn" aria-live="polite" data-testid="status-strip-turn">

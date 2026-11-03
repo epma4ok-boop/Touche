@@ -115,33 +115,34 @@ export default function LotteryScreen({ lang, onBack }: Props) {
       <div className="pose-lottery__body">
         <section className="pose-lottery__intro">
           <span className="pose-lottery__eyebrow">18+ <i /> TOUCHÉ</span>
+          <span className="pose-lottery__sequence" aria-hidden="true">01 / 03</span>
           <h1>{copy.title}</h1>
           <p>{copy.subtitle}</p>
         </section>
 
-        <div className={`pose-lottery__scene ${busy ? "is-spinning" : ""} ${phase === "revealed" ? "is-done" : ""}`}>
+        <div className={`pose-lottery__scene ${busy ? "is-spinning" : ""} ${phase === "revealed" ? "is-done" : ""}`} aria-label={copy.title}>
           <div className="pose-lottery__dial" aria-hidden="true">
             <span className="pose-lottery__index" />
             <div className={`pose-lottery__wheel${instant ? " is-instant" : ""}`} style={wheelStyle}>
               <svg viewBox="0 0 400 400" className="pose-lottery__svg" focusable="false">
                 <defs>
                   <linearGradient id="petal-wine" x1="150" y1="200" x2="215" y2="10" gradientUnits="userSpaceOnUse">
-                    <stop stopColor="#350c24" />
-                    <stop offset=".48" stopColor="#78183d" />
-                    <stop offset=".82" stopColor="#ad4160" />
-                    <stop offset="1" stopColor="#df9caa" />
+                    <stop stopColor="#ff477e" />
+                    <stop offset=".48" stopColor="#ff7392" />
+                    <stop offset=".82" stopColor="#ffb0a7" />
+                    <stop offset="1" stopColor="#fff0cf" />
                   </linearGradient>
                   <linearGradient id="petal-rose" x1="150" y1="200" x2="215" y2="10" gradientUnits="userSpaceOnUse">
-                    <stop stopColor="#460e2a" />
-                    <stop offset=".48" stopColor="#8c2349" />
-                    <stop offset=".82" stopColor="#bf5a73" />
-                    <stop offset="1" stopColor="#f0bcc3" />
+                    <stop stopColor="#6852f4" />
+                    <stop offset=".48" stopColor="#8978f7" />
+                    <stop offset=".82" stopColor="#c0b7fb" />
+                    <stop offset="1" stopColor="#fff0cf" />
                   </linearGradient>
                   {MARKS.map(m => (
                     <linearGradient key={m.id} id={`petal-${m.id}`} href={m.index % 2 ? "#petal-wine" : "#petal-rose"} gradientTransform={`rotate(${m.index * 18} 200 200)`} />
                   ))}
                 </defs>
-                <circle cx="200" cy="200" r="186" fill="#4a102c" />
+                <circle cx="200" cy="200" r="186" fill="#221d2d" />
                 {MARKS.map(m => (
                   <path key={m.id} d={m.d} fill={`url(#petal-${m.id})`} stroke="#f8d8d8" strokeOpacity=".32" strokeWidth=".85" strokeLinejoin="round" />
                 ))}

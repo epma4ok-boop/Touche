@@ -54,103 +54,32 @@ const COPY: Record<Lang, {
   },
 };
 
-const EXTRA_COPY: Record<Lang, {
-  headerNote: string; eyebrow: string; heroFirst: string; heroSecond: string;
-  heroText: string; you: string; me: string; scroll: string; gameLabel: string;
-  wheelAction: string; diceAction: string; stripAction: string;
-  footerLead: string; footerNote: string;
-}> = {
-  ru: {
-    headerNote: "ИГРА ДЛЯ ДВОИХ", eyebrow: "ТОЛЬКО ВАШИ ПРАВИЛА",
-    heroFirst: "ИГРАЙ.", heroSecond: "БЛИЖЕ.",
-    heroText: "Один телефон. Два человека. Сколько искры — решаете вы.",
-    you: "ТЫ", me: "Я", scroll: "ВЫБИРАЙ СВОЙ РИТМ", gameLabel: "ИГРА",
-    wheelAction: "ВЫБРАТЬ ИГРУ", diceAction: "БРОСАЙ", stripAction: "ТВОЙ ХОД",
-    footerLead: "ДА — это тоже часть игры.",
-    footerNote: "Можно остановиться в любой момент. Главное — чтобы обоим было хорошо.",
-  },
-  en: {
-    headerNote: "GAMES FOR TWO", eyebrow: "YOUR RULES ONLY",
-    heroFirst: "PLAY.", heroSecond: "CLOSER.",
-    heroText: "One phone. Two people. How much spark? You decide.",
-    you: "YOU", me: "ME", scroll: "PICK YOUR RHYTHM", gameLabel: "GAME",
-    wheelAction: "CHOOSE GAME", diceAction: "ROLL", stripAction: "YOUR MOVE",
-    footerLead: "YES IS PART OF THE GAME.",
-    footerNote: "You can stop at any moment. What matters is that you both feel good.",
-  },
-  hi: {
-    headerNote: "दो लोगों के लिए खेल", eyebrow: "नियम आपके",
-    heroFirst: "खेलें.", heroSecond: "करीब.",
-    heroText: "एक फ़ोन। दो लोग। कितनी चिंगारी — यह आप तय करें।",
-    you: "तुम", me: "मैं", scroll: "अपनी लय चुनें", gameLabel: "खेल",
-    wheelAction: "खेल चुनें", diceAction: "पासा फेंकें", stripAction: "आपकी चाल",
-    footerLead: "हाँ भी खेल का हिस्सा है।",
-    footerNote: "आप किसी भी समय रुक सकते हैं। ज़रूरी है कि आप दोनों सहज हों।",
-  },
-  pt: {
-    headerNote: "JOGOS A DOIS", eyebrow: "AS REGRAS SÃO DE VOCÊS",
-    heroFirst: "JOGUEM.", heroSecond: "MAIS PERTO.",
-    heroText: "Um celular. Duas pessoas. A faísca é vocês que decidem.",
-    you: "VOCÊ", me: "EU", scroll: "ESCOLHAM O RITMO", gameLabel: "JOGO",
-    wheelAction: "ESCOLHER JOGO", diceAction: "JOGAR DADOS", stripAction: "SUA VEZ",
-    footerLead: "SIM também faz parte do jogo.",
-    footerNote: "Vocês podem parar a qualquer momento. O importante é que ambos se sintam bem.",
-  },
-  es: {
-    headerNote: "JUEGOS PARA DOS", eyebrow: "SOLO SUS REGLAS",
-    heroFirst: "JUEGA.", heroSecond: "MÁS CERCA.",
-    heroText: "Un teléfono. Dos personas. Ustedes deciden la chispa.",
-    you: "TÚ", me: "YO", scroll: "ELIJAN EL RITMO", gameLabel: "JUEGO",
-    wheelAction: "ELEGIR JUEGO", diceAction: "LANZAR", stripAction: "TU TURNO",
-    footerLead: "SÍ también es parte del juego.",
-    footerNote: "Pueden parar en cualquier momento. Lo importante es que ambos estén a gusto.",
-  },
-};
-
 function WheelMark() {
   return (
-    <svg viewBox="0 0 180 180" aria-hidden="true" className="tx-wheel">
-      <circle cx="90" cy="90" r="78" fill="#221d2d" />
-      {Array.from({ length: 8 }, (_, index) => (
-        <path key={index} d="M90 90V13A77 77 0 0 1 144.4 35.6Z"
-          fill={index % 2 ? "#d9fb4a" : "#ff477e"} stroke="#221d2d"
-          strokeWidth="2" transform={`rotate(${index * 45} 90 90)`} />
-      ))}
-      <circle cx="90" cy="90" r="23" fill="#fff9ed" stroke="#221d2d" strokeWidth="2" />
-      <circle cx="90" cy="90" r="6" fill="#221d2d" />
-      <path d="m8 82 19 8-19 8z" fill="#ffb849" stroke="#221d2d" strokeWidth="2" />
+    <svg viewBox="0 0 100 100" aria-hidden="true" className="touche-games__wheel-mark">
+      <circle cx="50" cy="50" r="43" />
+      {Array.from({ length: 8 }, (_, index) => <path key={index} d="M50 50 C55 34 65 17 50 7 C35 17 45 34 50 50Z" transform={`rotate(${index * 45} 50 50)`} />)}
+      <circle className="touche-games__wheel-center" cx="50" cy="50" r="9" />
     </svg>
   );
 }
 
 function CubeMark() {
   return (
-    <svg viewBox="0 0 140 112" aria-hidden="true" className="tx-dice">
-      <g transform="rotate(-13 42 48)">
-        <rect x="9" y="17" width="65" height="65" rx="15" fill="#d9fb4a" stroke="#221d2d" strokeWidth="3" />
-        <circle cx="27" cy="35" r="5" fill="#221d2d" /><circle cx="56" cy="35" r="5" fill="#221d2d" />
-        <circle cx="42" cy="50" r="5" fill="#221d2d" /><circle cx="27" cy="65" r="5" fill="#221d2d" />
-        <circle cx="56" cy="65" r="5" fill="#221d2d" />
-      </g>
-      <g transform="rotate(12 93 63)">
-        <rect x="66" y="34" width="61" height="61" rx="15" fill="#ff477e" stroke="#221d2d" strokeWidth="3" />
-        <path d="M85 51h5v5h-5zm19 19h5v5h-5z" fill="#221d2d" />
-        <circle cx="88" cy="75" r="4" fill="#221d2d" /><circle cx="110" cy="53" r="4" fill="#221d2d" />
-      </g>
+    <svg viewBox="0 0 100 100" aria-hidden="true" className="touche-games__cube-mark">
+      <path d="m50 8 36 20v43L50 92 14 71V28L50 8Z" />
+      <path d="m14 28 36 21 36-21M50 49v43" />
+      <circle cx="50" cy="28" r="3" /><circle cx="38" cy="57" r="3" /><circle cx="62" cy="69" r="3" />
     </svg>
   );
 }
 
 function StripMark() {
   return (
-    <svg viewBox="0 0 126 130" aria-hidden="true" className="tx-cards">
-      <g transform="rotate(-14 52 65)">
-        <rect x="13" y="12" width="74" height="102" rx="10" fill="#ffb849" stroke="#221d2d" strokeWidth="3" />
-      </g>
-      <g transform="rotate(9 72 65)">
-        <rect x="36" y="12" width="74" height="102" rx="10" fill="#fff9ed" stroke="#221d2d" strokeWidth="3" />
-        <path d="m72 29 7 19 20 1-16 12 6 20-17-12-17 12 6-20-16-12 20-1z" fill="#ff477e" stroke="#221d2d" strokeWidth="2" />
-      </g>
+    <svg viewBox="0 0 100 100" aria-hidden="true" className="touche-games__strip-mark">
+      <path d="M36 24 50 16l14 8 14 10-9 12-8-5v35H39V41l-8 5-9-12 14-10Z" />
+      <path d="M38 56h24M38 66h24M38 76h24" />
+      <circle cx="50" cy="10" r="4" />
     </svg>
   );
 }
@@ -163,59 +92,42 @@ export default function GamesScreen({ lang, onBack }: Props) {
   if (game === "dice") return <DiceScreen lang={lang} onBack={() => setGame(null)} />;
   if (game === "strip") return <StripGameScreen lang={lang} onBack={() => setGame(null)} />;
 
-  const extra = EXTRA_COPY[lang];
   return (
-    <main className="touche-games tx-app" style={{ "--games-top": `${top}px` } as CSSProperties}>
-      <header className="tx-header">
-        <button type="button" className="tx-back" onClick={onBack} aria-label={copy.back} data-testid="button-games-back">
+    <main className="touche-games" style={{ "--games-top": `${top}px` } as CSSProperties}>
+      <header className="touche-games__header">
+        <button type="button" className="touche-games__back" onClick={onBack} aria-label={copy.back} data-testid="button-games-back">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 18 9 12l6-6" /></svg>
         </button>
-        <span className="tx-brand">Touché<span>®</span></span>
-        <span className="tx-header-note">{extra.headerNote}</span>
-        <span className="tx-age" aria-label="18+">18+</span>
+        <span className="touche-games__brand">Touch<em>é</em></span>
+        <span className="touche-games__header-space" />
       </header>
-
-      <div className="tx-body">
-        <section className="tx-hero">
-          <div className="tx-eyebrow"><span className="tx-pulse" />{extra.eyebrow}</div>
-          <h1>{extra.heroFirst}<br /><em>{extra.heroSecond}</em></h1>
-          <div className="tx-hero-sticker" aria-hidden="true">
-            <span>{extra.you}<br />+ {extra.me}</span><i />
-          </div>
-          <p>{extra.heroText}</p>
-          <div className="tx-scroll-mark">{extra.scroll}</div>
-        </section>
-
-        <section className="tx-games" aria-label={copy.title}>
-          <button type="button" className="tx-game tx-game--wheel" onClick={() => setGame("wheel")} aria-label={`${copy.wheel}: ${copy.wheelNote}`} data-testid="button-game-wheel">
-            <span className="tx-game-num">01 <i>{extra.gameLabel}</i></span>
-            <span className="tx-w-label">{copy.wheelMood}</span>
-            <strong>{copy.wheel}</strong>
-            <span className="tx-choose">{extra.wheelAction}<b aria-hidden="true">+</b></span>
-            <WheelMark />
-            <span className="tx-w-dots" aria-hidden="true">● ● ●</span>
+      <div className="touche-games__body">
+        <div className="touche-games__intro">
+          <span className="touche-games__eyebrow">18+ <i /> TOUCHÉ</span>
+          <div className="touche-games__intro-heading"><span className="touche-games__edition">PLAY / 01—03</span><h1>{copy.title}</h1></div>
+          <p>{copy.subtitle}</p>
+        </div>
+        <section className="touche-games__choices" aria-label={copy.title}>
+          <button type="button" className="touche-games__choice touche-games__choice--wheel" onClick={() => setGame("wheel")} data-testid="button-game-wheel">
+            <span className="touche-games__choice-index">01 <small>{copy.number}</small></span>
+            <span className="touche-games__art-wrap"><WheelMark /></span>
+            <span className="touche-games__choice-copy"><small className="touche-games__choice-mood">{copy.wheelMood}</small><strong>{copy.wheel}</strong><small>{copy.wheelNote}</small></span>
+            <span className="touche-games__arrow" aria-hidden="true">↗</span>
           </button>
-
-          <div className="tx-sidegames">
-            <button type="button" className="tx-game tx-game--dice" onClick={() => setGame("dice")} aria-label={`${copy.dice}: ${copy.diceNote}`} data-testid="button-game-dice">
-              <span className="tx-game-num">02 <i>{extra.gameLabel}</i></span>
-              <strong>{copy.dice}</strong>
-              <span className="tx-choose">{extra.diceAction}<b aria-hidden="true">+</b></span>
-              <CubeMark />
-            </button>
-            <button type="button" className="tx-game tx-game--strip" onClick={() => setGame("strip")} aria-label={`${copy.strip}: ${copy.stripNote}`} data-testid="button-game-strip">
-              <span className="tx-game-num">03 <i>{extra.gameLabel}</i></span>
-              <strong>{copy.strip}</strong>
-              <span className="tx-choose">{extra.stripAction}<b aria-hidden="true">+</b></span>
-              <StripMark />
-            </button>
-          </div>
+          <button type="button" className="touche-games__choice touche-games__choice--dice" onClick={() => setGame("dice")} data-testid="button-game-dice">
+            <span className="touche-games__choice-index">02 <small>{copy.number}</small></span>
+            <span className="touche-games__art-wrap"><CubeMark /></span>
+            <span className="touche-games__choice-copy"><small className="touche-games__choice-mood">{copy.diceMood}</small><strong>{copy.dice}</strong><small>{copy.diceNote}</small></span>
+            <span className="touche-games__arrow" aria-hidden="true">↗</span>
+          </button>
+          <button type="button" className="touche-games__choice touche-games__choice--strip" onClick={() => setGame("strip")} data-testid="button-game-strip">
+            <span className="touche-games__choice-index">03 <small>{copy.number}</small></span>
+            <span className="touche-games__art-wrap"><StripMark /></span>
+            <span className="touche-games__choice-copy"><small className="touche-games__choice-mood">{copy.stripMood}</small><strong>{copy.strip}</strong><small>{copy.stripNote}</small></span>
+            <span className="touche-games__arrow" aria-hidden="true">↗</span>
+          </button>
         </section>
-
-        <footer className="tx-footer">
-          <strong>{extra.footerLead}</strong>
-          <span>{extra.footerNote}</span>
-        </footer>
+        <p className="touche-games__footnote"><span /> {lang === "ru" ? "Только для вас двоих" : lang === "hi" ? "सिर्फ़ आप दोनों के लिए" : lang === "pt" ? "Só para vocês dois" : lang === "es" ? "Solo para ustedes dos" : "Just for the two of you"}</p>
       </div>
     </main>
   );

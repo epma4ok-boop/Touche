@@ -275,6 +275,7 @@ export default function LovePathScreen({ lang, onBack }: { lang: Lang; onBack: (
          <span className="lp-header-mark" aria-hidden="true" />
       </header>
 
+      <div className="lp-experience">
       <section className="lp-intro">
         <p className="lp-eyebrow">TOUCHÉ · 18+</p>
         <h1>{labels.title}</h1>
@@ -389,6 +390,7 @@ export default function LovePathScreen({ lang, onBack }: { lang: Lang; onBack: (
           <button type="button" className="lp-primary lp-full" onClick={onBack} data-testid="button-love-path-finish">{isRu ? "Вернуться на главную" : "Back to home"}</button>
         </section>
       )}
+      </div>
       <footer className="lp-footer">{labels.pauseHint}</footer>
     </main>
   );

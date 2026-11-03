@@ -237,6 +237,7 @@ function TaskReveal({ text, color, visible, onDismiss, onGenerateAgain, lang, ca
   return (
     <div className={`task-reveal ${visible ? "is-visible" : ""}`} aria-hidden={!visible}>
       <div className="task-reveal__rule" style={{ background: `rgb(${color.r},${color.g},${color.b})` }} />
+      <div className="task-reveal__folio">
       <span className="task-reveal__label">{catLabel}</span>
       <p className="task-reveal__text" data-testid="text-task-result">{text}</p>
       {isTutorialDemo && (
@@ -264,6 +265,7 @@ function TaskReveal({ text, color, visible, onDismiss, onGenerateAgain, lang, ca
           </button>
         </div>
       )}
+      </div>
     </div>
   );
 }
@@ -543,7 +545,9 @@ export default function CategoryScreen({ lang, gender, category, onBack, onCateg
         <div className="category-pop__logo">Touch<em>é</em></div>
         <button data-testid="button-open-history" className="category-pop__history" onClick={() => setHistoryOpen(true)}>{t.history}</button>
       </header>
-      <div className="category-pop__content">
+       <div className="category-pop__content">
+        <div className="category-pop__layout">
+         <div className="category-pop__context">
         <section className="category-pop__hero">
           <span className="category-pop__stamp">{mode === "together" ? t.sharedTask : `18+ · ${t.lockSub}`}</span>
            <div className="category-pop__orb" style={{ backgroundImage: `url(/images/cat-${category}-art.svg)` }} aria-hidden="true" />
@@ -566,6 +570,7 @@ export default function CategoryScreen({ lang, gender, category, onBack, onCateg
             </div>
           )}
         {(remaining !== null || isPremium) && <div className="category-pop__remaining" data-testid="status-remaining">{remaining === null ? (lang === "ru" ? "Задания без ограничений" : "Unlimited tasks") : t.remaining(remaining)}</div>}
+         </div>
         <section className="category-pop__generator">
            <div className="category-pop__generator-head"><span>{t.hint}</span><b>{String(index + 1).padStart(2, "0")} / {String(CATEGORIES_ORDER.length).padStart(2, "0")}</b></div>
           <div className="category-pop__heartbeat" data-testid="tutorial-heartbeat-target">
@@ -573,19 +578,25 @@ export default function CategoryScreen({ lang, gender, category, onBack, onCateg
           </div>
           {errorKind && errorKind !== "subscription_required" && errorKind !== "limit_exceeded" && <div className="category-pop__error" role="alert" data-testid="status-task-error"><strong>{errorCopy[errorKind]}</strong>{errorKind === "unknown" && generatedErrorCode && <small>{generatedErrorCode}</small>}<button onClick={() => setErrorKind(null)}>{lang === "ru" ? "Понятно" : "Dismiss"}</button></div>}
         </section>
+        <aside className="category-pop__aside">
         <div className="category-pop__dots" aria-label="Categories">
            {CATEGORIES_ORDER.map((item) => <button key={item} data-testid={`button-category-${item}`} className={item === category ? "active" : ""} onClick={() => goToCategory(item)} style={{ background: item === category ? `rgb(${POP_COLORS[item].r},${POP_COLORS[item].g},${POP_COLORS[item].b})` : undefined }} aria-label={categoryLabel(item, t)} />)}
         </div>
         <p className="category-pop__hold-label">{t.holdHint}</p>
           {sensitive && !isPremium && onUpgrade && onBuyPremiumTask && <button className="category-pop__premium" data-testid="button-premium-category" onClick={openPremiumGate}><span>P</span><strong>Touché Premium</strong><small>{t.subTagline}</small><b>→</b></button>}
          <footer className="category-pop__footer"><strong>Touché</strong><span>{t.appSub}</span></footer>
+        </aside>
+        </div>
       </div>
       {(errorKind === "subscription_required" || errorKind === "limit_exceeded") && (
         <div className="category-paywall-backdrop" role="presentation" onClick={() => { if (!paywallBusy) setErrorKind(null); }}>
           <section className="category-paywall" role="dialog" aria-modal="true" aria-labelledby="category-paywall-title" onClick={(event) => event.stopPropagation()}>
-            <div className="category-paywall__topline"><span>18+ · Touché</span><button type="button" aria-label={paywallCopy.close} onClick={() => { setErrorKind(null); setPaywallNotice(null); }} disabled={!!paywallBusy}>×</button></div>
-            <h2 id="category-paywall-title">{paywallCopy.title}</h2>
-            <p>{paywallCopy.description}</p>
+            <header className="category-paywall__topline"><span>18+ · Touché</span><button type="button" aria-label={paywallCopy.close} onClick={() => { setErrorKind(null); setPaywallNotice(null); }} disabled={!!paywallBusy}>×</button></header>
+            <div className="category-paywall__letter">
+              <span className="category-paywall__index">{String(index + 1).padStart(2, "0")} / 05</span>
+              <h2 id="category-paywall-title">{paywallCopy.title}</h2>
+              <p>{paywallCopy.description}</p>
+            </div>
             {errorKind === "subscription_required" && !isPremium && <button className="category-paywall__offer category-paywall__offer--premium" data-testid="button-buy-premium" onClick={() => void choosePremiumAccess("premium")} disabled={!!paywallBusy}>
               <strong>{paywallBusy === "premium" ? paywallCopy.working : paywallCopy.premiumTitle}</strong>
               <small>{paywallCopy.premiumDetails}</small>

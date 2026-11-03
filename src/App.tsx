@@ -15,6 +15,7 @@ import LovePathScreen from "@/pages/LovePathScreen";
 import GamesScreen from "@/pages/GamesScreen";
 import TarotScreen from "@/pages/TarotScreen";
 import "./interface.css";
+import "./composition.css";
 
 type AppPhase = "splash" | "lang" | "onboarding" | "gender" | "home" | "category" | "scenario" | "shared_task_error" | "love_path" | "games" | "tarot";
 export type AppMode = "solo" | "together";

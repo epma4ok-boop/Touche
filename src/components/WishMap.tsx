@@ -796,7 +796,7 @@ export default function WishMap({ lang, coupleId, refreshKey, onOpenTask }: Wish
 
   return (
     <>
-    <section className="wm-shell">
+    <section className="wm-shell wm-editorial" data-testid="section-wish-diary">
       <style>{`
         .wm-shell{--wm-paper:#fffaf3;--wm-ink:#162238;--wm-muted:#657080;--wm-coral:#ff6f61;--wm-line:rgba(22,34,56,.12);position:relative;isolation:isolate;overflow:hidden;border:1px solid rgba(22,34,56,.08);border-radius:22px;background:var(--wm-paper);color:var(--wm-ink);box-shadow:0 10px 28px rgba(36,44,58,.08);font-family:'DM Sans',sans-serif}
         .wm-shell:before{content:"";position:absolute;z-index:-1;right:-46px;top:-88px;width:210px;height:210px;border-radius:50%;background:radial-gradient(circle,rgba(255,111,97,.13),rgba(255,111,97,0) 68%);pointer-events:none}

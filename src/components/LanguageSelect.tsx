@@ -67,6 +67,9 @@ export default function LanguageSelect({ currentLang, onSelect, onCancel }: Lang
   return (
     <div className="pop-screen" data-testid="screen-language">
       <div className="pop-screen__inner language-picker pop-fade" data-mounted={mounted}>
+        <div className="language-picker__folio" aria-hidden="true">
+          <span>TOUCHÉ / 01</span><i /><span>01 — {String(LANGUAGES.length).padStart(2, "0")}</span>
+        </div>
         <header className="language-picker__header">
           <div className="pop-brand">Touché<em>.</em></div>
           <h1 className="language-picker__title">{pickerTitle}</h1>
@@ -76,6 +79,8 @@ export default function LanguageSelect({ currentLang, onSelect, onCancel }: Lang
           <p className="language-picker__instruction">{pickerInstruction}</p>
         </header>
 
+        <section className="language-picker__selection">
+        <div className="language-picker__selection-heading"><span>01—05</span><span>{copyLang ? PICKER_COPY[copyLang].instruction : "·"}</span></div>
         <fieldset className="language-picker__table" aria-label="Available languages">
           {LANGUAGES.map(({ lang, code, native, english }) => (
             <label
@@ -104,6 +109,7 @@ export default function LanguageSelect({ currentLang, onSelect, onCancel }: Lang
             </label>
           ))}
         </fieldset>
+        </section>
 
         <div className="language-picker__actions">
           {onCancel && currentLang && (

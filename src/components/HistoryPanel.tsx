@@ -62,19 +62,19 @@ export default function HistoryPanel({ entries, open, onClose, accentRgb, lang }
 
   return (
     <>
-      <div data-testid="history-backdrop" style={{ position:"absolute",inset:0,zIndex:20,background:"rgba(22,34,56,0.22)",opacity:open?1:0,pointerEvents:open?"auto":"none",transition:"opacity 0.35s",backdropFilter:open?"blur(4px)":"none" }} onClick={onClose} />
-      <div ref={panelRef} data-testid="panel-history" className="pop-panel" style={{ position:"absolute",bottom:0,left:0,right:0,zIndex:25,maxHeight:"72vh",borderRadius:"22px 22px 0 0",background:"var(--pop-paper)",borderTop:`2px solid rgba(${r},${g},${b},0.35)`,boxShadow:"0 -8px 0 rgba(255,111,97,.22)",transform:open?"translateY(0)":"translateY(110%)",transition:"transform 0.42s cubic-bezier(0.32,0.72,0,1)",display:"flex",flexDirection:"column" }}>
-        <div style={{ display:"flex",justifyContent:"center",paddingTop:12,paddingBottom:4 }}>
+      <div className="history-backdrop" data-testid="history-backdrop" style={{ position:"absolute",inset:0,zIndex:20,background:"rgba(22,34,56,0.22)",opacity:open?1:0,pointerEvents:open?"auto":"none",transition:"opacity 0.35s",backdropFilter:open?"blur(4px)":"none" }} onClick={onClose} />
+      <section ref={panelRef} data-testid="panel-history" className="pop-panel history-panel" role="dialog" aria-modal={open} aria-label={t.history} aria-hidden={!open} inert={!open} style={{ position:"absolute",bottom:0,left:0,right:0,zIndex:25,maxHeight:"72vh",borderRadius:"22px 22px 0 0",background:"var(--pop-paper)",borderTop:`2px solid rgba(${r},${g},${b},0.35)`,boxShadow:"0 -8px 0 rgba(255,111,97,.22)",transform:open?"translateY(0)":"translateY(110%)",transition:"transform 0.42s cubic-bezier(0.32,0.72,0,1)",display:"flex",flexDirection:"column" }}>
+        <div className="history-grab" style={{ display:"flex",justifyContent:"center",paddingTop:12,paddingBottom:4 }}>
           <div style={{ width:34,height:3,borderRadius:99,background:`rgba(${r},${g},${b},0.18)` }} />
         </div>
-        <div style={{ display:"flex",justifyContent:"space-between",alignItems:"baseline",padding:"10px 22px 14px" }}>
+        <header className="history-heading" style={{ display:"flex",justifyContent:"space-between",alignItems:"baseline",padding:"10px 22px 14px" }}>
           <div>
-            <span style={{ fontFamily:"'Plus Jakarta Sans','DM Sans',sans-serif",fontWeight:700,fontSize:20,color:"rgba(40,30,50,0.85)",letterSpacing:"-0.02em" }}>{t.history}</span>
-            <span style={{ fontFamily:"'Plus Jakarta Sans','DM Sans',sans-serif",fontWeight:300,fontSize:11,color:`rgba(${r},${g},${b},0.55)`,letterSpacing:"0.10em",textTransform:"uppercase",marginLeft:10 }}>{t.historyCount(entries.length)}</span>
+            <span className="history-title" style={{ fontFamily:"'DM Sans',sans-serif",fontWeight:700,fontSize:20,color:"rgba(40,30,50,0.85)",letterSpacing:"-0.02em" }}>{t.history}</span>
+            <span className="history-count" style={{ fontFamily:"'DM Sans',sans-serif",fontWeight:300,fontSize:11,color:`rgba(${r},${g},${b},0.55)`,letterSpacing:"0.10em",textTransform:"uppercase",marginLeft:10 }}>{t.historyCount(entries.length)}</span>
           </div>
-          <button data-testid="button-history-close" onClick={onClose} style={{ background:"transparent",border:"none",cursor:"pointer",fontFamily:"'DM Sans',sans-serif",fontWeight:700,fontSize:12,letterSpacing:"0.10em",textTransform:"uppercase",color:"var(--pop-coral)" }}>{t.panelClose}</button>
-        </div>
-        <div style={{ overflowY:"auto",flex:1,paddingBottom:24 }}>
+          <button className="history-close" data-testid="button-history-close" onClick={onClose} style={{ background:"transparent",border:"none",cursor:"pointer",fontFamily:"'DM Sans',sans-serif",fontWeight:700,fontSize:12,letterSpacing:"0.10em",textTransform:"uppercase",color:"var(--pop-coral)" }}>{t.panelClose}</button>
+        </header>
+        <div className="history-list" style={{ overflowY:"auto",flex:1,paddingBottom:24 }}>
           {entries.length === 0 ? (
             <div style={{ textAlign:"center",padding:"40px 24px" }}>
               <p style={{ fontFamily:"'Plus Jakarta Sans','DM Sans',sans-serif",fontWeight:600,fontSize:18,color:"rgba(40,30,50,0.25)",margin:0,letterSpacing:"-0.01em" }}>{t.historyEmpty}</p>
@@ -84,18 +84,18 @@ export default function HistoryPanel({ entries, open, onClose, accentRgb, lang }
             [...entries].reverse().map(entry => {
               const catCfg = CATEGORY_CONFIG[entry.category];
               return (
-                <div key={entry.id} style={{ padding:"14px 22px",borderBottom:"0.5px solid rgba(40,30,50,0.06)" }}>
+                <article className="history-entry" key={entry.id} style={{ padding:"14px 22px",borderBottom:"0.5px solid rgba(40,30,50,0.06)" }}>
                   <div style={{ display:"flex",justifyContent:"space-between",marginBottom:6 }}>
                     <span style={{ fontFamily:"'Plus Jakarta Sans','DM Sans',sans-serif",fontWeight:500,fontSize:10,letterSpacing:"0.12em",textTransform:"uppercase",color:`rgba(${catCfg.r},${catCfg.g},${catCfg.b},0.70)` }}>{getCatLabel(entry.category, t)}</span>
                     <span style={{ fontFamily:"'Plus Jakarta Sans','DM Sans',sans-serif",fontWeight:300,fontSize:10,color:"rgba(40,30,50,0.28)",letterSpacing:"0.04em" }}>{formatDate(entry.date, lang, t)}</span>
                   </div>
                   <p style={{ fontFamily:"'Plus Jakarta Sans','DM Sans',sans-serif",fontWeight:400,fontSize:15,color:"rgba(40,30,50,0.78)",margin:0,lineHeight:1.55 }}>{entry.text}</p>
-                </div>
+                </article>
               );
             })
           )}
         </div>
-      </div>
+      </section>
     </>
   );
 }

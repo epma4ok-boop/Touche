@@ -316,6 +316,7 @@ export default function FirstRunTutorial({ lang, step, suspended = false, onStar
         aria-describedby="first-run-tour-description"
         data-testid="tutorial-dialog"
       >
+        <div className="first-run-tour__side-index" aria-hidden="true"><span>TOUCHÉ</span><i /><span>{String(step).padStart(2, "0")}</span></div>
         <div className="first-run-tour__topline">
           <span className="first-run-tour__brand">Touché <i>·</i> {copy.step} {String(step).padStart(2, "0")} / 05</span>
           <button ref={skipRef} type="button" className="first-run-tour__skip" onClick={onSkip} data-testid="tutorial-skip">

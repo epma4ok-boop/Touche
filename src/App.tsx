@@ -13,8 +13,9 @@ import FirstRunTutorial, { type TutorialStep } from "@/components/FirstRunTutori
 import { trackAnalyticsEvent } from "@/analytics";
 import LovePathScreen from "@/pages/LovePathScreen";
 import GamesScreen from "@/pages/GamesScreen";
+import TarotScreen from "@/pages/TarotScreen";
 
-type AppPhase = "splash" | "lang" | "onboarding" | "gender" | "home" | "category" | "scenario" | "shared_task_error" | "love_path" | "games";
+type AppPhase = "splash" | "lang" | "onboarding" | "gender" | "home" | "category" | "scenario" | "shared_task_error" | "love_path" | "games" | "tarot";
 export type AppMode = "solo" | "together";
 
 const COUPLE_ID_KEY = "touche_couple_id";
@@ -639,10 +640,14 @@ export default function App() {
              onTutorialModeSelected={() => setTutorialStep((current) => current === 2 ? 3 : current)}
             onLovePathOpen={() => setPhase("love_path")}
             onGamesOpen={() => setPhase("games")}
+            onTarotOpen={() => setPhase("tarot")}
           />
         )}
         {phase === "games" && (
           <GamesScreen lang={lang} onBack={() => setPhase("home")} />
+        )}
+        {phase === "tarot" && (
+          <TarotScreen lang={lang} onBack={() => setPhase("home")} />
         )}
         {phase === "love_path" && (
           <LovePathScreen

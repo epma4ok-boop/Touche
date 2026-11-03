@@ -3,11 +3,11 @@ import type { CSSProperties } from "react";
 import type { Lang } from "@/data/i18n";
 import WheelScreen from "./LotteryScreen";
 import DiceScreen from "./DiceScreen";
-import TarotScreen from "./TarotScreen";
+import StripGameScreen from "./StripGameScreen";
 import useTelegramTopInset from "./useTelegramTopInset";
 import "./GamesScreen.css";
 
-type Game = "wheel" | "dice" | "tarot";
+type Game = "wheel" | "dice" | "strip";
 type Props = { lang: Lang; onBack: () => void };
 
 const COPY: Record<Lang, {
@@ -15,42 +15,42 @@ const COPY: Record<Lang, {
   wheel: string; wheelNote: string; wheelMood: string;
   dice: string; diceNote: string; diceMood: string;
   back: string; number: string;
-  tarot: string; tarotNote: string; tarotMood: string;
+  strip: string; stripNote: string; stripMood: string;
 }> = {
   ru: {
     title: "Игры", subtitle: "Выберите, с чего начнётся ваш вечер.",
     wheel: "Колесо поз", wheelNote: "Двадцать вариантов — один выбор", wheelMood: "ДВИЖЕНИЕ",
     dice: "Кубики действий", diceNote: "Два броска — новый повод сблизиться", diceMood: "ИМПУЛЬС",
     back: "Назад", number: "Игра",
-    tarot: "Таро для двоих", tarotNote: "Три карты. Один честный разговор.", tarotMood: "БЛИЗОСТЬ",
+    strip: "Стрип или действие", stripNote: "Пять уровней. Только ваш выбор.", stripMood: "ИГРА 18+",
   },
   en: {
     title: "Games", subtitle: "Choose how your evening begins.",
     wheel: "Wheel of poses", wheelNote: "Twenty possibilities, one shared choice", wheelMood: "MOVEMENT",
     dice: "Action dice", diceNote: "Two rolls to bring you closer", diceMood: "SPONTANEITY",
     back: "Back", number: "Game",
-    tarot: "Tarot for two", tarotNote: "Three cards. One honest conversation.", tarotMood: "CONNECTION",
+    strip: "Strip or dare", stripNote: "Five levels. Your next move.", stripMood: "GAME 18+",
   },
   hi: {
     title: "खेल", subtitle: "चुनें, आपकी शाम कैसे शुरू होगी।",
     wheel: "पोज़ का पहिया", wheelNote: "बीस विकल्प, एक साझा चुनाव", wheelMood: "क़रीबी",
     dice: "क्रिया के पासे", diceNote: "दो दाँव, और भी क़रीब आने का नया बहाना", diceMood: "रोमांच",
     back: "वापस", number: "खेल",
-    tarot: "दो के लिए टैरो", tarotNote: "तीन कार्ड। एक सच्ची बातचीत।", tarotMood: "जुड़ाव",
+    strip: "स्ट्रिप या डेयर", stripNote: "पाँच स्तर। अगला कदम आपका।", stripMood: "18+ खेल",
   },
   pt: {
     title: "Jogos", subtitle: "Escolham como a noite vai começar.",
     wheel: "Roleta das poses", wheelNote: "Vinte opções, uma escolha a dois", wheelMood: "MOVIMENTO",
     dice: "Dados de ação", diceNote: "Dois lançamentos para aproximar vocês", diceMood: "SURPRESA",
     back: "Voltar", number: "Jogo",
-    tarot: "Tarô para dois", tarotNote: "Três cartas. Uma conversa sincera.", tarotMood: "CONEXÃO",
+    strip: "Tire ou ouse", stripNote: "Cinco níveis. A próxima escolha é sua.", stripMood: "JOGO 18+",
   },
   es: {
     title: "Juegos", subtitle: "Elijan cómo empieza su noche.",
     wheel: "Ruleta de posturas", wheelNote: "Veinte opciones, una elección compartida", wheelMood: "MOVIMIENTO",
     dice: "Dados de acción", diceNote: "Dos lanzamientos para acercarse", diceMood: "SORPRESA",
     back: "Volver", number: "Juego",
-    tarot: "Tarot para dos", tarotNote: "Tres cartas. Una conversación sincera.", tarotMood: "CONEXIÓN",
+    strip: "Quítate o atrévete", stripNote: "Cinco niveles. Tú eliges el siguiente paso.", stripMood: "JUEGO 18+",
   },
 };
 
@@ -74,12 +74,12 @@ function CubeMark() {
   );
 }
 
-function TarotMark() {
+function StripMark() {
   return (
-    <svg viewBox="0 0 100 100" aria-hidden="true" className="touche-games__tarot-mark">
-      <rect x="20" y="16" width="38" height="62" rx="5" transform="rotate(-12 39 47)" />
-      <rect x="42" y="22" width="38" height="62" rx="5" transform="rotate(10 61 53)" />
-      <circle cx="61" cy="53" r="9" />
+    <svg viewBox="0 0 100 100" aria-hidden="true" className="touche-games__strip-mark">
+      <path d="M36 24 50 16l14 8 14 10-9 12-8-5v35H39V41l-8 5-9-12 14-10Z" />
+      <path d="M38 56h24M38 66h24M38 76h24" />
+      <circle cx="50" cy="10" r="4" />
     </svg>
   );
 }
@@ -89,8 +89,8 @@ export default function GamesScreen({ lang, onBack }: Props) {
   const top = useTelegramTopInset();
   const copy = COPY[lang];
   if (game === "wheel") return <WheelScreen lang={lang} onBack={() => setGame(null)} />;
-  if (game === "tarot") return <TarotScreen lang={lang} onBack={() => setGame(null)} />;
   if (game === "dice") return <DiceScreen lang={lang} onBack={() => setGame(null)} />;
+  if (game === "strip") return <StripGameScreen lang={lang} onBack={() => setGame(null)} />;
 
   return (
     <main className="touche-games" style={{ "--games-top": `${top}px` } as CSSProperties}>
@@ -120,10 +120,10 @@ export default function GamesScreen({ lang, onBack }: Props) {
             <span className="touche-games__choice-copy"><small className="touche-games__choice-mood">{copy.diceMood}</small><strong>{copy.dice}</strong><small>{copy.diceNote}</small></span>
             <span className="touche-games__arrow" aria-hidden="true">↗</span>
           </button>
-          <button type="button" className="touche-games__choice touche-games__choice--tarot" onClick={() => setGame("tarot")} data-testid="button-game-tarot">
+          <button type="button" className="touche-games__choice touche-games__choice--strip" onClick={() => setGame("strip")} data-testid="button-game-strip">
             <span className="touche-games__choice-index">03 <small>{copy.number}</small></span>
-            <span className="touche-games__art-wrap"><TarotMark /></span>
-            <span className="touche-games__choice-copy"><small className="touche-games__choice-mood">{copy.tarotMood}</small><strong>{copy.tarot}</strong><small>{copy.tarotNote}</small></span>
+            <span className="touche-games__art-wrap"><StripMark /></span>
+            <span className="touche-games__choice-copy"><small className="touche-games__choice-mood">{copy.stripMood}</small><strong>{copy.strip}</strong><small>{copy.stripNote}</small></span>
             <span className="touche-games__arrow" aria-hidden="true">↗</span>
           </button>
         </section>

@@ -53,6 +53,7 @@ interface HomeProps {
   onTutorialModeSelected?: () => void;
   onLovePathOpen: () => void;
   onGamesOpen: () => void;
+  onTarotOpen: () => void;
 }
 
 function useTelegramTopInset(): number {
@@ -1140,7 +1141,7 @@ export default function Home({
   onCategorySelect, onScenarioOpen, onOpenSharedTask, onLanguageOpen, onGenderSwitch,
   onModeChange,
   onLinkCouple, onUnlinkCouple, onSubscribe, onTutorialPairFlow, onTutorialModeSelected,
-  onLovePathOpen, onGamesOpen,
+  onLovePathOpen, onGamesOpen, onTarotOpen,
 }: HomeProps) {
   const t = UI[lang];
   const [mounted, setMounted] = useState(false);
@@ -1362,9 +1363,13 @@ export default function Home({
                 <img className="pop-entry-action__art" src="/images/cat-invite-art.svg" alt="" aria-hidden="true" />
                 <span className="pop-entry-action__index">03</span><span className="pop-entry-action__copy"><strong>{lang === "ru" ? "Путь любви" : lang === "hi" ? "प्यार का путь" : lang === "pt" ? "Caminho do amor" : lang === "es" ? "Camino del amor" : "Love Path"}</strong><small>{lang === "ru" ? "Семь шагов навстречу друг другу" : lang === "hi" ? "एक-दूसरे के करीब सात कदम" : lang === "pt" ? "Sete passos para se aproximarem" : lang === "es" ? "Siete pasos para acercarse" : "Seven small steps closer"}</small></span><span className="pop-entry-action__arrow" aria-hidden="true">↗</span>
               </button>
+              <button type="button" className="pop-entry-action pop-entry-action--tarot" onClick={onTarotOpen} data-testid="button-open-tarot">
+                <img className="pop-entry-action__art" src="/images/tarot/card-back.png" alt="" aria-hidden="true" />
+                <span className="pop-entry-action__index">04</span><span className="pop-entry-action__copy"><strong>{lang === "ru" ? "Таро для двоих" : lang === "hi" ? "दो के लिए टैरो" : lang === "pt" ? "Tarô para dois" : lang === "es" ? "Tarot para dos" : "Tarot for two"}</strong><small>{lang === "ru" ? "Три карты. Один честный разговор." : lang === "hi" ? "तीन कार्ड। एक सच्ची बातचीत।" : lang === "pt" ? "Três cartas. Uma conversa sincera." : lang === "es" ? "Tres cartas. Una conversación sincera." : "Three cards. One honest conversation."}</small></span><span className="pop-entry-action__arrow" aria-hidden="true">↗</span>
+              </button>
               <button type="button" className="pop-entry-action pop-entry-action--lottery" onClick={onGamesOpen} data-testid="button-open-games">
                 <img className="pop-entry-action__art" src="/images/home-wheel-art.svg" alt="" aria-hidden="true" />
-                <span className="pop-entry-action__index">04</span><span className="pop-entry-action__copy"><strong>{lang === "ru" ? "Игры" : lang === "hi" ? "खेल" : lang === "pt" ? "Jogos" : lang === "es" ? "Juegos" : "Games"}</strong><small>18+ · {lang === "ru" ? "Колесо и кости для двоих" : lang === "hi" ? "आप दोनों के लिए व्हील और पासे" : lang === "pt" ? "Roda e dados para dois" : lang === "es" ? "Rueda y dados para dos" : "Wheel and dice for two"}</small></span><span className="pop-entry-action__arrow" aria-hidden="true">↗</span>
+                <span className="pop-entry-action__index">05</span><span className="pop-entry-action__copy"><strong>{lang === "ru" ? "Игры" : lang === "hi" ? "खेल" : lang === "pt" ? "Jogos" : lang === "es" ? "Juegos" : "Games"}</strong><small>18+ · {lang === "ru" ? "Колесо, кубики и игра для двоих" : lang === "hi" ? "व्हील, पासे और आप दोनों के लिए खेल" : lang === "pt" ? "Roleta, dados e jogo para dois" : lang === "es" ? "Ruleta, dados y juego para dos" : "Wheel, dice and a two-player game"}</small></span><span className="pop-entry-action__arrow" aria-hidden="true">↗</span>
               </button>
             </div>
           </div>

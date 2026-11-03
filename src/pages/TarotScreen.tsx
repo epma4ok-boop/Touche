@@ -43,7 +43,7 @@ type Copy = {
 
 const COPY: Record<Lang, Copy> = {
   ru: {
-    title: "Таро для двоих", back: "Назад к играм",
+    title: "Таро для двоих", back: "На главную",
     lead: "Три карты — три слоя одной встречи. Вы открываете их по очереди и говорите о каждой, прежде чем идти дальше.",
     positionsHead: "Три позиции",
     positions: ["Что видите — но не говорите", "Что чувствуете — но не показываете", "Что хотите — но не просите"],
@@ -56,11 +56,11 @@ const COPY: Record<Lang, Copy> = {
     pause: "Сделайте паузу. Пусть выскажутся оба. Говорите от себя: «я чувствую», «мне важно».",
     discussed: "Мы обсудили — дальше", toReflection: "Мы обсудили — к итогу",
     reflectionHead: "Последний вопрос", reflectionNote: "Ответьте вслух, каждый по очереди. Ничего не нужно записывать.",
-    finish: "Завершить", doneHead: "Ваш расклад", doneNote: "Спасибо, что выслушали друг друга.", newSpread: "Новый расклад", toGames: "К играм",
+    finish: "Завершить", doneHead: "Ваш расклад", doneNote: "Спасибо, что выслушали друг друга.", newSpread: "Новый расклад", toGames: "На главную",
     loading: "Загружаем изображение", imgError: "Изображение не загрузилось.", retry: "Повторить", authorNote: "", artAlt: "Иллюстрация карты",
   },
   en: {
-    title: "Tarot for two", back: "Back to games",
+    title: "Tarot for two", back: "Home",
     lead: "Three cards, three layers of one conversation. Open them one at a time and talk about each before moving on.",
     positionsHead: "Three positions",
     positions: ["What you see but don't say", "What you feel but don't show", "What you want but don't ask for"],
@@ -73,12 +73,12 @@ const COPY: Record<Lang, Copy> = {
     pause: "Pause. Let both of you speak. Use I statements: \"I feel\", \"it matters to me\".",
     discussed: "We've discussed it, next", toReflection: "We've discussed it, to the closing",
     reflectionHead: "Closing question", reflectionNote: "Answer aloud, one at a time. Nothing is recorded.",
-    finish: "Finish", doneHead: "Your spread", doneNote: "Thank you for hearing each other.", newSpread: "New spread", toGames: "To games",
+    finish: "Finish", doneHead: "Your spread", doneNote: "Thank you for hearing each other.", newSpread: "New spread", toGames: "Home",
     loading: "Loading image", imgError: "The image didn't load.", retry: "Retry",
     authorNote: "Card names and the closing question remain in Russian, as in the original.", artAlt: "Card illustration",
   },
   hi: {
-    title: "दो के लिए टैरो", back: "खेलों पर वापस",
+    title: "दो के लिए टैरो", back: "होम",
     lead: "तीन कार्ड, एक बातचीत की तीन परतें। उन्हें एक-एक करके खोलें और आगे बढ़ने से पहले हर एक पर बात करें।",
     positionsHead: "तीन स्थितियाँ",
     positions: ["जो आप देखते हैं पर कहते नहीं", "जो आप महसूस करते हैं पर दिखाते नहीं", "जो आप चाहते हैं पर माँगते नहीं"],
@@ -91,12 +91,12 @@ const COPY: Record<Lang, Copy> = {
     pause: "रुकें। दोनों को बोलने दें। \"मैं\" से वाक्य शुरू करें।",
     discussed: "हमने बात कर ली, आगे", toReflection: "हमने बात कर ली, समापन",
     reflectionHead: "अंतिम प्रश्न", reflectionNote: "बारी-बारी से ज़ोर से जवाब दें। कुछ भी दर्ज नहीं होता।",
-    finish: "समाप्त", doneHead: "आपका स्प्रेड", doneNote: "एक-दूसरे को सुनने के लिए धन्यवाद।", newSpread: "नया स्प्रेड", toGames: "खेलों पर",
+    finish: "समाप्त", doneHead: "आपका स्प्रेड", doneNote: "एक-दूसरे को सुनने के लिए धन्यवाद।", newSpread: "नया स्प्रेड", toGames: "होम",
     loading: "छवि लोड हो रही है", imgError: "छवि लोड नहीं हुई।", retry: "फिर कोशिश करें",
     authorNote: "मूल रूप में कार्डों के नाम और अंतिम प्रश्न रूसी में ही रखे गए हैं।", artAlt: "कार्ड चित्र",
   },
   pt: {
-    title: "Tarô para dois", back: "Voltar aos jogos",
+    title: "Tarô para dois", back: "Início",
     lead: "Três cartas, três camadas de uma conversa. Abram uma de cada vez e conversem sobre cada uma antes de seguir.",
     positionsHead: "Três posições",
     positions: ["O que veem, mas não dizem", "O que sentem, mas não mostram", "O que querem, mas não pedem"],
@@ -109,12 +109,12 @@ const COPY: Record<Lang, Copy> = {
     pause: "Pausa. Deixem os dois falarem. Usem frases com \"eu\".",
     discussed: "Conversamos, próxima", toReflection: "Conversamos, ao fechamento",
     reflectionHead: "Pergunta final", reflectionNote: "Respondam em voz alta, um de cada vez. Nada é registrado.",
-    finish: "Concluir", doneHead: "Sua tiragem", doneNote: "Obrigado por se ouvirem.", newSpread: "Nova tiragem", toGames: "Aos jogos",
+    finish: "Concluir", doneHead: "Sua tiragem", doneNote: "Obrigado por se ouvirem.", newSpread: "Nova tiragem", toGames: "Início",
     loading: "Carregando imagem", imgError: "A imagem não carregou.", retry: "Tentar de novo",
     authorNote: "Os nomes das cartas e a pergunta final permanecem em russo, como no original.", artAlt: "Ilustração da carta",
   },
   es: {
-    title: "Tarot para dos", back: "Volver a juegos",
+    title: "Tarot para dos", back: "Inicio",
     lead: "Tres cartas, tres capas de una conversación. Ábranlas una a una y hablen de cada una antes de seguir.",
     positionsHead: "Tres posiciones",
     positions: ["Lo que ven pero no dicen", "Lo que sienten pero no muestran", "Lo que quieren pero no piden"],
@@ -127,7 +127,7 @@ const COPY: Record<Lang, Copy> = {
     pause: "Pausa. Que hablen los dos. Usen frases en primera persona.",
     discussed: "Ya lo hablamos, siguiente", toReflection: "Ya lo hablamos, al cierre",
     reflectionHead: "Pregunta final", reflectionNote: "Respondan en voz alta, por turnos. No se guarda nada.",
-    finish: "Terminar", doneHead: "Su tirada", doneNote: "Gracias por escucharse.", newSpread: "Nueva tirada", toGames: "A juegos",
+    finish: "Terminar", doneHead: "Su tirada", doneNote: "Gracias por escucharse.", newSpread: "Nueva tirada", toGames: "Inicio",
     loading: "Cargando imagen", imgError: "La imagen no se cargó.", retry: "Reintentar",
     authorNote: "Los nombres de las cartas y la pregunta final se mantienen en ruso, como en el original.", artAlt: "Ilustración de la carta",
   },
@@ -295,7 +295,7 @@ export default function TarotScreen({ lang, onBack }: Props) {
         </ol>
         <p className="tarot__hint">{copy.doneNote}</p>
         <button type="button" className="tarot-btn" onClick={start} data-testid="button-tarot-restart">{copy.newSpread}</button>
-        <button type="button" className="tarot-btn tarot-btn--ghost" onClick={onBack} data-testid="button-tarot-to-games">{copy.toGames}</button>
+        <button type="button" className="tarot-btn tarot-btn--ghost" onClick={onBack} data-testid="button-tarot-to-home">{copy.toGames}</button>
       </section>
     );
   }

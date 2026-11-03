@@ -466,6 +466,7 @@
 .pop-entry-action--together { background: #f3e4e8; }
 .pop-entry-action--path { background: #e9e9f2; }
 .pop-entry-action--lottery { background: #f7ddd3; }
+.pop-entry-action--tarot { background: #f0dce9; }
 .pop-entry-action__index {
   align-self: stretch;
   display: grid;
@@ -662,6 +663,7 @@
 .pop-entry-action--together { background: #e5e9ff !important; }
 .pop-entry-action--path { background: #ffe4d8 !important; }
 .pop-entry-action--lottery { background: #e5cbd9 !important; }
+.pop-entry-action--tarot { background: #e9d5e8 !important; }
 @media (max-width: 380px) {
   .pop-entry-actions { gap: 10px; }
   .pop-home .pop-entry-action { padding: 10px; border-radius: 16px; }

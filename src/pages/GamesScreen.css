@@ -100,12 +100,12 @@
 .touche-games__choice::after { content: ""; position: absolute; width: 236px; height: 236px; right: -74px; top: -100px; border: 1px solid rgba(255,246,231,.16); border-radius: 50%; box-shadow: 0 0 0 18px rgba(255,246,231,.045), 0 0 0 40px rgba(255,246,231,.03), 0 0 0 65px rgba(255,246,231,.02); pointer-events: none; }
 .touche-games__choice-index { z-index: 1; align-self: start; font: 600 11px "Space Grotesk", sans-serif; letter-spacing: .1em; opacity: .85; }
 .touche-games__choice-index small { margin-left: 7px; font: 600 8px "DM Sans", sans-serif; letter-spacing: .16em; text-transform: uppercase; opacity: .7; }
-.touche-games__art-wrap { position: absolute; top: 18px; right: 19px; width: 128px; height: 128px; display: grid; place-items: center; border: 1px solid rgba(255,248,235,.2); border-radius: 50%; background: rgba(255,244,232,.075); box-shadow: inset 0 0 0 8px rgba(255,244,232,.035); }
-.touche-games__wheel-mark { width: 86px; overflow: visible; fill: rgba(255,231,216,.67); stroke: rgba(255,244,232,.67); stroke-width: 1.5; }
+.touche-games__art-wrap { position: absolute; top: 18px; right: 19px; width: 88px; height: 88px; display: grid; place-items: center; border: 1px solid rgba(255,248,235,.2); border-radius: 50%; background: rgba(255,244,232,.075); box-shadow: inset 0 0 0 5px rgba(255,244,232,.035); }
+.touche-games__wheel-mark { width: 58px; overflow: visible; fill: rgba(255,231,216,.67); stroke: rgba(255,244,232,.67); stroke-width: 1.5; }
 .touche-games__wheel-mark > circle:first-child { fill: none; }
 .touche-games__wheel-mark path:nth-of-type(even) { fill: rgba(255,255,255,.36); }
 .touche-games__wheel-center { fill: #f6e6d8; stroke: #7c2442; stroke-width: 2; }
-.touche-games__cube-mark { width: 88px; fill: rgba(255,250,241,.28); stroke: #6a3947; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.touche-games__cube-mark { width: 60px; fill: rgba(255,250,241,.28); stroke: #6a3947; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 .touche-games__choice-copy { z-index: 1; align-self: end; grid-column: 1 / -1; display: flex; flex-direction: column; align-items: flex-start; gap: 5px; max-width: 100%; }
 .touche-games__choice-copy .touche-games__choice-mood { margin-bottom: 1px; font-size: 9px; font-weight: 700; letter-spacing: .18em; opacity: .72; }
 .touche-games__choice-copy strong { max-width: 100%; font: 700 clamp(23px, 7.1vw, 30px)/1.04 "Space Grotesk", sans-serif; letter-spacing: -.055em; }
@@ -118,7 +118,7 @@
   .touche-games__body { padding: 25px 16px max(18px, env(safe-area-inset-bottom)); }
   .touche-games__choices { gap: 12px; margin-top: 30px; }
   .touche-games__choice { min-height: 184px; padding: 18px; }
-  .touche-games__art-wrap { width: 108px; height: 108px; right: 14px; top: 17px; }
+  .touche-games__art-wrap { width: 76px; height: 76px; right: 14px; top: 17px; }
 }
 @media (max-height: 700px) {
   .touche-games__body { padding-top: 13px; }
@@ -130,7 +130,7 @@
   .touche-games *, .touche-games *::before, .touche-games *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
 }
 .touche-games__choice--strip { background: radial-gradient(ellipse at 82% 22%, rgba(239,212,224,.16), transparent 45%), linear-gradient(135deg, #281e39, #552845 62%, #8b405e); }
-.touche-games__strip-mark { width: 88px; fill: rgba(255,240,228,.16); stroke: rgba(255,236,222,.75); stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+.touche-games__strip-mark { width: 60px; fill: rgba(255,240,228,.16); stroke: rgba(255,236,222,.75); stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
 
 /* Give the wheel the lead on wider screens; the other two experiences orbit
    it as a deliberate pair. Phones retain a single, comfortable scroll column. */
@@ -175,23 +175,23 @@
   .touche-games__choice--wheel .touche-games__art-wrap {
     top: 50%;
     right: 24px;
-    width: clamp(154px, 22vw, 214px);
-    height: clamp(154px, 22vw, 214px);
+    width: clamp(112px, 15vw, 142px);
+    height: clamp(112px, 15vw, 142px);
     transform: translateY(-56%);
   }
-  .touche-games__choice--wheel .touche-games__wheel-mark { width: 64%; }
+  .touche-games__choice--wheel .touche-games__wheel-mark { width: 58%; }
   .touche-games__choice--wheel .touche-games__choice-copy strong { font-size: clamp(32px, 4vw, 48px); }
   .touche-games__choice--dice { grid-column: 2; grid-row: 1; }
   .touche-games__choice--strip { grid-column: 2; grid-row: 2; }
   .touche-games__choice--dice .touche-games__art-wrap,
   .touche-games__choice--strip .touche-games__art-wrap {
-    width: 94px;
-    height: 94px;
+    width: 72px;
+    height: 72px;
     top: 16px;
     right: 16px;
   }
   .touche-games__choice--dice .touche-games__cube-mark,
-  .touche-games__choice--strip .touche-games__strip-mark { width: 62px; }
+  .touche-games__choice--strip .touche-games__strip-mark { width: 48px; }
   .touche-games__choice-copy strong { font-size: clamp(21px, 2.6vw, 29px); }
   .touche-games__footnote { justify-content: flex-start; }
 }

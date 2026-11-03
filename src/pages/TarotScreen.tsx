@@ -3,6 +3,7 @@ import type { CSSProperties } from "react";
 import type { Lang } from "@/data/i18n";
 import { TAROT_POSITIONS, drawTarotSpread, getTarotCard, getTarotText, isTarotSpread, tarotImageUrl } from "@/data/tarot";
 import type { TarotDraw } from "@/data/tarot";
+import tarotCardBack from "@/assets/tarot-card-back.svg";
 import useTelegramTopInset from "./useTelegramTopInset";
 import "./TarotScreen.css";
 
@@ -248,7 +249,7 @@ export default function TarotScreen({ lang, onBack }: Props) {
         {!session.revealed ? (
           <div className="tarot-enter">
             <button type="button" className="tarot-cardback" onClick={() => update({ revealed: true })} aria-label={`${copy.reveal}. ${copy.cardBack}`} data-testid="button-tarot-cardback">
-              <img className="tarot-cardback__image" src={tarotImageUrl("card-back.png")} alt="" aria-hidden="true" draggable={false} />
+              <img className="tarot-cardback__image" src={tarotCardBack} alt="" aria-hidden="true" draggable={false} />
             </button>
             <p className="tarot__hint">{copy.cardBack}</p>
             <button type="button" className="tarot-btn" onClick={() => update({ revealed: true })} data-testid="button-tarot-reveal">{copy.reveal}</button>

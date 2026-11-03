@@ -602,19 +602,28 @@
 .pop-home .pop-entry-action:focus-visible { outline: 3px solid var(--focus-ring); outline-offset: 3px; }
 .pop-home .pop-entry-action__art {
   position: absolute;
-  top: 17px;
-  left: 50%;
+  top: 14px;
+  right: 14px;
   z-index: 0;
   display: block;
-  width: calc(100% - 34px);
-  height: 52%;
+  width: clamp(46px, 30%, 64px);
+  height: 40%;
   object-fit: contain;
   object-position: center;
-  transform: translateX(-50%);
+  transform: rotate(3deg);
   pointer-events: none;
   transition: transform .2s ease;
 }
-.pop-home .pop-entry-action:hover .pop-entry-action__art { transform: translateX(-50%) translateY(-2px) scale(1.04); }
+.pop-home .pop-entry-action:hover .pop-entry-action__art { transform: translateY(-2px) rotate(1deg) scale(1.04); }
+.pop-home .pop-entry-action--tarot .pop-entry-action__art {
+  top: 12px;
+  right: 12px;
+  width: 54px;
+  height: 72px;
+  transform: rotate(5deg);
+  filter: drop-shadow(0 7px 9px rgba(21, 3, 13, .36));
+}
+.pop-home .pop-entry-action--tarot:hover .pop-entry-action__art { transform: translateY(-2px) rotate(2deg) scale(1.03); }
 .pop-entry-action__index {
   position: absolute;
   top: 10px;
@@ -667,7 +676,8 @@
 @media (max-width: 380px) {
   .pop-entry-actions { gap: 10px; }
   .pop-home .pop-entry-action { padding: 10px; border-radius: 16px; }
-  .pop-home .pop-entry-action__art { top: 15px; width: calc(100% - 28px); }
+  .pop-home .pop-entry-action__art { top: 13px; right: 12px; width: 52px; height: 38%; }
+  .pop-home .pop-entry-action--tarot .pop-entry-action__art { width: 48px; height: 64px; }
   .pop-entry-action__index { top: 8px; left: 9px; }
   .pop-entry-action__copy strong { font-size: 14px; }
   .pop-entry-action__copy small { font-size: 8px; }

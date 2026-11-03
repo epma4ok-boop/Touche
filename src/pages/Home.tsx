@@ -7,6 +7,7 @@ import WishMap from "@/components/WishMap";
 import SmokeBackground from "@/components/SmokeBackground";
 import { BRAND } from "@/theme/palette";
 import { BOT_USERNAME, TELEGRAM_MINI_APP_SHORT_NAME } from "@/config";
+import tarotCardBack from "@/assets/tarot-card-back.svg";
 import "./HomePop.css";
 
 const HERO_COPY: Record<Lang, { first: string; last: string; sub: string }> = {
@@ -1365,7 +1366,7 @@ export default function Home({
                 <span className="pop-entry-action__index">03</span><span className="pop-entry-action__copy"><strong>{lang === "ru" ? "Путь любви" : lang === "hi" ? "प्यार का путь" : lang === "pt" ? "Caminho do amor" : lang === "es" ? "Camino del amor" : "Love Path"}</strong><small>{lang === "ru" ? "Семь шагов навстречу друг другу" : lang === "hi" ? "एक-दूसरे के करीब सात कदम" : lang === "pt" ? "Sete passos para se aproximarem" : lang === "es" ? "Siete pasos para acercarse" : "Seven small steps closer"}</small></span><span className="pop-entry-action__arrow" aria-hidden="true">↗</span>
               </button>
               <button type="button" className="pop-entry-action pop-entry-action--tarot" onClick={onTarotOpen} data-testid="button-open-tarot">
-                <img className="pop-entry-action__art" src="/images/tarot/card-back.png" alt="" aria-hidden="true" />
+                <img className="pop-entry-action__art" src={tarotCardBack} alt="" aria-hidden="true" />
                 <span className="pop-entry-action__index">04</span><span className="pop-entry-action__copy"><strong>{lang === "ru" ? "Таро для двоих" : lang === "hi" ? "दो के लिए टैरो" : lang === "pt" ? "Tarô para dois" : lang === "es" ? "Tarot para dos" : "Tarot for two"}</strong><small>{lang === "ru" ? "Три карты. Один честный разговор." : lang === "hi" ? "तीन कार्ड। एक सच्ची बातचीत।" : lang === "pt" ? "Três cartas. Uma conversa sincera." : lang === "es" ? "Tres cartas. Una conversación sincera." : "Three cards. One honest conversation."}</small></span><span className="pop-entry-action__arrow" aria-hidden="true">↗</span>
               </button>
               <button type="button" className="pop-entry-action pop-entry-action--lottery" onClick={onGamesOpen} data-testid="button-open-games">

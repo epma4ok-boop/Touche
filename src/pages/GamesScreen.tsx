@@ -165,7 +165,7 @@ export default function GamesScreen({ lang, onBack }: Props) {
 
   const extra = EXTRA_COPY[lang];
   return (
-    <main className="touche-games tx-games" style={{ "--games-top": `${top}px` } as CSSProperties}>
+    <main className="touche-games tx-app" style={{ "--games-top": `${top}px` } as CSSProperties}>
       <header className="tx-header">
         <button type="button" className="tx-back" onClick={onBack} aria-label={copy.back} data-testid="button-games-back">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 18 9 12l6-6" /></svg>

@@ -5,7 +5,7 @@ import useTelegramTopInset from "./useTelegramTopInset";
 import "./StripGameScreen.css";
 import "./StripGameScreenPremium.css";
 import { StripCharacter, StripMiniGame } from "./StripGameVisuals";
-import { applyStripOutcome, createMiniRound, validMiniRound, rpsOutcome, type MiniRound, type RpsChoice } from "./stripGameRules";
+import { STRIP_CLOTHES, applyStripOutcome, createMiniRound, validMiniRound, rpsOutcome, type MiniRound, type RpsChoice } from "./stripGameRules";
 
 type PlayerIndex = 0 | 1;
 type Phase = "playing" | "finished";
@@ -24,10 +24,7 @@ type Session = {
 type Props = { lang: Lang; onBack: () => void };
 
 const STORAGE_KEY = "touche.strip.session.v1";
-const LAYER_SETS: [string[], string[]] = [
-  ["Жакет", "Юбка", "Бюстгальтер", "Колготки", "Трусы"],
-  ["Пиджак", "Брюки", "Рубашка", "Нижний слой", "Бельё"],
-];
+const LAYER_SETS = STRIP_CLOTHES;
 
 const CARDS: Card[][] = [
   [

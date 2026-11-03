@@ -1,14 +1,23 @@
 import { useEffect, useRef, useState } from "react";
-import { BODY_CHOICES, RPS_CHOICES, rpsOutcome, type MiniRound, type RpsChoice } from "./stripGameRules";
+import { STRIP_CLOTHES, BODY_CHOICES, RPS_CHOICES, rpsOutcome, type MiniRound, type RpsChoice } from "./stripGameRules";
 import "./StripGameFinal.css";
 
-const CLOTHES = [
-  ["Жакет", "Юбка", "Бюстгальтер", "Колготки", "Трусы"],
-  ["Пиджак", "Брюки", "Рубашка", "Нижний слой", "Бельё"],
-];
 const assetBase = `${import.meta.env.BASE_URL.replace(/\/$/, "")}/`;
 const imagePath = (player: number, stage: number) =>
-  `${assetBase}images/strip-game/touche-mini-games-${player === 0 ? "woman" : "man"}-${stage}.webp`;
+  `${assetBase}images/strip-game/touche-mini-games-${player === 0 ? "woman" : "man"}-${stage}.webp?v=uploaded-20261103`;
+
+export function ClothingGlyph({ player, item }: { player: 0 | 1; item: number }) {
+  const paths = item === 0
+    ? ["M8 6h11v18l-6 4 6 8q-7 7-13-2L2 27l6-5z", "M29 6h11v18l-6 4 6 8q-7 7-13-2l-4-7 6-5z"]
+    : item === 1
+      ? [player === 0 ? "m15 7 9 4 9-4 10 11-7 7-5-6v20H17V19l-5 6-7-7z" : "m17 5 7 7 7-7 9 8-4 26H12L8 13z", ...(player === 1 ? ["M24 12v27M17 5l-2 11 9 7 9-7-2-11"] : [])]
+      : item === 2
+        ? [player === 0 ? "M15 8h18l8 30H7z" : "M13 7h22l-2 33H24V21l-2 19H12z"]
+        : item === 3
+          ? [player === 0 ? "M7 13v12q8 10 17 0 9 10 17 0V13M8 20q8-10 15 0h2q8-10 15 0M7 25h34" : "m16 6 8 4 8-4 11 10-7 7-5-5v22H17V18l-5 5-7-7z"]
+          : ["M7 13h34l-7 12-8 11h-4L14 25zM7 13l17 9 17-9"];
+  return <svg viewBox="0 0 48 46" aria-hidden="true">{paths.map((d, index) => <path key={index} d={d} />)}</svg>;
+}
 
 export function StripCharacter({ player, stage, fromStage }: { player: 0 | 1; stage: number; fromStage?: number }) {
   const previous = useRef(stage);
@@ -17,7 +26,7 @@ export function StripCharacter({ player, stage, fromStage }: { player: 0 | 1; st
     if (fromStage !== undefined && fromStage < stage) setLeaving(fromStage);
     else if (stage > previous.current) setLeaving(previous.current);
     previous.current = stage;
-    const timer = window.setTimeout(() => setLeaving(null), 850);
+    const timer = window.setTimeout(() => setLeaving(null), 950);
     return () => window.clearTimeout(timer);
   }, [stage, fromStage]);
   useEffect(() => {
@@ -25,13 +34,13 @@ export function StripCharacter({ player, stage, fromStage }: { player: 0 | 1; st
     const image = new Image();
     image.src = imagePath(player, stage + 1);
   }, [player, stage]);
-  return <div className="strip-final-character">
+  return <div className="strip-final-character" data-transitioning={leaving !== null}>
     {leaving !== null && <img key={`old-${leaving}`} className="strip-final-character__old" src={imagePath(player, leaving)} alt="" aria-hidden="true" />}
     <img key={stage} className={leaving === null ? "" : "strip-final-character__new"} src={imagePath(player, stage)}
-      alt={`Взрослый персонаж: снято слоёв ${stage} из 5; интимные области закрыты`} />
-    {leaving !== null && <span key={`layer-${leaving}`} className="strip-final-garment" aria-hidden="true">
-      <svg viewBox="0 0 48 46"><path d={leaving === 4 ? "M8 11h32l-4 14-8-3-4 14-4-14-8 3z" : leaving === 1 ? "M10 8h28l-4 32H14z" : "m15 8 9-4 9 4 8 10-6 5-4-4v20H17V19l-4 4-6-5z"} /></svg>
-      {CLOTHES[player][leaving]}
+      alt={`${player === 0 ? "Девушка" : "Парень"}: состояние ${stage} из 5`} />
+    {leaving !== null && <span key={`layer-${leaving}`} className="strip-final-garment" data-item={leaving} aria-hidden="true">
+      <ClothingGlyph player={player} item={leaving} />
+      {STRIP_CLOTHES[player][leaving]}
     </span>}
   </div>;
 }

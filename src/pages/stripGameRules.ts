@@ -1,5 +1,10 @@
 export type StripPlayer = { layersRemoved: number; finalCompleted?: number };
 export type StripTurn = 0 | 1;
+/** Player 0 is the woman, player 1 is the man. Index = next removed item. */
+export const STRIP_CLOTHES: [string[], string[]] = [
+  ["Носки", "Кофта", "Юбка", "Бюстгальтер", "Трусы"],
+  ["Носки", "Пиджак", "Штаны", "Футболка", "Трусы"],
+];
 export const RPS_CHOICES = ["Камень", "Бумага", "Ножницы"] as const;
 export const BODY_CHOICES = ["Рука", "Нога", "Голова", "Женские гениталии", "Мужские гениталии", "Попа", "Спина", "Грудь"] as const;
 export type RpsChoice = typeof RPS_CHOICES[number];

@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 320" fill="none">
+  <defs>
+    <linearGradient id="card" x1="16" y1="8" x2="224" y2="312" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#3D1028"/>
+      <stop offset=".55" stop-color="#641A37"/>
+      <stop offset="1" stop-color="#842B4B"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0" cy="0" r="1" gradientTransform="matrix(0 116 -102 0 120 145)" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#B65A70" stop-opacity=".35"/>
+      <stop offset="1" stop-color="#B65A70" stop-opacity="0"/>
+    </radialGradient>
+    <clipPath id="rounded-card">
+      <rect x="4" y="4" width="232" height="312" rx="21"/>
+    </clipPath>
+  </defs>
+  <g clip-path="url(#rounded-card)">
+    <rect x="4" y="4" width="232" height="312" rx="21" fill="url(#card)"/>
+    <rect x="4" y="4" width="232" height="312" rx="21" fill="url(#glow)"/>
+    <rect x="12" y="12" width="216" height="296" rx="16" stroke="#F5DCE1" stroke-opacity=".82"/>
+    <rect x="19" y="19" width="202" height="282" rx="12" stroke="#E3A6B5" stroke-opacity=".48"/>
+
+    <path d="M35 66V35h31M205 66V35h-31M35 254v31h31m108 0h31v-31" stroke="#F5DCE1" stroke-opacity=".68" stroke-width="1.2"/>
+    <path d="M120 58c-14.6 0-26.5 11.9-26.5 26.5S105.4 111 120 111c-8.8-5.3-14.4-15.1-14.4-26.5S111.2 63.3 120 58Z" fill="#F8E5E6"/>
+    <path d="m150 72 2.1 5.9L158 80l-5.9 2.1L150 88l-2.1-5.9L142 80l5.9-2.1L150 72Z" fill="#F2A9BA"/>
+    <path d="m82 94 1.4 3.8 3.8 1.4-3.8 1.4-1.4 3.8-1.4-3.8-3.8-1.4 3.8-1.4L82 94Z" fill="#F5DCE1" fill-opacity=".86"/>
+    <path d="m171 111 1.2 3.3 3.3 1.2-3.3 1.2-1.2 3.3-1.2-3.3-3.3-1.2 3.3-1.2 1.2-3.3Z" fill="#F5DCE1" fill-opacity=".76"/>
+    <circle cx="91" cy="72" r="1.5" fill="#F5DCE1"/>
+    <circle cx="160" cy="99" r="1.2" fill="#F2A9BA"/>
+    <circle cx="75" cy="119" r="1.2" fill="#F5DCE1" fill-opacity=".7"/>
+    <path d="M76 137h88" stroke="#E3A6B5" stroke-opacity=".55"/>
+    <path d="M89 144h62" stroke="#E3A6B5" stroke-opacity=".28"/>
+
+    <text x="120" y="178" fill="#FFF8EF" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="23" letter-spacing=".3">Touch<tspan fill="#F2A9BA">é</tspan></text>
+    <path d="M106 193h28" stroke="#F2A9BA" stroke-opacity=".76"/>
+    <text x="120" y="210" fill="#F8E5E6" fill-opacity=".84" text-anchor="middle" font-family="Arial, sans-serif" font-size="7" font-weight="700" letter-spacing="2.2">TAROT FOR TWO</text>
+
+    <path d="m120 234 5 5-5 5-5-5 5-5Z" stroke="#F2A9BA" stroke-opacity=".8"/>
+    <circle cx="120" cy="239" r="15" stroke="#F5DCE1" stroke-opacity=".32"/>
+    <path d="M89 267c17 10 45 10 62 0" stroke="#E3A6B5" stroke-opacity=".42"/>
+    <circle cx="75" cy="274" r="1.4" fill="#F5DCE1" fill-opacity=".72"/>
+    <circle cx="165" cy="274" r="1.4" fill="#F5DCE1" fill-opacity=".72"/>
+  </g>
+</svg>

@@ -5,13 +5,13 @@
  * this file so nothing reads as a separate, disconnected design.
  */
 
-// App-wide "resting" accent — muted modern garnet (was a brighter neon pink).
-export const BRAND = { r: 188, g: 46, b: 74 };
-export const CHAMPAGNE = { r: 196, g: 164, b: 112 };
-export const IVORY = { r: 245, g: 235, b: 228 };
+// Warm citrus-coral identity shared throughout the app.
+export const BRAND = { r: 255, g: 104, b: 76 };
+export const CHAMPAGNE = { r: 255, g: 189, b: 97 };
+export const IVORY = { r: 255, g: 246, b: 238 };
 
 // Shared dark surface used by every card/panel across the app.
-export const SURFACE = "rgba(16,7,12,0.97)";
+export const SURFACE = "rgba(255,246,238,0.97)";
 export const SURFACE_PRESSED_ALPHA = 0.09;
 
 /**

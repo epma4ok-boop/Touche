@@ -68,3 +68,20 @@
 }
 @media (prefers-reduced-motion: reduce) { .pop-heart-mark { animation:none; } }
 @media (max-height: 700px) { .pop-title { font-size: 40px; } }
+
+/* Shared onboarding and sheet composition, with a magazine-like first fold. */
+.pop-screen:not(.touche-splash) { padding-top:env(safe-area-inset-top); padding-bottom:env(safe-area-inset-bottom); }
+.pop-screen__inner { gap:clamp(18px,4vh,30px) !important; }
+.pop-panel { width:100%; }
+.pop-screen .pop-title { max-width:11ch; }
+.pop-screen .pop-copy { max-width:34ch; }
+.pop-screen .pop-button { min-height:52px; }
+.pop-heart-mark { border-radius:44% 56% 58% 42% !important; }
+.language-picker { width:min(calc(100% - 36px),480px) !important; }
+.language-picker__title { max-width:9ch; margin-bottom:7px !important; font-size:clamp(40px,12vw,56px) !important; }
+.language-picker__description { max-width:33ch !important; }
+.language-picker__option { min-height:62px !important; padding:11px 14px !important; }
+.pop-onboarding-card { overflow:hidden; }
+.pop-button:active,.language-picker__option:active { transform:translateY(1px) scale(.99) !important; }
+.pop-sheet-backdrop { align-items:end !important; }
+.pop-sheet { width:min(100%,620px) !important; max-height:min(88dvh,780px) !important; overflow-y:auto !important; margin-inline:auto !important; }

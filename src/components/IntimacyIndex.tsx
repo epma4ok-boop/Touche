@@ -5,11 +5,11 @@ import type { Lang } from "@/data/i18n";
 
 /* ─── Palette — shares the app's own brand accent so this card reads as ──
    part of the same system as every other card, not a separate widget. ── */
-const INK = "255,249,237";       // warm paper
-const GOLD = "255,71,126";        // coral-pink accent
-const IVORY = "34,29,45";         // plum ink
+const INK = "244,238,228";       // warm archive paper
+const GOLD = "214,182,124";      // quiet brass accent
+const IVORY = "43,32,38";        // plum-toned ink
 
-const SERIF = "'Syne', 'DM Sans', sans-serif";
+const SERIF = "'Fraunces', Georgia, serif";
 const SANS = "'DM Sans', sans-serif";
 
 const T = {
@@ -166,7 +166,7 @@ function LevelWatermark({ nameRu, nameEn, lang, iconId, color }:{ nameRu:string;
         <LevelGlyph id={iconId} color={color} size={26} opacity={0.5} />
       </div>
       {/* italic serif caption running low across the card, ink not glow */}
-      <div className="intimacy-index-card" style={{
+      <div style={{
         position:"absolute", left:24, bottom:16, right:24,
         fontFamily:SERIF, fontStyle:"italic", fontWeight:500, fontSize:15,
         letterSpacing:"0.02em", color:`rgba(${IVORY},0.16)`, userSelect:"none",
@@ -238,35 +238,35 @@ function IntimacyModal({lang,data,onClose}:{lang:Lang;data:IntimacyLocal;onClose
   const today=new Date().toISOString().slice(0,10);
   const yest=(()=>{const d=new Date();d.setDate(d.getDate()-1);return d.toISOString().slice(0,10);})();
   return createPortal(
-    <div className="intimacy-modal" role="dialog" aria-modal="true" aria-label={t.title} style={{position:"fixed",inset:0,zIndex:900,display:"flex",flexDirection:"column",justifyContent:"flex-end"}}>
-      <div onClick={onClose} style={{position:"absolute",inset:0,background:"rgba(22,34,56,0.58)",backdropFilter:"blur(8px)"}}/>
-      <section className="intimacy-modal__panel" style={{position:"relative",zIndex:1,background:"#fffaf3",
+     <div className="intimacy-modal" role="dialog" aria-modal="true" aria-label={t.title} style={{position:"fixed",inset:0,zIndex:900,display:"flex",flexDirection:"column",justifyContent:"flex-end"}}>
+       <div className="intimacy-modal__backdrop" onClick={onClose} style={{position:"absolute",inset:0,background:"rgba(43,32,38,0.58)",backdropFilter:"blur(8px)"}}/>
+      <div className="intimacy-modal__panel" style={{position:"relative",zIndex:1,background:"#fffaf3",
         borderRadius:"28px 28px 0 0",padding:`0 22px max(34px,env(safe-area-inset-bottom))`,
-         border:"2px solid #162238",borderBottom:"none",
-         boxShadow:"0 -12px 0 rgba(111,18,52,.25)",
+          border:"1px solid rgba(72,40,50,.14)",borderBottom:"none",
+          boxShadow:"0 -12px 40px rgba(43,32,38,.16)",
         transform:mounted?"translateY(0)":"translateY(100%)",
         transition:`transform ${MOTION_DURATION}ms ${MOTION_EASE}`,maxHeight:"92dvh",overflowY:"auto"}}>
-         <header className="intimacy-modal__nav" style={{position:"sticky",top:0,zIndex:5,display:"flex",alignItems:"center",justifyContent:"space-between",padding:"13px 0 12px",background:"#fffaf3",borderBottom:"1px solid rgba(22,34,56,.12)",marginBottom:12}}>
-           <button ref={backRef} data-testid="button-intimacy-back" onClick={onClose} type="button" style={{background:"none",border:0,color:"#162238",fontFamily:SANS,fontWeight:700,fontSize:14,cursor:"pointer",padding:"8px 8px 8px 0"}}>← {lang==="ru"?"Назад":lang==="hi"?"वापस":lang==="pt"?"Voltar":lang==="es"?"Volver":"Back"}</button>
-           <span style={{fontFamily:SANS,fontWeight:700,fontSize:13,color:"#162238"}}>{t.title}</span>
-           <button onClick={onClose} type="button" aria-label={t.close} style={{width:34,height:34,borderRadius:"50%",border:"1px solid #162238",background:"#dafa70",fontSize:20,lineHeight:1,cursor:"pointer",color:"#162238"}}>×</button>
-         </header>
-         <div className="intimacy-modal__summary" style={{display:"flex",alignItems:"center",gap:20,marginBottom:22,paddingTop:8}}>
+         <div className="intimacy-modal__nav" style={{position:"sticky",top:0,zIndex:5,display:"flex",alignItems:"center",justifyContent:"space-between",padding:"13px 0 12px",background:"#f4eee4",borderBottom:"1px solid rgba(72,40,50,.12)",marginBottom:12}}>
+           <button ref={backRef} data-testid="button-intimacy-back" onClick={onClose} type="button" style={{background:"none",border:0,color:"#2b2026",fontFamily:SANS,fontWeight:700,fontSize:14,cursor:"pointer",padding:"8px 8px 8px 0"}}>← {lang==="ru"?"Назад":lang==="hi"?"वापस":lang==="pt"?"Voltar":lang==="es"?"Volver":"Back"}</button>
+           <span style={{fontFamily:SANS,fontWeight:700,fontSize:13,color:"#2b2026"}}>{t.title}</span>
+           <button onClick={onClose} type="button" aria-label={t.close} style={{width:34,height:34,borderRadius:"50%",border:"1px solid rgba(72,40,50,.16)",background:"#ead7d1",fontSize:20,lineHeight:1,cursor:"pointer",color:"#2b2026"}}>×</button>
+        </div>
+         <div className="intimacy-modal__score" style={{display:"flex",alignItems:"center",gap:20,marginBottom:22,paddingTop:8}}>
           <div style={{position:"relative",flexShrink:0}}>
-             <Ring progress={prog} color="#78183d" size={88}/>
+              <Ring progress={prog} color="#783449" size={88}/>
             <div style={{position:"absolute",inset:0,display:"flex",alignItems:"center",justifyContent:"center"}}>
-               <LevelGlyph id={lvl.iconId} color="#78183d" size={28} opacity={0.85}/>
+                <LevelGlyph id={lvl.iconId} color="#783449" size={28} opacity={0.85}/>
             </div>
           </div>
           <div style={{flex:1}}>
             <div style={{fontFamily:SERIF,fontWeight:600,fontSize:46,color:`rgba(${IVORY},0.95)`,lineHeight:1,letterSpacing:"-0.01em"}}>{score}</div>
              <div style={{fontFamily:SANS,fontSize:10,color:`rgba(${IVORY},0.68)`,marginTop:4,letterSpacing:"0.12em",textTransform:"uppercase"}}>{t.title}</div>
-             <div style={{fontFamily:SERIF,fontStyle:"italic",fontWeight:600,fontSize:17,color:"#78183d",marginTop:6}}>
+              <div style={{fontFamily:SERIF,fontStyle:"italic",fontWeight:600,fontSize:17,color:"#783449",marginTop:6}}>
               {t.level}: {lang==="ru"?lvl.nameRu:lvl.nameEn}
             </div>
           </div>
         </div>
-         <div className="intimacy-modal__metrics" style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:16}}>
+         <div className="intimacy-modal__stats" style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:16}}>
           {[{id:"streak" as const,main:data.streakDays>0?t.streak(data.streakDays):t.noStreak},{id:"tasks" as const,main:t.tasks(data.totalTasks)}].map((item,i)=>(
             <div key={i} style={{padding:"13px 14px",borderRadius:14,background:`rgba(${IVORY},0.03)`,border:`1px solid rgba(${GOLD},0.14)`}}>
               <div style={{marginBottom:7}}><StatGlyph id={item.id} color={`rgb(${GOLD})`}/></div>
@@ -278,10 +278,10 @@ function IntimacyModal({lang,data,onClose}:{lang:Lang;data:IntimacyLocal;onClose
            <StatGlyph id="decay" color={`rgba(${IVORY},0.62)`} size={15}/>
            <span style={{fontFamily:SANS,fontSize:12,color:`rgba(${IVORY},0.72)`,lineHeight:1.4}}>{t.decay}</span>
         </div>
-         <section className="intimacy-modal__progress" style={{marginBottom:20}}>
+         <div className="intimacy-modal__progress" style={{marginBottom:20}}>
           <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}}>
              <span style={{fontFamily:SANS,fontSize:11,color:`rgba(${IVORY},0.72)`,letterSpacing:"0.08em",textTransform:"uppercase"}}>{nextLvl?t.progress:t.maxLevel}</span>
-             {nextLvl&&<span style={{fontFamily:SERIF,fontStyle:"italic",fontSize:14,color:"#78183d",display:"flex",alignItems:"center",gap:5}}><LevelGlyph id={nextLvl.iconId} color="#78183d" size={14}/> {lang==="ru"?nextLvl.nameRu:nextLvl.nameEn}</span>}
+              {nextLvl&&<span style={{fontFamily:SERIF,fontStyle:"italic",fontSize:14,color:"#783449",display:"flex",alignItems:"center",gap:5}}><LevelGlyph id={nextLvl.iconId} color="#783449" size={14}/> {lang==="ru"?nextLvl.nameRu:nextLvl.nameEn}</span>}
           </div>
           <div style={{height:2,borderRadius:99,background:`rgba(${IVORY},0.08)`,overflow:"hidden"}}>
             <div style={{height:"100%",borderRadius:99,width:`${Math.round(prog*100)}%`,background:`rgb(${GOLD})`,transition:`width 1.1s ${MOTION_EASE}`}}/>
@@ -290,14 +290,14 @@ function IntimacyModal({lang,data,onClose}:{lang:Lang;data:IntimacyLocal;onClose
              <span style={{fontFamily:SANS,fontSize:10,color:`rgba(${IVORY},0.65)`}}>{data.score}</span>
              <span style={{fontFamily:SANS,fontSize:10,color:`rgba(${IVORY},0.65)`}}>{nextLvl.min}</span>
           </div>}
-         </section>
+        </div>
         {data.history.length>0&&(
-           <section className="intimacy-modal__chart" style={{marginBottom:18}}>
+         <div className="intimacy-modal__history-chart" style={{marginBottom:18}}>
              <div style={{fontFamily:SANS,fontSize:11,color:`rgba(${IVORY},0.7)`,letterSpacing:"0.08em",textTransform:"uppercase",marginBottom:10}}>{t.history}</div>
             <HistoryChart history={data.history}/>
-           </section>
+          </div>
         )}
-         <section className="intimacy-modal__history" style={{marginBottom:18}}>
+         <div className="intimacy-modal__history-list" style={{marginBottom:18}}>
           {data.history.length===0
              ?<div style={{textAlign:"center",padding:"22px 0",fontFamily:SANS,fontSize:13,color:`rgba(${IVORY},0.72)`}}>{t.noHistory}</div>
             :<div style={{display:"flex",flexDirection:"column",gap:7}}>
@@ -312,8 +312,8 @@ function IntimacyModal({lang,data,onClose}:{lang:Lang;data:IntimacyLocal;onClose
               })}
             </div>
           }
-         </section>
-         <section className="intimacy-modal__levels" style={{marginBottom:20}}>
+        </div>
+         <div className="intimacy-modal__levels" style={{marginBottom:20}}>
            <div style={{fontFamily:SANS,fontSize:11,color:`rgba(${IVORY},0.72)`,letterSpacing:"0.08em",textTransform:"uppercase",marginBottom:10}}>{lang==="ru"?"Уровни":"Levels"}</div>
           <div style={{display:"flex",flexDirection:"column",gap:4}}>
             {LEVELS.map((l,i)=>{
@@ -329,11 +329,11 @@ function IntimacyModal({lang,data,onClose}:{lang:Lang;data:IntimacyLocal;onClose
               );
             })}
           </div>
-         </section>
+        </div>
         <button data-testid="button-intimacy-close" onClick={onClose} style={{width:"100%",padding:"14px",borderRadius:14,border:`2px solid rgba(${IVORY},0.18)`,background:"transparent",color:`rgba(${IVORY},0.64)`,fontFamily:SANS,fontWeight:700,fontSize:14,cursor:"pointer"}}>
           {t.close}
         </button>
-      </section>
+      </div>
     </div>, document.body
   );
 }
@@ -395,7 +395,7 @@ export default function IntimacyIndex({lang,refreshKey=0,index=0,children}:Intim
           to   { opacity:1; transform:translateY(0); }
         }
       `}</style>
-      <div style={{
+         <div className="intimacy-index-card" style={{
         width:"100%", borderRadius:20, position:"relative", overflow:"hidden",
         background:`rgba(${INK},0.97)`,
         border:`1px solid rgba(${GOLD},${pulse?0.34:0.20})`,
@@ -408,7 +408,7 @@ export default function IntimacyIndex({lang,refreshKey=0,index=0,children}:Intim
         {!open && <LevelWatermark nameRu={lvl.nameRu} nameEn={lvl.nameEn} lang={lang} iconId={lvl.iconId} color={lvl.color} />}
         <div style={{position:"absolute",top:0,left:"14%",right:"14%",height:1,background:`linear-gradient(90deg,transparent,rgba(${GOLD},0.32),transparent)`,pointerEvents:"none"}}/>
 
-          <button className="intimacy-index-toggle" data-testid="button-intimacy-toggle" onClick={toggle} style={{ all:"unset", display:"flex", flexDirection:"column", width:"100%", cursor:"pointer", position:"relative", zIndex:1 }}>
+         <button className="intimacy-index-toggle" data-testid="button-intimacy-toggle" onClick={toggle} style={{ all:"unset", display:"flex", flexDirection:"column", width:"100%", cursor:"pointer", position:"relative", zIndex:1 }}>
           {!open ? (
             <>
                <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",gap:12,marginBottom:"auto"}}>
@@ -489,7 +489,7 @@ export default function IntimacyIndex({lang,refreshKey=0,index=0,children}:Intim
         </button>
 
         {open && (
-          <div className="intimacy-index-categories" style={{ marginTop:14, display:"flex", flexDirection:"column", gap:9, position:"relative", zIndex:1, animation:`categoriesIn ${MOTION_DURATION}ms ${MOTION_EASE} both` }}>
+          <div style={{ marginTop:14, display:"flex", flexDirection:"column", gap:9, position:"relative", zIndex:1, animation:`categoriesIn ${MOTION_DURATION}ms ${MOTION_EASE} both` }}>
             {children}
           </div>
         )}

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { playHeartbeat } from "@/hooks/useSensualSound";
+import splashHands from "@/assets/touche-splash-hands.jpg";
 import "./SupportPop.css";
 
 interface Props { onDone: () => void; linkStatus?: "idle"|"linking"|"linked"|"error"; skipDelay?: boolean; }
@@ -23,16 +24,16 @@ export default function SplashScreen({ onDone, linkStatus="idle", skipDelay=fals
     }
   },[linkStatus,onDone]);
   const status=linkStatus==="linking"?"Connecting your pair…":linkStatus==="linked"?"Pair connected":linkStatus==="error"?"Try again later":"";
-  return <div className="pop-screen splash-screen" data-testid="screen-splash">
-    <div className={`pop-screen__inner splash-layout pop-fade splash-layout--${phase}`} data-mounted={phase!=="enter"}>
-      <div className="splash-index"><span>01</span><i /><span>TOUCHÉ STUDIO</span></div>
-      <div className="splash-seal" aria-hidden="true"><span /><i /><b /></div>
-      <div className="pop-brand splash-brand" data-testid="text-splash-brand">Touché<em>.</em></div>
-      <div className="splash-subtitle">TOUCHÉ / 01</div>
-      <div className="splash-status" data-testid="status-splash">
-        {status || <span className="splash-progress" />}
+  return <div className={`pop-screen touche-splash touche-splash--${phase}`} data-testid="screen-splash">
+    <img className="touche-splash__image" src={splashHands} alt="" aria-hidden="true" />
+    <div className="touche-splash__veil" aria-hidden="true" />
+    <div className="pop-screen__inner touche-splash__inner pop-fade" data-mounted={phase!=="enter"}>
+      <div className="pop-brand" data-testid="text-splash-brand">Touché<em>.</em></div>
+      <div className="touche-splash__caption">for two</div>
+      <div className="touche-splash__rule" aria-hidden="true" />
+      <div className="touche-splash__status" data-testid="status-splash">
+        {status || <span className="touche-splash__pulse" />}
       </div>
-      <div className="splash-bottomline"><span>TOUCHÉ</span><span>01—02</span></div>
     </div>
     <style>{`@keyframes popPulse{0%,100%{opacity:.25;transform:scaleX(.6)}50%{opacity:1;transform:scaleX(1)}}`}</style>
   </div>;

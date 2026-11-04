@@ -131,3 +131,24 @@
   .first-run-tour__spotlight { animation:none; }
   .first-run-tour__primary { transition:none; }
 }
+
+/* Tutorial reads as a set of guided editorial annotations around the live app. */
+.first-run-tour { background:rgba(43,32,38,.58) !important; backdrop-filter:blur(5px) !important; }
+.first-run-tour__spotlight { border:1px solid #d6b67c !important; border-radius:24px !important; box-shadow:0 0 0 9999px rgba(43,32,38,.48),0 0 0 5px rgba(214,182,124,.16) !important; }
+.first-run-tour__card {
+  width:min(calc(100% - 32px),390px) !important; padding:22px 22px 18px !important;
+  border:1px solid rgba(72,40,50,.15) !important; border-radius:25px !important;
+  background:#f4eee4 !important; box-shadow:0 18px 55px rgba(43,32,38,.22) !important;
+}
+.first-run-tour__topline { min-height:30px !important; padding-bottom:10px !important; border-bottom:1px solid rgba(72,40,50,.12) !important; }
+.first-run-tour__brand { font:700 9px var(--font-mono) !important; letter-spacing:.08em !important; color:#783449 !important; }
+.first-run-tour__skip { color:#75656b !important; font-size:11px !important; }
+.first-run-tour__card > .first-run-tour__progress { height:3px !important; margin:15px 0 20px !important; background:transparent !important; }
+.first-run-tour__progress span { border-radius:99px !important; background:#e2d4ca !important; }
+.first-run-tour__progress span.is-active { background:#783449 !important; }
+.first-run-tour__card .first-run-tour__eyebrow { margin:0 0 10px !important; font:700 9px var(--font-mono) !important; letter-spacing:.14em !important; color:#783449 !important; }
+.first-run-tour__card h2 { max-width:12ch !important; margin:0 0 10px !important; font:600 30px/1.03 var(--font-display) !important; letter-spacing:-.04em !important; }
+.first-run-tour__card > p[id] { margin:0 0 20px !important; font:13px/1.6 var(--font-body) !important; color:#75656b !important; }
+.first-run-tour__primary { min-height:48px !important; border-radius:999px !important; background:#783449 !important; color:#fffaf2 !important; }
+.first-run-tour__card--welcome,.first-run-tour__card--result { padding:25px !important; }
+.first-run-tour__primary { min-height:46px !important; border-radius:999px !important; background:#783449 !important; }

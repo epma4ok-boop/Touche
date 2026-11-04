@@ -148,7 +148,7 @@ button:focus-visible, [role="button"]:focus-visible {
 .love-path-home-card { border: 1.5px solid var(--tx-ink); box-shadow: 3px 3px 0 var(--tx-ink); }
 .love-path-home-button { background: var(--tx-ink); border-color: var(--tx-ink); box-shadow: 3px 3px 0 var(--tx-pink); }
 .pop-home .pop-tiles .pop-card {
-  min-height: 158px !important; border: 1.5px solid var(--tx-ink) !important;
+  min-height: 128px !important; border: 1.5px solid var(--tx-ink) !important;
   border-radius: 16px !important; box-shadow: 3px 3px 0 var(--tx-ink) !important;
 }
 .pop-home .pop-card-compliments { background: #fff0bd !important; }

@@ -243,3 +243,22 @@
 @media (prefers-reduced-motion: reduce) {
   .strip *, .strip *::before, .strip *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
 }
+
+/* Strip Game is a play mat: instructions and bodies are kept in their own framed panels. */
+.strip { background:linear-gradient(180deg,#eee4d8 0%,#f4eee4 48%,#e9dfd5 100%) !important; }
+.strip__body { width:min(100%,620px) !important; padding:16px 22px max(24px,env(safe-area-inset-bottom)) !important; }
+.strip__intro { width:100%; text-align:left !important; padding:10px 2px 18px; }
+.strip__intro h1 { max-width:9ch; margin:15px 0 8px !important; font-size:clamp(41px,12vw,58px) !important; }
+.strip__intro p { max-width:31ch !important; margin:0 !important; }
+.strip__players { display:grid !important; grid-template-columns:1fr 1fr !important; gap:10px !important; }
+.strip-player { min-height:125px !important; padding:16px !important; border-radius:20px !important; background:#fffaf2 !important; }
+.strip-player__number { font:700 9px var(--font-mono) !important; }
+.strip-player__name { font:600 19px var(--font-display) !important; }
+.strip__rules { margin-top:14px !important; padding:18px !important; border:1px solid rgba(72,40,50,.14) !important; border-radius:22px !important; background:#eae1d7 !important; }
+.strip__rules h2 { font:600 21px var(--font-display) !important; }
+.strip__rules li { line-height:1.55 !important; }
+.strip__play-area { margin:16px 0 !important; padding:24px 20px !important; border:1px solid rgba(72,40,50,.13) !important; border-radius:25px !important; background:#fffaf2 !important; }
+.strip__play-heading { max-width:24ch !important; font:500 clamp(25px,7vw,38px)/1.2 var(--font-display) !important; }
+.strip__result { border-radius:24px !important; background:#eee0ca !important; }
+.strip__result p { padding:18px !important; font:500 21px/1.35 var(--font-display) !important; }
+.strip-btn { min-height:54px !important; }

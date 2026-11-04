@@ -483,3 +483,21 @@
     transition-duration: .01ms !important;
   }
 }
+
+/* Premium reveal shifts into the dark folio's intimate inner cover. */
+.strip-premium__reveal {
+  display:grid !important; grid-template-rows:auto 1fr auto !important;
+  align-items:stretch !important; padding:max(28px,env(safe-area-inset-top)) 25px max(25px,env(safe-area-inset-bottom)) !important;
+  background:
+    radial-gradient(ellipse at 88% 8%,rgba(214,182,124,.25),transparent 32%),
+    linear-gradient(160deg,#49313b 0%,#38252e 54%,#291d27 100%) !important;
+}
+.strip-premium__reveal-top { align-self:start !important; }
+.strip-premium__reveal-label { font:700 9px var(--font-mono) !important; letter-spacing:.18em !important; }
+.strip-premium__reveal-task {
+  align-self:center !important; max-width:18ch !important; margin:0 auto !important;
+  font-size:clamp(35px,10vw,61px) !important; line-height:1.02 !important;
+}
+.strip-premium__reveal-actions { display:grid !important; grid-template-columns:1fr 1fr !important; gap:9px !important; }
+.strip-premium__reveal-actions button { min-height:52px !important; border-radius:999px !important; }
+.strip-premium__reveal-actions button:last-child { grid-column:1/-1; }

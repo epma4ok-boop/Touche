@@ -232,3 +232,21 @@
     scroll-behavior: auto !important;
   }
 }
+
+/* The wheel sits like a lacquered centerpiece, with the copy acting as a caption. */
+.pose-lottery { background:linear-gradient(180deg,#eee4d8 0%,#f4eee4 45%,#e9dfd4 100%) !important; }
+.pose-lottery__body { width:min(100%,580px) !important; padding:13px 23px max(20px,env(safe-area-inset-bottom)) !important; }
+.pose-lottery__intro { width:100%; text-align:left !important; padding:8px 3px 0; }
+.pose-lottery__eyebrow { font:700 9px var(--font-mono) !important; }
+.pose-lottery__intro h1 { max-width:9ch; margin:14px 0 8px !important; font-size:clamp(40px,11vw,56px) !important; }
+.pose-lottery__intro p { margin:0 !important; max-width:28ch !important; }
+.pose-lottery__scene { width:100% !important; height:clamp(350px,54vh,470px) !important; margin:8px 0 0 !important; }
+.pose-lottery__dial { --dial:min(88vw,390px) !important; }
+.pose-lottery__index { width:18px !important; height:30px !important; top:-9px !important; }
+.pose-lottery__hub { width:27% !important; border:1px solid rgba(72,40,50,.12); }
+.pose-lottery__hub b { font-size:clamp(17px,4.5vw,22px) !important; }
+.pose-lottery__status { margin:0 0 12px !important; font:500 16px var(--font-display) !important; color:#783449 !important; }
+.pose-lottery__button { width:100% !important; max-width:430px !important; min-height:57px !important; margin-top:0 !important; font:700 12px var(--font-mono) !important; }
+.pose-lottery__pose-image { width:clamp(250px,72vw,320px) !important; height:clamp(270px,73vw,340px) !important; }
+@media(max-width:390px) { .pose-lottery__body { padding-inline:15px !important; } .pose-lottery__scene { height:clamp(315px,48vh,370px) !important; } .pose-lottery__dial { --dial:min(82vw,320px) !important; } }
+@media(max-height:700px) { .pose-lottery__scene { height: min(70vw,300px) !important; } .pose-lottery__intro h1 { font-size:36px !important; } }

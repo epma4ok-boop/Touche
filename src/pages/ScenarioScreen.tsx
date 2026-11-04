@@ -119,7 +119,7 @@ function NoPartner({ lang, onInvite, onBack }: { lang: Lang; onInvite: () => voi
   const t = T[lang]; const top = useTelegramTopInset();
   return <main className="scenario-pop no-partner" style={{ paddingTop: top }}>
     <button className="pop-back" style={{ top }} onClick={onBack} data-testid="button-scenarios-back">{t.back}</button>
-    <div className="no-partner-art" aria-hidden="true"><span /></div>
+    <div className="no-partner-art" aria-hidden="true"><svg viewBox="0 0 48 48"><path d="M24 40s-17-10.6-17-22a9.3 9.3 0 0 1 17-5.5A9.3 9.3 0 0 1 41 18C41 29.4 24 40 24 40Z" /></svg></div>
     <div className="no-partner-copy"><span className="pop-eyebrow">{t.title}</span><h1>{t.noPartner}</h1><p>{t.noPartnerSub}</p><button className="pop-primary" onClick={onInvite} data-testid="button-invite-partner">{t.invite}<b>→</b></button></div>
   </main>;
 }
@@ -238,19 +238,11 @@ export default function ScenarioScreen({ lang, gender, onBack, onUpgrade }: Scen
   return <>
     <main className={`scenario-pop scenario-main ${tone}`} style={{ paddingTop: topPadding, opacity: mounted ? 1 : 0 }}>
     <header className="scenario-header"><button className="pop-back" onClick={onBack} data-testid="button-scenarios-back">{t.back}</button><div className="scenario-brand">Touch<em>é</em></div><span className="premium-tag">PREMIUM</span></header>
-     <div className="scenario-experience">
-       <div className="scenario-choice-column">
-         <section className="scenario-intro"><span className="pop-stamp">{SCENARIO_STAMP[lang]}</span><h1>{t.title}</h1><p>{t.sub}</p><div className="scenario-orb" aria-hidden="true" /></section>
-         <section className="scenario-controls" aria-label={t.title}>
-           <IntensitySelector value={intensity} onChange={setIntensity} lang={lang} />
-           {intensity !== "romantic" && <p className="adult-note" data-testid="text-adult-notice">{SCENARIO_COPY[lang].adult}</p>}
-         </section>
-       </div>
-       <div className="scenario-stage-column">
-         <div className="heartbeat-stage"><HeartbeatCanvas onHoldComplete={handleHoldComplete} isCasting={isCasting} color={intensity === "romantic" ? { r: 255, g: 212, b: 93 } : intensity === "passion" ? { r: 255, g: 111, b: 97 } : { r: 62, g: 91, b: 255 }} hintText={hintText} holdDuration={2600} baseRScale={0.28} bgColor="#fffaf3" /></div>
-         <footer className="scenario-footer"><span>TOUCHÉ / AI SCENARIO</span></footer>
-       </div>
-     </div>
+    <section className="scenario-intro"><span className="pop-stamp">{SCENARIO_STAMP[lang]}</span><h1>{t.title}</h1><p>{t.sub}</p><div className="scenario-orb" aria-hidden="true"><svg viewBox="0 0 48 48"><path d="M24 40s-17-10.6-17-22a9.3 9.3 0 0 1 17-5.5A9.3 9.3 0 0 1 41 18C41 29.4 24 40 24 40Z" /></svg></div></section>
+    <IntensitySelector value={intensity} onChange={setIntensity} lang={lang} />
+    {intensity !== "romantic" && <p className="adult-note" data-testid="text-adult-notice">{SCENARIO_COPY[lang].adult}</p>}
+    <div className="heartbeat-stage"><HeartbeatCanvas onHoldComplete={handleHoldComplete} isCasting={isCasting} color={intensity === "romantic" ? { r: 255, g: 212, b: 93 } : intensity === "passion" ? { r: 255, g: 111, b: 97 } : { r: 62, g: 91, b: 255 }} hintText={hintText} holdDuration={2600} baseRScale={0.28} bgColor="#fffaf3" /></div>
+    <footer className="scenario-footer"><span>TOUCHÉ / AI SCENARIO</span></footer>
     {errorKind && <div className="scenario-error" role="alert"><p>{errorKind === "subscription_required" ? SCENARIO_COPY[lang].subscription : errorKind === "rate_limited" ? SCENARIO_COPY[lang].rate : SCENARIO_COPY[lang].unknown}</p>{errorKind === "subscription_required" && onUpgrade && <button className="pop-primary" onClick={onUpgrade}>{SCENARIO_COPY[lang].upgrade}</button>}<button className="error-dismiss" onClick={() => setErrorKind(null)}>{SCENARIO_COPY[lang].dismiss}</button></div>}
     </main>
     {phase === "revealed" && <RoleCard title={revealTitle} roleText={revealRoleText} intensity={revealIntensity} lang={lang} notified={notified} onHideCard={handleHideCard} isMissed={isMissed} topPadding={topPadding} />}

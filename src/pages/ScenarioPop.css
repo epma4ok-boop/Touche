@@ -232,3 +232,50 @@
   .role-bottom .ai-label { display:none; }
   .role-complete { min-height:46px; }
 }
+
+/* Scenario selection is staged like a private theatre card: title, choice, then pulse. */
+.scenario-main {
+  background:
+    radial-gradient(ellipse at 90% 18%,rgba(214,182,124,.18),transparent 36%),
+    linear-gradient(180deg,#f0e7dc 0%,#f4eee4 52%,#ebe1d7 100%) !important;
+}
+.scenario-header { width:min(100%,560px); margin:0 auto; padding-inline:22px !important; }
+.scenario-intro { max-width:540px !important; padding:24px 26px 18px !important; }
+.scenario-intro .pop-stamp { padding:0 !important; border:0 !important; background:transparent !important; font:700 9px var(--font-mono) !important; }
+.scenario-intro h1 { max-width:8ch; margin-top:26px !important; font-size:clamp(54px,15vw,76px) !important; }
+.scenario-intro p { max-width:25ch; font-size:14px !important; line-height:1.5; }
+.scenario-orb { top:59px !important; right:28px !important; width:100px !important; height:122px !important; border-radius:58% 42% 47% 53% !important; }
+.scenario-orb svg,.no-partner-art svg { width:51%; height:51%; fill:#783449; }
+.scenario-orb svg { fill:rgba(255,250,242,.83); }
+.no-partner-art svg { fill:#783449; }
+.intensity-select { width:min(100% - 36px,500px) !important; margin-top:15px !important; gap:9px !important; }
+.intensity-item { min-height:69px !important; padding:11px 13px !important; }
+.intensity-item strong { font-family:var(--font-display); font-size:16px !important; }
+.intensity-item small { font-size:9px !important; }
+.adult-note { width:calc(100% - 40px); max-width:460px !important; }
+.heartbeat-stage { width:min(100%,560px); align-self:center; margin-top:8px; }
+.scenario-footer { padding-top:12px !important; font:700 8px var(--font-mono) !important; color:#967f7b !important; }
+.no-partner { background:#eee4d9 !important; }
+.no-partner-art { width:150px !important; height:174px !important; margin-bottom:30px !important; border-radius:62% 38% 47% 53% !important; }
+.no-partner-copy { width:min(100%,370px); padding:26px 22px; border-radius:24px; background:rgba(255,250,242,.7); }
+.no-partner h1 { font-size:38px !important; }
+.role-overlay { padding-top:max(18px,env(safe-area-inset-top)) !important; background-color:#38252e; }
+.role-top { width:min(100%,620px); margin:0 auto; }
+.role-sections { width:min(100%,620px); margin:0 auto; padding:20px 0 18px !important; }
+.role-heading { padding:6px 0 14px; border-bottom:1px solid rgba(255,250,242,.18); margin-bottom:15px; }
+.role-heading h1 { font-size:clamp(29px,8vw,42px) !important; }
+.role-task-card { padding:21px !important; }
+.role-task-copy { max-width:31ch !important; font-size:clamp(21px,6vw,28px) !important; line-height:1.25 !important; }
+.role-support-grid { grid-template-columns:1fr 1fr !important; gap:10px !important; }
+.role-detail-card { min-height:100px; padding:14px !important; }
+.role-bottom { width:min(100%,620px); margin-inline:auto; }
+.role-overlay .scenario-feedback { margin-inline:auto; }
+@media(max-width:390px) {
+  .scenario-intro { padding-inline:19px !important; }
+  .scenario-orb { width:78px !important; height:98px !important; right:20px !important; }
+  .role-support-grid { grid-template-columns:1fr !important; }
+  .role-detail-card { min-height:0; }
+}
+@media(prefers-reduced-motion:reduce) {
+  .scenario-orb,.no-partner-art { animation:none !important; }
+}

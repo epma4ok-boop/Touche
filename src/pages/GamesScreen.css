@@ -75,11 +75,11 @@
 .touche-games__eyebrow i { width: 4px; height: 4px; border-radius: 50%; background: var(--games-wine); opacity: .55; }
 .touche-games__intro h1 { margin: 10px 0 7px; font: 700 clamp(34px, 9vw, 43px)/1 "Space Grotesk", sans-serif; letter-spacing: -.065em; }
 .touche-games__intro p { max-width: 320px; margin: 0 auto; color: var(--games-muted); font-size: 13px; line-height: 1.5; }
-.touche-games__choices { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; margin-top: clamp(18px, 4vh, 30px); }
+.touche-games__choices { display: grid; gap: 12px; margin-top: clamp(28px, 7vh, 58px); }
 .touche-games__choice {
   position: relative;
   width: 100%;
-  min-height: 138px;
+  min-height: 190px;
   padding: 19px 22px 20px;
   overflow: hidden;
   display: grid;
@@ -100,12 +100,12 @@
 .touche-games__choice::after { content: ""; position: absolute; width: 236px; height: 236px; right: -74px; top: -100px; border: 1px solid rgba(255,246,231,.16); border-radius: 50%; box-shadow: 0 0 0 18px rgba(255,246,231,.045), 0 0 0 40px rgba(255,246,231,.03), 0 0 0 65px rgba(255,246,231,.02); pointer-events: none; }
 .touche-games__choice-index { z-index: 1; align-self: start; font: 600 11px "Space Grotesk", sans-serif; letter-spacing: .1em; opacity: .85; }
 .touche-games__choice-index small { margin-left: 7px; font: 600 8px "DM Sans", sans-serif; letter-spacing: .16em; text-transform: uppercase; opacity: .7; }
-.touche-games__art-wrap { position: absolute; top: 14px; right: 14px; width: 72px; height: 72px; display: grid; place-items: center; border: 1px solid rgba(255,248,235,.2); border-radius: 50%; background: rgba(255,244,232,.075); box-shadow: inset 0 0 0 4px rgba(255,244,232,.035); }
-.touche-games__wheel-mark { width: 46px; overflow: visible; fill: rgba(255,231,216,.67); stroke: rgba(255,244,232,.67); stroke-width: 1.5; }
+.touche-games__art-wrap { position: absolute; top: 18px; right: 19px; width: 128px; height: 128px; display: grid; place-items: center; border: 1px solid rgba(255,248,235,.2); border-radius: 50%; background: rgba(255,244,232,.075); box-shadow: inset 0 0 0 8px rgba(255,244,232,.035); }
+.touche-games__wheel-mark { width: 86px; overflow: visible; fill: rgba(255,231,216,.67); stroke: rgba(255,244,232,.67); stroke-width: 1.5; }
 .touche-games__wheel-mark > circle:first-child { fill: none; }
 .touche-games__wheel-mark path:nth-of-type(even) { fill: rgba(255,255,255,.36); }
 .touche-games__wheel-center { fill: #f6e6d8; stroke: #7c2442; stroke-width: 2; }
-.touche-games__cube-mark { width: 48px; fill: rgba(255,250,241,.28); stroke: #6a3947; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.touche-games__cube-mark { width: 88px; fill: rgba(255,250,241,.28); stroke: #6a3947; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 .touche-games__choice-copy { z-index: 1; align-self: end; grid-column: 1 / -1; display: flex; flex-direction: column; align-items: flex-start; gap: 5px; max-width: 100%; }
 .touche-games__choice-copy .touche-games__choice-mood { margin-bottom: 1px; font-size: 9px; font-weight: 700; letter-spacing: .18em; opacity: .72; }
 .touche-games__choice-copy strong { max-width: 100%; font: 700 clamp(23px, 7.1vw, 30px)/1.04 "Space Grotesk", sans-serif; letter-spacing: -.055em; }
@@ -116,96 +116,55 @@
 @media (max-width: 380px) {
   .touche-games__header { padding-inline: 14px; }
   .touche-games__body { padding: 25px 16px max(18px, env(safe-area-inset-bottom)); }
-  .touche-games__choices { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; margin-top: 20px; }
-  .touche-games__choice { min-height: 136px; padding: 12px; border-radius: 18px; }
-  .touche-games__art-wrap { width: 62px; height: 62px; right: 13px; top: 12px; }
-  .touche-games__wheel-mark { width: 42px; }
-  .touche-games__cube-mark, .touche-games__strip-mark { width: 42px; }
-  .touche-games__choice-copy strong { font-size: clamp(18px, 5vw, 22px); }
-  .touche-games__choice-copy > small:last-child { font-size: 11px; }
+  .touche-games__choices { gap: 12px; margin-top: 30px; }
+  .touche-games__choice { min-height: 184px; padding: 18px; }
+  .touche-games__art-wrap { width: 108px; height: 108px; right: 14px; top: 17px; }
 }
 @media (max-height: 700px) {
   .touche-games__body { padding-top: 13px; }
   .touche-games__choices { gap: 10px; margin-top: 22px; }
-  .touche-games__choice { min-height: 118px; }
+  .touche-games__choice { min-height: 160px; }
   .touche-games__footnote { padding-top: 12px; }
-}
-@media (max-width: 359px) {
-  .touche-games__choices { grid-template-columns: 1fr; }
-  .touche-games__choice { min-height: 112px; }
 }
 @media (prefers-reduced-motion: reduce) {
   .touche-games *, .touche-games *::before, .touche-games *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
 }
 .touche-games__choice--strip { background: radial-gradient(ellipse at 82% 22%, rgba(239,212,224,.16), transparent 45%), linear-gradient(135deg, #281e39, #552845 62%, #8b405e); }
-.touche-games__strip-mark { width: 48px; fill: rgba(255,240,228,.16); stroke: rgba(255,236,222,.75); stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+.touche-games__strip-mark { width: 88px; fill: rgba(255,240,228,.16); stroke: rgba(255,236,222,.75); stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
 
-/* Give the wheel the lead on wider screens; the other two experiences orbit
-   it as a deliberate pair. Phones retain a single, comfortable scroll column. */
-@media (min-width: 720px) {
-  .touche-games {
-    overflow-y: auto;
-    padding-bottom: max(28px, env(safe-area-inset-bottom));
-  }
-  .touche-games__header {
-    width: min(100%, 1080px);
-    margin-inline: auto;
-    padding-inline: 32px;
-  }
-  .touche-games__body {
-    width: min(100%, 940px);
-    padding: clamp(34px, 6vh, 68px) 34px 32px;
-  }
-  .touche-games__intro {
-    width: 100%;
-    max-width: 680px;
-    margin-inline: 0;
-    text-align: left;
-  }
-  .touche-games__intro h1 {
-    max-width: 12ch;
-    font-size: clamp(52px, 7vw, 76px);
-  }
-  .touche-games__intro p { margin-inline: 0; max-width: 420px; }
-  .touche-games__choices {
-    grid-template-columns: minmax(0, 1.2fr) minmax(250px, .8fr);
-    grid-template-rows: repeat(2, minmax(200px, 1fr));
-    gap: 16px;
-    margin-top: 36px;
-  }
-  .touche-games__choice { min-height: 170px; border-radius: 23px; }
-  .touche-games__choice--wheel {
-    grid-column: 1;
-    grid-row: 1 / span 2;
-    min-height: 354px;
-    padding: 25px;
-  }
-  .touche-games__choice--wheel .touche-games__art-wrap {
-    top: 50%;
-    right: 24px;
-    width: clamp(112px, 15vw, 142px);
-    height: clamp(112px, 15vw, 142px);
-    transform: translateY(-56%);
-  }
-  .touche-games__choice--wheel .touche-games__wheel-mark { width: 58%; }
-  .touche-games__choice--wheel .touche-games__choice-copy strong { font-size: clamp(32px, 4vw, 48px); }
-  .touche-games__choice--dice { grid-column: 2; grid-row: 1; }
-  .touche-games__choice--strip { grid-column: 2; grid-row: 2; }
-  .touche-games__choice--dice .touche-games__art-wrap,
-  .touche-games__choice--strip .touche-games__art-wrap {
-    width: 72px;
-    height: 72px;
-    top: 16px;
-    right: 16px;
-  }
-  .touche-games__choice--dice .touche-games__cube-mark,
-  .touche-games__choice--strip .touche-games__strip-mark { width: 48px; }
-  .touche-games__choice-copy strong { font-size: clamp(21px, 2.6vw, 29px); }
-  .touche-games__footnote { justify-content: flex-start; }
+/* A three-act game menu: one feature game, then two smaller invitations. */
+.touche-games {
+  background:linear-gradient(180deg,#eee4d8 0%,#f4eee4 43%,#ece2d8 100%) !important;
 }
-
-@media (min-width: 720px) and (max-height: 760px) {
-  .touche-games__body { padding-top: 24px; }
-  .touche-games__choices { grid-template-rows: repeat(2, minmax(148px, 1fr)); margin-top: 22px; }
-  .touche-games__choice--wheel { min-height: 312px; }
+.touche-games__body { width:min(100%,620px) !important; padding:22px 22px max(24px,env(safe-area-inset-bottom)) !important; }
+.touche-games__intro { width:100%; text-align:left !important; padding:13px 5px 4px; }
+.touche-games__eyebrow { font:700 9px var(--font-mono) !important; letter-spacing:.16em !important; }
+.touche-games__intro h1 { margin:18px 0 9px !important; font-size:clamp(50px,14vw,68px) !important; }
+.touche-games__intro p { margin:0 !important; max-width:30ch !important; font-size:14px !important; }
+.touche-games__choices {
+  display:grid !important; grid-template-columns:1fr 1fr; gap:11px !important;
+  margin-top:25px !important;
+}
+.touche-games__choice {
+  min-height:172px !important; padding:15px !important; border-radius:20px !important;
+  grid-template-columns:1fr !important; grid-template-rows:22px 1fr !important;
+}
+.touche-games__choice--wheel { grid-column:1/-1; min-height:220px !important; }
+.touche-games__choice--wheel .touche-games__art-wrap { width:160px; height:160px; right:22px; top:26px; }
+.touche-games__choice--wheel .touche-games__wheel-mark { width:112px; }
+.touche-games__choice--dice .touche-games__art-wrap,.touche-games__choice--strip .touche-games__art-wrap { width:92px; height:92px; top:17px; right:12px; }
+.touche-games__choice--dice .touche-games__cube-mark,.touche-games__choice--strip .touche-games__strip-mark { width:60px; }
+.touche-games__choice-copy strong { font-size:clamp(17px,5vw,23px) !important; }
+.touche-games__choice-copy > small:last-child { font-size:10px !important; }
+.touche-games__choice-index { font:700 9px var(--font-mono) !important; }
+.touche-games__choice-copy { max-width:calc(100% - 4px) !important; }
+.touche-games__choice--wheel .touche-games__choice-copy { max-width:58% !important; }
+.touche-games__arrow { bottom:15px !important; right:15px !important; }
+.touche-games__footnote { padding-top:17px !important; font:10px var(--font-mono) !important; }
+@media(max-width:390px) {
+  .touche-games__body { padding-inline:16px !important; }
+  .touche-games__choice { min-height:158px !important; }
+  .touche-games__choice--wheel { min-height:198px !important; }
+  .touche-games__choice--wheel .touche-games__art-wrap { width:132px; height:132px; }
+  .touche-games__choice--dice .touche-games__choice-copy,.touche-games__choice--strip .touche-games__choice-copy { padding-right:35px; }
 }

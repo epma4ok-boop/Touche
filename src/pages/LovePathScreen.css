@@ -234,3 +234,43 @@
   .lp-progress-track span, .lp-primary, .lp-choice { transition: none; }
   .lp-panel { animation: none; }
 }
+
+/* Love Path is a progress map first: large illustrated route, concise daily action below. */
+.love-path-screen {
+  padding-inline:max(19px,env(safe-area-inset-left)) !important;
+  background:radial-gradient(ellipse at 85% 5%,rgba(214,182,124,.17),transparent 33%),linear-gradient(180deg,#eee4d8,#f4eee4 54%,#e9dfd5) !important;
+}
+.lp-header { width:min(100%,650px) !important; margin-bottom:19px !important; }
+.lp-back { min-height:40px; padding:8px 13px 8px 0 !important; font:700 10px var(--font-mono) !important; letter-spacing:.06em; }
+.lp-intro { width:min(100%,650px) !important; padding:3px 0 14px !important; }
+.lp-intro .lp-eyebrow { font:700 9px var(--font-mono) !important; }
+.lp-intro h1 { max-width:11ch; margin:12px 0 9px !important; font-size:clamp(42px,12vw,61px) !important; }
+.lp-intro > p:last-child { max-width:36ch !important; font-size:13px !important; }
+.lp-progress { width:min(100%,650px) !important; margin-bottom:17px !important; }
+.lp-progress-top { font:700 9px var(--font-mono) !important; }
+.lp-progress-track { height:4px !important; background:#dfd2c8 !important; }
+.lp-panel { width:min(100%,650px) !important; border:0 !important; border-radius:27px !important; padding:20px !important; background:rgba(255,250,242,.77) !important; box-shadow:0 14px 34px rgba(62,38,44,.07) !important; }
+.lp-section-heading h2 { font:600 28px/1.05 var(--font-display) !important; }
+.lp-turn { font:700 8px var(--font-mono) !important; }
+.lp-heart-board { width:min(100%,390px) !important; margin:8px auto 2px !important; }
+.lp-heart-svg { max-height:330px; }
+.lp-heart-fill { fill:#ead7d1 !important; stroke:#783449 !important; stroke-width:2 !important; }
+.lp-route { stroke:rgba(120,52,73,.62) !important; stroke-width:3 !important; stroke-dasharray:2 6 !important; }
+.lp-node { stroke:#783449 !important; stroke-width:1.5 !important; }
+.lp-node-label { font-family:var(--font-mono) !important; font-size:10px !important; }
+.lp-board-legend { font:9px var(--font-mono) !important; }
+.lp-day-summary { margin-top:15px !important; padding-top:13px !important; }
+.lp-day-number { border:0 !important; border-radius:50% !important; background:#ead7d1 !important; font:700 12px var(--font-mono) !important; }
+.lp-day-summary strong { font:600 17px var(--font-display) !important; }
+.lp-primary { min-height:48px !important; padding-inline:18px !important; }
+.lp-choice-list { gap:10px !important; }
+.lp-choice { grid-template-columns:31px minmax(0,1fr) auto !important; padding:15px !important; border:1px solid rgba(72,40,50,.14) !important; border-radius:18px !important; background:#f8f1e8 !important; }
+.lp-choice-number { border-radius:50% !important; background:#ead7d1 !important; font:700 9px var(--font-mono) !important; }
+.lp-choice strong { font:600 16px var(--font-display) !important; }
+.lp-choice small { font-size:11px !important; }
+.lp-message { border:0 !important; border-radius:17px !important; }
+.lp-message-actor { background:#eee0ca !important; }
+.lp-message-partner { background:#eadcdb !important; }
+.lp-consent-note { border-left-color:#a95e60 !important; border-radius:0 13px 13px 0 !important; background:#f4eee4 !important; }
+@media(min-width:720px) { .lp-panel { padding:26px !important; } .lp-heart-board { width:410px !important; } }
+@media(max-width:380px) { .love-path-screen { padding-inline:13px !important; } .lp-panel { padding:15px !important; } }

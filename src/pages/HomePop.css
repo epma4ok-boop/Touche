@@ -583,7 +583,8 @@
   position: relative;
   display: flex;
   min-width: 0;
-  aspect-ratio: 1;
+  aspect-ratio: auto;
+  min-height: 128px;
   flex-direction: column;
   align-items: stretch;
   justify-content: flex-end;
@@ -615,6 +616,18 @@
   transition: transform .2s ease;
 }
 .pop-home .pop-entry-action:hover .pop-entry-action__art { transform: translateY(-2px) rotate(1deg) scale(1.04); }
+.pop-home .pop-entry-action__mark {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  width: 28px;
+  height: 28px;
+  color: rgba(34, 29, 45, .7);
+  pointer-events: none;
+}
+.pop-home .pop-entry-action--together .pop-entry-action__mark { color: #5944cf; }
+.pop-home .pop-entry-action--path .pop-entry-action__mark { color: #9c435f; }
+.pop-home .pop-entry-action--lottery .pop-entry-action__mark { color: #526b26; }
 .pop-home .pop-entry-action--tarot .pop-entry-action__art {
   top: 12px;
   right: 12px;

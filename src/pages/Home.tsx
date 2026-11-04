@@ -18,6 +18,32 @@ const HERO_COPY: Record<Lang, { first: string; last: string; sub: string }> = {
   es: { first: "Encuentra", last: "tu vibra.", sub: "Elige un ánimo. Lo demás queda entre ustedes." },
 };
 
+function HomeEntryMark({ kind }: { kind: "solo" | "together" | "path" | "games" }) {
+  return (
+    <svg className={`pop-entry-action__mark pop-entry-action__mark--${kind}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      {kind === "solo" && <>
+        <circle cx="12" cy="7.5" r="3.1" />
+        <path d="M5 20c.6-3.6 3-5.6 7-5.6s6.4 2 7 5.6" />
+      </>}
+      {kind === "together" && <>
+        <circle cx="9" cy="8" r="2.7" />
+        <circle cx="17" cy="8" r="2.7" />
+        <path d="M3.5 19c.5-3.2 2.4-5.1 5.5-5.1 1.5 0 2.8.5 3.7 1.4M12.7 15.3c.9-.9 2.2-1.4 3.8-1.4 3.1 0 5 1.9 5.5 5.1" />
+      </>}
+      {kind === "path" && <>
+        <circle cx="5" cy="19" r="2" />
+        <circle cx="19" cy="5" r="2" />
+        <path d="M7 18c3.4-1.2 2.3-5.5 5.2-6.8 2-.9 3.1.2 4.9-3.2" />
+      </>}
+      {kind === "games" && <>
+        <rect x="4.5" y="6.5" width="11" height="14" rx="1.8" transform="rotate(-8 4.5 6.5)" />
+        <rect x="10" y="4.5" width="9.5" height="13" rx="1.8" transform="rotate(7 10 4.5)" />
+        <path d="M13.5 9h2.5M14.8 7.8v2.5" />
+      </>}
+    </svg>
+  );
+}
+
 declare global {
   interface Window {
     Telegram?: { WebApp: {
@@ -1354,15 +1380,15 @@ export default function Home({
               </section>
               <div className="pop-entry-actions">
               <button type="button" className="pop-entry-action pop-entry-action--solo" onClick={() => openHomeSection("solo")} data-testid="button-mode-solo">
-                <img className="pop-entry-action__art" src="/images/cat-tenderness-art.svg" alt="" aria-hidden="true" />
+                <HomeEntryMark kind="solo" />
                 <span className="pop-entry-action__index">01</span><span className="pop-entry-action__copy"><strong>{lang === "ru" ? "Соло" : lang === "hi" ? "अकेले" : lang === "pt" ? "Solo" : lang === "es" ? "A solas" : "Solo"}</strong><small>{lang === "ru" ? "Нежное задание только для себя" : lang === "hi" ? "सिर्फ़ अपने लिए एक कोमल चुनौती" : lang === "pt" ? "Um convite delicado só para você" : lang === "es" ? "Un reto íntimo solo para ti" : "A little moment, just for you"}</small></span><span className="pop-entry-action__arrow" aria-hidden="true">↗</span>
               </button>
               <button type="button" className="pop-entry-action pop-entry-action--together" onClick={() => openHomeSection("together")} data-testid="button-mode-together">
-                <img className="pop-entry-action__art" src="/images/cat-pair-art.svg" alt="" aria-hidden="true" />
+                <HomeEntryMark kind="together" />
                 <span className="pop-entry-action__index">02</span><span className="pop-entry-action__copy"><strong>{lang === "ru" ? "Вместе" : lang === "hi" ? "साथ में" : lang === "pt" ? "A dois" : lang === "es" ? "En pareja" : "Together"}</strong><small>{lang === "ru" ? "Общие задания и ваши желания" : lang === "hi" ? "साझा चुनौतियाँ और इच्छाएँ" : lang === "pt" ? "Desafios e desejos compartilhados" : lang === "es" ? "Retos y deseos compartidos" : "Shared prompts and your wishes"}</small></span><span className="pop-entry-action__arrow" aria-hidden="true">↗</span>
               </button>
               <button type="button" className="pop-entry-action pop-entry-action--path" onClick={onLovePathOpen} data-testid="button-open-love-path">
-                <img className="pop-entry-action__art" src="/images/cat-invite-art.svg" alt="" aria-hidden="true" />
+                <HomeEntryMark kind="path" />
                 <span className="pop-entry-action__index">03</span><span className="pop-entry-action__copy"><strong>{lang === "ru" ? "Путь любви" : lang === "hi" ? "प्यार का путь" : lang === "pt" ? "Caminho do amor" : lang === "es" ? "Camino del amor" : "Love Path"}</strong><small>{lang === "ru" ? "Семь шагов навстречу друг другу" : lang === "hi" ? "एक-दूसरे के करीब सात कदम" : lang === "pt" ? "Sete passos para se aproximarem" : lang === "es" ? "Siete pasos para acercarse" : "Seven small steps closer"}</small></span><span className="pop-entry-action__arrow" aria-hidden="true">↗</span>
               </button>
               <button type="button" className="pop-entry-action pop-entry-action--tarot" onClick={onTarotOpen} data-testid="button-open-tarot">
@@ -1370,7 +1396,7 @@ export default function Home({
                 <span className="pop-entry-action__index">04</span><span className="pop-entry-action__copy"><strong>{lang === "ru" ? "Таро для двоих" : lang === "hi" ? "दो के लिए टैरो" : lang === "pt" ? "Tarô para dois" : lang === "es" ? "Tarot para dos" : "Tarot for two"}</strong><small>{lang === "ru" ? "Три карты. Один честный разговор." : lang === "hi" ? "तीन कार्ड। एक सच्ची बातचीत।" : lang === "pt" ? "Três cartas. Uma conversa sincera." : lang === "es" ? "Tres cartas. Una conversación sincera." : "Three cards. One honest conversation."}</small></span><span className="pop-entry-action__arrow" aria-hidden="true">↗</span>
               </button>
               <button type="button" className="pop-entry-action pop-entry-action--lottery" onClick={onGamesOpen} data-testid="button-open-games">
-                <img className="pop-entry-action__art" src="/images/home-wheel-art.svg" alt="" aria-hidden="true" />
+                <HomeEntryMark kind="games" />
                 <span className="pop-entry-action__index">05</span><span className="pop-entry-action__copy"><strong>{lang === "ru" ? "Игры" : lang === "hi" ? "खेल" : lang === "pt" ? "Jogos" : lang === "es" ? "Juegos" : "Games"}</strong><small>18+ · {lang === "ru" ? "Колесо, кубики и игра для двоих" : lang === "hi" ? "व्हील, पासे और आप दोनों के लिए खेल" : lang === "pt" ? "Roleta, dados e jogo para dois" : lang === "es" ? "Ruleta, dados y juego para dos" : "Wheel, dice and a two-player game"}</small></span><span className="pop-entry-action__arrow" aria-hidden="true">↗</span>
               </button>
               </div>

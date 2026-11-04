@@ -70,7 +70,7 @@
 .tarot-cardback:focus-visible { outline: 2px solid var(--t-wine); outline-offset: 5px; }
 .tarot-cardback__image { display: block; width: 100%; height: 100%; object-fit: contain; }
 .tarot__hint { margin: 0 0 14px; color: var(--t-muted); font-size: 12.5px; line-height: 1.5; }
-.tarot-art { position: relative; margin: 0 auto; width: 100%; max-width: 340px; aspect-ratio: 3 / 4; max-height: 52dvh;
+.tarot-art { position: relative; margin: 0 auto; width: 100%; max-width: 280px; aspect-ratio: 3 / 4; max-height: 44dvh;
   padding: 0; border-radius: 14px; background: transparent; border: 0; box-shadow: 0 20px 36px -26px rgba(64,24,43,.7); overflow: hidden; }
 .tarot-art img { width: 100%; height: 100%; object-fit: contain; display: block; border-radius: 0; opacity: 0; transition: opacity .4s ease; }
 .tarot-art[data-state="ok"] img { opacity: 1; }
@@ -95,7 +95,7 @@
   .tarot__panel { padding: 13px 14px; }
 }
 @media (max-height: 700px) {
-  .tarot-art { max-height: 44dvh; }
+  .tarot-art { max-height: 38dvh; }
   .tarot-cardback { width: min(42vw, 154px); }
 }
 @media (prefers-reduced-motion: reduce) {

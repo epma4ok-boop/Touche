@@ -17,6 +17,22 @@ const HERO_COPY: Record<Lang, { first: string; last: string; sub: string }> = {
   es: { first: "Encuentra", last: "tu vibra.", sub: "Elige un ánimo. Lo demás queda entre ustedes." },
 };
 
+const TASKS_COPY: Record<Lang, { title: string; sub: string; chooseTitle: string; chooseSub: string }> = {
+  ru: { title: "Задания", sub: "Соло или вместе — выберите режим", chooseTitle: "Выберите формат", chooseSub: "Начните с задания для себя или для двоих." },
+  en: { title: "Tasks", sub: "Solo or together — choose your mode", chooseTitle: "Choose your format", chooseSub: "Start with a moment for yourself or a shared task." },
+  hi: { title: "कार्य", sub: "अकेले या साथ — अपना तरीका चुनें", chooseTitle: "अपना तरीका चुनें", chooseSub: "अपने लिए या साथ में एक काम से शुरुआत करें।" },
+  pt: { title: "Tarefas", sub: "Solo ou a dois — escolha o formato", chooseTitle: "Escolha o formato", chooseSub: "Comece com um momento só seu ou uma tarefa a dois." },
+  es: { title: "Retos", sub: "A solas o en pareja — tú eliges", chooseTitle: "Elige el formato", chooseSub: "Empieza con un momento para ti o una tarea en pareja." },
+};
+
+const NIGHT_GAMES_LABELS: Record<Lang, string> = {
+  ru: "Игры на ночь",
+  en: "Night games",
+  hi: "रात के खेल",
+  pt: "Jogos da noite",
+  es: "Juegos nocturnos",
+};
+
 declare global {
   interface Window {
     Telegram?: { WebApp: {
@@ -319,7 +335,7 @@ const INVITE_MSG: Record<Lang, string> = {
   es: "Prueba Touché — una noche especial para dos",
 };
 
-type HomeSection = "home" | AppMode;
+type HomeSection = "home" | "tasks" | AppMode;
 
 /* ─── Couple modal labels ──────────────────────────────────────── */
 const COUPLE_LABELS: Record<Lang, {
@@ -1288,7 +1304,7 @@ export default function Home({
     <>
       <style>{GLOBAL_STYLES}</style>
 
-      <div className="pop-home" data-home-layout={homeSection === "home" ? "list" : undefined} style={{
+      <div className="pop-home" data-home-layout={homeSection === "home" ? "list" : homeSection === "tasks" ? "task-picker" : undefined} style={{
         position: "fixed", inset: 0, background: BG,
         display: "flex", flexDirection: "column",
         overflow: "hidden",
@@ -1351,25 +1367,42 @@ export default function Home({
               <p>{HERO_COPY[lang].sub}</p>
             </section>
             <div className="pop-entry-actions">
-              <button type="button" className="pop-entry-action pop-entry-action--solo" onClick={() => openHomeSection("solo")} data-testid="button-mode-solo">
-                <img className="pop-entry-action__art" src="/images/cat-tenderness-art.svg" alt="" aria-hidden="true" />
-                <span className="pop-entry-action__index">01</span><span className="pop-entry-action__copy"><strong>{lang === "ru" ? "Соло" : lang === "hi" ? "अकेले" : lang === "pt" ? "Solo" : lang === "es" ? "A solas" : "Solo"}</strong><small>{lang === "ru" ? "Нежное задание только для себя" : lang === "hi" ? "सिर्फ़ अपने लिए एक कोमल चुनौती" : lang === "pt" ? "Um convite delicado só para você" : lang === "es" ? "Un reto íntimo solo para ti" : "A little moment, just for you"}</small></span><span className="pop-entry-action__arrow" aria-hidden="true">↗</span>
-              </button>
-              <button type="button" className="pop-entry-action pop-entry-action--together" onClick={() => openHomeSection("together")} data-testid="button-mode-together">
-                <img className="pop-entry-action__art" src="/images/cat-pair-art.svg" alt="" aria-hidden="true" />
-                <span className="pop-entry-action__index">02</span><span className="pop-entry-action__copy"><strong>{lang === "ru" ? "Вместе" : lang === "hi" ? "साथ में" : lang === "pt" ? "A dois" : lang === "es" ? "En pareja" : "Together"}</strong><small>{lang === "ru" ? "Общие задания и ваши желания" : lang === "hi" ? "साझा चुनौतियाँ और इच्छाएँ" : lang === "pt" ? "Desafios e desejos compartilhados" : lang === "es" ? "Retos y deseos compartidos" : "Shared prompts and your wishes"}</small></span><span className="pop-entry-action__arrow" aria-hidden="true">↗</span>
+              <button type="button" className="pop-entry-action pop-entry-action--tasks" onClick={() => setHomeSection("tasks")} data-testid="button-open-tasks">
+                <img className="pop-entry-action__art" src="/images/home-cards/tasks.jpg" alt="" aria-hidden="true" />
+                <span className="pop-entry-action__index">01</span><span className="pop-entry-action__copy"><strong>{TASKS_COPY[lang].title}</strong><small>{TASKS_COPY[lang].sub}</small></span><span className="pop-entry-action__arrow" aria-hidden="true">▶</span>
               </button>
               <button type="button" className="pop-entry-action pop-entry-action--path" onClick={onLovePathOpen} data-testid="button-open-love-path">
                 <img className="pop-entry-action__art" src="/images/cat-invite-art.svg" alt="" aria-hidden="true" />
-                <span className="pop-entry-action__index">03</span><span className="pop-entry-action__copy"><strong>{lang === "ru" ? "Путь любви" : lang === "hi" ? "प्यार का путь" : lang === "pt" ? "Caminho do amor" : lang === "es" ? "Camino del amor" : "Love Path"}</strong><small>{lang === "ru" ? "Семь шагов навстречу друг другу" : lang === "hi" ? "एक-दूसरे के करीब सात कदम" : lang === "pt" ? "Sete passos para se aproximarem" : lang === "es" ? "Siete pasos para acercarse" : "Seven small steps closer"}</small></span><span className="pop-entry-action__arrow" aria-hidden="true">↗</span>
+                <span className="pop-entry-action__index">02</span><span className="pop-entry-action__copy"><strong>{lang === "ru" ? "Путь любви" : lang === "hi" ? "प्यार का путь" : lang === "pt" ? "Caminho do amor" : lang === "es" ? "Camino del amor" : "Love Path"}</strong><small>{lang === "ru" ? "Семь шагов навстречу друг другу" : lang === "hi" ? "एक-दूसरे के करीब सात कदम" : lang === "pt" ? "Sete passos para se aproximarem" : lang === "es" ? "Siete pasos para acercarse" : "Seven small steps closer"}</small></span><span className="pop-entry-action__arrow" aria-hidden="true">▶</span>
               </button>
               <button type="button" className="pop-entry-action pop-entry-action--tarot" onClick={onTarotOpen} data-testid="button-open-tarot">
-                <img className="pop-entry-action__art" src="/images/tarot/card-back.png" alt="" aria-hidden="true" />
-                <span className="pop-entry-action__index">04</span><span className="pop-entry-action__copy"><strong>{lang === "ru" ? "Таро для двоих" : lang === "hi" ? "दो के लिए टैरो" : lang === "pt" ? "Tarô para dois" : lang === "es" ? "Tarot para dos" : "Tarot for two"}</strong><small>{lang === "ru" ? "Три карты. Один честный разговор." : lang === "hi" ? "तीन कार्ड। एक सच्ची बातचीत।" : lang === "pt" ? "Três cartas. Uma conversa sincera." : lang === "es" ? "Tres cartas. Una conversación sincera." : "Three cards. One honest conversation."}</small></span><span className="pop-entry-action__arrow" aria-hidden="true">↗</span>
+                <img className="pop-entry-action__art" src="/images/home-cards/tarot.jpg" alt="" aria-hidden="true" />
+                <span className="pop-entry-action__index">03</span><span className="pop-entry-action__copy"><strong>{lang === "ru" ? "Таро для двоих" : lang === "hi" ? "दो के लिए टैरो" : lang === "pt" ? "Tarô para dois" : lang === "es" ? "Tarot para dos" : "Tarot for two"}</strong><small>{lang === "ru" ? "Три карты. Один честный разговор." : lang === "hi" ? "तीन कार्ड। एक सच्ची बातचीत।" : lang === "pt" ? "Três cartas. Uma conversa sincera." : lang === "es" ? "Tres cartas. Una conversación sincera." : "Three cards. One honest conversation."}</small></span><span className="pop-entry-action__arrow" aria-hidden="true">▶</span>
               </button>
               <button type="button" className="pop-entry-action pop-entry-action--lottery" onClick={onGamesOpen} data-testid="button-open-games">
-                <img className="pop-entry-action__art" src="/images/home-wheel-art.svg" alt="" aria-hidden="true" />
-                <span className="pop-entry-action__index">05</span><span className="pop-entry-action__copy"><strong>{lang === "ru" ? "Игры" : lang === "hi" ? "खेल" : lang === "pt" ? "Jogos" : lang === "es" ? "Juegos" : "Games"}</strong><small>18+ · {lang === "ru" ? "Колесо, кубики и игра для двоих" : lang === "hi" ? "व्हील, पासे और आप दोनों के लिए खेल" : lang === "pt" ? "Roleta, dados e jogo para dois" : lang === "es" ? "Ruleta, dados y juego para dos" : "Wheel, dice and a two-player game"}</small></span><span className="pop-entry-action__arrow" aria-hidden="true">↗</span>
+                <img className="pop-entry-action__art" src="/images/home-cards/night-games.jpg" alt="" aria-hidden="true" />
+                <span className="pop-entry-action__index">04</span><span className="pop-entry-action__copy"><strong>{NIGHT_GAMES_LABELS[lang]}</strong><small>18+ · {lang === "ru" ? "Колесо, кубики и игра для двоих" : lang === "hi" ? "व्हील, पासे और आप दोनों के लिए खेल" : lang === "pt" ? "Roleta, dados e jogo para dois" : lang === "es" ? "Ruleta, dados y juego para dos" : "Wheel, dice and a two-player game"}</small></span><span className="pop-entry-action__arrow" aria-hidden="true">▶</span>
+              </button>
+            </div>
+          </div>
+        ) : homeSection === "tasks" ? (
+          <div className="pop-list pop-home-subpage pop-task-mode-picker" style={{ flex: 1, overflowY: "auto", overflowX: "hidden", padding: `10px 14px max(28px,env(safe-area-inset-bottom))`, display: "flex", flexDirection: "column", gap: 12, position: "relative", zIndex: 1, scrollbarWidth: "none" as const }}>
+            <button type="button" className="pop-subpage-back" onClick={() => setHomeSection("home")} data-testid="button-home-back">
+              <span aria-hidden="true">←</span> {lang === "ru" ? "На главную" : lang === "hi" ? "होम" : lang === "pt" ? "Início" : lang === "es" ? "Inicio" : "Home"}
+            </button>
+            <section className="pop-subpage-heading">
+              <span>01 · TOUCHÉ</span>
+              <h1>{TASKS_COPY[lang].chooseTitle}</h1>
+              <p>{TASKS_COPY[lang].chooseSub}</p>
+            </section>
+            <div className="pop-entry-actions">
+              <button type="button" className="pop-entry-action pop-entry-action--solo" onClick={() => openHomeSection("solo")} data-testid="button-mode-solo">
+                <img className="pop-entry-action__art" src="/images/cat-tenderness-art.svg" alt="" aria-hidden="true" />
+                <span className="pop-entry-action__index">01</span><span className="pop-entry-action__copy"><strong>{lang === "ru" ? "Соло" : lang === "hi" ? "अकेले" : lang === "pt" ? "Solo" : lang === "es" ? "A solas" : "Solo"}</strong><small>{lang === "ru" ? "Нежное задание только для себя" : lang === "hi" ? "सिर्फ़ अपने लिए एक कोमल चुनौती" : lang === "pt" ? "Um convite delicado só para você" : lang === "es" ? "Un reto íntimo solo para ti" : "A little moment, just for you"}</small></span><span className="pop-entry-action__arrow" aria-hidden="true">▶</span>
+              </button>
+              <button type="button" className="pop-entry-action pop-entry-action--together" onClick={() => openHomeSection("together")} data-testid="button-mode-together">
+                <img className="pop-entry-action__art" src="/images/cat-pair-art.svg" alt="" aria-hidden="true" />
+                <span className="pop-entry-action__index">02</span><span className="pop-entry-action__copy"><strong>{lang === "ru" ? "Вместе" : lang === "hi" ? "साथ में" : lang === "pt" ? "A dois" : lang === "es" ? "En pareja" : "Together"}</strong><small>{lang === "ru" ? "Общие задания и ваши желания" : lang === "hi" ? "साझा चुनौतियाँ और इच्छाएँ" : lang === "pt" ? "Desafios e desejos compartilhados" : lang === "es" ? "Retos y deseos compartidos" : "Shared prompts and your wishes"}</small></span><span className="pop-entry-action__arrow" aria-hidden="true">▶</span>
               </button>
             </div>
           </div>

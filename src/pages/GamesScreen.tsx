@@ -54,36 +54,6 @@ const COPY: Record<Lang, {
   },
 };
 
-function WheelMark() {
-  return (
-    <svg viewBox="0 0 100 100" aria-hidden="true" className="touche-games__wheel-mark">
-      <circle cx="50" cy="50" r="43" />
-      {Array.from({ length: 8 }, (_, index) => <path key={index} d="M50 50 C55 34 65 17 50 7 C35 17 45 34 50 50Z" transform={`rotate(${index * 45} 50 50)`} />)}
-      <circle className="touche-games__wheel-center" cx="50" cy="50" r="9" />
-    </svg>
-  );
-}
-
-function CubeMark() {
-  return (
-    <svg viewBox="0 0 100 100" aria-hidden="true" className="touche-games__cube-mark">
-      <path d="m50 8 36 20v43L50 92 14 71V28L50 8Z" />
-      <path d="m14 28 36 21 36-21M50 49v43" />
-      <circle cx="50" cy="28" r="3" /><circle cx="38" cy="57" r="3" /><circle cx="62" cy="69" r="3" />
-    </svg>
-  );
-}
-
-function StripMark() {
-  return (
-    <svg viewBox="0 0 100 100" aria-hidden="true" className="touche-games__strip-mark">
-      <path d="M36 24 50 16l14 8 14 10-9 12-8-5v35H39V41l-8 5-9-12 14-10Z" />
-      <path d="M38 56h24M38 66h24M38 76h24" />
-      <circle cx="50" cy="10" r="4" />
-    </svg>
-  );
-}
-
 export default function GamesScreen({ lang, onBack }: Props) {
   const [game, setGame] = useState<Game | null>(null);
   const top = useTelegramTopInset();
@@ -104,27 +74,27 @@ export default function GamesScreen({ lang, onBack }: Props) {
       <div className="touche-games__body">
         <div className="touche-games__intro">
           <span className="touche-games__eyebrow">18+ <i /> TOUCHÉ</span>
-          <div className="touche-games__intro-heading"><span className="touche-games__edition">PLAY / 01—03</span><h1>{copy.title}</h1></div>
+          <h1>{copy.title}</h1>
           <p>{copy.subtitle}</p>
         </div>
         <section className="touche-games__choices" aria-label={copy.title}>
           <button type="button" className="touche-games__choice touche-games__choice--wheel" onClick={() => setGame("wheel")} data-testid="button-game-wheel">
             <span className="touche-games__choice-index">01 <small>{copy.number}</small></span>
-            <span className="touche-games__art-wrap"><WheelMark /></span>
+            <span className="touche-games__art-wrap"><img className="touche-games__art-image touche-games__art-image--wheel" src="/images/game-cards/pose-wheel.jpg" alt="" aria-hidden="true" /></span>
             <span className="touche-games__choice-copy"><small className="touche-games__choice-mood">{copy.wheelMood}</small><strong>{copy.wheel}</strong><small>{copy.wheelNote}</small></span>
-            <span className="touche-games__arrow" aria-hidden="true">↗</span>
+            <span className="touche-games__arrow" aria-hidden="true">▶</span>
           </button>
           <button type="button" className="touche-games__choice touche-games__choice--dice" onClick={() => setGame("dice")} data-testid="button-game-dice">
             <span className="touche-games__choice-index">02 <small>{copy.number}</small></span>
-            <span className="touche-games__art-wrap"><CubeMark /></span>
+            <span className="touche-games__art-wrap"><img className="touche-games__art-image touche-games__art-image--dice" src="/images/game-cards/action-dice.jpg" alt="" aria-hidden="true" /></span>
             <span className="touche-games__choice-copy"><small className="touche-games__choice-mood">{copy.diceMood}</small><strong>{copy.dice}</strong><small>{copy.diceNote}</small></span>
-            <span className="touche-games__arrow" aria-hidden="true">↗</span>
+            <span className="touche-games__arrow" aria-hidden="true">▶</span>
           </button>
           <button type="button" className="touche-games__choice touche-games__choice--strip" onClick={() => setGame("strip")} data-testid="button-game-strip">
             <span className="touche-games__choice-index">03 <small>{copy.number}</small></span>
-            <span className="touche-games__art-wrap"><StripMark /></span>
+            <span className="touche-games__art-wrap"><img className="touche-games__art-image touche-games__art-image--strip" src="/images/game-cards/strip-or-action.jpg" alt="" aria-hidden="true" /></span>
             <span className="touche-games__choice-copy"><small className="touche-games__choice-mood">{copy.stripMood}</small><strong>{copy.strip}</strong><small>{copy.stripNote}</small></span>
-            <span className="touche-games__arrow" aria-hidden="true">↗</span>
+            <span className="touche-games__arrow" aria-hidden="true">▶</span>
           </button>
         </section>
         <p className="touche-games__footnote"><span /> {lang === "ru" ? "Только для вас двоих" : lang === "hi" ? "सिर्फ़ आप दोनों के लिए" : lang === "pt" ? "Só para vocês dois" : lang === "es" ? "Solo para ustedes dos" : "Just for the two of you"}</p>

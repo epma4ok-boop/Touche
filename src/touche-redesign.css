@@ -933,3 +933,29 @@ button:focus-visible, [role="button"]:focus-visible {
   background: rgba(255, 250, 244, .96);
   font: 800 9px/1 "DM Sans", sans-serif !important;
 }
+
+/* The old HomePop ::after was a 140px circular decoration. Reset its size
+   as well as its inset so the photo wash fills the card instead of a circle. */
+.pop-home[data-home-layout="list"] .pop-entry-action::after {
+  content: "" !important;
+  inset: 0 !important;
+  width: auto !important;
+  height: auto !important;
+  border: 0 !important;
+  border-radius: inherit !important;
+  background:
+    linear-gradient(90deg,
+      rgba(var(--home-card-rgb), .58) 0%,
+      rgba(var(--home-card-rgb), .42) 44%,
+      rgba(var(--home-card-rgb), .08) 100%),
+    linear-gradient(0deg, rgba(40, 31, 48, .12), transparent 34%, transparent 78%, rgba(40, 31, 48, .06)) !important;
+}
+.pop-home[data-home-layout="list"] .pop-entry-action > .pop-entry-action__art {
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  object-position: center center !important;
+  border: 0 !important;
+  border-radius: inherit !important;
+}

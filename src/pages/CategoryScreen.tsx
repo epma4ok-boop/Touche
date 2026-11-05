@@ -583,7 +583,7 @@ export default function CategoryScreen({ lang, gender, category, onBack, onCateg
         <section className="category-pop__generator">
            <div className="category-pop__generator-head"><span>{t.hint}</span><b>{String(index + 1).padStart(2, "0")} / {String(CATEGORIES_ORDER.length).padStart(2, "0")}</b></div>
           <div className="category-pop__heartbeat" data-testid="tutorial-heartbeat-target">
-              <HeartbeatCanvas onHoldComplete={tutorialDemo ? showTutorialSample : generate} isCasting={tutorialDemo ? false : isCasting} color={popColor} hintText={tutorialDemo ? TUTORIAL_SAMPLE[lang].holdHint : isCasting ? t.tapping : t.hint} holdDuration={2600} baseRScale={0.28} bgColor="#f8f5fc" />
+              <HeartbeatCanvas onHoldComplete={tutorialDemo ? showTutorialSample : generate} isCasting={tutorialDemo ? false : isCasting} color={popColor} hintText={tutorialDemo ? TUTORIAL_SAMPLE[lang].holdHint : isCasting ? t.tapping : t.hint} holdDuration={2600} baseRScale={0.42} bgColor="#f8f5fc" />
           </div>
           {errorKind && errorKind !== "subscription_required" && errorKind !== "limit_exceeded" && <div className="category-pop__error" role="alert" data-testid="status-task-error"><strong>{errorCopy[errorKind]}</strong>{errorKind === "unknown" && generatedErrorCode && <small>{generatedErrorCode}</small>}<button onClick={() => setErrorKind(null)}>{lang === "ru" ? "Понятно" : "Dismiss"}</button></div>}
         </section>

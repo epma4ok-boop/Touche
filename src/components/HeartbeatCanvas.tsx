@@ -19,7 +19,7 @@ export default function HeartbeatCanvas({
   hintText,
   holdDuration = 2600,
   baseRScale = 0.20,
-  bgColor = "#0d0610",
+  bgColor = "#f8f5fc",
 }: HeartbeatCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animFrameRef = useRef<number>(0);
@@ -171,7 +171,7 @@ export default function HeartbeatCanvas({
       ctx.bezierCurveTo(heartSize * 0.85, -heartSize * 0.55, heartSize * 0.86, heartSize * 0.26, 0, heartSize * 0.78);
       ctx.closePath();
       ctx.fillStyle = `rgb(${r},${g},${b})`;
-      ctx.strokeStyle = "#162238";
+      ctx.strokeStyle = "#40334f";
       ctx.lineWidth = 2.5;
       ctx.lineJoin = "round";
       ctx.fill();
@@ -202,7 +202,7 @@ export default function HeartbeatCanvas({
         ctx.globalAlpha = hintAlpha;
         const fs = Math.min(26, Math.max(18, w * 0.057));
         ctx.font = `700 ${fs}px 'Space Grotesk','DM Sans',sans-serif`;
-        ctx.fillStyle = "#162238";
+        ctx.fillStyle = "#40334f";
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
         ctx.fillText(hintRef.current.toUpperCase(), cx, cy + Math.min(w, h) * 0.38);

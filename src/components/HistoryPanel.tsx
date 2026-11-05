@@ -62,8 +62,8 @@ export default function HistoryPanel({ entries, open, onClose, accentRgb, lang }
 
   return (
     <>
-      <div className="history-backdrop" data-testid="history-backdrop" style={{ position:"absolute",inset:0,zIndex:20,background:"rgba(22,34,56,0.22)",opacity:open?1:0,pointerEvents:open?"auto":"none",transition:"opacity 0.35s",backdropFilter:open?"blur(4px)":"none" }} onClick={onClose} />
-      <section ref={panelRef} data-testid="panel-history" className="pop-panel history-panel" role="dialog" aria-modal={open} aria-label={t.history} aria-hidden={!open} inert={!open} style={{ position:"absolute",bottom:0,left:0,right:0,zIndex:25,maxHeight:"72vh",borderRadius:"22px 22px 0 0",background:"var(--pop-paper)",borderTop:`2px solid rgba(${r},${g},${b},0.35)`,boxShadow:"0 -8px 0 rgba(255,111,97,.22)",transform:open?"translateY(0)":"translateY(110%)",transition:"transform 0.42s cubic-bezier(0.32,0.72,0,1)",display:"flex",flexDirection:"column" }}>
+      <div className="history-backdrop" data-testid="history-backdrop" style={{ position:"absolute",inset:0,zIndex:20,background:"rgba(43,34,55,0.28)",opacity:open?1:0,pointerEvents:open?"auto":"none",transition:"opacity 0.35s",backdropFilter:open?"blur(4px)":"none" }} onClick={onClose} />
+      <section ref={panelRef} data-testid="panel-history" className="pop-panel history-panel" role="dialog" aria-modal={open} aria-label={t.history} aria-hidden={!open} inert={!open} style={{ position:"absolute",bottom:0,left:0,right:0,zIndex:25,maxHeight:"72vh",borderRadius:"22px 22px 0 0",background:"var(--pop-paper)",borderTop:`2px solid rgba(${r},${g},${b},0.35)`,boxShadow:"0 -8px 0 rgba(118,91,153,.22)",transform:open?"translateY(0)":"translateY(110%)",transition:"transform 0.42s cubic-bezier(0.32,0.72,0,1)",display:"flex",flexDirection:"column" }}>
         <div className="history-grab" style={{ display:"flex",justifyContent:"center",paddingTop:12,paddingBottom:4 }}>
           <div style={{ width:34,height:3,borderRadius:99,background:`rgba(${r},${g},${b},0.18)` }} />
         </div>

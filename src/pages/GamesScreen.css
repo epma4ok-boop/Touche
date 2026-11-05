@@ -81,6 +81,7 @@
   --game-card-ink: #fff8ef;
   --game-card-muted: rgba(255, 248, 239, .82);
   --game-card-action: #632238;
+  --game-art-wash: .1;
   position: relative;
   isolation: isolate;
   width: 100%;
@@ -102,9 +103,9 @@
 }
 .touche-games__choice:hover { transform: translateY(-2px); box-shadow: 0 14px 26px -15px rgba(64,24,43,.62), inset 0 1px rgba(255,255,255,.28); }
 .touche-games__choice:active { transform: translateY(0) scale(.99); }
-.touche-games__choice--wheel { --game-card-rgb: 79, 28, 49; --game-card-ink: #fff8ef; --game-card-muted: rgba(255, 248, 239, .84); --game-card-action: #592037; }
-.touche-games__choice--dice { --game-card-rgb: 231, 213, 197; --game-card-ink: #3d302e; --game-card-muted: rgba(61, 48, 46, .8); --game-card-action: #e6d1c3; }
-.touche-games__choice--strip { --game-card-rgb: 55, 34, 48; --game-card-ink: #fff7ee; --game-card-muted: rgba(255, 247, 238, .82); --game-card-action: #49253a; }
+.touche-games__choice--wheel { --game-card-rgb: 79, 28, 49; --game-card-ink: #fff8ef; --game-card-muted: rgba(255, 248, 239, .84); --game-card-action: #592037; --game-art-wash: .4; }
+.touche-games__choice--dice { --game-card-rgb: 231, 213, 197; --game-card-ink: #3d302e; --game-card-muted: rgba(61, 48, 46, .8); --game-card-action: #e6d1c3; --game-art-wash: .06; }
+.touche-games__choice--strip { --game-card-rgb: 55, 34, 48; --game-card-ink: #fff7ee; --game-card-muted: rgba(255, 247, 238, .82); --game-card-action: #49253a; --game-art-wash: .46; }
 .touche-games__choice::before {
   content: "";
   position: absolute;
@@ -113,10 +114,11 @@
   pointer-events: none;
   background: linear-gradient(90deg,
     rgb(var(--game-card-rgb)) 0%,
-    rgba(var(--game-card-rgb), .98) 38%,
-    rgba(var(--game-card-rgb), .88) 49%,
-    rgba(var(--game-card-rgb), .42) 63%,
-    rgba(var(--game-card-rgb), 0) 76%);
+    rgb(var(--game-card-rgb)) 34%,
+    rgba(var(--game-card-rgb), .94) 48%,
+    rgba(var(--game-card-rgb), .72) 64%,
+    rgba(var(--game-card-rgb), .4) 80%,
+    rgba(var(--game-card-rgb), var(--game-art-wash, .1)) 100%);
 }
 .touche-games__choice::after { display: none; }
 .touche-games__art-wrap { position: absolute; z-index: 0; inset: 0 0 0 auto; width: 54%; height: 100%; overflow: hidden; border: 0; border-radius: 0 21px 21px 0; background: none; box-shadow: none; }
@@ -128,13 +130,21 @@
   border-radius: inherit;
   object-fit: cover;
   opacity: 1;
-  filter: saturate(1.16) contrast(1.14) brightness(1.06);
+  filter: none;
   mix-blend-mode: normal;
   transform: none;
+  -webkit-mask-image: linear-gradient(90deg, transparent 0%, rgba(0,0,0,.03) 14%, rgba(0,0,0,.2) 28%, rgba(0,0,0,.56) 48%, rgba(0,0,0,.9) 66%, #000 80%);
+  mask-image: linear-gradient(90deg, transparent 0%, rgba(0,0,0,.03) 14%, rgba(0,0,0,.2) 28%, rgba(0,0,0,.56) 48%, rgba(0,0,0,.9) 66%, #000 80%);
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
 }
 .touche-games__art-image--wheel,
 .touche-games__art-image--dice,
 .touche-games__art-image--strip { object-position: center center; }
+.touche-games__art-image--wheel { object-fit: contain; object-position: right center; }
+.touche-games__art-image--strip { object-position: center bottom; }
 .touche-games__choice-copy { position: absolute; z-index: 2; top: 50%; left: 16px; display: flex; flex-direction: column; align-items: flex-start; gap: 4px; width: min(46%, 210px); margin: 0; padding: 0; transform: translateY(-50%); }
 .touche-games__choice-copy .touche-games__choice-mood { margin-bottom: 0; color: var(--game-card-muted); font-size: 8px; font-weight: 700; letter-spacing: .17em; opacity: .9; }
 .touche-games__choice-copy strong { max-width: 100%; color: var(--game-card-ink); font: 800 clamp(18px, 5.4vw, 22px)/1.05 "Manrope", sans-serif; letter-spacing: -.045em; }

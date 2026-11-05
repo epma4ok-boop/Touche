@@ -673,7 +673,7 @@
   .pop-entry-action__copy small { font-size: 8px; }
 }
 
-/* Home list cards use a clear left copy column and a vivid photo panel. */
+/* Home list cards use a left copy column and a softly blended art panel. */
 .pop-home[data-home-layout="list"] .pop-entry-action {
   isolation: isolate;
 }
@@ -688,11 +688,12 @@
   border-radius: inherit !important;
   pointer-events: none !important;
   background: linear-gradient(90deg,
-    rgba(var(--home-card-rgb), 1) 0%,
-    rgba(var(--home-card-rgb), .98) 38%,
-    rgba(var(--home-card-rgb), .9) 49%,
-    rgba(var(--home-card-rgb), .45) 62%,
-    rgba(var(--home-card-rgb), 0) 76%) !important;
+    rgb(var(--home-card-rgb)) 0%,
+    rgb(var(--home-card-rgb)) 36%,
+    rgba(var(--home-card-rgb), .8) 48%,
+    rgba(var(--home-card-rgb), .4) 62%,
+    rgba(var(--home-card-rgb), .12) 78%,
+    rgba(var(--home-card-rgb), var(--home-art-wash, .1)) 100%) !important;
 }
 .pop-home[data-home-layout="list"] .pop-entry-action__art {
   position: absolute !important;
@@ -708,9 +709,15 @@
   object-fit: cover !important;
   object-position: center center !important;
   opacity: 1 !important;
-  filter: saturate(1.1) contrast(1.08) brightness(1.04) !important;
+  filter: none !important;
   mix-blend-mode: normal !important;
   transform: none !important;
+  -webkit-mask-image: linear-gradient(90deg, transparent 0%, rgba(0,0,0,.08) 12%, rgba(0,0,0,.45) 30%, rgba(0,0,0,.82) 48%, #000 62%);
+  mask-image: linear-gradient(90deg, transparent 0%, rgba(0,0,0,.08) 12%, rgba(0,0,0,.45) 30%, rgba(0,0,0,.82) 48%, #000 62%);
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
 }
 .pop-home[data-home-layout="list"] .pop-entry-action__copy {
   position: absolute !important;

@@ -111,16 +111,33 @@
   z-index: 1;
   inset: 0;
   pointer-events: none;
-   background: linear-gradient(90deg,
-     rgb(var(--game-card-rgb)) 0%,
-     rgba(var(--game-card-rgb), .96) 26%,
-     rgba(var(--game-card-rgb), .72) 43%,
-     rgba(var(--game-card-rgb), .34) 59%,
-     rgba(var(--game-card-rgb), .04) 100%);
+  background:
+    linear-gradient(90deg,
+      rgb(var(--game-card-rgb)) 0%,
+      rgba(var(--game-card-rgb), .98) 30%,
+      rgba(var(--game-card-rgb), .91) 43%,
+      rgba(var(--game-card-rgb), .75) 58%,
+      rgba(var(--game-card-rgb), .5) 100%),
+    linear-gradient(0deg,
+      rgba(var(--game-card-rgb), .18) 0%,
+      transparent 18%,
+      transparent 82%,
+      rgba(var(--game-card-rgb), .2) 100%);
 }
 .touche-games__choice::after { display: none; }
-.touche-games__art-wrap { position: absolute; z-index: 0; inset: 0 0 0 auto; width: 67%; height: 100%; overflow: hidden; border: 0; border-radius: inherit; background: none; box-shadow: none; }
-.touche-games__art-image { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; filter: saturate(1.06) contrast(1.04); }
+.touche-games__art-wrap { position: absolute; z-index: 0; inset: 0; width: 100%; height: 100%; overflow: hidden; border: 0; border-radius: inherit; background: none; box-shadow: none; }
+.touche-games__art-image {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  object-fit: cover;
+  opacity: .9;
+  filter: saturate(.72) contrast(.92) blur(.35px);
+  mix-blend-mode: normal;
+  transform: scale(1.03);
+}
 .touche-games__art-image--wheel { object-position: 56% 53%; }
 .touche-games__art-image--dice { object-position: 51% 57%; }
 .touche-games__art-image--strip { object-position: 56% 52%; }
@@ -135,7 +152,7 @@
   .touche-games__body { padding: 25px 16px max(18px, env(safe-area-inset-bottom)); }
   .touche-games__choices { gap: 10px; margin-top: 18px; }
    .touche-games__choice { min-height: 120px; padding: 12px 14px; }
-   .touche-games__art-wrap { width: 65%; }
+    .touche-games__art-wrap { width: 100%; }
    .touche-games__choice-copy { width: 70%; }
 }
 @media (max-height: 700px) {

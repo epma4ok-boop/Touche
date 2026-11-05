@@ -283,8 +283,10 @@ button:focus-visible, [role="button"]:focus-visible {
   position: absolute !important; inset: 0 !important; display: block !important;
   width: 100% !important; height: 100% !important; border-radius: inherit !important;
   object-fit: cover !important; object-position: center !important;
-  opacity: 1 !important; filter: saturate(1.16) contrast(1.14) brightness(1.06) !important;
+  opacity: 1 !important; filter: none !important;
   transform: none !important; mix-blend-mode: normal !important;
+  -webkit-mask-image: linear-gradient(90deg, transparent 0%, rgba(0,0,0,.03) 14%, rgba(0,0,0,.2) 28%, rgba(0,0,0,.56) 48%, rgba(0,0,0,.9) 66%, #000 80%) !important;
+  mask-image: linear-gradient(90deg, transparent 0%, rgba(0,0,0,.03) 14%, rgba(0,0,0,.2) 28%, rgba(0,0,0,.56) 48%, rgba(0,0,0,.9) 66%, #000 80%) !important;
 }
 .touche-games__choice-copy {
   position: absolute !important; z-index: 2 !important; top: 50% !important; left: 16px !important;
@@ -759,30 +761,35 @@ button:focus-visible, [role="button"]:focus-visible {
   top: 0 !important;
   right: 0 !important;
   bottom: 0 !important;
-  left: 0 !important;
+  left: auto !important;
   z-index: 0;
-  width: 100% !important;
+  width: 56% !important;
   height: 100% !important;
-  border-radius: inherit !important;
+  border-radius: 0 19px 19px 0 !important;
   object-fit: cover !important;
   object-position: center center !important;
-  opacity: .9 !important;
+  opacity: 1 !important;
   transform: none !important;
-  filter: saturate(1.02) contrast(1.02);
-  mix-blend-mode: normal;
+  filter: none !important;
+  mix-blend-mode: normal !important;
+  -webkit-mask-image: linear-gradient(90deg, transparent 0%, rgba(0,0,0,.08) 12%, rgba(0,0,0,.45) 30%, rgba(0,0,0,.82) 48%, #000 62%) !important;
+  mask-image: linear-gradient(90deg, transparent 0%, rgba(0,0,0,.08) 12%, rgba(0,0,0,.45) 30%, rgba(0,0,0,.82) 48%, #000 62%) !important;
 }
 .pop-home[data-home-layout="list"] .pop-entry-action--path .pop-entry-action__art {
   top: 0 !important;
   right: 0 !important;
   bottom: 0 !important;
-  left: 0 !important;
-  width: 100% !important;
+  left: auto !important;
+  width: 56% !important;
   height: 100% !important;
-  border-radius: inherit !important;
+  border-radius: 0 19px 19px 0 !important;
   object-fit: cover !important;
   object-position: center center !important;
-  opacity: .9 !important;
-  mix-blend-mode: normal;
+  opacity: 1 !important;
+  filter: none !important;
+  mix-blend-mode: normal !important;
+  -webkit-mask-image: linear-gradient(90deg, transparent 0%, rgba(0,0,0,.08) 12%, rgba(0,0,0,.45) 30%, rgba(0,0,0,.82) 48%, #000 62%) !important;
+  mask-image: linear-gradient(90deg, transparent 0%, rgba(0,0,0,.08) 12%, rgba(0,0,0,.45) 30%, rgba(0,0,0,.82) 48%, #000 62%) !important;
 }
 .pop-home[data-home-layout="list"] .pop-entry-action__index {
   position: absolute !important;
@@ -956,11 +963,12 @@ button:focus-visible, [role="button"]:focus-visible {
   border-radius: inherit !important;
   pointer-events: none !important;
   background: linear-gradient(90deg,
-    rgba(var(--home-card-rgb), 1) 0%,
-    rgba(var(--home-card-rgb), .98) 38%,
-    rgba(var(--home-card-rgb), .9) 49%,
-    rgba(var(--home-card-rgb), .45) 62%,
-    rgba(var(--home-card-rgb), 0) 76%) !important;
+    rgb(var(--home-card-rgb)) 0%,
+    rgb(var(--home-card-rgb)) 36%,
+    rgba(var(--home-card-rgb), .8) 48%,
+    rgba(var(--home-card-rgb), .4) 62%,
+    rgba(var(--home-card-rgb), .12) 78%,
+    rgba(var(--home-card-rgb), var(--home-art-wash, .1)) 100%) !important;
 }
 .pop-home[data-home-layout="list"] .pop-entry-action > .pop-entry-action__art {
   top: 0 !important; right: 0 !important; bottom: 0 !important; left: auto !important;
@@ -972,9 +980,11 @@ button:focus-visible, [role="button"]:focus-visible {
   border: 0 !important;
   border-radius: 0 19px 19px 0 !important;
   opacity: 1 !important;
-  filter: saturate(1.1) contrast(1.08) brightness(1.04) !important;
+  filter: none !important;
   transform: none !important;
   pointer-events: none !important;
+  -webkit-mask-image: linear-gradient(90deg, transparent 0%, rgba(0,0,0,.08) 12%, rgba(0,0,0,.45) 30%, rgba(0,0,0,.82) 48%, #000 62%) !important;
+  mask-image: linear-gradient(90deg, transparent 0%, rgba(0,0,0,.08) 12%, rgba(0,0,0,.45) 30%, rgba(0,0,0,.82) 48%, #000 62%) !important;
 }
 .pop-home[data-home-layout="list"] .pop-entry-action__copy {
   position: absolute !important;

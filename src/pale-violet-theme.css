@@ -147,49 +147,60 @@ button:focus-visible,
   border-color: rgba(73,57,93,.15) !important;
   box-shadow: 0 7px 16px rgba(55,42,70,.09), inset 0 1px 0 rgba(255,255,255,.5) !important;
 }
-.pop-home[data-home-layout="list"] .pop-entry-action--tasks { --home-card-rgb: 158, 132, 185; --home-card-ink: #fffaff; --home-card-muted: rgba(255,250,255,.9); --home-image-wash: .5; }
-.pop-home[data-home-layout="list"] .pop-entry-action--path { --home-card-rgb: 220, 211, 234; --home-card-ink: #40334f; --home-card-muted: rgba(64,51,79,.83); --home-image-wash: .48; }
-.pop-home[data-home-layout="list"] .pop-entry-action--tarot { --home-card-rgb: 205, 199, 220; --home-card-ink: #39314a; --home-card-muted: rgba(57,49,74,.83); --home-image-wash: .5; }
-.pop-home[data-home-layout="list"] .pop-entry-action--lottery { --home-card-rgb: 120, 94, 151; --home-card-ink: #fffaff; --home-card-muted: rgba(255,250,255,.88); --home-image-wash: .52; }
+.pop-home[data-home-layout="list"] .pop-entry-action--tasks { --home-card-rgb: 158, 132, 185; --home-card-ink: #fffaff; --home-card-muted: rgba(255,250,255,.9); --home-art-wash: .12; }
+.pop-home[data-home-layout="list"] .pop-entry-action--path { --home-card-rgb: 220, 211, 234; --home-card-ink: #40334f; --home-card-muted: rgba(64,51,79,.83); --home-art-wash: .04; }
+.pop-home[data-home-layout="list"] .pop-entry-action--tarot { --home-card-rgb: 205, 199, 220; --home-card-ink: #39314a; --home-card-muted: rgba(57,49,74,.83); --home-art-wash: .08; }
+.pop-home[data-home-layout="list"] .pop-entry-action--lottery { --home-card-rgb: 120, 94, 151; --home-card-ink: #fffaff; --home-card-muted: rgba(255,250,255,.88); --home-art-wash: .44; }
 .pop-home[data-home-layout="list"] .pop-entry-action::after {
   background:
     linear-gradient(90deg,
       rgb(var(--home-card-rgb)) 0%,
-      rgba(var(--home-card-rgb),.98) 30%,
-      rgba(var(--home-card-rgb),.91) 43%,
-      rgba(var(--home-card-rgb),.75) 58%,
-      rgba(var(--home-card-rgb),var(--home-image-wash,.5)) 100%),
+      rgb(var(--home-card-rgb)) 36%,
+      rgba(var(--home-card-rgb),.8) 48%,
+      rgba(var(--home-card-rgb),.4) 62%,
+      rgba(var(--home-card-rgb),.12) 78%,
+      rgba(var(--home-card-rgb),var(--home-art-wash,.1)) 100%),
     linear-gradient(0deg, rgba(var(--home-card-rgb),.18), transparent 18%, transparent 82%, rgba(var(--home-card-rgb),.2)) !important;
 }
 .pop-home[data-home-layout="list"] .pop-entry-action__art {
-  inset: 0 !important;
+  top: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  left: auto !important;
   z-index: 0 !important;
-  width: 100% !important;
+  width: 56% !important;
   height: 100% !important;
   object-fit: cover !important;
   object-position: center center !important;
   border: 0 !important;
-  border-radius: inherit !important;
+  border-radius: 0 19px 19px 0 !important;
   box-shadow: none !important;
-  opacity: .9 !important;
-  filter: saturate(.72) contrast(.92) blur(.35px) !important;
+  opacity: 1 !important;
+  filter: none !important;
   mix-blend-mode: normal !important;
-  transform: scale(1.03) !important;
+  transform: none !important;
+  -webkit-mask-image: linear-gradient(90deg, transparent 0%, rgba(0,0,0,.08) 12%, rgba(0,0,0,.45) 30%, rgba(0,0,0,.82) 48%, #000 62%) !important;
+  mask-image: linear-gradient(90deg, transparent 0%, rgba(0,0,0,.08) 12%, rgba(0,0,0,.45) 30%, rgba(0,0,0,.82) 48%, #000 62%) !important;
 }
 .pop-home[data-home-layout="list"] .pop-entry-action--path .pop-entry-action__art {
-  inset: 0 !important;
+  top: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  left: auto !important;
   z-index: 0 !important;
-  width: 100% !important;
+  width: 56% !important;
   height: 100% !important;
   object-fit: cover !important;
   object-position: center center !important;
   border: 0 !important;
-  border-radius: inherit !important;
+  border-radius: 0 19px 19px 0 !important;
   box-shadow: none !important;
-  opacity: .9 !important;
-  filter: saturate(.72) contrast(.92) blur(.35px) !important;
+  opacity: 1 !important;
+  filter: none !important;
   mix-blend-mode: normal !important;
-  transform: scale(1.03) !important;
+  transform: none !important;
+  -webkit-mask-image: linear-gradient(90deg, transparent 0%, rgba(0,0,0,.08) 12%, rgba(0,0,0,.45) 30%, rgba(0,0,0,.82) 48%, #000 62%) !important;
+  mask-image: linear-gradient(90deg, transparent 0%, rgba(0,0,0,.08) 12%, rgba(0,0,0,.45) 30%, rgba(0,0,0,.82) 48%, #000 62%) !important;
 }
 .pop-home[data-home-layout="list"] .pop-entry-action__copy { z-index: 2 !important; }
 .pop-home[data-home-layout="list"] .pop-entry-action__arrow { color: #6d568a !important; }
@@ -404,33 +415,32 @@ button:focus-visible,
   background:
     linear-gradient(90deg,
       rgb(var(--game-card-rgb)) 0%,
-      rgba(var(--game-card-rgb),.98) 30%,
-      rgba(var(--game-card-rgb),.91) 43%,
-      rgba(var(--game-card-rgb),.75) 58%,
-      rgba(var(--game-card-rgb),.5) 100%),
+      rgb(var(--game-card-rgb)) 34%,
+      rgba(var(--game-card-rgb),.94) 48%,
+      rgba(var(--game-card-rgb),.72) 64%,
+      rgba(var(--game-card-rgb),.4) 80%,
+      rgba(var(--game-card-rgb),var(--game-art-wash,.1)) 100%),
     linear-gradient(0deg,rgba(var(--game-card-rgb),.18) 0%,transparent 18%,transparent 82%,rgba(var(--game-card-rgb),.2) 100%) !important;
 }
 .touche-games__art-wrap {
-  inset: 0 !important;
-  top: 0 !important;
-  right: 0 !important;
-  bottom: 0 !important;
-  left: 0 !important;
+  inset: 0 0 0 auto !important;
   z-index: 0 !important;
-  width: 100% !important;
+  width: 54% !important;
   height: 100% !important;
   border: 0 !important;
-  border-radius: inherit !important;
+  border-radius: 0 21px 21px 0 !important;
   background: none !important;
   box-shadow: none !important;
 }
 .touche-games__art-image {
   border-radius: inherit !important;
   object-fit: cover !important;
-  opacity: .9 !important;
-  filter: saturate(.72) contrast(.92) blur(.35px) !important;
+  opacity: 1 !important;
+  filter: none !important;
   mix-blend-mode: normal !important;
-  transform: scale(1.03) !important;
+  transform: none !important;
+  -webkit-mask-image: linear-gradient(90deg, transparent 0%, rgba(0,0,0,.03) 14%, rgba(0,0,0,.2) 28%, rgba(0,0,0,.56) 48%, rgba(0,0,0,.9) 66%, #000 80%) !important;
+  mask-image: linear-gradient(90deg, transparent 0%, rgba(0,0,0,.03) 14%, rgba(0,0,0,.2) 28%, rgba(0,0,0,.56) 48%, rgba(0,0,0,.9) 66%, #000 80%) !important;
 }
 .touche-games__choice-copy { position: relative !important; z-index: 2 !important; }
 .touche-games__choice-copy strong,
@@ -654,9 +664,11 @@ main[style*="background: rgb(13, 6, 16)"] button:last-of-type { border-color: #c
   object-fit: cover !important;
   object-position: center center !important;
   opacity: 1 !important;
-  filter: saturate(1.1) contrast(1.08) brightness(1.04) !important;
+  filter: none !important;
   transform: none !important;
   pointer-events: none !important;
+  -webkit-mask-image: linear-gradient(90deg, transparent 0%, rgba(0,0,0,.08) 12%, rgba(0,0,0,.45) 30%, rgba(0,0,0,.82) 48%, #000 62%) !important;
+  mask-image: linear-gradient(90deg, transparent 0%, rgba(0,0,0,.08) 12%, rgba(0,0,0,.45) 30%, rgba(0,0,0,.82) 48%, #000 62%) !important;
 }
 .pop-home[data-home-layout="list"] .pop-entry-action::after {
   content: "" !important;
@@ -669,11 +681,12 @@ main[style*="background: rgb(13, 6, 16)"] button:last-of-type { border-color: #c
   border-radius: inherit !important;
   pointer-events: none !important;
   background: linear-gradient(90deg,
-    rgba(var(--home-card-rgb), 1) 0%,
-    rgba(var(--home-card-rgb), .98) 38%,
-    rgba(var(--home-card-rgb), .9) 49%,
-    rgba(var(--home-card-rgb), .45) 62%,
-    rgba(var(--home-card-rgb), 0) 76%) !important;
+    rgb(var(--home-card-rgb)) 0%,
+    rgb(var(--home-card-rgb)) 36%,
+    rgba(var(--home-card-rgb), .8) 48%,
+    rgba(var(--home-card-rgb), .4) 62%,
+    rgba(var(--home-card-rgb), .12) 78%,
+    rgba(var(--home-card-rgb), var(--home-art-wash, .1)) 100%) !important;
 }
 .pop-home[data-home-layout="list"] .pop-entry-action__copy {
   position: absolute !important;
@@ -712,18 +725,28 @@ main[style*="background: rgb(13, 6, 16)"] button:last-of-type { border-color: #c
   border-radius: inherit !important;
   object-fit: cover !important;
   opacity: 1 !important;
-  filter: saturate(1.16) contrast(1.14) brightness(1.06) !important;
+  filter: none !important;
   transform: none !important;
   mix-blend-mode: normal !important;
   pointer-events: none !important;
+  -webkit-mask-image: linear-gradient(90deg, transparent 0%, rgba(0,0,0,.03) 14%, rgba(0,0,0,.2) 28%, rgba(0,0,0,.56) 48%, rgba(0,0,0,.9) 66%, #000 80%) !important;
+  mask-image: linear-gradient(90deg, transparent 0%, rgba(0,0,0,.03) 14%, rgba(0,0,0,.2) 28%, rgba(0,0,0,.56) 48%, rgba(0,0,0,.9) 66%, #000 80%) !important;
+}
+.touche-games .touche-games__choice > .touche-games__art-wrap > .touche-games__art-image--wheel {
+  object-fit: contain !important;
+  object-position: right center !important;
+}
+.touche-games .touche-games__choice > .touche-games__art-wrap > .touche-games__art-image--strip {
+  object-position: center bottom !important;
 }
 .touche-games .touche-games__choice::before {
   background: linear-gradient(90deg,
     rgb(var(--game-card-rgb)) 0%,
-    rgba(var(--game-card-rgb), .98) 38%,
-    rgba(var(--game-card-rgb), .88) 49%,
-    rgba(var(--game-card-rgb), .42) 63%,
-    rgba(var(--game-card-rgb), 0) 76%) !important;
+    rgb(var(--game-card-rgb)) 34%,
+    rgba(var(--game-card-rgb), .94) 48%,
+    rgba(var(--game-card-rgb), .72) 64%,
+    rgba(var(--game-card-rgb), .4) 80%,
+    rgba(var(--game-card-rgb), var(--game-art-wash, .1)) 100%) !important;
 }
 .touche-games .touche-games__choice-copy {
   position: absolute !important;

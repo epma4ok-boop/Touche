@@ -116,8 +116,9 @@ button:focus-visible, [role="button"]:focus-visible {
 .pop-entry-action--lottery { background: #ffb59b !important; }
 .pop-entry-action--tarot { background: #ffe9cd !important; }
 .pop-home .pop-entry-action__art {
-  top: 14px !important; left: auto !important; right: 11px !important; width: 48% !important; height: 48% !important;
-  object-position: center !important; transform: none !important; opacity: .9;
+  top: 0 !important; right: 0 !important; bottom: 0 !important; left: 0 !important;
+  width: 100% !important; height: 100% !important; border-radius: inherit !important;
+  object-fit: cover !important; object-position: center !important; transform: none !important; opacity: .9;
 }
 .pop-entry-action__index { top: 10px !important; left: 11px !important; color: #7f3e29 !important; font-size: 9px !important; }
 .pop-entry-action__copy { padding-right: 16px !important; }
@@ -273,7 +274,16 @@ button:focus-visible, [role="button"]:focus-visible {
 .touche-games__choice--wheel { background:linear-gradient(135deg,#ffcf88,#ff986f) !important; }
 .touche-games__choice--dice { background:linear-gradient(135deg,#fff1d8,#ffc679) !important; }
 .touche-games__choice--strip { background:linear-gradient(135deg,#ff9a75,#ec542c) !important; color:#fff8ee !important; }
-.touche-games__art-wrap { width:90px !important; height:90px !important; top:12px !important; right:14px !important; border-color:rgba(120,53,26,.2) !important; background:rgba(255,248,237,.32) !important; }
+.touche-games__art-wrap {
+  inset: 0 !important; top: 0 !important; right: 0 !important; bottom: 0 !important; left: 0 !important;
+  width: 100% !important; height: 100% !important; border: 0 !important; border-radius: inherit !important;
+  background: none !important; box-shadow: none !important;
+}
+.touche-games__art-image {
+  position: absolute !important; inset: 0 !important; display: block !important;
+  width: 100% !important; height: 100% !important; border-radius: inherit !important;
+  object-fit: cover !important; object-position: center !important;
+}
 .touche-games__choice-copy strong { font-size:clamp(19px,5.6vw,26px) !important; }
 .touche-games__choice-mood,.touche-games__choice-index { color:inherit !important; }
 .touche-games__footnote { color:rgba(255,246,233,.78) !important; }
@@ -505,7 +515,7 @@ button:focus-visible, [role="button"]:focus-visible {
   .pop-home .pop-tiles .pop-card { min-height:132px !important; }
   .pop-home .pop-tiles .pop-card > div:last-child { min-height:132px !important; }
   .touche-games__choice { min-height:132px !important; }
-  .touche-games__art-wrap { width:76px !important; height:76px !important; }
+  .touche-games__art-wrap { width:100% !important; height:100% !important; }
   .lp-day-summary { align-items:stretch !important; flex-direction:column !important; }
 }
 @media (max-height: 720px) {
@@ -738,13 +748,15 @@ button:focus-visible, [role="button"]:focus-visible {
   position: absolute !important;
   top: 0 !important;
   right: 0 !important;
-  left: auto !important;
+  bottom: 0 !important;
+  left: 0 !important;
   z-index: 0;
-  width: 54% !important;
+  width: 100% !important;
   height: 100% !important;
-  object-fit: contain !important;
-  object-position: right center !important;
-  opacity: .96 !important;
+  border-radius: inherit !important;
+  object-fit: cover !important;
+  object-position: center center !important;
+  opacity: .9 !important;
   transform: none !important;
   filter: saturate(1.02) contrast(1.02);
   mix-blend-mode: normal;
@@ -752,11 +764,14 @@ button:focus-visible, [role="button"]:focus-visible {
 .pop-home[data-home-layout="list"] .pop-entry-action--path .pop-entry-action__art {
   top: 0 !important;
   right: 0 !important;
-  width: 54% !important;
+  bottom: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
   height: 100% !important;
+  border-radius: inherit !important;
   object-fit: cover !important;
-  object-position: 68% 52% !important;
-  opacity: 1 !important;
+  object-position: center center !important;
+  opacity: .9 !important;
   mix-blend-mode: normal;
 }
 .pop-home[data-home-layout="list"] .pop-entry-action__index {

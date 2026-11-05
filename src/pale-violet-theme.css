@@ -638,3 +638,39 @@ main[style*="background: rgb(13, 6, 16)"] {
 }
 main[style*="background: rgb(13, 6, 16)"] button:first-of-type { background: #8064a2 !important; color: #fffaff !important; }
 main[style*="background: rgb(13, 6, 16)"] button:last-of-type { border-color: #c9bdd9 !important; color: #594573 !important; }
+
+/* Final card-image guard: keep photos on the button, never in small thumbnails. */
+.pop-home[data-home-layout="list"] .pop-entry-action > .pop-entry-action__art {
+  position: absolute !important;
+  inset: 0 !important;
+  z-index: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  border: 0 !important;
+  border-radius: inherit !important;
+  object-fit: cover !important;
+  object-position: center center !important;
+  pointer-events: none !important;
+}
+.touche-games .touche-games__choice > .touche-games__art-wrap {
+  position: absolute !important;
+  inset: 0 !important;
+  z-index: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  border: 0 !important;
+  border-radius: inherit !important;
+  background: none !important;
+  box-shadow: none !important;
+}
+.touche-games .touche-games__choice > .touche-games__art-wrap > .touche-games__art-image {
+  position: absolute !important;
+  inset: 0 !important;
+  display: block !important;
+  width: 100% !important;
+  height: 100% !important;
+  border: 0 !important;
+  border-radius: inherit !important;
+  object-fit: cover !important;
+  pointer-events: none !important;
+}

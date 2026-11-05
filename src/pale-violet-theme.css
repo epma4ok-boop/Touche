@@ -147,20 +147,21 @@ button:focus-visible,
   border-color: rgba(73,57,93,.15) !important;
   box-shadow: 0 7px 16px rgba(55,42,70,.09), inset 0 1px 0 rgba(255,255,255,.5) !important;
 }
-.pop-home[data-home-layout="list"] .pop-entry-action--tasks { --home-card-rgb: 158, 132, 185; --home-card-ink: #fffaff; --home-card-muted: rgba(255,250,255,.9); --home-art-wash: .12; }
+.pop-home[data-home-layout="list"] .pop-entry-action--tasks { --home-card-rgb: 158, 132, 185; --home-card-ink: #fffaff; --home-card-muted: rgba(255,250,255,.9); --home-art-wash: .38; }
 .pop-home[data-home-layout="list"] .pop-entry-action--path { --home-card-rgb: 220, 211, 234; --home-card-ink: #40334f; --home-card-muted: rgba(64,51,79,.83); --home-art-wash: .04; }
-.pop-home[data-home-layout="list"] .pop-entry-action--tarot { --home-card-rgb: 205, 199, 220; --home-card-ink: #39314a; --home-card-muted: rgba(57,49,74,.83); --home-art-wash: .08; }
-.pop-home[data-home-layout="list"] .pop-entry-action--lottery { --home-card-rgb: 120, 94, 151; --home-card-ink: #fffaff; --home-card-muted: rgba(255,250,255,.88); --home-art-wash: .44; }
+.pop-home[data-home-layout="list"] .pop-entry-action--tarot { --home-card-rgb: 205, 199, 220; --home-card-ink: #39314a; --home-card-muted: rgba(57,49,74,.83); --home-art-wash: .27; }
+.pop-home[data-home-layout="list"] .pop-entry-action--lottery { --home-card-rgb: 120, 94, 151; --home-card-ink: #fffaff; --home-card-muted: rgba(255,250,255,.88); --home-art-wash: .42; }
 .pop-home[data-home-layout="list"] .pop-entry-action::after {
   background:
     linear-gradient(90deg,
       rgb(var(--home-card-rgb)) 0%,
       rgb(var(--home-card-rgb)) 36%,
-      rgba(var(--home-card-rgb),.8) 48%,
-      rgba(var(--home-card-rgb),.4) 62%,
-      rgba(var(--home-card-rgb),.12) 78%,
+      rgba(var(--home-card-rgb),.9) 46%,
+      rgba(var(--home-card-rgb),.7) 58%,
+      rgba(var(--home-card-rgb),.42) 72%,
+      rgba(var(--home-card-rgb),.2) 84%,
       rgba(var(--home-card-rgb),var(--home-art-wash,.1)) 100%),
-    linear-gradient(0deg, rgba(var(--home-card-rgb),.18), transparent 18%, transparent 82%, rgba(var(--home-card-rgb),.2)) !important;
+    linear-gradient(0deg, rgba(var(--home-card-rgb),.3), rgba(var(--home-card-rgb),.12) 14%, transparent 31%, transparent 69%, rgba(var(--home-card-rgb),.12) 86%, rgba(var(--home-card-rgb),.3)) !important;
 }
 .pop-home[data-home-layout="list"] .pop-entry-action__art {
   top: 0 !important;
@@ -175,13 +176,16 @@ button:focus-visible,
   border: 0 !important;
   border-radius: 0 19px 19px 0 !important;
   box-shadow: none !important;
-  opacity: 1 !important;
-  filter: none !important;
+  opacity: .97 !important;
+  filter: saturate(.84) contrast(.96) brightness(1.01) !important;
   mix-blend-mode: normal !important;
   transform: none !important;
   -webkit-mask-image: linear-gradient(90deg, transparent 0%, rgba(0,0,0,.08) 12%, rgba(0,0,0,.45) 30%, rgba(0,0,0,.82) 48%, #000 62%) !important;
   mask-image: linear-gradient(90deg, transparent 0%, rgba(0,0,0,.08) 12%, rgba(0,0,0,.45) 30%, rgba(0,0,0,.82) 48%, #000 62%) !important;
 }
+.pop-home[data-home-layout="list"] .pop-entry-action--tasks .pop-entry-action__art { object-position: center 22% !important; }
+.pop-home[data-home-layout="list"] .pop-entry-action--tarot .pop-entry-action__art { object-position: center 48% !important; }
+.pop-home[data-home-layout="list"] .pop-entry-action--lottery .pop-entry-action__art { object-position: center 52% !important; }
 .pop-home[data-home-layout="list"] .pop-entry-action--path .pop-entry-action__art {
   top: 0 !important;
   right: 0 !important;
@@ -766,4 +770,39 @@ main[style*="background: rgb(13, 6, 16)"] button:last-of-type { border-color: #c
 @media (max-width: 380px) {
   .pop-home[data-home-layout="list"] .pop-entry-action__copy { left: 14px !important; }
   .touche-games .touche-games__choice-copy { left: 14px !important; }
+}
+
+/* Blend the supplied collage crops into the existing game-card fills. */
+.touche-games .touche-games__choice--wheel { --game-art-wash: .42 !important; }
+.touche-games .touche-games__choice--dice { --game-art-wash: .28 !important; }
+.touche-games .touche-games__choice--strip { --game-art-wash: .4 !important; }
+.touche-games .touche-games__choice::before {
+  background:
+    linear-gradient(90deg,
+      rgb(var(--game-card-rgb)) 0%,
+      rgb(var(--game-card-rgb)) 34%,
+      rgba(var(--game-card-rgb), .9) 46%,
+      rgba(var(--game-card-rgb), .68) 60%,
+      rgba(var(--game-card-rgb), .38) 78%,
+      rgba(var(--game-card-rgb), var(--game-art-wash, .1)) 100%),
+    linear-gradient(0deg,
+      rgba(var(--game-card-rgb), .28),
+      rgba(var(--game-card-rgb), .1) 15%,
+      transparent 31%,
+      transparent 69%,
+      rgba(var(--game-card-rgb), .1) 85%,
+      rgba(var(--game-card-rgb), .28)) !important;
+}
+.touche-games .touche-games__choice > .touche-games__art-wrap > .touche-games__art-image {
+  filter: saturate(.84) contrast(.96) brightness(1.01) !important;
+}
+.touche-games .touche-games__choice > .touche-games__art-wrap > .touche-games__art-image--wheel {
+  object-fit: contain !important;
+  object-position: right center !important;
+}
+.touche-games .touche-games__choice > .touche-games__art-wrap > .touche-games__art-image--dice {
+  object-position: center 52% !important;
+}
+.touche-games .touche-games__choice > .touche-games__art-wrap > .touche-games__art-image--strip {
+  object-position: center 56% !important;
 }

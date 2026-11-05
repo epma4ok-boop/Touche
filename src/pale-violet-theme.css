@@ -1,0 +1,515 @@
+/* Touché · violet dusk
+   A shared, color-only skin. Kept last in the entry cascade so every destination,
+   modal, and game uses the same lilac paper / plum ink / soft violet language. */
+:root {
+  --bg: #f1edf8;
+  --surface: #fbf9fe;
+  --text-primary: #342a42;
+  --text-secondary: #62566f;
+  --text-tertiary: #81758e;
+  --border: #c9bdd9;
+  --divider: #e2d9ec;
+  --accent-wine: #765b99;
+  --accent-champagne: #d7c9ec;
+  --focus-ring: #795e9c;
+  --pop-ink: #342a42;
+  --pop-muted: #62566f;
+  --pop-paper: #f8f5fc;
+  --pop-coral: #9b82bd;
+  --pop-blue: #8064a2;
+  --pop-lime: #e1d8ef;
+  --pop-yellow: #eee6f5;
+  --pop-wine: #765b99;
+  --pop-blush: #e9e0f2;
+  --pop-plum: #40334f;
+  --touche-orange: #8064a2;
+  --touche-coral: #a48abf;
+  --touche-cream: #f8f5fc;
+  --touche-ink: #342a42;
+  --sun-orange: #8064a2;
+  --sun-coral: #a48abf;
+  --sun-hot: #765b99;
+  --sun-cream: #f8f5fc;
+  --sun-paper: #f1edf8;
+  --sun-ink: #342a42;
+  --sun-muted: #62566f;
+  --sun-line: rgba(67, 52, 83, .16);
+  --sun-yellow: #e1d8ef;
+}
+
+/* Shared paper, ink, and controls. Never blanket-paint the document: artwork
+   remains owned by its original image/background layers. */
+.pop-screen,
+.pop-home[data-home-layout="list"],
+.pop-home[data-home-layout="task-picker"],
+.category-pop,
+.scenario-pop,
+.touche-games,
+.touche-dice,
+.pose-lottery,
+.strip,
+.strip.strip-premium,
+.tarot,
+.love-path-screen {
+  --pop-ink: #342a42 !important;
+  --pop-muted: #62566f !important;
+  --pop-paper: #f8f5fc !important;
+  --pop-coral: #9b82bd !important;
+  --pop-wine: #765b99 !important;
+  --pop-blush: #e9e0f2 !important;
+  --pop-yellow: #eee6f5 !important;
+  --pop-plum: #40334f !important;
+}
+
+button:focus-visible,
+[role="button"]:focus-visible,
+.pop-home .pop-entry-action:focus-visible,
+.category-pop button:focus-visible,
+.scenario-pop button:focus-visible,
+.touche-games button:focus-visible,
+.touche-dice button:focus-visible,
+.pose-lottery button:focus-visible,
+.strip button:focus-visible,
+.tarot button:focus-visible,
+.love-path-screen button:focus-visible {
+  outline-color: #795e9c !important;
+}
+
+/* Entry, language, onboarding and profile setup */
+.pop-screen {
+  background:
+    radial-gradient(ellipse at 92% 2%, rgba(220, 207, 239, .72), transparent 45%),
+    linear-gradient(155deg, #f8f5fc 0%, #f0ebf7 55%, #e9e2f2 100%) !important;
+  color: #40334f !important;
+}
+.pop-brand { color: #40334f !important; }
+.pop-brand em, .pop-title span { color: #8064a2 !important; }
+.pop-eyebrow { background: #e4d9f0 !important; color: #443653 !important; }
+.pop-title, .language-picker__title { color: #40334f !important; }
+.pop-copy, .language-picker__hint, .language-picker__instruction { color: #62566f !important; }
+.pop-panel {
+  border-color: rgba(255,255,255,.55) !important;
+  background: #f8f5fc !important;
+  color: #342a42 !important;
+  box-shadow: 0 18px 40px rgba(43,32,57,.22) !important;
+}
+.pop-panel .pop-title { color: #342a42 !important; }
+.pop-panel .pop-title span { color: #765b99 !important; }
+.pop-panel .pop-copy, .pop-choice small, .language-picker__names small { color: #62566f !important; }
+.pop-button, .language-picker__continue {
+  background: #f8f5fc !important;
+  color: #594573 !important;
+  box-shadow: 0 5px 0 rgba(48,37,63,.22) !important;
+}
+.pop-outline { border-color: #c9bdd9 !important; color: #40334f !important; background: transparent !important; }
+.pop-choice, .language-picker__option {
+  border-color: #ddd3e8 !important;
+  background: #fcfaff !important;
+  color: #342a42 !important;
+  box-shadow: 0 5px 16px rgba(55,42,70,.08) !important;
+}
+.pop-choice:hover, .pop-choice[data-chosen="true"],
+.language-picker__option:hover, .language-picker__option[data-selected="true"] { background: #eee7f6 !important; }
+.pop-choice__mark, .language-picker__code { background: #d9cde9 !important; color: #40334f !important; }
+.language-picker__check { border-color: #8b74a9 !important; }
+.language-picker__option[data-selected="true"] .language-picker__check { background: #8064a2 !important; color: #fff !important; }
+.pop-heart-mark { background: linear-gradient(145deg,#c7b6dc,#765b99) !important; color: #fbf8ff !important; }
+
+/* Home and task picker: preserve every original illustration and its visibility. */
+.pop-home[data-home-layout="list"] {
+  background:
+    radial-gradient(ellipse 300px 220px at 94% 0%, rgba(222,211,239,.8), transparent 75%),
+    #f2eef8 !important;
+  color: #342a42 !important;
+}
+.pop-home[data-home-layout="list"]::before {
+  background-image: radial-gradient(rgba(80,63,101,.13) .55px, transparent .55px) !important;
+}
+.pop-home[data-home-layout="list"] .pop-header button,
+.pop-home[data-home-layout="task-picker"] .pop-header button,
+.pop-home[data-home-layout="task-picker"] .pop-subpage-back {
+  border-color: rgba(73,57,93,.16) !important;
+  color: #514365 !important;
+  background: rgba(251,249,254,.88) !important;
+}
+.pop-home[data-home-layout="list"] .pop-header button div,
+.pop-home[data-home-layout="list"] .pop-header button svg { background: #514365 !important; stroke: #514365 !important; }
+.pop-home[data-home-layout="list"] .pop-header > div:nth-child(2) { color: #40334f !important; }
+.pop-home[data-home-layout="list"] .pop-home-hero__stamp { color: #725b91 !important; }
+.pop-home[data-home-layout="list"] .pop-home-hero__stamp::before { background: #9b82bd !important; box-shadow: 0 0 0 3px rgba(155,130,189,.16) !important; }
+.pop-home[data-home-layout="list"] .pop-home-hero h1,
+.pop-home[data-home-layout="task-picker"] .pop-subpage-heading h1 { color: #40334f !important; }
+.pop-home[data-home-layout="list"] .pop-home-hero h1 span,
+.pop-home[data-home-layout="task-picker"] .pop-subpage-heading > span { color: #8064a2 !important; }
+.pop-home[data-home-layout="list"] .pop-home-hero p,
+.pop-home[data-home-layout="task-picker"] .pop-subpage-heading p { color: #62566f !important; }
+.pop-home[data-home-layout="list"] .pop-entry-action {
+  border-color: rgba(73,57,93,.15) !important;
+  box-shadow: 0 7px 16px rgba(55,42,70,.09), inset 0 1px 0 rgba(255,255,255,.5) !important;
+}
+.pop-home[data-home-layout="list"] .pop-entry-action--tasks { --home-card-rgb: 158, 132, 185; --home-card-ink: #fffaff; --home-card-muted: rgba(255,250,255,.9); }
+.pop-home[data-home-layout="list"] .pop-entry-action--path { --home-card-rgb: 220, 211, 234; --home-card-ink: #40334f; --home-card-muted: rgba(64,51,79,.83); }
+.pop-home[data-home-layout="list"] .pop-entry-action--tarot { --home-card-rgb: 205, 199, 220; --home-card-ink: #39314a; --home-card-muted: rgba(57,49,74,.83); }
+.pop-home[data-home-layout="list"] .pop-entry-action--lottery { --home-card-rgb: 120, 94, 151; --home-card-ink: #fffaff; --home-card-muted: rgba(255,250,255,.88); }
+.pop-home[data-home-layout="list"] .pop-entry-action__arrow { color: #6d568a !important; }
+.pop-home[data-home-layout="list"] .pop-entry-action:focus-visible { outline-color: rgba(121,94,156,.7) !important; }
+.pop-home[data-home-layout="task-picker"] { background: #f2eef8 !important; color: #342a42 !important; }
+.pop-home[data-home-layout="task-picker"] .pop-subpage-heading > span { color: #8064a2 !important; }
+.pop-home[data-home-layout="task-picker"] .pop-entry-action {
+  border-color: rgba(73,57,93,.16) !important;
+  color: #40334f !important;
+  background: #e4dcef !important;
+}
+.pop-home[data-home-layout="task-picker"] .pop-entry-action--together { background: #e9dfef !important; }
+.pop-home[data-home-layout="task-picker"] .pop-entry-action__index,
+.pop-home[data-home-layout="task-picker"] .pop-entry-action__copy small { color: #62566f !important; }
+.pop-home[data-home-layout="task-picker"] .pop-entry-action__copy strong { color: #40334f !important; }
+.pop-home[data-home-layout="task-picker"] .pop-entry-action__arrow { color: #765b99 !important; }
+.pop-home .pop-entry-action--solo { background-color: #eee8f5 !important; }
+.pop-home .pop-entry-action--together { background-color: #e9e1f2 !important; }
+.pop-home .pop-entry-action--path { background-color: #e2d9ef !important; }
+.pop-home .pop-entry-action--lottery { background-color: #dfd4ec !important; }
+.pop-home .pop-entry-action--tarot { background-color: #e8e0f0 !important; }
+.love-path-home-card { border-color: #c9bdd9 !important; background-color: #e9e1f2 !important; }
+.love-path-home-card h2 { color: #40334f !important; }
+.love-path-home-card > p:not(.love-path-home-kicker) { color: #62566f !important; }
+.love-path-home-kicker { color: #765b99 !important; }
+.love-path-home-button { border-color: #594573 !important; background: #765b99 !important; color: #fffaff !important; box-shadow: 3px 3px 0 #594573 !important; }
+.pop-home .pop-card { border-color: rgba(73,57,93,.18) !important; }
+.pop-home .pop-card-compliments { background-color: #eee8f5 !important; }
+.pop-home .pop-card-tenderness { background-color: #e5def0 !important; }
+.pop-home .pop-card-desire { background-color: #e8dcec !important; }
+.pop-home .pop-card-passion { background-color: #dfd2e9 !important; }
+.pop-home .pop-card-hard { background-color: #d9cde5 !important; }
+.pop-home .pop-card-scenarios { background-color: #e9e2f1 !important; }
+.pop-home .pop-card-invite, .pop-home .pop-card-pair { background-color: #eee8f5 !important; }
+.pop-home .pop-card > div:nth-child(2) {
+  background: linear-gradient(180deg,transparent 24%,rgba(248,245,252,.73) 67%,rgba(248,245,252,.97) 100%) !important;
+}
+.pop-home .pop-card > div:last-child > div:nth-child(2) > div:first-child { color: #40334f !important; }
+.pop-home .pop-card > div:last-child > div:nth-child(2) > div:last-child { color: #62566f !important; }
+.pop-home .pop-card__remaining { color: #594573 !important; }
+.pop-home .pop-mode { background: #e5deef !important; }
+.pop-home .pop-mode button { color: #62566f !important; }
+.pop-home .pop-mode button[style*="rgba(255"] { color: #49385f !important; background: #fbf9fe !important; }
+.pop-overlay, .pop-home ~ .pop-overlay { background: rgba(44,34,57,.42) !important; }
+.pop-sheet, .pop-menu-detail, .pop-menu-main {
+  background: #f8f5fc !important;
+  color: #342a42 !important;
+  border-color: #d7cde4 !important;
+  box-shadow: 0 -7px 0 rgba(167,146,194,.35) !important;
+}
+.pop-sheet .pop-primary, .pop-menu-detail .pop-menu-subscribe { background: #765b99 !important; color: #fffaff !important; border-color: #594573 !important; }
+.pop-sheet .pop-secondary { border-color: #c9bdd9 !important; color: #49385f !important; }
+.pop-menu-main .pop-menu-hero { background: #ded4ec !important; border-color: #c9bdd9 !important; }
+.pop-menu-main .pop-menu-card { border-color: #d1c6e0 !important; background-color: #eee8f5 !important; }
+.pop-menu-main .pop-menu-card--instructions { background-color: #e4dcef !important; }
+.pop-menu-main .pop-menu-card--premium { background-color: #d8cce8 !important; }
+.pop-menu-main .pop-menu-gender, .pop-menu-main .pop-menu-small { background: #fbf9fe !important; border-color: #d1c6e0 !important; }
+.pop-connect-panel { border-color: #d4c9e2 !important; background: #fbf9fe !important; }
+.pop-connect-panel p { color: #40334f !important; }
+.pop-connect-panel small { color: #62566f !important; }
+.pop-connect-panel button { background: #765b99 !important; color: #fffaff !important; border-color: #765b99 !important; }
+
+/* Categories, task reveal and scenario surfaces */
+.category-pop {
+  --pop-ink: #342a42 !important; --pop-muted: #62566f !important; --pop-paper: #f8f5fc !important;
+  background:
+    radial-gradient(ellipse at 88% 3%, rgba(210,194,232,.7), transparent 36%),
+    linear-gradient(155deg,#f8f5fc,#f0ebf7 72%,#e8e0f1) !important;
+  color: #40334f !important;
+}
+.category-pop__menu span { background: #f8f5fc !important; }
+.category-pop__history, .category-pop__logo { color: #40334f !important; }
+.category-pop__logo em { color: #8064a2 !important; }
+.category-pop__stamp { background: #e7def1 !important; color: #48385c !important; }
+.category-pop__orb { background-color: #ddd2eb !important; border-color: rgba(255,255,255,.6) !important; }
+.category-pop__eyebrow, .category-pop__remaining { color: #765b99 !important; }
+.category-pop__hero h1 { color: #40334f !important; }
+.category-pop__description, .category-pop__footer { color: #62566f !important; }
+.category-pop__warning { border-color: #d1c6e0 !important; background: #eee8f5 !important; color: #51465e !important; }
+.category-pop__mode { border-color: #d9cde8 !important; background: #eee8f5 !important; color: #40334f !important; }
+.category-pop__mode small { color: #62566f !important; }
+.category-pop__generator, .category-paywall, .category-pop__error {
+  border-color: rgba(255,255,255,.58) !important; background: #f8f5fc !important; color: #342a42 !important;
+}
+.category-pop__generator-head { color: #62566f !important; }
+.category-pop__generator-head b, .category-paywall__topline, .category-paywall__topline button { color: #765b99 !important; }
+.category-pop__hold-label { color: #62566f !important; }
+.category-pop__premium { background: #4b3d5e !important; }
+.category-pop__premium span { background: #ded4ec !important; color: #40334f !important; }
+.category-pop__premium small { color: #e5deef !important; }
+.category-pop__footer strong { color: #eee3f5 !important; }
+.category-paywall__offer--premium { background: #4b3d5e !important; }
+.category-paywall__offer--single { background: #e1d8ef !important; color: #40334f !important; }
+.category-paywall__notice { border-color: #d7cde4 !important; background: #eee8f5 !important; color: #40334f !important; }
+.task-reveal {
+  background:
+    radial-gradient(ellipse at 70% 15%,rgba(197,180,222,.64),transparent 48%),
+    linear-gradient(150deg,#f7f3fb,#ebe4f3) !important;
+  color: #40334f !important;
+}
+.task-reveal__rule { background: #ded4ec !important; }
+.task-reveal__shared-status { background: #f8f5fc !important; color: #40334f !important; }
+.task-reveal__text { color: #40334f !important; }
+.task-reveal__actions button { border-color: #c9bdd9 !important; color: #594573 !important; background: rgba(251,249,254,.76) !important; }
+.task-reveal__actions .task-reveal__done { background: #8064a2 !important; color: #fffaff !important; }
+.scenario-pop {
+  --ink: #342a42 !important; --muted: #62566f !important; --paper: #f8f5fc !important;
+  background: radial-gradient(ellipse at 84% 3%,#d9cbea 0,transparent 35%),linear-gradient(155deg,#f8f5fc,#eee8f6) !important;
+  color: #40334f !important;
+}
+.scenario-brand { color: #40334f !important; }
+.scenario-brand em, .premium-tag { color: #765b99 !important; }
+.scenario-intro h1 { color: #40334f !important; }
+.scenario-intro p { color: #62566f !important; }
+.scenario-intro .pop-stamp { border-color: #d1c6e0 !important; background: #fbf9fe !important; color: #594573 !important; }
+.scenario-orb, .no-partner-art { background: linear-gradient(145deg,#ded4ec,#a48abf) !important; color: #40334f !important; }
+.intensity-item { border-color: #d1c6e0 !important; background: #fbf9fe !important; color: #62566f !important; }
+.intensity-item.active { border-color: #8064a2 !important; background: #8064a2 !important; color: #fffaff !important; }
+.intensity-item.romantic.active, .intensity-item.passion.active, .intensity-item.hard.active { background: #8064a2 !important; color: #fffaff !important; }
+.adult-note { border-color: #d1c6e0 !important; background: #eee8f5 !important; color: #51465e !important; }
+.scenario-footer { color: #62566f !important; }
+.scenario-error, .role-task-card { background: #f8f5fc !important; color: #342a42 !important; }
+.role-overlay.coral, .role-overlay.yellow, .role-overlay.blue {
+  background:
+    radial-gradient(ellipse at 90% 8%,rgba(196,178,222,.24),transparent 38%),
+    linear-gradient(145deg,#40334f,#655278) !important;
+  color: #f8f5fc !important;
+}
+.role-task-label { color: #765b99 !important; }
+.role-task-index { background: #e2d8ee !important; color: #594573 !important; }
+.role-detail-card { border-color: #d1c6e0 !important; background: #eee8f5 !important; color: #51465e !important; }
+.role-detail-label { color: #765b99 !important; }
+.role-first-card { border-left-color: #b49ccf !important; }
+.partner-note { background: #eee8f5 !important; color: #51465e !important; }
+.role-complete, .pop-primary { background: #8064a2 !important; color: #fffaff !important; }
+.no-partner h1 { color: #40334f !important; }
+.no-partner p { color: #62566f !important; }
+.scenario-feedback-ratings button:hover:not(:disabled), .scenario-feedback-ratings button:focus-visible { background: #f8f5fc !important; color: #40334f !important; }
+
+/* Games, wheel, dice, and both Strip-or-Dare presentations */
+.touche-games, .touche-dice, .pose-lottery, .strip {
+  --games-ink: #342a42; --games-muted: #62566f; --games-paper: #f8f5fc; --games-wine: #765b99;
+  --dice-ink: #342a42; --dice-muted: #62566f; --dice-paper: #f8f5fc; --dice-wine: #765b99;
+  --wheel-ink: #342a42; --wheel-paper: #f8f5fc; --wheel-muted: #62566f; --wheel-wine: #765b99;
+  --strip-ink: #342a42; --strip-muted: #62566f; --strip-paper: #f8f5fc; --strip-wine: #765b99; --strip-rose: #a48abf;
+  color: #342a42 !important;
+  background:
+    radial-gradient(ellipse 350px 280px at 96% 8%,rgba(213,200,232,.74),transparent 74%),
+    radial-gradient(ellipse 320px 330px at 0% 90%,rgba(184,166,210,.25),transparent 76%),
+    #f1edf8 !important;
+}
+.touche-games__back, .touche-dice__back, .pose-lottery__back, .strip__back {
+  border-color: rgba(75,59,96,.23) !important; color: #514365 !important; background: rgba(251,249,254,.9) !important;
+}
+.touche-games__brand, .touche-dice__brand, .pose-lottery__brand, .strip__brand, .tarot__brand { color: #40334f !important; }
+.touche-games__brand em, .touche-dice__brand em, .pose-lottery__brand em, .strip__brand em, .tarot__brand em { color: #765b99 !important; }
+.touche-games__eyebrow, .touche-dice__eyebrow, .pose-lottery__eyebrow, .strip__eyebrow, .strip__kicker { color: #765b99 !important; }
+.touche-games__intro h1, .touche-dice__intro h1, .pose-lottery__intro h1, .strip__intro h1, .strip__play h1, .strip__finish h1 { color: #40334f !important; }
+.touche-games__intro p, .touche-dice__intro p, .pose-lottery__intro p, .strip__lead { color: #62566f !important; }
+.touche-games__choice { border-color: rgba(75,59,96,.18) !important; }
+.touche-games__choice--wheel { --game-card-rgb: 116, 91, 148 !important; --game-card-ink: #fffaff !important; --game-card-muted: rgba(255,250,255,.88) !important; --game-card-action: #604a7b !important; }
+.touche-games__choice--dice { --game-card-rgb: 224, 216, 236 !important; --game-card-ink: #40334f !important; --game-card-muted: rgba(64,51,79,.82) !important; --game-card-action: #d8cde9 !important; }
+.touche-games__choice--strip { --game-card-rgb: 77, 62, 96 !important; --game-card-ink: #fffaff !important; --game-card-muted: rgba(255,250,255,.88) !important; --game-card-action: #5e4a75 !important; }
+.touche-games__footnote { color: #62566f !important; }
+.touche-games__footnote span { background: #9b82bd !important; }
+.touche-dice__table { border-color: #d8cde7 !important; background: #e9e2f1 !important; }
+.touche-dice__face { border-color: #c4b5d7 !important; background: linear-gradient(145deg,#fbf9fe,#ded4ec) !important; }
+.touche-dice__player-label, .touche-dice__status { color: #62566f !important; }
+.touche-dice__status.is-result, .touche-dice__joke, .touche-dice__join { color: #765b99 !important; }
+.touche-dice__join { border-color: #d7cde4 !important; }
+.touche-dice__button, .pose-lottery__button, .strip-btn, .tarot-btn {
+  background: linear-gradient(110deg,#655078,#8064a2 70%,#a18abe) !important;
+  color: #fffaff !important;
+  box-shadow: 0 7px 0 rgba(65,49,83,.2) !important;
+}
+.touche-dice__button:hover, .pose-lottery__button:hover { background: #765b99 !important; }
+.pose-lottery__svg circle:first-child { fill: #765b99 !important; }
+.pose-lottery__svg path { stroke: #f8f5fc !important; }
+.pose-lottery__svg defs linearGradient stop:first-child { stop-color: #604a7b !important; }
+.pose-lottery__svg defs linearGradient stop:nth-child(2) { stop-color: #8064a2 !important; }
+.pose-lottery__svg defs linearGradient stop:nth-child(3) { stop-color: #a48abf !important; }
+.pose-lottery__svg defs linearGradient stop:nth-child(4) { stop-color: #d7c9ec !important; }
+.pose-lottery__hub { background: radial-gradient(circle at 35% 25%,#fbf9fe,#ded4ec) !important; }
+.pose-lottery__hub b { color: #40334f !important; }
+.pose-lottery__hub em { color: #765b99 !important; }
+.pose-lottery__index { background-color: #765b99 !important; }
+.pose-lottery__status { color: #62566f !important; }
+.strip__panel, .strip-player, .strip__challenge, .strip__result p, .strip__confirm {
+  border-color: #d8cde7 !important; background: rgba(251,249,254,.92) !important; color: #40334f !important;
+}
+.strip__panel h2, .strip__age-note > span, .strip__pick[aria-pressed="true"], .strip__result-toast, .strip__resume > p { color: #765b99 !important; }
+.strip__rules li, .strip__criteria p, .strip__wish { color: #51465e !important; }
+.strip__rules i, .strip__criteria > span, .strip__challenge-top b, .strip__result strong { color: #765b99 !important; }
+.strip__age-note, .strip__criteria { background: #ebe4f3 !important; color: #51465e !important; }
+.strip__pick { border-color: #d1c6e0 !important; color: #40334f !important; background: #fbf9fe !important; }
+.strip__pick[aria-pressed="true"] { border-color: #8064a2 !important; background: #e6ddef !important; }
+.strip__pick-mark { background: #765b99 !important; color: #fffaff !important; }
+.strip-btn--secondary, .strip-btn--text, .strip-btn--fail { border-color: #c9bdd9 !important; color: #6d568a !important; background: transparent !important; box-shadow: none !important; }
+.strip-btn--danger { background: #655078 !important; }
+.strip__turn, .strip__turn strong { border-color: #d8cde7 !important; color: #765b99 !important; background: #fbf9fe !important; }
+.strip-player[data-active="true"] { border-color: #9b82bd !important; background: #f4eff9 !important; }
+.strip-player__level { color: #62566f !important; background: #e9e1f2 !important; }
+.strip-player__level b, .strip__level-line span:first-child { color: #765b99 !important; }
+.strip-figure__garment { fill: #765b99 !important; }
+.strip-figure__garment--top { fill: #a48abf !important; }
+.strip-figure__garment--bottom { fill: #62566f !important; }
+.strip-figure__garment--base { fill: #c8b8dc !important; }
+.strip-figure__garment--under { fill: #8064a2 !important; }
+.strip__finish-mark { color: #765b99 !important; background: radial-gradient(circle,#ddd2eb,rgba(251,249,254,.8) 70%) !important; }
+.strip-premium__reveal {
+  color: #40334f !important;
+  background: rgba(49,39,62,.32) !important;
+}
+.strip-premium__reveal-panel {
+  border-color: #d1c6e0 !important;
+  background: radial-gradient(ellipse at 90% 5%,rgba(217,205,234,.5),transparent 42%),#f8f5fc !important;
+}
+.strip-premium__reveal-panel::before { border-color: rgba(109,86,139,.16) !important; }
+.strip-premium__reveal-brand strong, .strip-premium__reveal-cardno, .strip-premium__reveal-criteria strong { color: #765b99 !important; }
+.strip-premium__reveal-level, .strip-premium__reveal-turn { color: #62566f !important; }
+.strip-premium__reveal-level b { border-color: #c9bdd9 !important; color: #765b99 !important; }
+.strip-premium__reveal-task { color: #40334f !important; }
+.strip-premium__reveal-criteria { border-color: #d9cfe6 !important; border-left-color: #9b82bd !important; background: #eee8f5 !important; }
+.strip-premium__reveal-criteria p { color: #51465e !important; }
+.strip-premium__reveal-foot { color: #81758e !important; }
+.strip-premium .strip__panel, .strip-premium .strip-player, .strip-premium .strip__challenge, .strip-premium .strip__result p { border-color: #d8cde7 !important; background: #fbf9fe !important; }
+.strip-premium .strip__rules li { border-color: #e0d8ea !important; background: #f8f5fc !important; color: #51465e !important; }
+.strip-premium .strip__age-note { background: #eee8f5 !important; color: #51465e !important; }
+.strip-premium .strip-player[data-active="true"] { border-color: #9b82bd !important; background: #f2edf8 !important; }
+.strip-premium .strip-player__level { background: #e9e1f2 !important; color: #62566f !important; }
+.strip-premium .strip-player__level b, .strip-premium .strip__level-line span:first-child { color: #765b99 !important; }
+.strip-premium .strip__task { color: #40334f !important; }
+.strip-premium .strip__criteria { border-left-color: #9b82bd !important; background: #eee8f5 !important; }
+.strip-premium .strip__criteria p { color: #51465e !important; }
+.strip-premium .strip__turn { background: #fbf9fe !important; color: #62566f !important; }
+.strip-premium .strip__turn strong, .strip-premium .strip-btn--secondary, .strip-premium .strip-btn--text { color: #765b99 !important; }
+.strip-premium__progress span { background: #d5c9e2 !important; }
+.strip-premium__progress span[data-removed="true"] { background: #bdb0cf !important; }
+
+/* Tarot and Love Path retain their original card art and illustration colors. */
+.tarot {
+  --t-ink: #342a42 !important; --t-muted: #62566f !important; --t-wine: #765b99 !important; --t-paper: #f8f5fc !important;
+  color: #342a42 !important;
+  background: radial-gradient(ellipse 360px 300px at 100% 10%,rgba(213,200,232,.72),transparent 74%),#f1edf8 !important;
+}
+.tarot__back { border-color: #d1c6e0 !important; color: #514365 !important; background: #fbf9fe !important; }
+.tarot__eyebrow, .tarot__pos-index { color: #765b99 !important; }
+.tarot__panel, .tarot__summary li { border-color: #d9cfe6 !important; background: #fbf9fe !important; color: #40334f !important; }
+.tarot__panel h2, .tarot__card-title { color: #765b99 !important; }
+.tarot__positions li > span, .tarot__summary li > span { background: linear-gradient(135deg,#8064a2,#a48abf) !important; }
+.tarot__positions strong, .tarot__summary strong, .tarot__pos-title, .tarot__done-title { color: #40334f !important; }
+.tarot__positions small, .tarot__summary small, .tarot__lead, .tarot__rules, .tarot__hint { color: #62566f !important; }
+.tarot__notice, .tarot__pause { border-left-color: #9b82bd !important; background: #ebe4f3 !important; color: #51465e !important; }
+.tarot__resume-note { color: #765b99 !important; }
+.tarot__confirm { border-color: #d3c7e1 !important; background: #f4eff9 !important; color: #40334f !important; }
+.tarot-btn--ghost { border-color: #c9bdd9 !important; color: #6d568a !important; background: transparent !important; box-shadow: none !important; }
+.tarot-btn--danger { background: #655078 !important; }
+.tarot__progress span { background: #ded5e9 !important; }
+.tarot__progress span[data-on="true"] { background: #8064a2 !important; }
+.tarot__pos-sub { color: #62566f !important; }
+.tarot__card-text, .tarot__question { color: #40334f !important; }
+.tarot-art { background: #eee8f5 !important; }
+.tarot-art__skeleton { background: linear-gradient(100deg,#ddd2e9 30%,#f7f3fb 50%,#ddd2e9 70%) !important; }
+.love-path-screen {
+  --lp-ink: #342a42 !important; --lp-muted: #62566f !important; --lp-paper: #f8f5fc !important;
+  --lp-wine: #765b99 !important; --lp-coral: #9b82bd !important; --lp-yellow: #ded4ec !important;
+  background: radial-gradient(ellipse 340px 250px at 95% 6%,rgba(213,200,232,.72),transparent 72%),#f1edf8 !important;
+  color: #342a42 !important;
+}
+.lp-back { color: #62566f !important; }
+.lp-kicker, .lp-eyebrow { color: #765b99 !important; }
+.lp-header-mark, .lp-final-heart, .lp-scenario-mark { border-color: #c9bdd9 !important; background: radial-gradient(circle at 30% 25%,#f8f5fc 0 10%,#bfaed5 38%,#765b99 78%) !important; }
+.lp-intro h1 { color: #40334f !important; }
+.lp-intro > p:last-child, .lp-progress-top, .lp-board-legend, .lp-day-summary small, .lp-muted, .lp-footer { color: #62566f !important; }
+.lp-progress-track { background: #e3dbea !important; }
+.lp-progress-track span { background: linear-gradient(90deg,#765b99,#bba9d2) !important; }
+.lp-panel { border-color: #d8cde7 !important; background: #fbf9fe !important; color: #40334f !important; box-shadow: 0 8px 22px rgba(63,48,80,.1) !important; }
+.lp-section-heading h2, .lp-day-summary strong, .lp-choice strong, .lp-scenario-panel h2 { color: #40334f !important; }
+.lp-turn, .lp-day-number, .lp-choice-number { border-color: #d1c6e0 !important; background: #ebe4f3 !important; color: #6d568a !important; }
+.lp-heart-fill { fill: #e8e0f1 !important; stroke: #806a9b !important; }
+.lp-route { stroke: rgba(118,91,153,.62) !important; }
+.lp-node { fill: #fbf9fe !important; stroke: #806a9b !important; }
+.lp-node-label { fill: #40334f !important; }
+.lp-heart-svg g.is-complete .lp-node { fill: #d8cde9 !important; }
+.lp-heart-svg g.is-current .lp-node { fill: #9b82bd !important; }
+.lp-heart-svg g.is-current .lp-node-label { fill: #fffaff !important; }
+.lp-heart-svg g.is-final .lp-node { fill: #765b99 !important; }
+.lp-heart-word { fill: #765b99 !important; }
+.lp-day-summary { border-color: #e0d8ea !important; }
+.lp-legend-dot { border-color: #806a9b !important; }
+.lp-legend-done { background: #d8cde9 !important; }
+.lp-legend-current { background: #9b82bd !important; }
+.lp-legend-final { background: #765b99 !important; }
+.lp-primary { border-color: #594573 !important; background: #765b99 !important; color: #fffaff !important; box-shadow: 3px 3px 0 #594573 !important; }
+.lp-choice { border-color: #d8cde7 !important; background: #fbf9fe !important; color: #40334f !important; }
+.lp-choice:hover, .lp-choice.is-selected { border-color: #9b82bd !important; background: #eee8f5 !important; }
+.lp-choice small, .lp-text-button { color: #62566f !important; }
+.lp-arrow, .lp-message span { color: #765b99 !important; }
+.lp-message { border-color: #d8cde7 !important; }
+.lp-message-actor { background: #eee8f5 !important; }
+.lp-message-partner { background: #e6ddef !important; }
+.lp-consent-note { border-left-color: #9b82bd !important; background: #f4eff9 !important; color: #62566f !important; }
+.lp-participant-switch { color: #62566f !important; }
+.lp-participant-switch button { border-color: #d1c6e0 !important; color: #40334f !important; }
+.lp-participant-switch button.active { border-color: #765b99 !important; background: #765b99 !important; color: #fffaff !important; }
+.lp-finale-choices .lp-choice.is-selected { border-color: #9b82bd !important; background: #eee8f5 !important; }
+.lp-match-status.is-match { background: #e5e8df !important; color: #39463b !important; }
+.lp-match-status.is-mismatch { background: #f1e9d9 !important; color: #594b36 !important; }
+
+/* Tutorial, support/history panels, diary and index overlays. */
+.first-run-tour { color: #342a42 !important; }
+.first-run-tour__shade--full { background: rgba(43,34,55,.66) !important; }
+.first-run-tour__spotlight { border-color: #a48abf !important; box-shadow: 0 0 0 4px rgba(248,245,252,.94),0 8px 22px rgba(43,34,55,.2) !important; }
+.first-run-tour__card { border-color: #cfc3df !important; background: #f8f5fc !important; color: #342a42 !important; box-shadow: 5px 6px 0 rgba(74,57,94,.38) !important; }
+.first-run-tour__brand, .first-run-tour__eyebrow { color: #765b99 !important; }
+.first-run-tour__brand i { color: #a48abf !important; }
+.first-run-tour__skip { border-color: #c9bdd9 !important; color: #62566f !important; }
+.first-run-tour__progress span { background: #e2d9ec !important; }
+.first-run-tour__progress span.is-active { background: #8064a2 !important; }
+.first-run-tour__card h2 { color: #40334f !important; }
+.first-run-tour__card > p:not(.first-run-tour__eyebrow) { color: #62566f !important; }
+.first-run-tour__primary { border-color: #594573 !important; background: #8064a2 !important; color: #fffaff !important; box-shadow: 3px 3px 0 #594573 !important; }
+.wm-shell { color: #342a42 !important; }
+.wm-diary-trigger { border-color: rgba(108,83,142,.25) !important; background: linear-gradient(125deg,#f8f5fc,#e7def1) !important; color: #40334f !important; }
+.wm-entry-eyebrow, .wm-entry-status, .wm-entry-title { color: #40334f !important; }
+.wm-entry-seal, .wm-seal, .wm-wish-mark, .wm-dialog-mark { color: #765b99 !important; background: #ded4ec !important; }
+.wm-entry-track, .wm-track { background: #ded4ec !important; }
+.wm-entry-track span, .wm-track-fill { background: linear-gradient(90deg,#8064a2,#b09bc9) !important; }
+.wm-diary-backdrop, .wm-dialog-backdrop { background: rgba(43,34,55,.56) !important; }
+.wm-diary-panel, .wm-dialog-shell, .intimacy-modal__panel { border-color: #d8cde7 !important; background: #f8f5fc !important; color: #342a42 !important; }
+.wm-diary-cover { background: radial-gradient(ellipse at 75% 0%,#d7c9ec,transparent 39%),linear-gradient(160deg,#f4f0f9,#e8e0f1) !important; }
+.wm-head, .wm-title { color: #40334f !important; }
+.wm-eyebrow { color: #765b99 !important; }
+.wm-intro { color: #62566f !important; }
+.wm-progress, .wm-section, .wm-task, .wm-empty, .wm-wish-card, .wm-form, .wm-privacy, .wm-confirmation {
+  border-color: #d9cfe6 !important; background: #fbf9fe !important; color: #40334f !important;
+}
+.wm-count strong, .wm-availability, .wm-section-title, .wm-task-name, .wm-wish-text { color: #40334f !important; }
+.wm-count svg { color: #765b99 !important; }
+.wm-progress-note, .wm-hint, .wm-task-kicker, .wm-section-head { color: #62566f !important; }
+.wm-privacy, .wm-alert { background: #eee8f5 !important; color: #51465e !important; }
+.wm-btn, .wm-open-task, .wm-dialog-close, .wm-diary-close { background: #e9e1f2 !important; color: #6d568a !important; }
+.wm-btn-primary { background: #8064a2 !important; color: #fffaff !important; }
+.wm-textarea { border-color: #d1c6e0 !important; background: #fbf9fe !important; color: #342a42 !important; }
+.wm-wish-card { background: #eee8f5 !important; }
+.wm-status { color: #765b99 !important; }
+.wm-dialog-text { color: #40334f !important; }
+.wm-rule, .wm-dialog-rule { background: #ded4ec !important; }
+.intimacy-modal > div[style*="background: rgba(22, 34, 56"] { background: rgba(43,34,55,.56) !important; }
+.intimacy-modal__nav { background: #f8f5fc !important; border-color: #d8cde7 !important; }
+.intimacy-modal__nav button, .intimacy-index-card { color: #40334f !important; }
+.intimacy-modal__nav button[aria-label] { background: #e4dcef !important; }
+.intimacy-modal__panel svg circle { stroke: #8064a2 !important; }
+.intimacy-modal__panel button[data-testid="button-intimacy-close"] { background: #e9e1f2 !important; color: #6d568a !important; }
+.intimacy-index-card { border-color: #d8cde7 !important; background: #fbf9fe !important; }
+
+/* Shared-task error is inline-styled in App; constrain overrides to that screen. */
+main[style*="background: rgb(13, 6, 16)"] {
+  background: linear-gradient(155deg,#f7f3fb,#e9e2f2) !important;
+  color: #40334f !important;
+  font-family: "Manrope", sans-serif !important;
+}
+main[style*="background: rgb(13, 6, 16)"] button:first-of-type { background: #8064a2 !important; color: #fffaff !important; }
+main[style*="background: rgb(13, 6, 16)"] button:last-of-type { border-color: #c9bdd9 !important; color: #594573 !important; }

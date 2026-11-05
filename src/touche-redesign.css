@@ -666,7 +666,6 @@ button:focus-visible, [role="button"]:focus-visible {
   --home-card-rgb: 229, 81, 48;
   --home-card-ink: #fffaf4;
   --home-card-muted: rgba(255, 250, 244, .86);
-  --home-card-action: #dd4f31;
   isolation: isolate;
   position: relative !important;
   display: flex !important;
@@ -676,7 +675,7 @@ button:focus-visible, [role="button"]:focus-visible {
   width: min(calc(100% - 6px), 358px) !important;
   min-height: 108px !important;
   overflow: hidden !important;
-  padding: 14px 58px 14px 18px !important;
+  padding: 14px 18px !important;
   border: 1px solid rgba(85, 43, 32, .12) !important;
   border-radius: 22px !important;
   color: var(--home-card-ink) !important;
@@ -691,35 +690,38 @@ button:focus-visible, [role="button"]:focus-visible {
   z-index: 1;
   inset: 0;
   pointer-events: none;
-  background: linear-gradient(90deg,
-    rgb(var(--home-card-rgb)) 0%,
-    rgba(var(--home-card-rgb), .98) 33%,
-    rgba(var(--home-card-rgb), .72) 52%,
-    rgba(var(--home-card-rgb), .08) 100%);
+  background:
+    linear-gradient(90deg,
+      rgb(var(--home-card-rgb)) 0%,
+      rgb(var(--home-card-rgb)) 46%,
+      rgba(var(--home-card-rgb), .88) 56%,
+      rgba(var(--home-card-rgb), .4) 74%,
+      rgba(var(--home-card-rgb), 0) 93%),
+    linear-gradient(0deg,
+      rgb(var(--home-card-rgb)) 0%,
+      transparent 18%,
+      transparent 82%,
+      rgb(var(--home-card-rgb)) 100%);
 }
 .pop-home[data-home-layout="list"] .pop-entry-action--tasks {
   --home-card-rgb: 231, 82, 47;
   --home-card-ink: #fffaf4;
   --home-card-muted: rgba(255, 250, 244, .9);
-  --home-card-action: #dc4d2d;
 }
 .pop-home[data-home-layout="list"] .pop-entry-action--path {
   --home-card-rgb: 239, 208, 187;
   --home-card-ink: #4b3026;
   --home-card-muted: rgba(75, 48, 38, .78);
-  --home-card-action: #a54d35;
 }
 .pop-home[data-home-layout="list"] .pop-entry-action--tarot {
   --home-card-rgb: 204, 210, 207;
   --home-card-ink: #343e3c;
   --home-card-muted: rgba(52, 62, 60, .82);
-  --home-card-action: #495b57;
 }
 .pop-home[data-home-layout="list"] .pop-entry-action--lottery {
   --home-card-rgb: 113, 34, 57;
   --home-card-ink: #fff8f2;
   --home-card-muted: rgba(255, 248, 242, .84);
-  --home-card-action: #732239;
 }
 .pop-home[data-home-layout="list"] .pop-entry-action:hover {
   transform: translateY(-2px) !important;
@@ -738,24 +740,24 @@ button:focus-visible, [role="button"]:focus-visible {
   right: 0 !important;
   left: auto !important;
   z-index: 0;
-  width: 66% !important;
+  width: 54% !important;
+  height: 100% !important;
+  object-fit: contain !important;
+  object-position: right center !important;
+  opacity: .96 !important;
+  transform: none !important;
+  filter: saturate(1.02) contrast(1.02);
+  mix-blend-mode: normal;
+}
+.pop-home[data-home-layout="list"] .pop-entry-action--path .pop-entry-action__art {
+  top: 0 !important;
+  right: 0 !important;
+  width: 54% !important;
   height: 100% !important;
   object-fit: cover !important;
-  object-position: center !important;
-  opacity: .98 !important;
-  transform: none !important;
-}
-.pop-home[data-home-layout="list"] .pop-entry-action--tasks .pop-entry-action__art { object-position: 78% 54% !important; }
-.pop-home[data-home-layout="list"] .pop-entry-action--tarot .pop-entry-action__art { object-position: 74% 54% !important; }
-.pop-home[data-home-layout="list"] .pop-entry-action--lottery .pop-entry-action__art { object-position: 76% 52% !important; }
-.pop-home[data-home-layout="list"] .pop-entry-action--path .pop-entry-action__art {
-  top: 4% !important;
-  right: 9px !important;
-  width: 47% !important;
-  height: 92% !important;
-  object-fit: contain !important;
-  opacity: .9 !important;
-  mix-blend-mode: multiply;
+  object-position: 68% 52% !important;
+  opacity: 1 !important;
+  mix-blend-mode: normal;
 }
 .pop-home[data-home-layout="list"] .pop-entry-action__index {
   position: absolute !important;
@@ -769,20 +771,19 @@ button:focus-visible, [role="button"]:focus-visible {
 .pop-home[data-home-layout="list"] .pop-entry-action__copy {
   position: relative !important;
   z-index: 2;
+  align-self: center;
   display: flex !important;
-  width: min(62%, 224px);
-  max-width: 224px;
+  width: min(58%, 214px);
+  max-width: 214px;
   flex-direction: column !important;
-  gap: 5px;
-  padding: 10px 0 0 !important;
+  gap: 0;
+  padding: 0 !important;
   text-align: left !important;
 }
 .pop-home[data-home-layout="list"] .pop-entry-action__copy strong {
-  overflow: hidden;
   color: var(--home-card-ink) !important;
-  font: 800 clamp(14px, 4.1vw, 16px)/1.08 "Manrope", sans-serif !important;
-  letter-spacing: -.045em !important;
-  text-overflow: ellipsis;
+  font: 800 clamp(16px, 4.6vw, 18px)/1.08 "Manrope", sans-serif !important;
+  letter-spacing: -.04em !important;
 }
 .pop-home[data-home-layout="list"] .pop-entry-action__copy small {
   color: var(--home-card-muted) !important;

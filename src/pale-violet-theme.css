@@ -639,27 +639,66 @@ main[style*="background: rgb(13, 6, 16)"] {
 main[style*="background: rgb(13, 6, 16)"] button:first-of-type { background: #8064a2 !important; color: #fffaff !important; }
 main[style*="background: rgb(13, 6, 16)"] button:last-of-type { border-color: #c9bdd9 !important; color: #594573 !important; }
 
-/* Final card-image guard: keep photos on the button, never in small thumbnails. */
+/* Card art occupies the right side; left panels stay readable and brand-colored. */
 .pop-home[data-home-layout="list"] .pop-entry-action > .pop-entry-action__art {
   position: absolute !important;
-  inset: 0 !important;
+  top: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  left: auto !important;
   z-index: 0 !important;
-  width: 100% !important;
+  width: 56% !important;
   height: 100% !important;
   border: 0 !important;
-  border-radius: inherit !important;
+  border-radius: 0 19px 19px 0 !important;
   object-fit: cover !important;
   object-position: center center !important;
+  opacity: 1 !important;
+  filter: saturate(1.1) contrast(1.08) brightness(1.04) !important;
+  transform: none !important;
   pointer-events: none !important;
+}
+.pop-home[data-home-layout="list"] .pop-entry-action::after {
+  content: "" !important;
+  position: absolute !important;
+  inset: 0 !important;
+  z-index: 1 !important;
+  width: auto !important;
+  height: auto !important;
+  border: 0 !important;
+  border-radius: inherit !important;
+  pointer-events: none !important;
+  background: linear-gradient(90deg,
+    rgba(var(--home-card-rgb), 1) 0%,
+    rgba(var(--home-card-rgb), .98) 38%,
+    rgba(var(--home-card-rgb), .9) 49%,
+    rgba(var(--home-card-rgb), .45) 62%,
+    rgba(var(--home-card-rgb), 0) 76%) !important;
+}
+.pop-home[data-home-layout="list"] .pop-entry-action__copy {
+  position: absolute !important;
+  z-index: 2 !important;
+  top: 50% !important;
+  left: 18px !important;
+  width: min(48%, 190px) !important;
+  max-width: 48% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  transform: translateY(-50%) !important;
+  text-align: left !important;
+}
+.pop-home[data-home-layout="list"] .pop-entry-action__copy strong {
+  font: 800 clamp(18px, 5.1vw, 21px)/1.05 "Manrope", sans-serif !important;
+  letter-spacing: -.045em !important;
 }
 .touche-games .touche-games__choice > .touche-games__art-wrap {
   position: absolute !important;
-  inset: 0 !important;
+  inset: 0 0 0 auto !important;
   z-index: 0 !important;
-  width: 100% !important;
+  width: 54% !important;
   height: 100% !important;
   border: 0 !important;
-  border-radius: inherit !important;
+  border-radius: 0 21px 21px 0 !important;
   background: none !important;
   box-shadow: none !important;
 }
@@ -672,39 +711,36 @@ main[style*="background: rgb(13, 6, 16)"] button:last-of-type { border-color: #c
   border: 0 !important;
   border-radius: inherit !important;
   object-fit: cover !important;
-  pointer-events: none !important;
-}
-
-/* Final home-card override: remove the legacy fixed 140px circle and keep
-   each assigned photo visible across the full button. */
-.pop-home[data-home-layout="list"] .pop-entry-action::after {
-  content: "" !important;
-  position: absolute !important;
-  inset: 0 !important;
-  width: auto !important;
-  height: auto !important;
-  z-index: 1 !important;
-  border: 0 !important;
-  border-radius: inherit !important;
-  pointer-events: none !important;
-  background:
-    linear-gradient(90deg,
-      rgba(var(--home-card-rgb), .58) 0%,
-      rgba(var(--home-card-rgb), .42) 44%,
-      rgba(var(--home-card-rgb), .08) 100%),
-    linear-gradient(0deg, rgba(40, 31, 48, .12), transparent 34%, transparent 78%, rgba(40, 31, 48, .06)) !important;
-}
-.pop-home[data-home-layout="list"] .pop-entry-action > .pop-entry-action__art {
-  position: absolute !important;
-  inset: 0 !important;
-  z-index: 0 !important;
-  width: 100% !important;
-  height: 100% !important;
-  border: 0 !important;
-  border-radius: inherit !important;
-  object-fit: cover !important;
-  object-position: center center !important;
-  opacity: .96 !important;
+  opacity: 1 !important;
+  filter: saturate(1.16) contrast(1.14) brightness(1.06) !important;
   transform: none !important;
+  mix-blend-mode: normal !important;
   pointer-events: none !important;
+}
+.touche-games .touche-games__choice::before {
+  background: linear-gradient(90deg,
+    rgb(var(--game-card-rgb)) 0%,
+    rgba(var(--game-card-rgb), .98) 38%,
+    rgba(var(--game-card-rgb), .88) 49%,
+    rgba(var(--game-card-rgb), .42) 63%,
+    rgba(var(--game-card-rgb), 0) 76%) !important;
+}
+.touche-games .touche-games__choice-copy {
+  position: absolute !important;
+  z-index: 2 !important;
+  top: 50% !important;
+  left: 16px !important;
+  width: min(46%, 210px) !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  transform: translateY(-50%) !important;
+  align-self: auto !important;
+}
+.touche-games .touche-games__choice-copy strong {
+  font: 800 clamp(18px, 5.4vw, 22px)/1.05 "Manrope", sans-serif !important;
+  letter-spacing: -.045em !important;
+}
+@media (max-width: 380px) {
+  .pop-home[data-home-layout="list"] .pop-entry-action__copy { left: 14px !important; }
+  .touche-games .touche-games__choice-copy { left: 14px !important; }
 }

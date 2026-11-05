@@ -845,6 +845,18 @@ main[style*="background: rgb(13, 6, 16)"] button:last-of-type { border-color: #c
   border-color: rgba(255,248,241,.36) !important;
   background: rgba(52,42,66,.24) !important;
 }
+.pop-home[data-home-layout="list"] .pop-entry-action,
+.pop-home[data-home-layout="task-picker"] .pop-entry-action {
+  border: 1px solid rgba(87,68,110,.16) !important;
+  box-shadow:
+    0 8px 22px rgba(52,42,66,.10),
+    inset 0 1px 0 rgba(255,255,255,.56) !important;
+}
+.pop-home[data-home-layout="list"] .pop-entry-action__art,
+.pop-home[data-home-layout="task-picker"] .pop-entry-action__art {
+  opacity: 1 !important;
+  filter: saturate(.9) contrast(1.03) brightness(1.01) !important;
+}
 .pop-home[data-home-layout="task-detail"] {
   --pop-ink: #342a42 !important;
   --pop-muted: #62566f !important;

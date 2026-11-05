@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { CSSProperties } from "react";
 import type { Lang } from "../data/i18n";
+import stripGameTranslations from "./stripGameTranslations.json";
 import useTelegramTopInset from "./useTelegramTopInset";
 import "./StripGameScreen.css";
 import "./StripGameScreenPremium.css";
@@ -89,6 +90,40 @@ const FINAL_CARD: Card = {
   criteria: "Ничья — переиграй без штрафа. Победа — одежда остаётся, ход переходит партнёру. Поражение — снимается последний слой, игра заканчивается.",
 };
 
+type TranslationLang = Exclude<Lang, "ru">;
+const TRANSLATED_CARDS = stripGameTranslations as Record<TranslationLang, Card[]>;
+const LAYER_LABELS: Record<Lang, readonly [readonly string[], readonly string[]]> = {
+  ru: [
+    ["Носки", "Кофта", "Юбка", "Бюстгальтер", "Трусы"],
+    ["Носки", "Пиджак", "Штаны", "Футболка", "Трусы"],
+  ],
+  en: [
+    ["Socks", "Top", "Skirt", "Bra", "Underwear"],
+    ["Socks", "Jacket", "Trousers", "T-shirt", "Underwear"],
+  ],
+  hi: [
+    ["मोज़े", "टॉप", "स्कर्ट", "ब्रा", "अंडरवियर"],
+    ["मोज़े", "जैकेट", "पतलून", "टी-शर्ट", "अंडरवियर"],
+  ],
+  pt: [
+    ["Meias", "Blusa", "Saia", "Sutiã", "Roupa íntima"],
+    ["Meias", "Paletó", "Calça", "Camiseta", "Roupa íntima"],
+  ],
+  es: [
+    ["Calcetines", "Blusa", "Falda", "Sujetador", "Ropa interior"],
+    ["Calcetines", "Chaqueta", "Pantalón", "Camiseta", "Ropa interior"],
+  ],
+};
+
+function layerLabel(lang: Lang, player: PlayerIndex, index: number) {
+  return LAYER_LABELS[lang][player][index] ?? LAYER_SETS[player][index];
+}
+
+function localizedCard(card: Card, lang: Lang): Card {
+  if (lang === "ru") return card;
+  return TRANSLATED_CARDS[lang].find(item => item.id === card.id) ?? card;
+}
+
 type Copy = {
   back: string; title: string; subtitle: string; kicker: string; playKicker: string; start: string;
   rulesTitle: string; rules: string[]; age: string; firstTurn: string; woman: string; man: string;
@@ -96,7 +131,7 @@ type Copy = {
   turn: string; level: string; draw: string; card: string; criteria: string; completed: string; failed: string;
   layers: string; removed: string; left: string; nextLayer: string; removeLayer: string;
   winner: string; loser: string; wish: string; finishNote: string;
-  newGame: string; toGames: string; russianNote: string; layerChanged: string;
+  newGame: string; toGames: string; layerChanged: string; finalCounter: string; continue: string;
 };
 
 const COPY: Record<Lang, Copy> = {
@@ -114,11 +149,12 @@ const COPY: Record<Lang, Copy> = {
     winner: "Победитель", loser: "Проигравший",
     wish: "Победитель сразу загадывает желание. Проигравший его выполняет.",
     finishNote: "Игра завершена.",
-    newGame: "Новая игра", toGames: "К играм", russianNote: "Карточки и задания остаются на русском языке.",
+    newGame: "Новая игра", toGames: "К играм", finalCounter: "Задания на последнем уровне: {count} / 5 · затем поединок с приложением",
+    continue: "Продолжить",
     layerChanged: "Снят слой: {layer}. Теперь ход партнёра.",
   },
   en: {
-    back: "Back to games", title: "Стрип или действие", subtitle: "A two-player game for one phone",
+    back: "Back to games", title: "Strip or dare", subtitle: "A two-player game for one phone",
     kicker: "A TWO-PLAYER GAME · ONE PHONE", playKicker: "18+ · TOUCHÉ",
     start: "Start game",
     rulesTitle: "How to play", rules: ["Take turns drawing a card for your current level.", "Complete it: your clothes stay on and the turn passes.", "Fail it: remove your next layer, advance a level, and pass the turn.", "There is no skip. Remove only your own layers, in order."],
@@ -131,11 +167,12 @@ const COPY: Record<Lang, Copy> = {
     winner: "Winner", loser: "Lost",
     wish: "The winner makes a wish right away. The loser carries it out.",
     finishNote: "The game is over.",
-    newGame: "New game", toGames: "Back to games", russianNote: "Cards and challenges remain in Russian.",
+    newGame: "New game", toGames: "Back to games", finalCounter: "Final-level challenges: {count} / 5 · then play against the app",
+    continue: "Continue",
     layerChanged: "Removed: {layer}. The other player is up.",
   },
   hi: {
-    back: "खेलों पर वापस", title: "Стрип или действие", subtitle: "एक फ़ोन पर दो लोगों का खेल",
+    back: "खेलों पर वापस", title: "स्ट्रिप या डेयर", subtitle: "एक फ़ोन पर दो लोगों का खेल",
     kicker: "दो लोगों का खेल · एक फ़ोन", playKicker: "18+ · TOUCHÉ",
     start: "खेल शुरू करें",
     rulesTitle: "कैसे खेलें", rules: ["बारी-बारी से अपने स्तर का कार्ड लें।", "पूरा करने पर कपड़े वैसे ही रहते हैं और बारी साथी की होती है।", "असफल होने पर अपनी अगली परत हटाएँ, स्तर बढ़ाएँ और बारी साथी को दें।", "कोई कार्ड छोड़ा नहीं जा सकता। अपनी परतें क्रम से हटाएँ।"],
@@ -148,11 +185,12 @@ const COPY: Record<Lang, Copy> = {
     winner: "विजेता", loser: "हारे",
     wish: "विजेता तुरंत एक इच्छा बताएगा। हारने वाला उसे पूरा करेगा।",
     finishNote: "खेल समाप्त हुआ।",
-    newGame: "नया खेल", toGames: "खेलों पर वापस", russianNote: "कार्ड और चुनौतियाँ रूसी में ही रहेंगी।",
+    newGame: "नया खेल", toGames: "खेलों पर वापस", finalCounter: "अंतिम स्तर की चुनौतियाँ: {count} / 5 · फिर ऐप के साथ खेलें",
+    continue: "आगे बढ़ें",
     layerChanged: "परत हटी: {layer}। अब साथी की बारी है।",
   },
   pt: {
-    back: "Voltar aos jogos", title: "Стрип или действие", subtitle: "Um jogo para dois em um só celular",
+    back: "Voltar aos jogos", title: "Tire uma peça ou ouse", subtitle: "Um jogo para dois em um só celular",
     kicker: "JOGO PARA DOIS · UM CELULAR", playKicker: "18+ · TOUCHÉ",
     start: "Começar jogo",
     rulesTitle: "Como jogar", rules: ["Alternem as jogadas e tirem uma carta do nível atual.", "Cumpriu: as roupas ficam e a vez passa para a outra pessoa.", "Falhou: retire a próxima camada, avance um nível e passe a vez.", "Não é possível pular. Retire apenas suas próprias camadas, na ordem."],
@@ -165,11 +203,12 @@ const COPY: Record<Lang, Copy> = {
     winner: "Vencedor", loser: "Perdeu",
     wish: "O vencedor faz um pedido imediatamente. Quem perdeu o realiza.",
     finishNote: "O jogo terminou.",
-    newGame: "Novo jogo", toGames: "Voltar aos jogos", russianNote: "As cartas e os desafios continuam em russo.",
+    newGame: "Novo jogo", toGames: "Voltar aos jogos", finalCounter: "Desafios do último nível: {count} / 5 · depois, joguem contra o app",
+    continue: "Continuar",
     layerChanged: "Camada removida: {layer}. Agora é a vez da outra pessoa.",
   },
   es: {
-    back: "Volver a juegos", title: "Стрип или действие", subtitle: "Un juego para dos en un solo móvil",
+    back: "Volver a juegos", title: "Quítate o atrévete", subtitle: "Un juego para dos en un solo móvil",
     kicker: "JUEGO PARA DOS · UN MÓVIL", playKicker: "18+ · TOUCHÉ",
     start: "Empezar juego",
     rulesTitle: "Cómo jugar", rules: ["Tomen turnos y saquen una carta de su nivel actual.", "Completada: la ropa se queda y el turno pasa a la otra persona.", "Fallida: quítate la siguiente capa, sube un nivel y pasa el turno.", "No se puede saltar. Cada persona se quita sus propias capas, en orden."],
@@ -182,7 +221,8 @@ const COPY: Record<Lang, Copy> = {
     winner: "Ganador", loser: "Perdió",
     wish: "Quien gana pide un deseo en el acto. Quien pierde lo cumple.",
     finishNote: "La partida ha terminado.",
-    newGame: "Nueva partida", toGames: "Volver a juegos", russianNote: "Las cartas y los retos siguen en ruso.",
+    newGame: "Nueva partida", toGames: "Volver a juegos", finalCounter: "Retos del último nivel: {count} / 5 · después, jueguen contra la app",
+    continue: "Continuar",
     layerChanged: "Capa quitada: {layer}. Le toca a la otra persona.",
   },
 };
@@ -348,13 +388,13 @@ export function DollArt({ player, removed }: { player: PlayerIndex; removed: num
   );
 }
 
-function PlayerFigure({ player, removed, active, copy, fromStage }: { player: PlayerIndex; removed: number; active: boolean; copy: Copy; fromStage?: number }) {
+function PlayerFigure({ player, removed, active, copy, lang, fromStage }: { player: PlayerIndex; removed: number; active: boolean; copy: Copy; lang: Lang; fromStage?: number }) {
   const name = player === 0 ? copy.woman : copy.man;
-  const layers = LAYER_SETS[player];
+  const layers = LAYER_LABELS[lang][player];
   const nextLayer = layers[removed];
   return (
     <article className="strip-player" data-active={active} data-testid={`card-strip-player-${player}`}>
-      <div className="strip-player__figure"><StripCharacter player={player} stage={removed} fromStage={fromStage} /></div>
+      <div className="strip-player__figure"><StripCharacter player={player} stage={removed} fromStage={fromStage} lang={lang} /></div>
       <div className="strip-player__heading">
         <strong>{name}</strong>
         <span>{removed} / 5 {copy.removed}</span>
@@ -386,6 +426,7 @@ export default function StripGameScreen({ lang, onBack }: Props) {
   const challengeHeadingRef = useRef<HTMLHeadingElement | null>(null);
   const currentLevel = session ? Math.min(session.players[session.turn].layersRemoved, 4) : 0;
   const levelCards = useMemo(() => session ? CARDS[currentLevel].filter(card => card.id !== "l5-rps") : [], [session, currentLevel]);
+  const currentCard = session?.card ? localizedCard(session.card, lang) : null;
 
   useEffect(() => { saveSession(session); }, [session]);
   useEffect(() => {
@@ -428,7 +469,7 @@ export default function StripGameScreen({ lang, onBack }: Props) {
     }
     const current = session.turn;
     if (!completed) setRemoval({ player: current, from: session.players[current].layersRemoved });
-    const removedLayer = LAYER_SETS[current][session.players[current].layersRemoved];
+    const removedLayer = layerLabel(lang, current, session.players[current].layersRemoved);
     const next = applyStripOutcome(session.players, current, completed, final);
     setSession({
       ...session, players: next.players, turn: next.turn,
@@ -461,14 +502,13 @@ export default function StripGameScreen({ lang, onBack }: Props) {
     body = (
       <section className="strip__intro strip-enter">
         <span className="strip__eyebrow">18+ <i /> TOUCHÉ</span>
-        <span className="strip__sequence" aria-hidden="true">03 / 03</span>
         <p className="strip__kicker">{copy.kicker}</p>
         <h1 tabIndex={-1} data-testid="text-strip-title">{copy.title}</h1>
         <p className="strip__lead">{copy.subtitle}</p>
         <div className="strip-premium__intro-stage" aria-hidden="true">
           {[0, 1].map(index => (
             <div className="strip-premium__intro-doll" key={index}>
-              <StripCharacter player={index as PlayerIndex} stage={0} />
+              <StripCharacter player={index as PlayerIndex} stage={0} lang={lang} />
             </div>
           ))}
         </div>
@@ -477,7 +517,6 @@ export default function StripGameScreen({ lang, onBack }: Props) {
           <ol className="strip__rules">{copy.rules.map((rule, index) => <li key={rule}><i>0{index + 1}</i><span>{rule}</span></li>)}</ol>
         </details>
         <div className="strip__age-note" role="note"><span>18+</span><p>{copy.age}</p></div>
-        {lang !== "ru" && <p className="strip__language-note" lang={lang}>{copy.russianNote}</p>}
         <fieldset className="strip__first">
           <legend>{copy.firstTurn}</legend>
           <div>
@@ -500,7 +539,7 @@ export default function StripGameScreen({ lang, onBack }: Props) {
         <div className="strip-premium__intro-stage strip-premium__finish-stage" aria-hidden="true">
           {session.players.map((player, index) => (
             <div className="strip-premium__intro-doll" key={index}>
-              <StripCharacter player={index as PlayerIndex} stage={player.layersRemoved} fromStage={removal?.player === index ? removal.from : undefined} />
+              <StripCharacter player={index as PlayerIndex} stage={player.layersRemoved} fromStage={removal?.player === index ? removal.from : undefined} lang={lang} />
             </div>
           ))}
         </div>
@@ -531,7 +570,6 @@ export default function StripGameScreen({ lang, onBack }: Props) {
     body = (
       <section className="strip__play strip-enter" data-testid="panel-strip-play">
         <div className="strip__play-heading">
-          <span className="strip__sequence" aria-hidden="true">03 / 03</span>
           <p className="strip__kicker">{copy.playKicker}</p>
           <h1>{copy.title}</h1>
           <div className="strip__turn" aria-live="polite" data-testid="status-strip-turn">
@@ -541,10 +579,10 @@ export default function StripGameScreen({ lang, onBack }: Props) {
         <div className="strip__players">
           {session.players.map((player, index) => (
             <PlayerFigure key={index} player={index as PlayerIndex} removed={player.layersRemoved}
-              active={session.turn === index} copy={copy} fromStage={removal?.player === index ? removal.from : undefined} />
+              active={session.turn === index} copy={copy} lang={lang} fromStage={removal?.player === index ? removal.from : undefined} />
           ))}
         </div>
-        {session.players[session.turn].layersRemoved === 4 && <p className="strip-final-counter">Задания на последнем уровне: {session.players[session.turn].finalCompleted ?? 0} / 5 · затем поединок с приложением</p>}
+        {session.players[session.turn].layersRemoved === 4 && <p className="strip-final-counter">{copy.finalCounter.replace("{count}", String(session.players[session.turn].finalCompleted ?? 0))}</p>}
         <div className="strip__play-area" aria-live="polite">
           {!session.card ? (
             <>
@@ -579,33 +617,35 @@ export default function StripGameScreen({ lang, onBack }: Props) {
       )}
       {session?.card && session.phase === "playing" && (
         <section className="strip-premium__reveal strip-enter" role="dialog" aria-modal="true" aria-labelledby="text-strip-task" data-testid="card-strip-challenge">
-          <div className="strip-premium__reveal-top">
-            <div className="strip-premium__reveal-brand">
-              <strong>18+ · TOUCHÉ</strong>
-              <span className="strip-premium__reveal-level">{copy.card}<b>{copy.level} {Math.min(session.players[session.turn].layersRemoved + 1, 5)}</b></span>
-            </div>
-            <span className="strip-premium__reveal-turn">{copy.turn}<br /><strong>{playerNames[session.turn]}</strong></span>
-          </div>
-          <div className="strip-premium__reveal-cardno" lang="ru">{session.card.category}</div>
-          <h2 id="text-strip-task" ref={challengeHeadingRef} tabIndex={-1} lang="ru" className="strip-premium__reveal-task" data-testid="text-strip-task">
-            {session.card.task}
-          </h2>
-          <div className="strip-premium__reveal-criteria">
-            <strong>{copy.criteria}</strong>
-            <p lang="ru" data-testid="text-strip-criteria">{session.card.criteria}</p>
-          </div>
-          {session.mini && <StripMiniGame round={session.mini} onChange={mini => setSession(previous => previous && previous.card ? { ...previous, mini } : previous)} />}
-          {session.mini?.kind === "final" ? (
-            session.mini.revealed && session.mini.choice && rpsOutcome(session.mini.choice, session.mini.target as RpsChoice) !== "tie" && (
-              <div className="strip-premium__reveal-actions">
-                <button type="button" className="strip-btn" onClick={() => resolveTurn(rpsOutcome(session.mini!.choice!, session.mini!.target as RpsChoice) === "win")}>Продолжить</button>
+          <div className="strip-premium__reveal-panel">
+            <div className="strip-premium__reveal-top">
+              <div className="strip-premium__reveal-brand">
+                <strong>18+ · TOUCHÉ</strong>
+                <span className="strip-premium__reveal-level">{copy.card}<b>{copy.level} {Math.min(session.players[session.turn].layersRemoved + 1, 5)}</b></span>
               </div>
-            )
-          ) : <div className="strip-premium__reveal-actions">
-            <button type="button" className="strip-btn" disabled={!!session.mini && !session.mini.revealed} onClick={() => resolveTurn(true)} data-testid="button-strip-complete">{copy.completed}</button>
-            <button type="button" className="strip-btn strip-btn--fail" disabled={!!session.mini && !session.mini.revealed} onClick={() => resolveTurn(false)} data-testid="button-strip-fail">{copy.failed} <span>· {copy.removeLayer}</span></button>
-          </div>}
-          <p className="strip-premium__reveal-foot">{copy.kicker}</p>
+              <span className="strip-premium__reveal-turn">{copy.turn}<br /><strong>{playerNames[session.turn]}</strong></span>
+            </div>
+            <div className="strip-premium__reveal-cardno" lang={lang}>{currentCard?.category}</div>
+            <h2 id="text-strip-task" ref={challengeHeadingRef} tabIndex={-1} lang={lang} className="strip-premium__reveal-task" data-testid="text-strip-task">
+              {currentCard?.task}
+            </h2>
+            <div className="strip-premium__reveal-criteria">
+              <strong>{copy.criteria}</strong>
+              <p lang={lang} data-testid="text-strip-criteria">{currentCard?.criteria}</p>
+            </div>
+            {session.mini && <StripMiniGame lang={lang} round={session.mini} onChange={mini => setSession(previous => previous && previous.card ? { ...previous, mini } : previous)} />}
+            {session.mini?.kind === "final" ? (
+              session.mini.revealed && session.mini.choice && rpsOutcome(session.mini.choice, session.mini.target as RpsChoice) !== "tie" && (
+                <div className="strip-premium__reveal-actions">
+                  <button type="button" className="strip-btn" onClick={() => resolveTurn(rpsOutcome(session.mini!.choice!, session.mini!.target as RpsChoice) === "win")}>{copy.continue}</button>
+                </div>
+              )
+            ) : <div className="strip-premium__reveal-actions">
+              <button type="button" className="strip-btn" disabled={!!session.mini && !session.mini.revealed} onClick={() => resolveTurn(true)} data-testid="button-strip-complete">{copy.completed}</button>
+              <button type="button" className="strip-btn strip-btn--fail" disabled={!!session.mini && !session.mini.revealed} onClick={() => resolveTurn(false)} data-testid="button-strip-fail">{copy.failed} <span>· {copy.removeLayer}</span></button>
+            </div>}
+            <p className="strip-premium__reveal-foot">{copy.kicker}</p>
+          </div>
         </section>
       )}
     </main>

@@ -84,8 +84,8 @@
   position: relative;
   isolation: isolate;
   width: 100%;
-  min-height: 132px;
-  padding: 14px 16px;
+  min-height: 126px;
+  padding: 13px 15px;
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -111,39 +111,37 @@
   z-index: 1;
   inset: 0;
   pointer-events: none;
-  background: linear-gradient(90deg,
-    rgb(var(--game-card-rgb)) 0%,
-    rgba(var(--game-card-rgb), .97) 34%,
-    rgba(var(--game-card-rgb), .72) 54%,
-    rgba(var(--game-card-rgb), .08) 100%);
+   background: linear-gradient(90deg,
+     rgb(var(--game-card-rgb)) 0%,
+     rgba(var(--game-card-rgb), .96) 26%,
+     rgba(var(--game-card-rgb), .72) 43%,
+     rgba(var(--game-card-rgb), .34) 59%,
+     rgba(var(--game-card-rgb), .04) 100%);
 }
 .touche-games__choice::after { display: none; }
-.touche-games__choice-index { position: relative; z-index: 2; align-self: start; font: 600 10px "Space Grotesk", sans-serif; letter-spacing: .1em; color: var(--game-card-muted); }
-.touche-games__choice-index small { margin-left: 7px; font: 600 8px "DM Sans", sans-serif; letter-spacing: .16em; text-transform: uppercase; opacity: .7; }
-.touche-games__art-wrap { position: absolute; z-index: 0; inset: 0 0 0 auto; width: 63%; height: 100%; overflow: hidden; border: 0; border-radius: inherit; background: none; box-shadow: none; }
-.touche-games__art-image { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.touche-games__art-wrap { position: absolute; z-index: 0; inset: 0 0 0 auto; width: 67%; height: 100%; overflow: hidden; border: 0; border-radius: inherit; background: none; box-shadow: none; }
+.touche-games__art-image { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; filter: saturate(1.06) contrast(1.04); }
 .touche-games__art-image--wheel { object-position: 56% 53%; }
 .touche-games__art-image--dice { object-position: 51% 57%; }
 .touche-games__art-image--strip { object-position: 56% 52%; }
-.touche-games__choice-copy { position: relative; z-index: 2; align-self: flex-start; display: flex; flex-direction: column; align-items: flex-start; gap: 4px; width: min(64%, 252px); margin-top: auto; padding-top: 10px; }
+.touche-games__choice-copy { position: relative; z-index: 2; align-self: flex-start; display: flex; flex-direction: column; align-items: flex-start; gap: 4px; width: min(68%, 252px); margin-top: auto; padding-top: 10px; }
 .touche-games__choice-copy .touche-games__choice-mood { margin-bottom: 0; color: var(--game-card-muted); font-size: 8px; font-weight: 700; letter-spacing: .17em; opacity: .9; }
-.touche-games__choice-copy strong { max-width: 100%; color: var(--game-card-ink); font: 700 clamp(19px, 5.6vw, 23px)/1.06 "Space Grotesk", sans-serif; letter-spacing: -.05em; }
+.touche-games__choice-copy strong { max-width: 100%; color: var(--game-card-ink); font: 700 clamp(18px, 5.4vw, 22px)/1.06 "Space Grotesk", sans-serif; letter-spacing: -.05em; }
 .touche-games__choice-copy > small:last-child { max-width: 100%; color: var(--game-card-muted); font-size: 10px; line-height: 1.32; opacity: 1; }
-.touche-games__arrow { position: absolute; z-index: 3; right: 12px; bottom: 11px; display: grid; width: 30px; height: 30px; place-items: center; border-radius: 50%; color: var(--game-card-action); background: rgba(255,250,243,.94); font-size: 9px; box-shadow: 0 3px 9px rgba(34,17,27,.18); }
 .touche-games__footnote { display: flex; align-items: center; justify-content: center; gap: 9px; margin: auto 0 0; padding-top: 28px; color: var(--games-muted); font-size: 11px; letter-spacing: .02em; }
 .touche-games__footnote span { width: 5px; height: 5px; border-radius: 50%; background: #a64d64; }
 @media (max-width: 380px) {
   .touche-games__header { padding-inline: 14px; }
   .touche-games__body { padding: 25px 16px max(18px, env(safe-area-inset-bottom)); }
   .touche-games__choices { gap: 10px; margin-top: 18px; }
-  .touche-games__choice { min-height: 125px; padding: 13px 14px; }
-  .touche-games__art-wrap { width: 61%; }
-  .touche-games__choice-copy { width: 66%; }
+   .touche-games__choice { min-height: 120px; padding: 12px 14px; }
+   .touche-games__art-wrap { width: 65%; }
+   .touche-games__choice-copy { width: 70%; }
 }
 @media (max-height: 700px) {
   .touche-games__body { padding-top: 13px; }
   .touche-games__choices { gap: 8px; margin-top: 14px; }
-  .touche-games__choice { min-height: 112px; }
+   .touche-games__choice { min-height: 108px; }
   .touche-games__footnote { padding-top: 12px; }
 }
 @media (prefers-reduced-motion: reduce) {

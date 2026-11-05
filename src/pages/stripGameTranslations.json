@@ -1,0 +1,1090 @@
+{
+  "en": [
+    {
+      "category": "Look",
+      "criteria": "Maintain the gaze for 15 seconds without smiling.",
+      "id": "l1-look",
+      "task": "Look into your partner's eyes with the most seductive expression possible and do not smile for 15 seconds."
+    },
+    {
+      "category": "Quick Compliments",
+      "criteria": "State the three things clearly without hesitation.",
+      "id": "l1-tongue",
+      "task": "Quickly name three things you love about your partner."
+    },
+    {
+      "category": "Rhyme in 10s",
+      "criteria": "Complete within 10 seconds and provide three distinct rhyming words.",
+      "id": "l1-rhyme",
+      "task": "Name three rhymes for the word 'desire'."
+    },
+    {
+      "category": "Imitate an Animal",
+      "criteria": "Imitate the cat for 15 seconds without laughing.",
+      "id": "l1-animal",
+      "task": "Act like a cat begging for food. Do not laugh."
+    },
+    {
+      "category": "Dance",
+      "criteria": "Dance for 20 seconds without breaking eye contact.",
+      "id": "l1-dance",
+      "task": "Perform a slow, seductive dance while maintaining eye contact with your partner."
+    },
+    {
+      "category": "Intonation",
+      "criteria": "Repeat the full phrase with the chosen intonation without laughing.",
+      "id": "l1-voice",
+      "task": "Ask your partner to say any phrase, then repeat it back in the voice of someone deeply in love."
+    },
+    {
+      "category": "Other Languages",
+      "criteria": "Speak for 15 seconds without laughing.",
+      "id": "l1-language",
+      "task": "Make up a few phrases in a fake language and say them with a serious expression."
+    },
+    {
+      "category": "Mirror",
+      "criteria": "Do not break the pattern for 20 seconds.",
+      "id": "l1-mirror",
+      "task": "Mimic your partner's movements and facial expressions with a three-second delay."
+    },
+    {
+      "category": "Martial Arts",
+      "criteria": "Show exactly five punches without laughing.",
+      "id": "l1-martial-arts",
+      "task": "Pretend you are a boxer in the ring and show a series of five punches into the air."
+    },
+    {
+      "category": "Sports",
+      "criteria": "Maintain balance for the full 20 seconds without touching the floor with your other foot.",
+      "id": "l2-balance",
+      "task": "Stand on one leg while your partner slowly counts to twenty."
+    },
+    {
+      "category": "Story by Letters",
+      "criteria": "Say exactly two related sentences; the second must start with the correct letter.",
+      "id": "l2-story",
+      "task": "Tell a story about your first date in two sentences. Start the second sentence with the last letter of the first."
+    },
+    {
+      "category": "Phone Tricks",
+      "criteria": "The message must be readable without corrections.",
+      "id": "l2-phone",
+      "task": "Type the message 'I miss you' using your nose and show it to your partner."
+    },
+    {
+      "category": "Guess the Number",
+      "criteria": "Match the app's answer to succeed; a different answer results in failure.",
+      "id": "l2-number",
+      "task": "The app has picked a number from 1 to 10. Say one guess aloud and reveal the image."
+    },
+    {
+      "category": "Guess the Object",
+      "criteria": "Guess the object selected by the app. This is a guess, not a duel with your partner.",
+      "id": "l2-rps",
+      "task": "The app has hidden Rock, Paper, or Scissors. Say one option aloud, then open the image."
+    },
+    {
+      "category": "Sports",
+      "criteria": "Perform 10 squats without pausing.",
+      "id": "l2-squat",
+      "task": "Do ten squats in a row at a comfortable pace."
+    },
+    {
+      "category": "Story by Letters",
+      "criteria": "Say two sentences and start the second one with the correct letter.",
+      "id": "l2-memory",
+      "task": "Tell a two-sentence story about your funniest shared moment. Start the second sentence with the last letter of the first."
+    },
+    {
+      "category": "Phone Tricks",
+      "criteria": "Send a voice recording to your partner that contains the entire phrase.",
+      "id": "l2-whisper",
+      "task": "Record a short voice message whispering: 'I want to spend this evening next to you'."
+    },
+    {
+      "category": "Strike a Pose",
+      "criteria": "Hold the pose for 20 seconds without laughing.",
+      "id": "l3-pose",
+      "task": "Strike an expressive pose in which you feel particularly attractive."
+    },
+    {
+      "category": "Selfie with a Hint",
+      "criteria": "Capture a shot with the specified gesture and facial expression and send it.",
+      "id": "l3-selfie",
+      "task": "Take a selfie with a finger to your lips, a languid look, and your mouth slightly open. Send it to your partner."
+    },
+    {
+      "category": "Erotic Message",
+      "criteria": "The message must consist of exactly three complete sentences and be shown to your partner.",
+      "id": "l3-message",
+      "task": "Write your partner three sentences about what you want from your evening tonight—sensual and unhurried."
+    },
+    {
+      "category": "Guess the Body Part",
+      "criteria": "The named body part must match the app's answer.",
+      "id": "l3-guess",
+      "task": "The app has selected a body part. Say one guess aloud, then reveal the blurred image."
+    },
+    {
+      "category": "Compliment",
+      "criteria": "Give one specific compliment while looking into your partner's eyes without laughing.",
+      "id": "l3-compliment",
+      "task": "Tell your partner what exactly about their look, voice, or hands you find especially attractive."
+    },
+    {
+      "category": "Hint",
+      "criteria": "Write exactly three complete sentences and show the message to your partner.",
+      "id": "l3-anticipation",
+      "task": "Write your partner three sentences about what you want to do tonight."
+    },
+    {
+      "category": "Compliment",
+      "criteria": "Name one specific body part and give one complete compliment about it.",
+      "id": "l3-breath",
+      "task": "Looking into your partner's eyes, tell them exactly what you like about their body."
+    },
+    {
+      "category": "Erotic Selfie",
+      "criteria": "Take one shot with the specified expression and gaze and send it.",
+      "id": "l3-oral-hint",
+      "task": "Take a selfie hinting at an oral kiss: tongue, lips, and a gaze into the camera. Send it to your partner."
+    },
+    {
+      "category": "Erotic Compliment",
+      "criteria": "Say one complete sentence while looking into your partner's eyes.",
+      "id": "l3-eye-compliment",
+      "task": "Tell your partner in one sentence what you want to do to them."
+    },
+    {
+      "category": "Erotic Photo in Pose",
+      "criteria": "Take and send one shot in the specified pose.",
+      "id": "l4-photo",
+      "task": "Take an erotic photo in a pose lying on your side, with a hint. Send it to your partner."
+    },
+    {
+      "category": "Erotic Video",
+      "criteria": "Send a continuous video to your partner lasting five seconds.",
+      "id": "l4-video",
+      "task": "Record a five-second video: slowly run your hand over your body and hold the gaze in the camera. Send it to your partner."
+    },
+    {
+      "category": "Erotic Dance",
+      "criteria": "Dance for exactly one minute without removing clothes.",
+      "id": "l4-dance",
+      "task": "Dance for one minute in front of your partner as if you are undressing, but do not remove any clothes."
+    },
+    {
+      "category": "Guess the Pose",
+      "criteria": "Name the pose correctly on the first attempt.",
+      "id": "l4-pose",
+      "task": "Your partner will silently show a pose from three options: sitting, standing at a wall, or lying on the side. Guess the option."
+    },
+    {
+      "category": "Erotic Photo",
+      "criteria": "Take and send one shot while standing at a wall.",
+      "id": "l4-sensory",
+      "task": "Take a photo standing at a wall in a sensual pose and send it to your partner."
+    },
+    {
+      "category": "Erotic Dance",
+      "criteria": "Continue dancing for one minute without standing up.",
+      "id": "l4-whisper",
+      "task": "Dance while sitting for one minute, using only your torso and hands."
+    },
+    {
+      "category": "Erotic Video",
+      "criteria": "Send a continuous video lasting five seconds with the specified action.",
+      "id": "l4-video-top",
+      "task": "Record a five-second video slowly removing or lowering your top piece of clothing. Send it to your partner."
+    },
+    {
+      "category": "Guess the Pose",
+      "criteria": "Correctly name one of the three poses on the first try.",
+      "id": "l4-pose-wall",
+      "task": "Your partner shows one of the poses: sitting, standing at a wall, or lying on the side. Guess on the first try."
+    },
+    {
+      "category": "Erotic Action",
+      "criteria": "Maintain the position for 10 seconds.",
+      "id": "l5-touch",
+      "task": "Press your nipples to your partner's lips and stay that way for 10 seconds."
+    },
+    {
+      "category": "Erotic Action",
+      "criteria": "Continue the action for 20 seconds.",
+      "id": "l5-nipple",
+      "task": "Lick your fingers and run them over your nipple areolas for 20 seconds."
+    },
+    {
+      "category": "Erotic Photo",
+      "criteria": "Take a shot without your face and send it to your partner.",
+      "id": "l5-photo",
+      "task": "Take an erotic photo of your breasts without your face and send it to your partner."
+    },
+    {
+      "category": "Dirty Talk",
+      "criteria": "Speak three complete phrases in a whisper; tone does not need to be evaluated.",
+      "id": "l5-words",
+      "task": "Whisper three naughty phrases in your partner's ear about what you want to do today."
+    },
+    {
+      "category": "Erotic Video",
+      "criteria": "Send one continuous clip lasting five to ten seconds.",
+      "id": "l5-video",
+      "task": "Record a 5–10 second video with your hand under your underwear and send it to your partner."
+    },
+    {
+      "category": "Erotic Action",
+      "criteria": "Continue the action for 20 seconds.",
+      "id": "l5-underwear",
+      "task": "Place your hand on your underwear and stroke gently for 20 seconds."
+    },
+    {
+      "category": "Erotic Action",
+      "criteria": "Continue the action for 20 seconds.",
+      "id": "l5-wish",
+      "task": "Put your hand inside your underwear and stroke yourself for 20 seconds."
+    },
+    {
+      "category": "Erotic Action",
+      "criteria": "Continue the action for 20 seconds.",
+      "id": "l5-hand",
+      "task": "Take your partner's hand, place it on your chest, and guide it, massaging your breast for 20 seconds."
+    },
+    {
+      "category": "Erotic Photo",
+      "criteria": "Take and send one shot of your back or buttocks.",
+      "id": "l5-hips-photo",
+      "task": "Take an erotic photo of your back or buttocks with a hint and send it to your partner."
+    },
+    {
+      "category": "Erotic Video",
+      "criteria": "Send one continuous clip lasting five to ten seconds.",
+      "id": "l5-video-legs",
+      "task": "Record a 5–10 second video with legs spread apart in underwear and send it to your partner."
+    },
+    {
+      "category": "Final Duel with App",
+      "criteria": "Tie—replay without penalty. Win—clothes stay on, turn passes to partner. Loss—remove the last layer, game ends.",
+      "id": "l5-rps",
+      "task": "The five tasks on the final level are done. Now play Rock, Paper, Scissors against the app."
+    }
+  ],
+  "hi": [
+    {
+      "category": "नजरें",
+      "criteria": "15 सेकंड तक नजरें बनाए रखें, बिना मुस्कुराए।",
+      "id": "l1-look",
+      "task": "अपने साथी की आँखों में बेहद लुभावने अंदाज़ से देखें और 15 सेकंड तक न मुस्कुराएँ।"
+    },
+    {
+      "category": "तारीफ़ का खेल",
+      "criteria": "तीन अलग-अलग बातें कहें, कोई दोहराव न हो।",
+      "id": "l1-tongue",
+      "task": "अपने साथी की तीन पसंदीदा खूबियाँ एक-एक करके बताएं।"
+    },
+    {
+      "category": "10 सेकंड में तुकबंदी",
+      "criteria": "10 सेकंड के भीतर तीन अलग तुकबंदी वाले शब्द कहें।",
+      "id": "l1-rhyme",
+      "task": "«इच्छा» शब्द के लिए तीन तुकबंदी वाले शब्द बताएं।"
+    },
+    {
+      "category": "जानवर की नकल",
+      "criteria": "15 सेकंड तक बिल्ली की नकल करें, बिना हँसे।",
+      "id": "l1-animal",
+      "task": "खाना माँगते हुए बिल्ली की नकल करें। हँसें नहीं।"
+    },
+    {
+      "category": "नृत्य",
+      "criteria": "20 सेकंड तक नाचें और नजरें न हटाएँ।",
+      "id": "l1-dance",
+      "task": "अपने साथी की आँखों में देखते हुए एक धीमा, कामुक नृत्य करें।"
+    },
+    {
+      "category": "टोन",
+      "criteria": "पूरी तरह से चुनी हुई टोन में दोहराएँ, बिना हँसे।",
+      "id": "l1-voice",
+      "task": "अपने साथी से कोई वाक्य बोलने को कहें और उसे किसी प्रेमी की तरह दोहराएँ।"
+    },
+    {
+      "category": "अन्य भाषाएं",
+      "criteria": "15 सेकंड तक बिना हँसे बोलें।",
+      "id": "l1-language",
+      "task": "एक काल्पनिक भाषा में कुछ वाक्य बनाएँ और उन्हें गंभीर चेहरे के साथ बोलें।"
+    },
+    {
+      "category": "आईना",
+      "criteria": "20 सेकंड तक बिना गलती किए नकल करें।",
+      "id": "l1-mirror",
+      "task": "अपने साथी के चेहरे के भावों और गतिविधियों की 3 सेकंड की देरी के साथ नकल करें।"
+    },
+    {
+      "category": "मार्शल आर्ट्स",
+      "criteria": "बिना हँसे सटीक पाँच पंच मारें।",
+      "id": "l1-martial-arts",
+      "task": "एक बॉक्सर की तरह रिंग में अभिनय करें और हवा में पाँच पंच मारें।"
+    },
+    {
+      "category": "खेल",
+      "criteria": "20 सेकंड तक दूसरा पैर जमीन पर रखे बिना संतुलन बनाए रखें।",
+      "id": "l2-balance",
+      "task": "एक पैर पर खड़े हों जबकि आपका साथी धीरे-धीरे बीस तक गिने।"
+    },
+    {
+      "category": "अक्षर से कहानी",
+      "criteria": "दो संबंधित वाक्य बोलें; दूसरा सही अक्षर से शुरू हो।",
+      "id": "l2-story",
+      "task": "अपनी पहली मुलाकात के बारे में दो वाक्यों में बताएं। दूसरा वाक्य पहले वाक्य के अंतिम अक्षर से शुरू करें।"
+    },
+    {
+      "category": "फोन ट्रिक्स",
+      "criteria": "संदेश बिना सुधार के स्पष्ट होना चाहिए।",
+      "id": "l2-phone",
+      "task": "अपनी नाक का उपयोग करके «I miss you» संदेश टाइप करें और साथी को दिखाएं।"
+    },
+    {
+      "category": "संख्या का अनुमान",
+      "criteria": "ऐप के उत्तर से मेल खाने पर सफल।",
+      "id": "l2-number",
+      "task": "ऐप ने 1 से 10 के बीच एक संख्या सोची है। अपना अनुमान जोर से कहें और इमेज खोलें।"
+    },
+    {
+      "category": "वस्तु का अनुमान",
+      "criteria": "ऐप के छिपे हुए ऑब्जेक्ट का सही अनुमान लगाएं।",
+      "id": "l2-rps",
+      "task": "ऐप ने पत्थर, कागज या कैंची छिपाया है। एक विकल्प जोर से बोलें और फिर तस्वीर खोलें।"
+    },
+    {
+      "category": "खेल",
+      "criteria": "बिना रुके 10 उठक-बैठक पूरे करें।",
+      "id": "l2-squat",
+      "task": "आरामदायक गति में लगातार दस उठक-बैठक (squats) करें।"
+    },
+    {
+      "category": "अक्षर से कहानी",
+      "criteria": "दो वाक्य बोलें और दूसरा सही अक्षर से शुरू करें।",
+      "id": "l2-memory",
+      "task": "अपने सबसे मजेदार पल के बारे में दो वाक्यों में बताएं। दूसरा वाक्य पहले के आखिरी अक्षर से शुरू करें।"
+    },
+    {
+      "category": "फोन ट्रिक्स",
+      "criteria": "पूरा वाक्य सुनाई देना चाहिए।",
+      "id": "l2-whisper",
+      "task": "धीमी आवाज में यह वॉइस मैसेज भेजें: «मैं यह शाम तुम्हारे साथ बिताना चाहता हूँ»।"
+    },
+    {
+      "category": "पोज़ दें",
+      "criteria": "बिना हँसे 20 सेकंड तक मुद्रा बनाए रखें।",
+      "id": "l3-pose",
+      "task": "एक ऐसी मुद्रा (pose) बनाएं जिसमें आप खुद को बेहद आकर्षक महसूस करते हैं।"
+    },
+    {
+      "category": "इशारों वाली सेल्फी",
+      "criteria": "निर्दिष्ट भाव के साथ फोटो भेजें।",
+      "id": "l3-selfie",
+      "task": "होठों पर उंगली रखकर, कामुक नजरों के साथ सेल्फी लें। साथी को भेजें।"
+    },
+    {
+      "category": "कामुक संदेश",
+      "criteria": "ठीक तीन पूर्ण वाक्य लिखें और साथी को दिखाएं।",
+      "id": "l3-message",
+      "task": "अपने साथी को तीन वाक्यों में बताएं कि आप आज शाम उनसे क्या चाहते हैं।"
+    },
+    {
+      "category": "अंग का अनुमान",
+      "criteria": "नाम ऐप के उत्तर से मेल खाना चाहिए।",
+      "id": "l3-guess",
+      "task": "ऐप ने एक शरीर का अंग चुना है। एक अनुमान जोर से बोलें और धुंधली तस्वीर खोलें।"
+    },
+    {
+      "category": "तारीफ",
+      "criteria": "आँखों में देखकर एक सटीक तारीफ करें, बिना हँसे।",
+      "id": "l3-compliment",
+      "task": "अपने साथी को बताएं कि उनकी आँखों, आवाज या हाथों में आपको क्या सबसे आकर्षक लगता है।"
+    },
+    {
+      "category": "इशारा",
+      "criteria": "ठीक तीन पूर्ण वाक्य लिखें और साथी को दिखाएं।",
+      "id": "l3-anticipation",
+      "task": "अपने साथी को लिखें कि आप आज शाम क्या चाहते हैं।"
+    },
+    {
+      "category": "तारीफ",
+      "criteria": "एक अंग चुनें और उसके बारे में एक तारीफ करें।",
+      "id": "l3-breath",
+      "task": "साथी की आँखों में देखकर बताएं कि उनके शरीर में आपको क्या पसंद है।"
+    },
+    {
+      "category": "कामुक सेल्फी",
+      "criteria": "निर्दिष्ट भाव के साथ एक फोटो भेजें।",
+      "id": "l3-oral-hint",
+      "task": "ओरल किस का इशारा करते हुए सेल्फी लें (जीभ, होंठ, कैमरा फोकस)। साथी को भेजें।"
+    },
+    {
+      "category": "कामुक तारीफ",
+      "criteria": "आँखों में देखकर एक वाक्य में कहें।",
+      "id": "l3-eye-compliment",
+      "task": "अपने साथी को एक वाक्य में बताएं कि आप उनके साथ क्या करना चाहते हैं।"
+    },
+    {
+      "category": "कामुक फोटो",
+      "criteria": "निर्दिष्ट मुद्रा में एक फोटो भेजें।",
+      "id": "l4-photo",
+      "task": "करवट लेकर लेटने वाली मुद्रा में एक कामुक फोटो लें और साथी को भेजें।"
+    },
+    {
+      "category": "कामुक वीडियो",
+      "criteria": "बिना रुके 5 सेकंड का वीडियो भेजें।",
+      "id": "l4-video",
+      "task": "5 सेकंड का वीडियो बनाएं: धीरे-धीरे अपने शरीर पर हाथ फेरें और कैमरे में देखें। साथी को भेजें।"
+    },
+    {
+      "category": "कामुक नृत्य",
+      "criteria": "कपड़े उतारे बिना पूरे एक मिनट तक नृत्य करें।",
+      "id": "l4-dance",
+      "task": "अपने साथी के सामने एक मिनट तक ऐसे नाचें जैसे आप कपड़े उतार रहे हों (पर उतारें नहीं)।"
+    },
+    {
+      "category": "मुद्रा का अनुमान",
+      "criteria": "पहली कोशिश में सही मुद्रा पहचानें।",
+      "id": "l4-pose",
+      "task": "साथी बिना बोले तीन में से एक मुद्रा करेगा: बैठना, दीवार के पास खड़ा होना, या करवट लेना। अनुमान लगाएं।"
+    },
+    {
+      "category": "कामुक फोटो",
+      "criteria": "दीवार के सहारे ली गई एक फोटो भेजें।",
+      "id": "l4-sensory",
+      "task": "दीवार के सहारे एक कामुक मुद्रा में फोटो लें और साथी को भेजें।"
+    },
+    {
+      "category": "कामुक नृत्य",
+      "criteria": "बिना उठे एक मिनट तक डांस जारी रखें।",
+      "id": "l4-whisper",
+      "task": "बैठे हुए केवल अपने शरीर और हाथों का उपयोग करके एक मिनट तक नृत्य करें।"
+    },
+    {
+      "category": "कामुक वीडियो",
+      "criteria": "निर्दिष्ट क्रिया के साथ 5 सेकंड का वीडियो भेजें।",
+      "id": "l4-video-top",
+      "task": "5 सेकंड का वीडियो रिकॉर्ड करें जिसमें आप धीरे-धीरे अपने कपड़े का ऊपरी हिस्सा उतारें या नीचे करें। साथी को भेजें।"
+    },
+    {
+      "category": "मुद्रा का अनुमान",
+      "criteria": "तीन में से एक का पहली बार में सही अनुमान लगाएं।",
+      "id": "l4-pose-wall",
+      "task": "साथी कोई मुद्रा दिखाता है (बैठना, दीवार के पास, करवट)। पहली बार में सही बताएं।"
+    },
+    {
+      "category": "कामुक क्रिया",
+      "criteria": "10 सेकंड तक यह मुद्रा बनाए रखें।",
+      "id": "l5-touch",
+      "task": "अपने निप्पल को साथी के होंठों से दबाएं और 10 सेकंड तक रुकें।"
+    },
+    {
+      "category": "कामुक क्रिया",
+      "criteria": "20 सेकंड तक क्रिया जारी रखें।",
+      "id": "l5-nipple",
+      "task": "अपनी उंगलियों को गीला करें और 20 सेकंड तक अपने निप्पल के आसपास घुमाएं।"
+    },
+    {
+      "category": "कामुक फोटो",
+      "criteria": "बिना चेहरा दिखाए फोटो भेजें।",
+      "id": "l5-photo",
+      "task": "बिना चेहरा दिखाए अपने सीने की एक कामुक फोटो लें और साथी को भेजें।"
+    },
+    {
+      "category": "धीमी आवाज में गंदी बातें",
+      "criteria": "तीन पूर्ण वाक्य फुसफुसाकर कहें।",
+      "id": "l5-words",
+      "task": "अपने साथी के कान में फुसफुसाकर तीन गंदी बातें कहें जो आप आज करना चाहते हैं।"
+    },
+    {
+      "category": "कामुक वीडियो",
+      "criteria": "5-10 सेकंड का एक वीडियो भेजें।",
+      "id": "l5-video",
+      "task": "अपने अंडरवियर के अंदर हाथ डालकर 5-10 सेकंड का वीडियो बनाएं। साथी को भेजें।"
+    },
+    {
+      "category": "कामुक क्रिया",
+      "criteria": "20 सेकंड तक क्रिया जारी रखें।",
+      "id": "l5-underwear",
+      "task": "अपने अंडरवियर पर हाथ रखें और 20 सेकंड तक धीरे-धीरे सहलाएं।"
+    },
+    {
+      "category": "कामुक क्रिया",
+      "criteria": "20 सेकंड तक क्रिया जारी रखें।",
+      "id": "l5-wish",
+      "task": "अपने अंडरवियर के अंदर हाथ डालें और 20 सेकंड तक खुद को सहलाएं।"
+    },
+    {
+      "category": "कामुक क्रिया",
+      "criteria": "20 सेकंड तक हाथ से सीने की मालिश करें।",
+      "id": "l5-hand",
+      "task": "अपने साथी का हाथ लें, उसे अपने सीने पर रखें और 20 सेकंड तक मालिश करवाएं।"
+    },
+    {
+      "category": "कामुक फोटो",
+      "criteria": "पीठ या कूल्हों की एक फोटो भेजें।",
+      "id": "l5-hips-photo",
+      "task": "अपनी पीठ या कूल्हों की एक कामुक फोटो लें और साथी को भेजें।"
+    },
+    {
+      "category": "कामुक वीडियो",
+      "criteria": "5-10 सेकंड का वीडियो भेजें।",
+      "id": "l5-video-legs",
+      "task": "अंडरवियर पहने हुए पैर फैलाकर 5-10 सेकंड का वीडियो बनाएं। साथी को भेजें।"
+    },
+    {
+      "category": "ऐप के साथ फाइनल मुकाबला",
+      "criteria": "टाई: फिर से खेलें; जीत: साथी की बारी; हार: खेल समाप्त।",
+      "id": "l5-rps",
+      "task": "अंतिम स्तर के पांच कार्य पूरे हुए। अब ऐप के साथ पत्थर, कागज, कैंची खेलें।"
+    }
+  ],
+  "pt": [
+    {
+      "category": "Olhar",
+      "criteria": "Mantenha o olhar por 15 segundos sem sorrir.",
+      "id": "l1-look",
+      "task": "Olhe nos olhos do seu parceiro com a expressão mais sedutora possível e não sorria por 15 segundos."
+    },
+    {
+      "category": "Três elogios",
+      "criteria": "Diga três qualidades diferentes, sem repetir.",
+      "id": "l1-tongue",
+      "task": "Diga três coisas que você admira no seu par, uma de cada vez."
+    },
+    {
+      "category": "Rima em 10 segundos",
+      "criteria": "Cumpra em 10 segundos e diga três palavras diferentes que rimam.",
+      "id": "l1-rhyme",
+      "task": "Diga três rimas para a palavra 'desejo'."
+    },
+    {
+      "category": "Imite um animal",
+      "criteria": "Imite o gato por 15 segundos sem rir.",
+      "id": "l1-animal",
+      "task": "Imite um gato pedindo comida. Não ria."
+    },
+    {
+      "category": "Dança",
+      "criteria": "Dance por 20 segundos sem desviar o olhar.",
+      "id": "l1-dance",
+      "task": "Dance uma dança lenta e sedutora olhando nos olhos do seu parceiro."
+    },
+    {
+      "category": "Entonação",
+      "criteria": "Repita a frase inteira com a entonação escolhida sem rir.",
+      "id": "l1-voice",
+      "task": "Peça para seu parceiro dizer qualquer frase e repita-a com a voz de alguém apaixonado."
+    },
+    {
+      "category": "Outros idiomas",
+      "criteria": "Fale por 15 segundos sem rir.",
+      "id": "l1-language",
+      "task": "Invente algumas frases em um idioma fictício e diga-as com uma expressão séria."
+    },
+    {
+      "category": "Espelho",
+      "criteria": "Não erre por 20 segundos.",
+      "id": "l1-mirror",
+      "task": "Imite os movimentos e a expressão facial do seu parceiro com um atraso de três segundos."
+    },
+    {
+      "category": "Artes marciais",
+      "criteria": "Mostre exatamente cinco socos sem rir.",
+      "id": "l1-martial-arts",
+      "task": "Finja ser um boxeador no ringue e mostre uma série de cinco socos no ar."
+    },
+    {
+      "category": "Esporte",
+      "criteria": "Mantenha o equilíbrio por 20 segundos sem tocar o chão com o outro pé.",
+      "id": "l2-balance",
+      "task": "Fique em uma perna só enquanto seu parceiro conta lentamente até vinte."
+    },
+    {
+      "category": "História por letras",
+      "criteria": "Diga exatamente duas frases conectadas; a segunda deve começar com a letra correta.",
+      "id": "l2-story",
+      "task": "Conte sobre o primeiro encontro de vocês em duas frases. Comece a segunda com a última letra da primeira."
+    },
+    {
+      "category": "Truques de telefone",
+      "criteria": "A mensagem deve ser legível sem correções.",
+      "id": "l2-phone",
+      "task": "Digite com o nariz a mensagem 'Eu sinto sua falta' e mostre ao seu parceiro."
+    },
+    {
+      "category": "Adivinhe o número",
+      "criteria": "Coincidir com a resposta do aplicativo é sucesso; caso contrário, é falha.",
+      "id": "l2-number",
+      "task": "O aplicativo escolheu um número de 1 a 10. Diga um palpite em voz alta e abra a imagem."
+    },
+    {
+      "category": "Adivinhe o objeto",
+      "criteria": "Adivinhe o item do aplicativo. É um palpite, não uma disputa com o parceiro.",
+      "id": "l2-rps",
+      "task": "O aplicativo escondeu pedra, papel ou tesoura. Diga um palpite em voz alta e abra a imagem."
+    },
+    {
+      "category": "Esporte",
+      "criteria": "Faça 10 agachamentos sem pausa.",
+      "id": "l2-squat",
+      "task": "Faça dez agachamentos seguidos em um ritmo confortável."
+    },
+    {
+      "category": "História por letras",
+      "criteria": "Diga duas frases e comece a segunda com a letra correta.",
+      "id": "l2-memory",
+      "task": "Conte em duas frases sobre o momento mais engraçado de vocês. Comece a segunda frase com a última letra da primeira."
+    },
+    {
+      "category": "Truques de telefone",
+      "criteria": "Envie uma mensagem de voz ao parceiro onde a frase inteira seja ouvida.",
+      "id": "l2-whisper",
+      "task": "Grave uma mensagem de voz curta sussurrando: 'Eu quero passar esta noite ao seu lado'."
+    },
+    {
+      "category": "Imite uma pose",
+      "criteria": "Mantenha a pose por 20 segundos sem rir.",
+      "id": "l3-pose",
+      "task": "Faça uma pose expressiva na qual você se sinta especialmente atraente."
+    },
+    {
+      "category": "Selfie com intenção",
+      "criteria": "Tire a foto com o gesto e expressão indicados e envie ao parceiro.",
+      "id": "l3-selfie",
+      "task": "Tire uma selfie com o dedo nos lábios, um olhar sedutor e a boca entreaberta. Envie para seu parceiro."
+    },
+    {
+      "category": "Mensagem erótica",
+      "criteria": "A mensagem deve consistir exatamente em três frases completas e ser mostrada ao parceiro.",
+      "id": "l3-message",
+      "task": "Escreva para seu parceiro três frases sobre o que você deseja para a noite de hoje — de forma sensual e sem pressa."
+    },
+    {
+      "category": "Adivinhe a parte do corpo",
+      "criteria": "A parte do corpo mencionada deve coincidir com a resposta do aplicativo.",
+      "id": "l3-guess",
+      "task": "O aplicativo escolheu uma parte do corpo. Diga um palpite em voz alta e abra a imagem borrada."
+    },
+    {
+      "category": "Elogio",
+      "criteria": "Diga um elogio específico olhando nos olhos do parceiro, sem rir.",
+      "id": "l3-compliment",
+      "task": "Diga ao seu parceiro o que exatamente no olhar, na voz ou nas mãos dele(a) você acha mais atraente."
+    },
+    {
+      "category": "Intenção",
+      "criteria": "Escreva exatamente três frases completas e mostre a mensagem ao parceiro.",
+      "id": "l3-anticipation",
+      "task": "Escreva para seu parceiro três frases sobre o que você quer para hoje à noite."
+    },
+    {
+      "category": "Elogio",
+      "criteria": "Nomeie uma parte do corpo específica e faça um elogio completo sobre ela.",
+      "id": "l3-breath",
+      "task": "Olhando nos olhos do seu parceiro, diga o que você gosta no corpo dele(a)."
+    },
+    {
+      "category": "Selfie erótica",
+      "criteria": "Tire uma foto com a expressão facial e o olhar indicados e envie para o parceiro.",
+      "id": "l3-oral-hint",
+      "task": "Tire uma selfie com uma sugestão de beijo oral: língua, lábios e olhar para a câmera. Envie para o parceiro."
+    },
+    {
+      "category": "Elogio erótico",
+      "criteria": "Diga uma frase completa olhando nos olhos do parceiro.",
+      "id": "l3-eye-compliment",
+      "task": "Diga ao seu parceiro em uma frase o que você quer fazer com ele(a)."
+    },
+    {
+      "category": "Foto erótica em pose",
+      "criteria": "Tire e envie uma foto na pose indicada.",
+      "id": "l4-photo",
+      "task": "Tire uma foto erótica deitado(a) de lado, com uma insinuação. Envie para seu parceiro."
+    },
+    {
+      "category": "Vídeo erótico",
+      "criteria": "Envie para o parceiro um vídeo contínuo de cinco segundos.",
+      "id": "l4-video",
+      "task": "Grave um vídeo de cinco segundos: passe a mão lentamente pelo corpo e mantenha o olhar na câmera. Envie para o parceiro."
+    },
+    {
+      "category": "Dança erótica",
+      "criteria": "Dance exatamente um minuto sem tirar a roupa.",
+      "id": "l4-dance",
+      "task": "Dance para o seu parceiro por um minuto como se estivesse se despindo, mas não tire a roupa."
+    },
+    {
+      "category": "Adivinhe a pose",
+      "criteria": "Adivinhe a pose corretamente na primeira tentativa.",
+      "id": "l4-pose",
+      "task": "O parceiro faz uma pose sem palavras dentre três opções: sentado, em pé na parede ou deitado de lado. Tente adivinhar."
+    },
+    {
+      "category": "Foto erótica",
+      "criteria": "Tire e envie uma foto em pé na parede.",
+      "id": "l4-sensory",
+      "task": "Tire uma foto em pé na parede em uma pose sensual e envie para seu parceiro."
+    },
+    {
+      "category": "Dança erótica",
+      "criteria": "Continue dançando por um minuto sem levantar.",
+      "id": "l4-whisper",
+      "task": "Dance sentado(a) por um minuto, usando apenas o tronco e as mãos."
+    },
+    {
+      "category": "Vídeo erótico",
+      "criteria": "Envie para o parceiro um vídeo contínuo de cinco segundos com a ação indicada.",
+      "id": "l4-video-top",
+      "task": "Grave um vídeo de cinco segundos, tirando lentamente ou abaixando a parte de cima da roupa. Envie para o parceiro."
+    },
+    {
+      "category": "Adivinhe a pose",
+      "criteria": "Adivinhe corretamente uma das três poses na primeira tentativa.",
+      "id": "l4-pose-wall",
+      "task": "O parceiro faz uma das poses: sentado, em pé na parede ou deitado de lado. Tente adivinhar na primeira tentativa."
+    },
+    {
+      "category": "Ação erótica",
+      "criteria": "Mantenha a posição por 10 segundos.",
+      "id": "l5-touch",
+      "task": "Pressione os mamilos contra os lábios do seu parceiro e permaneça assim por 10 segundos."
+    },
+    {
+      "category": "Ação erótica",
+      "criteria": "Continue a ação por 20 segundos.",
+      "id": "l5-nipple",
+      "task": "Lamba os dedos e passe-os sobre suas aréolas por 20 segundos."
+    },
+    {
+      "category": "Foto erótica",
+      "criteria": "Tire uma foto sem o rosto e envie para o parceiro.",
+      "id": "l5-photo",
+      "task": "Tire uma foto erótica dos seios sem mostrar o rosto e envie para o parceiro."
+    },
+    {
+      "category": "Coisas picantes sussurradas",
+      "criteria": "Diga três frases completas sussurradas; o tom não precisa ser avaliado.",
+      "id": "l5-words",
+      "task": "Sussurre no ouvido do parceiro três frases picantes sobre o que você quer fazer hoje."
+    },
+    {
+      "category": "Vídeo erótico",
+      "criteria": "Envie um clipe contínuo de cinco a dez segundos.",
+      "id": "l5-video",
+      "task": "Grave um vídeo de 5 a 10 segundos com a mão sob a roupa íntima e envie para o parceiro."
+    },
+    {
+      "category": "Ação erótica",
+      "criteria": "Continue a ação por 20 segundos.",
+      "id": "l5-underwear",
+      "task": "Coloque a mão sobre sua roupa íntima e acaricie suavemente por 20 segundos."
+    },
+    {
+      "category": "Ação erótica",
+      "criteria": "Continue a ação por 20 segundos.",
+      "id": "l5-wish",
+      "task": "Coloque a mão dentro da roupa íntima e acaricie-se por 20 segundos."
+    },
+    {
+      "category": "Ação erótica",
+      "criteria": "Continue a ação por 20 segundos.",
+      "id": "l5-hand",
+      "task": "Pegue a mão do seu parceiro, coloque-a no seu peito e guie-a, massageando o peito por 20 segundos."
+    },
+    {
+      "category": "Foto erótica",
+      "criteria": "Tire e envie uma foto das costas ou nádegas.",
+      "id": "l5-hips-photo",
+      "task": "Tire uma foto erótica das costas ou nádegas com uma insinuação e envie para o parceiro."
+    },
+    {
+      "category": "Vídeo erótico",
+      "criteria": "Envie um clipe contínuo de cinco a dez segundos.",
+      "id": "l5-video-legs",
+      "task": "Grave um vídeo de 5 a 10 segundos com as pernas abertas de roupa íntima e envie para o parceiro."
+    },
+    {
+      "category": "Duelo final com o aplicativo",
+      "criteria": "Empate: jogue novamente sem penalidade. Vitória: a roupa permanece, o turno passa ao parceiro. Derrota: tira-se a última peça, o jogo termina.",
+      "id": "l5-rps",
+      "task": "As cinco tarefas do último nível foram concluídas. Agora, jogue pedra, papel ou tesoura com o aplicativo."
+    }
+  ],
+  "es": [
+    {
+      "category": "Mirada",
+      "criteria": "Mantén la mirada 15 segundos sin sonreír.",
+      "id": "l1-look",
+      "task": "Mira a tu pareja a los ojos con la expresión más seductora posible y no sonrías durante 15 segundos."
+    },
+    {
+      "category": "Tres cumplidos",
+      "criteria": "Nombra tres cualidades distintas, sin repetir.",
+      "id": "l1-tongue",
+      "task": "Di tres cosas que admiras de tu pareja, una por una."
+    },
+    {
+      "category": "Rima en 10 segundos",
+      "criteria": "Completa en 10 segundos y di tres palabras que rimen.",
+      "id": "l1-rhyme",
+      "task": "Nombra tres rimas para la palabra «deseo»."
+    },
+    {
+      "category": "Imita un animal",
+      "criteria": "Imita al gato durante 15 segundos sin reírte.",
+      "id": "l1-animal",
+      "task": "Imita a un gato pidiendo comida. No te rías."
+    },
+    {
+      "category": "Baile",
+      "criteria": "Baila durante 20 segundos sin desviar la mirada.",
+      "id": "l1-dance",
+      "task": "Baila un baile lento y seductor mientras miras a tu pareja a los ojos."
+    },
+    {
+      "category": "Entonación",
+      "criteria": "Repite la frase completa con la entonación indicada sin reírte.",
+      "id": "l1-voice",
+      "task": "Pide a tu pareja que diga cualquier frase y repítela con voz de persona enamorada."
+    },
+    {
+      "category": "Otros idiomas",
+      "criteria": "Habla durante 15 segundos sin reírte.",
+      "id": "l1-language",
+      "task": "Inventa varias frases en un idioma ficticio y dilas con expresión seria."
+    },
+    {
+      "category": "Espejo",
+      "criteria": "No te equivoques durante 20 segundos.",
+      "id": "l1-mirror",
+      "task": "Repite los movimientos y las expresiones faciales de tu pareja con tres segundos de retraso."
+    },
+    {
+      "category": "Artes marciales",
+      "criteria": "Muestra exactamente cinco golpes sin reírte.",
+      "id": "l1-martial-arts",
+      "task": "Imita a un boxeador en el ring y muestra una serie de cinco golpes al aire."
+    },
+    {
+      "category": "Deporte",
+      "criteria": "Mantén el equilibrio durante 20 segundos sin tocar el suelo con el otro pie.",
+      "id": "l2-balance",
+      "task": "Mantente sobre un pie mientras tu pareja cuenta lentamente hasta veinte."
+    },
+    {
+      "category": "Historia por letras",
+      "criteria": "Di exactamente dos frases relacionadas; la segunda comienza con la letra requerida.",
+      "id": "l2-story",
+      "task": "Habla sobre su primera cita en dos frases. Empieza la segunda con la última letra de la primera."
+    },
+    {
+      "category": "Trucos telefónicos",
+      "criteria": "El mensaje debe leerse sin errores.",
+      "id": "l2-phone",
+      "task": "Escribe con la nariz el mensaje «Te extraño» y muéstraselo a tu pareja."
+    },
+    {
+      "category": "Adivina el número",
+      "criteria": "Coincidencia con la respuesta de la aplicación: completado; otra respuesta: fallo.",
+      "id": "l2-number",
+      "task": "La aplicación pensó un número del 1 al 10. Di una suposición en voz alta y abre la imagen."
+    },
+    {
+      "category": "Adivina el objeto",
+      "criteria": "Adivina el objeto de la aplicación. Es una adivinanza, no un duelo con tu pareja.",
+      "id": "l2-rps",
+      "task": "La aplicación escondió piedra, papel o tijera. Di una opción en voz alta y luego abre la imagen."
+    },
+    {
+      "category": "Deporte",
+      "criteria": "Haz 10 sentadillas sin pausas.",
+      "id": "l2-squat",
+      "task": "Haz diez sentadillas seguidas a un ritmo cómodo."
+    },
+    {
+      "category": "Historia por letras",
+      "criteria": "Di dos frases y comienza la segunda con la letra correcta.",
+      "id": "l2-memory",
+      "task": "Cuenta en dos frases sobre su momento divertido juntos. Empieza la segunda frase con la última letra de la primera."
+    },
+    {
+      "category": "Trucos telefónicos",
+      "criteria": "Envía a tu pareja un mensaje de voz donde se escuche toda la frase.",
+      "id": "l2-whisper",
+      "task": "Graba un mensaje de voz corto susurrando: «Quiero pasar esta noche a tu lado»."
+    },
+    {
+      "category": "Imita una pose",
+      "criteria": "Mantén la pose durante 20 segundos sin reírte.",
+      "id": "l3-pose",
+      "task": "Adopta una pose expresiva en la que te sientas especialmente atractivo o atractiva."
+    },
+    {
+      "category": "Selfie con pista",
+      "criteria": "Haz una foto con el gesto y la expresión facial indicados y envíala a tu pareja.",
+      "id": "l3-selfie",
+      "task": "Hazte un selfie con el dedo en los labios, mirada lánguida y boca entreabierta. Envíalo a tu pareja."
+    },
+    {
+      "category": "Mensaje erótico",
+      "criteria": "El mensaje consta exactamente de tres frases completas y se muestra a la pareja.",
+      "id": "l3-message",
+      "task": "Escribe a tu pareja tres frases sobre lo que deseas para esta noche, de forma sensual y sin prisa."
+    },
+    {
+      "category": "Adivina la parte del cuerpo",
+      "criteria": "La parte del cuerpo nombrada debe coincidir con la respuesta de la aplicación.",
+      "id": "l3-guess",
+      "task": "La aplicación eligió una parte del cuerpo. Di una suposición en voz alta y abre la imagen borrosa."
+    },
+    {
+      "category": "Cumplido",
+      "criteria": "Di un cumplido específico mirando a tu pareja a los ojos sin reírte.",
+      "id": "l3-compliment",
+      "task": "Dile a tu pareja qué es exactamente lo que te resulta más atractivo de su mirada, su voz o sus manos."
+    },
+    {
+      "category": "Pista",
+      "criteria": "Escribe exactamente tres frases completas y muestra el mensaje a tu pareja.",
+      "id": "l3-anticipation",
+      "task": "Escribe a tu pareja tres frases sobre lo que quieres hacer esta noche."
+    },
+    {
+      "category": "Cumplido",
+      "criteria": "Nombra una parte específica del cuerpo y dile un cumplido completo sobre ella.",
+      "id": "l3-breath",
+      "task": "Mirando a tu pareja a los ojos, dile qué es lo que te gusta de su cuerpo."
+    },
+    {
+      "category": "Selfie erótico",
+      "criteria": "Haz una foto con la expresión facial y la mirada indicadas y envíala a tu pareja.",
+      "id": "l3-oral-hint",
+      "task": "Hazte un selfie con una pista de beso oral: lengua, labios y mirada a cámara. Envíalo a tu pareja."
+    },
+    {
+      "category": "Cumplido erótico",
+      "criteria": "Di una frase completa mirando a tu pareja a los ojos.",
+      "id": "l3-eye-compliment",
+      "task": "Dile a tu pareja en una frase lo que quieres hacer con él o ella."
+    },
+    {
+      "category": "Foto erótica en pose",
+      "criteria": "Haz y envía una foto en la pose indicada.",
+      "id": "l4-photo",
+      "task": "Hazte una foto erótica en posición acostado de lado, con una pista. Envíala a tu pareja."
+    },
+    {
+      "category": "Video erótico",
+      "criteria": "Envía a tu pareja un video continuo de cinco segundos.",
+      "id": "l4-video",
+      "task": "Graba un video de cinco segundos: pasa la mano lentamente por tu cuerpo y mantén la mirada en la cámara. Envíalo a tu pareja."
+    },
+    {
+      "category": "Baile erótico",
+      "criteria": "Baila exactamente un minuto sin quitarte la ropa.",
+      "id": "l4-dance",
+      "task": "Baila frente a tu pareja durante un minuto como si te estuvieras desvistiendo, pero sin quitarte la ropa."
+    },
+    {
+      "category": "Adivina la pose",
+      "criteria": "Nombra la pose correctamente al primer intento.",
+      "id": "l4-pose",
+      "task": "Tu pareja muestra sin palabras una pose de tres opciones: sentado, de pie contra la pared o acostado de lado. Adivina la opción."
+    },
+    {
+      "category": "Foto erótica",
+      "criteria": "Haz y envía una foto de pie contra la pared.",
+      "id": "l4-sensory",
+      "task": "Hazte una foto de pie contra la pared en una pose sensual y envíasela a tu pareja."
+    },
+    {
+      "category": "Baile erótico",
+      "criteria": "Sigue bailando durante un minuto sin levantarte.",
+      "id": "l4-whisper",
+      "task": "Baila sentado durante un minuto usando solo el torso y los brazos."
+    },
+    {
+      "category": "Video erótico",
+      "criteria": "Envía a tu pareja un video continuo de cinco segundos con la acción indicada.",
+      "id": "l4-video-top",
+      "task": "Graba un video de cinco segundos quitándote o bajándote lentamente la parte superior de la ropa. Envíalo a tu pareja."
+    },
+    {
+      "category": "Adivina la pose",
+      "criteria": "Nombra correctamente una de las tres poses al primer intento.",
+      "id": "l4-pose-wall",
+      "task": "Tu pareja muestra una de las poses: sentado, de pie contra la pared o acostado de lado. Adivina al primer intento."
+    },
+    {
+      "category": "Acción erótica",
+      "criteria": "Mantén la posición durante 10 segundos.",
+      "id": "l5-touch",
+      "task": "Presiona tus pezones contra los labios de tu pareja y mantente así durante 10 segundos."
+    },
+    {
+      "category": "Acción erótica",
+      "criteria": "Continúa la acción durante 20 segundos.",
+      "id": "l5-nipple",
+      "task": "Lame tus dedos y pásalos por las aureolas de tus pezones durante 20 segundos."
+    },
+    {
+      "category": "Foto erótica",
+      "criteria": "Haz una foto sin mostrar la cara y envíasela a tu pareja.",
+      "id": "l5-photo",
+      "task": "Haz una foto erótica de tu pecho sin mostrar la cara y envíasela a tu pareja."
+    },
+    {
+      "category": "Cosas sucias susurradas",
+      "criteria": "Di tres frases completas susurrando.",
+      "id": "l5-words",
+      "task": "Susurra a tu pareja al oído tres frases pícaras sobre lo que quieres hacer hoy."
+    },
+    {
+      "category": "Video erótico",
+      "criteria": "Envía un video continuo de cinco a diez segundos.",
+      "id": "l5-video",
+      "task": "Graba un video de 5 a 10 segundos con una mano bajo la ropa interior y envíaselo a tu pareja."
+    },
+    {
+      "category": "Acción erótica",
+      "criteria": "Continúa la acción durante 20 segundos.",
+      "id": "l5-underwear",
+      "task": "Pon tu mano sobre tus bragas o calzoncillos y acaricia suavemente durante 20 segundos."
+    },
+    {
+      "category": "Acción erótica",
+      "criteria": "Continúa la acción durante 20 segundos.",
+      "id": "l5-wish",
+      "task": "Mete la mano bajo tu ropa interior y acaríciate durante 20 segundos."
+    },
+    {
+      "category": "Acción erótica",
+      "criteria": "Continúa la acción durante 20 segundos.",
+      "id": "l5-hand",
+      "task": "Toma la mano de tu pareja, ponla sobre tu pecho y guíala masajeando durante 20 segundos."
+    },
+    {
+      "category": "Foto erótica",
+      "criteria": "Haz y envía una foto de la espalda o los glúteos.",
+      "id": "l5-hips-photo",
+      "task": "Haz una foto erótica de tu espalda o glúteos con una pista y envíasela a tu pareja."
+    },
+    {
+      "category": "Video erótico",
+      "criteria": "Envía un video continuo de cinco a diez segundos.",
+      "id": "l5-video-legs",
+      "task": "Graba un video de 5 a 10 segundos con las piernas abiertas en ropa interior y envíaselo a tu pareja."
+    },
+    {
+      "category": "Duelo final con la aplicación",
+      "criteria": "Empate: repite sin penalización. Victoria: mantienes la ropa y el turno pasa a tu pareja. Derrota: te quitas la última prenda y el juego termina.",
+      "id": "l5-rps",
+      "task": "Has completado cinco tareas del último nivel. Ahora juega a piedra, papel o tijera con la aplicación."
+    }
+  ]
+}

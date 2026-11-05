@@ -1369,19 +1369,19 @@ export default function Home({
             <div className="pop-entry-actions">
               <button type="button" className="pop-entry-action pop-entry-action--tasks" onClick={() => setHomeSection("tasks")} data-testid="button-open-tasks">
                 <img className="pop-entry-action__art" src="/images/home-cards/tasks.jpg" alt="" aria-hidden="true" />
-                <span className="pop-entry-action__index">01</span><span className="pop-entry-action__copy"><strong>{TASKS_COPY[lang].title}</strong><small>{TASKS_COPY[lang].sub}</small></span><span className="pop-entry-action__arrow" aria-hidden="true">▶</span>
+                <span className="pop-entry-action__copy"><strong>{TASKS_COPY[lang].title}</strong></span>
               </button>
               <button type="button" className="pop-entry-action pop-entry-action--path" onClick={onLovePathOpen} data-testid="button-open-love-path">
-                <img className="pop-entry-action__art" src="/images/cat-invite-art.svg" alt="" aria-hidden="true" />
-                <span className="pop-entry-action__index">02</span><span className="pop-entry-action__copy"><strong>{lang === "ru" ? "Путь любви" : lang === "hi" ? "प्यार का путь" : lang === "pt" ? "Caminho do amor" : lang === "es" ? "Camino del amor" : "Love Path"}</strong><small>{lang === "ru" ? "Семь шагов навстречу друг другу" : lang === "hi" ? "एक-दूसरे के करीब सात कदम" : lang === "pt" ? "Sete passos para se aproximarem" : lang === "es" ? "Siete pasos para acercarse" : "Seven small steps closer"}</small></span><span className="pop-entry-action__arrow" aria-hidden="true">▶</span>
+                <img className="pop-entry-action__art" src="/images/home-cards/love-path.jpg" alt="" aria-hidden="true" />
+                <span className="pop-entry-action__copy"><strong>{lang === "ru" ? "Путь любви" : lang === "hi" ? "प्यार का путь" : lang === "pt" ? "Caminho do amor" : lang === "es" ? "Camino del amor" : "Love Path"}</strong></span>
               </button>
               <button type="button" className="pop-entry-action pop-entry-action--tarot" onClick={onTarotOpen} data-testid="button-open-tarot">
                 <img className="pop-entry-action__art" src="/images/home-cards/tarot.jpg" alt="" aria-hidden="true" />
-                <span className="pop-entry-action__index">03</span><span className="pop-entry-action__copy"><strong>{lang === "ru" ? "Таро для двоих" : lang === "hi" ? "दो के लिए टैरो" : lang === "pt" ? "Tarô para dois" : lang === "es" ? "Tarot para dos" : "Tarot for two"}</strong><small>{lang === "ru" ? "Три карты. Один честный разговор." : lang === "hi" ? "तीन कार्ड। एक सच्ची बातचीत।" : lang === "pt" ? "Três cartas. Uma conversa sincera." : lang === "es" ? "Tres cartas. Una conversación sincera." : "Three cards. One honest conversation."}</small></span><span className="pop-entry-action__arrow" aria-hidden="true">▶</span>
+                <span className="pop-entry-action__copy"><strong>{lang === "ru" ? "Таро для двоих" : lang === "hi" ? "दो के लिए टैरो" : lang === "pt" ? "Tarô para dois" : lang === "es" ? "Tarot para dos" : "Tarot for two"}</strong></span>
               </button>
               <button type="button" className="pop-entry-action pop-entry-action--lottery" onClick={onGamesOpen} data-testid="button-open-games">
                 <img className="pop-entry-action__art" src="/images/home-cards/night-games.jpg" alt="" aria-hidden="true" />
-                <span className="pop-entry-action__index">04</span><span className="pop-entry-action__copy"><strong>{NIGHT_GAMES_LABELS[lang]}</strong><small>18+ · {lang === "ru" ? "Колесо, кубики и игра для двоих" : lang === "hi" ? "व्हील, पासे और आप दोनों के लिए खेल" : lang === "pt" ? "Roleta, dados e jogo para dois" : lang === "es" ? "Ruleta, dados y juego para dos" : "Wheel, dice and a two-player game"}</small></span><span className="pop-entry-action__arrow" aria-hidden="true">▶</span>
+                <span className="pop-entry-action__copy"><strong>{NIGHT_GAMES_LABELS[lang]}</strong></span>
               </button>
             </div>
           </div>

@@ -1125,3 +1125,272 @@ main[style*="background: rgb(13, 6, 16)"] button:last-of-type { border-color: #c
   stroke-linecap: round !important;
   stroke-linejoin: round !important;
 }
+
+/* Approved supplied-art treatment: keep the illustrations on the right, blended into each button. */
+.pop-home[data-home-layout="list"] .pop-entry-action {
+  isolation: isolate !important;
+  overflow: hidden !important;
+}
+.pop-home[data-home-layout="list"] .pop-entry-action::after {
+  content: "" !important;
+  position: absolute !important;
+  inset: 0 !important;
+  z-index: 1 !important;
+  width: auto !important;
+  height: auto !important;
+  border: 0 !important;
+  border-radius: inherit !important;
+  pointer-events: none !important;
+  background:
+    linear-gradient(90deg,
+      rgb(var(--home-card-rgb)) 0%,
+      rgb(var(--home-card-rgb)) 18%,
+      rgba(var(--home-card-rgb), .97) 30%,
+      rgba(var(--home-card-rgb), .84) 43%,
+      rgba(var(--home-card-rgb), .65) 57%,
+      rgba(var(--home-card-rgb), .42) 71%,
+      rgba(var(--home-card-rgb), .2) 86%,
+      rgba(var(--home-card-rgb), .05) 96%,
+      transparent 100%),
+    linear-gradient(0deg, rgba(var(--home-card-rgb), .12), transparent 28%, transparent 74%, rgba(var(--home-card-rgb), .1)) !important;
+}
+.pop-home[data-home-layout="list"] .pop-entry-action > .pop-entry-action__art {
+  position: absolute !important;
+  top: -12% !important;
+  right: -5% !important;
+  bottom: -12% !important;
+  left: auto !important;
+  z-index: 0 !important;
+  width: 62% !important;
+  height: 124% !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  object-fit: cover !important;
+  object-position: center center !important;
+  opacity: 1 !important;
+  filter: none !important;
+  transform: none !important;
+  pointer-events: none !important;
+  -webkit-mask-image: linear-gradient(90deg, transparent 0%, rgba(0,0,0,.025) 7%, rgba(0,0,0,.12) 17%, rgba(0,0,0,.34) 30%, rgba(0,0,0,.67) 47%, rgba(0,0,0,.91) 64%, #000 78%) !important;
+  mask-image: linear-gradient(90deg, transparent 0%, rgba(0,0,0,.025) 7%, rgba(0,0,0,.12) 17%, rgba(0,0,0,.34) 30%, rgba(0,0,0,.67) 47%, rgba(0,0,0,.91) 64%, #000 78%) !important;
+}
+.pop-home[data-home-layout="list"] .pop-entry-action--tasks .pop-entry-action__art {
+  right: -13% !important;
+  width: 52% !important;
+  object-position: 54% 39% !important;
+}
+.pop-home[data-home-layout="list"] .pop-entry-action--tarot .pop-entry-action__art { object-position: 52% 41% !important; }
+.pop-home[data-home-layout="list"] .pop-entry-action--lottery .pop-entry-action__art { object-position: 49% 47% !important; }
+.pop-home[data-home-layout="list"] .pop-entry-action--path .pop-entry-action__art {
+  top: -12% !important;
+  right: -10% !important;
+  bottom: -12% !important;
+  z-index: 2 !important;
+  width: 72% !important;
+  height: 124% !important;
+  object-position: center 43% !important;
+  -webkit-mask-image: linear-gradient(90deg, transparent 0%, rgba(0,0,0,.18) 12%, rgba(0,0,0,.62) 32%, rgba(0,0,0,.9) 47%, #000 58%) !important;
+  mask-image: linear-gradient(90deg, transparent 0%, rgba(0,0,0,.18) 12%, rgba(0,0,0,.62) 32%, rgba(0,0,0,.9) 47%, #000 58%) !important;
+}
+.pop-home[data-home-layout="list"] .pop-entry-action--path::after {
+  opacity: .42 !important;
+  background:
+    linear-gradient(90deg, rgb(var(--home-card-rgb)) 0%, rgb(var(--home-card-rgb)) 24%, rgba(var(--home-card-rgb),.94) 34%, rgba(var(--home-card-rgb),.72) 46%, rgba(var(--home-card-rgb),.32) 58%, rgba(var(--home-card-rgb),.08) 72%, transparent 100%),
+    linear-gradient(0deg, rgba(var(--home-card-rgb),.14), transparent 28%, transparent 74%, rgba(var(--home-card-rgb),.12)) !important;
+}
+.pop-home[data-home-layout="list"] .pop-entry-action__copy,
+.pop-home[data-home-layout="list"] .pop-entry-action__index,
+.pop-home[data-home-layout="list"] .pop-entry-action__arrow { z-index: 3 !important; }
+@media (max-width: 380px) {
+  .pop-home[data-home-layout="list"] .pop-entry-action--tasks .pop-entry-action__art {
+    right: -16% !important;
+    width: 48% !important;
+  }
+}
+
+/* Keep mode and category cards in the same soft lilac surface as the approved preview. */
+.pop-home[data-home-layout="task-picker"] .pop-entry-action {
+  --mode-card-rgb: 230, 222, 238 !important;
+  min-height: 86px !important;
+  border: 1px solid rgba(87,68,110,.16) !important;
+  border-radius: 18px !important;
+  background: #e6deee !important;
+  color: #40334f !important;
+  box-shadow: 0 7px 18px rgba(52,42,66,.08), inset 0 1px 0 rgba(255,255,255,.52) !important;
+  isolation: isolate !important;
+  overflow: hidden !important;
+}
+.pop-home[data-home-layout="task-picker"] .pop-entry-action--together { background: #e6deee !important; }
+.pop-home[data-home-layout="task-picker"] .pop-entry-action::after {
+  background: linear-gradient(90deg, #e6deee 0%, rgba(230,222,238,.96) 29%, rgba(230,222,238,.72) 47%, rgba(230,222,238,.22) 69%, rgba(230,222,238,.02) 100%) !important;
+}
+.pop-home[data-home-layout="task-picker"] .pop-entry-action__art {
+  top: -8% !important;
+  right: -4% !important;
+  bottom: -8% !important;
+  left: auto !important;
+  z-index: 0 !important;
+  width: 58% !important;
+  height: 116% !important;
+  border-radius: 0 !important;
+  object-fit: cover !important;
+  object-position: center 40% !important;
+  opacity: 1 !important;
+  filter: none !important;
+  -webkit-mask-image: linear-gradient(90deg, transparent 0%, rgba(0,0,0,.08) 9%, rgba(0,0,0,.34) 24%, rgba(0,0,0,.74) 43%, #000 62%) !important;
+  mask-image: linear-gradient(90deg, transparent 0%, rgba(0,0,0,.08) 9%, rgba(0,0,0,.34) 24%, rgba(0,0,0,.74) 43%, #000 62%) !important;
+}
+.pop-home[data-home-layout="task-picker"] .pop-entry-action__index,
+.pop-home[data-home-layout="task-picker"] .pop-entry-action__copy,
+.pop-home[data-home-layout="task-picker"] .pop-entry-action__arrow {
+  z-index: 2 !important;
+  color: #40334f !important;
+}
+.pop-home[data-home-layout="task-picker"] .pop-entry-action__index { color: #8064a2 !important; border-right-color: rgba(87,68,110,.18) !important; }
+.pop-home[data-home-layout="task-picker"] .pop-entry-action__copy strong {
+  color: #40334f !important;
+  text-shadow: none !important;
+}
+.pop-home[data-home-layout="task-picker"] .pop-entry-action__copy small { color: #62566f !important; }
+.pop-home[data-home-layout="task-picker"] .pop-entry-action__arrow {
+  border-color: rgba(87,68,110,.18) !important;
+  background: rgba(251,249,254,.68) !important;
+}
+
+.pop-home .pop-tiles .pop-card {
+  min-height: 112px !important;
+  border: 1px solid rgba(87,68,110,.16) !important;
+  border-radius: 17px !important;
+  background: #e6deee !important;
+  color: #40334f !important;
+  box-shadow: 0 7px 18px rgba(52,42,66,.08), inset 0 1px 0 rgba(255,255,255,.52) !important;
+  overflow: hidden !important;
+}
+.pop-home .pop-tiles .pop-card > div:first-child {
+  display: block !important;
+  inset: -5% -12% -5% auto !important;
+  width: 78% !important;
+  height: 110% !important;
+  background-size: cover !important;
+  background-position: center center !important;
+  background-repeat: no-repeat !important;
+  opacity: 1 !important;
+  filter: none !important;
+}
+.pop-home .pop-tiles .pop-card > div:nth-child(2) {
+  display: block !important;
+  z-index: 1 !important;
+  background:
+    linear-gradient(90deg, #e6deee 0%, rgba(230,222,238,.94) 23%, rgba(230,222,238,.68) 43%, rgba(230,222,238,.14) 72%, rgba(230,222,238,0) 100%),
+    linear-gradient(0deg, rgba(230,222,238,.14), transparent 34%, transparent 78%, rgba(230,222,238,.12)) !important;
+}
+.pop-home .pop-tiles .pop-card > div:nth-child(3),
+.pop-home .pop-tiles .pop-card > div:nth-child(4),
+.pop-home .pop-tiles .pop-card > div:nth-child(5) { display: none !important; }
+.pop-home .pop-tiles .pop-card > div:last-child {
+  position: relative !important;
+  z-index: 2 !important;
+  align-items: flex-end !important;
+  min-height: 112px !important;
+  padding: 12px !important;
+}
+.pop-home .pop-tiles .pop-card > div:last-child > div:nth-child(2) { max-width: 73% !important; }
+.pop-home .pop-tiles .pop-card > div:last-child > div:nth-child(2) > div:first-child {
+  margin-top: 0 !important;
+  color: #40334f !important;
+  font-size: 13px !important;
+  line-height: 1.08 !important;
+  text-shadow: none !important;
+}
+.pop-home .pop-tiles .pop-card > div:last-child > div:nth-child(2) > div:last-child {
+  margin-top: 3px !important;
+  color: #62566f !important;
+  font-size: 9px !important;
+  line-height: 1.2 !important;
+  opacity: .82 !important;
+}
+.pop-home .pop-tiles .pop-card > div:last-child > svg { color: #765b99 !important; stroke: #765b99 !important; }
+.pop-home .pop-card::before { color: #8064a2 !important; }
+.pop-home .pop-card__remaining {
+  border: 1px solid #c9bdd9 !important;
+  background: rgba(248,245,252,.92) !important;
+  color: #594573 !important;
+  box-shadow: 0 2px 8px rgba(52,42,66,.08) !important;
+}
+.pop-home .pop-card-invite,
+.pop-home .pop-card-pair {
+  min-height: 114px !important;
+  border: 1px solid rgba(87,68,110,.16) !important;
+  border-radius: 17px !important;
+  background: #e6deee !important;
+  color: #40334f !important;
+  box-shadow: 0 7px 18px rgba(52,42,66,.08), inset 0 1px 0 rgba(255,255,255,.52) !important;
+  overflow: hidden !important;
+}
+.pop-home .pop-card-invite > div:first-child,
+.pop-home .pop-card-pair > div:first-child {
+  inset: -6% -8% -6% auto !important;
+  width: 66% !important;
+  height: 112% !important;
+  background-size: cover !important;
+  background-position: center center !important;
+  opacity: 1 !important;
+  filter: none !important;
+}
+.pop-home .pop-card-invite > div:nth-child(2),
+.pop-home .pop-card-pair > div:nth-child(2) {
+  background: linear-gradient(90deg, #e6deee 0%, rgba(230,222,238,.94) 23%, rgba(230,222,238,.68) 43%, rgba(230,222,238,.14) 72%, transparent 100%) !important;
+}
+.pop-home .pop-card-invite > div:last-child,
+.pop-home .pop-card-pair > div:last-child { min-height: 114px !important; padding-top: 29px !important; padding-bottom: 12px !important; }
+.pop-home .pop-card-invite > div:last-child > div:nth-child(2),
+.pop-home .pop-card-pair > div:last-child > div:nth-child(2) { max-width: 70% !important; }
+
+/* Game buttons use the same right-side crop and soft edge blend as the approved mockup. */
+.touche-games__choice {
+  min-height: 138px !important;
+  padding: 13px 15px !important;
+}
+.touche-games__choice::before {
+  background:
+    linear-gradient(90deg,
+      rgb(var(--game-card-rgb)) 0%,
+      rgb(var(--game-card-rgb)) 24%,
+      rgba(var(--game-card-rgb),.94) 34%,
+      rgba(var(--game-card-rgb),.72) 46%,
+      rgba(var(--game-card-rgb),.32) 58%,
+      rgba(var(--game-card-rgb),.08) 72%,
+      transparent 100%) !important;
+}
+.touche-games__art-wrap {
+  inset: 0 -1% 0 auto !important;
+  width: 66% !important;
+  overflow: hidden !important;
+  border-radius: 0 21px 21px 0 !important;
+}
+.touche-games__art-image {
+  width: 100% !important;
+  height: 100% !important;
+  border-radius: 0 !important;
+  object-fit: cover !important;
+  opacity: 1 !important;
+  filter: none !important;
+  transform: none !important;
+  -webkit-mask-image: linear-gradient(90deg, transparent 0%, rgba(0,0,0,.025) 7%, rgba(0,0,0,.12) 18%, rgba(0,0,0,.34) 33%, rgba(0,0,0,.67) 51%, rgba(0,0,0,.91) 69%, #000 83%) !important;
+  mask-image: linear-gradient(90deg, transparent 0%, rgba(0,0,0,.025) 7%, rgba(0,0,0,.12) 18%, rgba(0,0,0,.34) 33%, rgba(0,0,0,.67) 51%, rgba(0,0,0,.91) 69%, #000 83%) !important;
+}
+.touche-games__choice--wheel .touche-games__art-image {
+  object-fit: contain !important;
+  object-position: 100% 50% !important;
+  transform: scale(1.12) translateX(1%) !important;
+}
+.touche-games__choice--dice .touche-games__art-image {
+  object-position: 50% 57% !important;
+  transform: scale(1.11) !important;
+}
+.touche-games__choice--strip .touche-games__art-wrap { transform: translateX(20%) !important; }
+.touche-games__choice--strip .touche-games__art-image {
+  object-position: 52% 65% !important;
+  transform: scale(1.12) !important;
+}
+.touche-games__choice-copy { width: min(56%, 252px) !important; }

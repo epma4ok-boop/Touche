@@ -131,19 +131,19 @@ export async function createWishShareImage(text: string, lang: Lang): Promise<st
   const copy = COPY[lang];
   const cleanText = text.replace(/\s+/gu, " ").trim();
 
-  context.fillStyle = "#fffaf3";
+  context.fillStyle = "#f8f5fc";
   context.fillRect(0, 0, canvas.width, canvas.height);
 
   roundedRect(context, 32, 32, 1016, 1286, 42);
-  context.fillStyle = "#fceacc";
+  context.fillStyle = "#e9e0f2";
   context.fill();
-  context.strokeStyle = "#162238";
+  context.strokeStyle = "#40334f";
   context.lineWidth = 5;
   context.stroke();
 
   drawImageCover(context, cover, 56, 56, 968, 520, 30);
   roundedRect(context, 56, 56, 968, 520, 30);
-  context.strokeStyle = "#162238";
+  context.strokeStyle = "#40334f";
   context.lineWidth = 5;
   context.stroke();
   drawStar(context, 91, 91, 14, 1);
@@ -154,21 +154,21 @@ export async function createWishShareImage(text: string, lang: Lang): Promise<st
   roundedRect(context, 92, 612, 896, 77, 21);
   context.fillStyle = "#fff";
   context.fill();
-  context.strokeStyle = "#162238";
+  context.strokeStyle = "#40334f";
   context.lineWidth = 3;
   context.stroke();
-  context.fillStyle = "#78183d";
+  context.fillStyle = "#765b99";
   context.font = "700 20px 'DM Sans', Arial, sans-serif";
   context.fillText(copy.eyebrow.toUpperCase(), 540, 650, 830);
 
-  context.fillStyle = "#162238";
+  context.fillStyle = "#342a42";
   context.font = "600 43px 'Space Grotesk', 'DM Sans', Arial, sans-serif";
   context.fillText(copy.title, 540, 735, 850);
 
   roundedRect(context, 76, 788, 928, 440, 32);
   context.fillStyle = "#fff";
   context.fill();
-  context.strokeStyle = "#162238";
+  context.strokeStyle = "#40334f";
   context.lineWidth = 4;
   context.stroke();
   drawStar(context, 125, 836, 11, 0.95);
@@ -188,7 +188,7 @@ export async function createWishShareImage(text: string, lang: Lang): Promise<st
 
   const firstLineY = 1008 - ((lines.length - 1) * lineHeight) / 2;
   context.font = `${fontSize}px Georgia, 'Times New Roman', serif`;
-  context.fillStyle = "#162238";
+  context.fillStyle = "#342a42";
   context.textAlign = "center";
   context.textBaseline = "middle";
   lines.forEach((line, index) => {
@@ -197,10 +197,10 @@ export async function createWishShareImage(text: string, lang: Lang): Promise<st
 
   drawStar(context, 150, 1264, 13, 0.9);
   drawStar(context, 930, 1264, 13, 0.9);
-  context.fillStyle = "#ff6f61";
+  context.fillStyle = "#8064a2";
   roundedRect(context, 485, 1245, 110, 36, 18);
   context.fill();
-  context.fillStyle = "#162238";
+  context.fillStyle = "#342a42";
   context.font = "700 16px 'Space Grotesk', 'DM Sans', Arial, sans-serif";
   context.fillText("TOUCHÉ", 540, 1263, 95);
 

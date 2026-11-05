@@ -363,6 +363,82 @@ button:focus-visible,
 .touche-games__choice--strip { --game-card-rgb: 77, 62, 96 !important; --game-card-ink: #fffaff !important; --game-card-muted: rgba(255,250,255,.88) !important; --game-card-action: #5e4a75 !important; }
 .touche-games__footnote { color: #62566f !important; }
 .touche-games__footnote span { background: #9b82bd !important; }
+/* The legacy game skin uses circular image badges and orange !important rules.
+   Keep the current selector aligned with the full-photo home buttons instead. */
+.touche-games {
+  color: #342a42 !important;
+  background:
+    radial-gradient(ellipse 350px 280px at 96% 8%,rgba(213,200,232,.74),transparent 74%),
+    radial-gradient(ellipse 320px 330px at 0% 90%,rgba(184,166,210,.25),transparent 76%),
+    #f1edf8 !important;
+  font-family: "DM Sans",sans-serif !important;
+}
+.touche-games::before { opacity: .12 !important; background-image: radial-gradient(rgba(80,63,101,.12) .55px,transparent .55px) !important; background-size: 8px 8px !important; }
+.touche-games__back {
+  width: 42px !important;
+  height: 42px !important;
+  border: 1px solid rgba(75,59,96,.23) !important;
+  border-radius: 14px !important;
+  color: #514365 !important;
+  background: rgba(251,249,254,.9) !important;
+}
+.touche-games__brand { color: #40334f !important; }
+.touche-games__brand em { color: #765b99 !important; }
+.touche-games__eyebrow { color: #765b99 !important; }
+.touche-games__intro h1 { color: #40334f !important; font-family: "Space Grotesk",sans-serif !important; letter-spacing: -.065em !important; }
+.touche-games__intro p { color: #62566f !important; }
+.touche-games__choice {
+  min-height: 126px !important;
+  padding: 13px 15px !important;
+  border: 1px solid rgba(75,59,96,.18) !important;
+  border-radius: 22px !important;
+  color: var(--game-card-ink) !important;
+  background: rgb(var(--game-card-rgb)) !important;
+  box-shadow: 0 10px 22px -15px rgba(64,24,43,.42), inset 0 1px rgba(255,255,255,.22) !important;
+}
+.touche-games__choice--wheel { background: rgb(116,91,148) !important; }
+.touche-games__choice--dice { background: rgb(224,216,236) !important; }
+.touche-games__choice--strip { background: rgb(77,62,96) !important; }
+.touche-games__choice::before {
+  display: block !important;
+  background:
+    linear-gradient(90deg,
+      rgb(var(--game-card-rgb)) 0%,
+      rgba(var(--game-card-rgb),.98) 30%,
+      rgba(var(--game-card-rgb),.91) 43%,
+      rgba(var(--game-card-rgb),.75) 58%,
+      rgba(var(--game-card-rgb),.5) 100%),
+    linear-gradient(0deg,rgba(var(--game-card-rgb),.18) 0%,transparent 18%,transparent 82%,rgba(var(--game-card-rgb),.2) 100%) !important;
+}
+.touche-games__art-wrap {
+  inset: 0 !important;
+  top: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  left: 0 !important;
+  z-index: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  border: 0 !important;
+  border-radius: inherit !important;
+  background: none !important;
+  box-shadow: none !important;
+}
+.touche-games__art-image {
+  border-radius: inherit !important;
+  object-fit: cover !important;
+  opacity: .9 !important;
+  filter: saturate(.72) contrast(.92) blur(.35px) !important;
+  mix-blend-mode: normal !important;
+  transform: scale(1.03) !important;
+}
+.touche-games__choice-copy { position: relative !important; z-index: 2 !important; }
+.touche-games__choice-copy strong,
+.touche-games__choice-copy .touche-games__choice-mood,
+.touche-games__choice-copy > small:last-child { color: var(--game-card-ink) !important; }
+.touche-games__choice-copy > small:last-child { color: var(--game-card-muted) !important; }
+.touche-games__footnote { color: #62566f !important; }
+.touche-games__footnote span { background: #9b82bd !important; }
 .touche-dice__table { border-color: #d8cde7 !important; background: #e9e2f1 !important; }
 .touche-dice__face { border-color: #c4b5d7 !important; background: linear-gradient(145deg,#fbf9fe,#ded4ec) !important; }
 .touche-dice__player-label, .touche-dice__status { color: #62566f !important; }

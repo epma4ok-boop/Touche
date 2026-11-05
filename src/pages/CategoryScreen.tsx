@@ -11,13 +11,20 @@ import type { SharedTaskSnapshot } from "@/data/sharedPair";
 import "./CategoryPop.css";
 
 const HISTORY_KEY = "touche_history_v2";
-const FALLBACK_INK = "#162238";
+const FALLBACK_INK = "#342a42";
+const CATEGORY_ART: Record<Category, string> = {
+  compliments: "/images/touche-button-art/compliments.webp",
+  tenderness: "/images/touche-button-art/tenderness.webp",
+  desire: "/images/touche-button-art/desire.webp",
+  passion: "/images/touche-button-art/passion.webp",
+  hard: "/images/touche-button-art/hard.webp",
+};
 const POP_COLORS: Record<Category, { r: number; g: number; b: number }> = {
-  compliments: { r: 255, g: 212, b: 93 },
-  tenderness: { r: 62, g: 91, b: 255 },
-  desire: { r: 255, g: 111, b: 97 },
-  passion: { r: 255, g: 111, b: 97 },
-  hard: { r: 22, g: 34, b: 56 },
+  compliments: { r: 158, g: 132, b: 185 },
+  tenderness: { r: 220, g: 211, b: 234 },
+  desire: { r: 205, g: 199, b: 220 },
+  passion: { r: 155, g: 130, b: 189 },
+  hard: { r: 77, g: 62, b: 96 },
 };
 
 function loadHistory(): HistoryEntry[] {
@@ -207,7 +214,7 @@ function TaskReveal({ text, color, visible, onDismiss, onGenerateAgain, lang, ca
       canvas.width = size; canvas.height = size;
       const ctx = canvas.getContext("2d");
       if (!ctx) return;
-      ctx.fillStyle = "#fffaf3"; ctx.fillRect(0, 0, size, size);
+      ctx.fillStyle = "#f8f5fc"; ctx.fillRect(0, 0, size, size);
       ctx.strokeStyle = FALLBACK_INK; ctx.lineWidth = 5; ctx.strokeRect(48, 48, size - 96, size - 96);
       ctx.fillStyle = `rgb(${color.r},${color.g},${color.b})`; ctx.fillRect(48, 48, 230, 18);
       ctx.fillStyle = FALLBACK_INK; ctx.textAlign = "center";
@@ -246,7 +253,7 @@ function TaskReveal({ text, color, visible, onDismiss, onGenerateAgain, lang, ca
         </span>
       )}
       {isShared && (
-        <div className="task-reveal__shared-status" role="status" data-testid="status-shared-task" style={{ maxWidth: 560, padding: "13px 16px", border: "1px solid rgba(22,34,56,.25)", borderRadius: 14, background: "rgba(255,250,243,.34)", color: "var(--pop-ink)", textAlign: "left" }}>
+        <div className="task-reveal__shared-status" role="status" data-testid="status-shared-task" style={{ maxWidth: 560, padding: "13px 16px", border: "1px solid rgba(64,51,79,.18)", borderRadius: 14, background: "rgba(248,245,252,.72)", color: "var(--pop-ink)", textAlign: "left" }}>
           <strong style={{ display: "block", fontSize: 13 }}>{pairCopy.shared}</strong>
           <small style={{ display: "block", marginTop: 4, lineHeight: 1.45 }}>{pairCopy.checkInHint}</small>
         </div>
@@ -541,7 +548,9 @@ export default function CategoryScreen({ lang, gender, category, onBack, onCateg
   return (
     <main className="category-pop" style={{ height, opacity: mounted ? 1 : 0, transform: mounted ? "translateX(0)" : `translateX(${enterX}px)` }} onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
       <header className="category-pop__top" style={{ paddingTop: topPadding }}>
-        <button data-testid="button-category-back" className="category-pop__menu" onClick={onBack} aria-label={t.backLabel}><span /><span /><span /></button>
+        <button data-testid="button-category-back" className="category-pop__menu" onClick={onBack} aria-label={t.backLabel}>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 18 9 12l6-6" /></svg>
+        </button>
         <div className="category-pop__logo">Touch<em>é</em></div>
         <button data-testid="button-open-history" className="category-pop__history" onClick={() => setHistoryOpen(true)}>{t.history}</button>
       </header>
@@ -550,7 +559,7 @@ export default function CategoryScreen({ lang, gender, category, onBack, onCateg
          <div className="category-pop__context">
         <section className="category-pop__hero">
           <span className="category-pop__stamp">{mode === "together" ? t.sharedTask : `18+ · ${t.lockSub}`}</span>
-           <div className="category-pop__orb" style={{ backgroundImage: `url(/images/cat-${category}-art.svg)` }} aria-hidden="true" />
+           <div className="category-pop__orb" style={{ backgroundImage: `url(${CATEGORY_ART[category]})` }} aria-hidden="true" />
           <p className="category-pop__eyebrow">{categorySub(category, t)}</p>
           <h1 data-testid="text-category-title">{label}</h1>
            <p className="category-pop__description">{({
@@ -561,12 +570,12 @@ export default function CategoryScreen({ lang, gender, category, onBack, onCateg
          {sensitive && <div className="category-pop__warning" role="note">18+ · {t.lockSub}</div>}
          {mode === "together" && <div className="category-pop__mode"><span className="category-pop__mode-dot" style={{ background: `rgb(${popColor.r},${popColor.g},${popColor.b})` }} /><strong>{t.sharedTask}</strong><small>{coupleId ? t.linked : t.appSub}</small></div>}
           {mode === "together" && sharedTask && !showReveal && (
-            <div data-testid="card-shared-task-status" role="status" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, padding: "12px 14px", borderRadius: 14, background: "rgba(22,34,56,.05)", border: "1px solid rgba(22,34,56,.10)" }}>
+            <div data-testid="card-shared-task-status" role="status" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, padding: "12px 14px", borderRadius: 14, background: "rgba(64,51,79,.05)", border: "1px solid rgba(64,51,79,.10)" }}>
               <span style={{ minWidth: 0 }}>
-                <strong style={{ display: "block", fontSize: 12, color: "#162238" }}>{sharedTaskStatus}</strong>
-                <small style={{ display: "block", marginTop: 3, fontSize: 10, lineHeight: 1.4, color: "rgba(22,34,56,.68)" }}>{sharedTaskHint}</small>
+                <strong style={{ display: "block", fontSize: 12, color: "#40334f" }}>{sharedTaskStatus}</strong>
+                <small style={{ display: "block", marginTop: 3, fontSize: 10, lineHeight: 1.4, color: "rgba(64,51,79,.68)" }}>{sharedTaskHint}</small>
               </span>
-              <button type="button" data-testid="button-reopen-shared-task" onClick={() => setShowReveal(true)} style={{ flexShrink: 0, padding: "9px 11px", border: "1px solid rgba(22,34,56,.18)", borderRadius: 11, background: "#fffaf3", color: "#162238", fontSize: 10, fontWeight: 700, cursor: "pointer" }}>{sharedCopy.openTask}</button>
+              <button type="button" data-testid="button-reopen-shared-task" onClick={() => setShowReveal(true)} style={{ flexShrink: 0, padding: "9px 11px", border: "1px solid rgba(64,51,79,.18)", borderRadius: 11, background: "#fbf9fe", color: "#40334f", fontSize: 10, fontWeight: 700, cursor: "pointer" }}>{sharedCopy.openTask}</button>
             </div>
           )}
         {(remaining !== null || isPremium) && <div className="category-pop__remaining" data-testid="status-remaining">{remaining === null ? (lang === "ru" ? "Задания без ограничений" : "Unlimited tasks") : t.remaining(remaining)}</div>}
@@ -574,7 +583,7 @@ export default function CategoryScreen({ lang, gender, category, onBack, onCateg
         <section className="category-pop__generator">
            <div className="category-pop__generator-head"><span>{t.hint}</span><b>{String(index + 1).padStart(2, "0")} / {String(CATEGORIES_ORDER.length).padStart(2, "0")}</b></div>
           <div className="category-pop__heartbeat" data-testid="tutorial-heartbeat-target">
-              <HeartbeatCanvas onHoldComplete={tutorialDemo ? showTutorialSample : generate} isCasting={tutorialDemo ? false : isCasting} color={popColor} hintText={tutorialDemo ? TUTORIAL_SAMPLE[lang].holdHint : isCasting ? t.tapping : t.hint} holdDuration={2600} baseRScale={0.28} bgColor="#fffaf3" />
+              <HeartbeatCanvas onHoldComplete={tutorialDemo ? showTutorialSample : generate} isCasting={tutorialDemo ? false : isCasting} color={popColor} hintText={tutorialDemo ? TUTORIAL_SAMPLE[lang].holdHint : isCasting ? t.tapping : t.hint} holdDuration={2600} baseRScale={0.28} bgColor="#f8f5fc" />
           </div>
           {errorKind && errorKind !== "subscription_required" && errorKind !== "limit_exceeded" && <div className="category-pop__error" role="alert" data-testid="status-task-error"><strong>{errorCopy[errorKind]}</strong>{errorKind === "unknown" && generatedErrorCode && <small>{generatedErrorCode}</small>}<button onClick={() => setErrorKind(null)}>{lang === "ru" ? "Понятно" : "Dismiss"}</button></div>}
         </section>

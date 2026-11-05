@@ -101,14 +101,14 @@ const PINK      = `rgb(${PR},${PG},${PB})`;
 const PINK_GLOW = `drop-shadow(0 0 6px rgba(${PR},${PG},${PB},1)) drop-shadow(0 0 14px rgba(${PR},${PG},${PB},0.55))`;
 
 const CAT_IMG: Record<Category | "scenarios" | "invite" | "pair", string> = {
-  compliments: "/images/cat-compliments-art.svg",
-  tenderness:  "/images/cat-tenderness-art.svg",
-  desire:      "/images/cat-desire-art.svg",
-  passion:     "/images/cat-passion-art.svg",
-  hard:        "/images/cat-hard-art.svg",
-  scenarios:   "/images/cat-scenarios-art.svg",
-  invite:      "/images/cat-invite-art.svg",
-  pair:        "/images/cat-pair-art.svg",
+  compliments: "/images/touche-button-art/compliments.webp",
+  tenderness:  "/images/touche-button-art/tenderness.webp",
+  desire:      "/images/touche-button-art/desire.webp",
+  passion:     "/images/touche-button-art/passion.webp",
+  hard:        "/images/touche-button-art/hard.webp",
+  scenarios:   "/images/touche-button-art/scenarios.webp",
+  invite:      "/images/touche-button-art/invite-friend.webp",
+  pair:        "/images/touche-button-art/link-pair.webp",
 };
 
 /* ─── NeonIcon ─────────────────────────────────────────────────── */
@@ -814,7 +814,7 @@ function CoupleModal({ lang, coupleId, pendingRefUserId, onLink, onUnlink, onClo
           onClick={() => { void handleNotificationToggle(); }}
           style={{ width: 46, height: 28, padding: 3, flexShrink: 0, border: 0, borderRadius: 20, cursor: notificationsLoading || notificationsSaving ? "wait" : "pointer", background: notificationsEnabled ? PINK : "rgba(255,238,248,0.16)", opacity: notificationsLoading || notificationsSaving ? 0.65 : 1, transition: "background .2s ease" }}
         >
-          <span aria-hidden="true" style={{ display: "block", width: 22, height: 22, borderRadius: "50%", background: "#fffaf3", transform: notificationsEnabled ? "translateX(18px)" : "translateX(0)", transition: "transform .2s ease" }} />
+          <span aria-hidden="true" style={{ display: "block", width: 22, height: 22, borderRadius: "50%", background: "#f8f5fc", transform: notificationsEnabled ? "translateX(18px)" : "translateX(0)", transition: "transform .2s ease" }} />
         </button>
       </section>
 
@@ -1304,7 +1304,7 @@ export default function Home({
     <>
       <style>{GLOBAL_STYLES}</style>
 
-      <div className="pop-home" data-home-layout={homeSection === "home" ? "list" : homeSection === "tasks" ? "task-picker" : undefined} style={{
+      <div className="pop-home" data-home-layout={homeSection === "home" ? "list" : homeSection === "tasks" ? "task-picker" : "task-detail"} style={{
         position: "fixed", inset: 0, background: BG,
         display: "flex", flexDirection: "column",
         overflow: "hidden",
@@ -1372,7 +1372,7 @@ export default function Home({
                 <span className="pop-entry-action__copy"><strong>{TASKS_COPY[lang].title}</strong></span>
               </button>
               <button type="button" className="pop-entry-action pop-entry-action--path" onClick={onLovePathOpen} data-testid="button-open-love-path">
-                <img className="pop-entry-action__art" src="/images/home-cards/love-path.jpg" alt="" aria-hidden="true" />
+                <img className="pop-entry-action__art" src="/images/touche-button-art/love-path.webp" alt="" aria-hidden="true" />
                 <span className="pop-entry-action__copy"><strong>{lang === "ru" ? "Путь любви" : lang === "hi" ? "प्यार का путь" : lang === "pt" ? "Caminho do amor" : lang === "es" ? "Camino del amor" : "Love Path"}</strong></span>
               </button>
               <button type="button" className="pop-entry-action pop-entry-action--tarot" onClick={onTarotOpen} data-testid="button-open-tarot">
@@ -1397,11 +1397,11 @@ export default function Home({
             </section>
             <div className="pop-entry-actions">
               <button type="button" className="pop-entry-action pop-entry-action--solo" onClick={() => openHomeSection("solo")} data-testid="button-mode-solo">
-                <img className="pop-entry-action__art" src="/images/cat-tenderness-art.svg" alt="" aria-hidden="true" />
+                <img className="pop-entry-action__art" src="/images/touche-button-art/solo.webp" alt="" aria-hidden="true" />
                 <span className="pop-entry-action__index">01</span><span className="pop-entry-action__copy"><strong>{lang === "ru" ? "Соло" : lang === "hi" ? "अकेले" : lang === "pt" ? "Solo" : lang === "es" ? "A solas" : "Solo"}</strong><small>{lang === "ru" ? "Нежное задание только для себя" : lang === "hi" ? "सिर्फ़ अपने लिए एक कोमल चुनौती" : lang === "pt" ? "Um convite delicado só para você" : lang === "es" ? "Un reto íntimo solo para ti" : "A little moment, just for you"}</small></span><span className="pop-entry-action__arrow" aria-hidden="true">▶</span>
               </button>
               <button type="button" className="pop-entry-action pop-entry-action--together" onClick={() => openHomeSection("together")} data-testid="button-mode-together">
-                <img className="pop-entry-action__art" src="/images/cat-pair-art.svg" alt="" aria-hidden="true" />
+                <img className="pop-entry-action__art" src="/images/touche-button-art/together.webp" alt="" aria-hidden="true" />
                 <span className="pop-entry-action__index">02</span><span className="pop-entry-action__copy"><strong>{lang === "ru" ? "Вместе" : lang === "hi" ? "साथ में" : lang === "pt" ? "A dois" : lang === "es" ? "En pareja" : "Together"}</strong><small>{lang === "ru" ? "Общие задания и ваши желания" : lang === "hi" ? "साझा चुनौतियाँ और इच्छाएँ" : lang === "pt" ? "Desafios e desejos compartilhados" : lang === "es" ? "Retos y deseos compartidos" : "Shared prompts and your wishes"}</small></span><span className="pop-entry-action__arrow" aria-hidden="true">▶</span>
               </button>
             </div>

@@ -147,10 +147,51 @@ button:focus-visible,
   border-color: rgba(73,57,93,.15) !important;
   box-shadow: 0 7px 16px rgba(55,42,70,.09), inset 0 1px 0 rgba(255,255,255,.5) !important;
 }
-.pop-home[data-home-layout="list"] .pop-entry-action--tasks { --home-card-rgb: 158, 132, 185; --home-card-ink: #fffaff; --home-card-muted: rgba(255,250,255,.9); }
-.pop-home[data-home-layout="list"] .pop-entry-action--path { --home-card-rgb: 220, 211, 234; --home-card-ink: #40334f; --home-card-muted: rgba(64,51,79,.83); }
-.pop-home[data-home-layout="list"] .pop-entry-action--tarot { --home-card-rgb: 205, 199, 220; --home-card-ink: #39314a; --home-card-muted: rgba(57,49,74,.83); }
-.pop-home[data-home-layout="list"] .pop-entry-action--lottery { --home-card-rgb: 120, 94, 151; --home-card-ink: #fffaff; --home-card-muted: rgba(255,250,255,.88); }
+.pop-home[data-home-layout="list"] .pop-entry-action--tasks { --home-card-rgb: 158, 132, 185; --home-card-ink: #fffaff; --home-card-muted: rgba(255,250,255,.9); --home-image-wash: .5; }
+.pop-home[data-home-layout="list"] .pop-entry-action--path { --home-card-rgb: 220, 211, 234; --home-card-ink: #40334f; --home-card-muted: rgba(64,51,79,.83); --home-image-wash: .48; }
+.pop-home[data-home-layout="list"] .pop-entry-action--tarot { --home-card-rgb: 205, 199, 220; --home-card-ink: #39314a; --home-card-muted: rgba(57,49,74,.83); --home-image-wash: .5; }
+.pop-home[data-home-layout="list"] .pop-entry-action--lottery { --home-card-rgb: 120, 94, 151; --home-card-ink: #fffaff; --home-card-muted: rgba(255,250,255,.88); --home-image-wash: .52; }
+.pop-home[data-home-layout="list"] .pop-entry-action::after {
+  background:
+    linear-gradient(90deg,
+      rgb(var(--home-card-rgb)) 0%,
+      rgba(var(--home-card-rgb),.98) 30%,
+      rgba(var(--home-card-rgb),.91) 43%,
+      rgba(var(--home-card-rgb),.75) 58%,
+      rgba(var(--home-card-rgb),var(--home-image-wash,.5)) 100%),
+    linear-gradient(0deg, rgba(var(--home-card-rgb),.18), transparent 18%, transparent 82%, rgba(var(--home-card-rgb),.2)) !important;
+}
+.pop-home[data-home-layout="list"] .pop-entry-action__art {
+  inset: 0 !important;
+  z-index: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  object-position: center center !important;
+  border: 0 !important;
+  border-radius: inherit !important;
+  box-shadow: none !important;
+  opacity: .9 !important;
+  filter: saturate(.72) contrast(.92) blur(.35px) !important;
+  mix-blend-mode: normal !important;
+  transform: scale(1.03) !important;
+}
+.pop-home[data-home-layout="list"] .pop-entry-action--path .pop-entry-action__art {
+  inset: 0 !important;
+  z-index: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  object-position: center center !important;
+  border: 0 !important;
+  border-radius: inherit !important;
+  box-shadow: none !important;
+  opacity: .9 !important;
+  filter: saturate(.72) contrast(.92) blur(.35px) !important;
+  mix-blend-mode: normal !important;
+  transform: scale(1.03) !important;
+}
+.pop-home[data-home-layout="list"] .pop-entry-action__copy { z-index: 2 !important; }
 .pop-home[data-home-layout="list"] .pop-entry-action__arrow { color: #6d568a !important; }
 .pop-home[data-home-layout="list"] .pop-entry-action:focus-visible { outline-color: rgba(121,94,156,.7) !important; }
 .pop-home[data-home-layout="task-picker"] { background: #f2eef8 !important; color: #342a42 !important; }
@@ -165,6 +206,14 @@ button:focus-visible,
 .pop-home[data-home-layout="task-picker"] .pop-entry-action__copy small { color: #62566f !important; }
 .pop-home[data-home-layout="task-picker"] .pop-entry-action__copy strong { color: #40334f !important; }
 .pop-home[data-home-layout="task-picker"] .pop-entry-action__arrow { color: #765b99 !important; }
+.pop-home[data-home-layout="task-picker"] .pop-entry-action__art {
+  right: 14px !important;
+  width: 60px !important;
+  height: 60px !important;
+  opacity: .48 !important;
+  filter: grayscale(1) contrast(1.08) !important;
+  mix-blend-mode: multiply !important;
+}
 .pop-home .pop-entry-action--solo { background-color: #eee8f5 !important; }
 .pop-home .pop-entry-action--together { background-color: #e9e1f2 !important; }
 .pop-home .pop-entry-action--path { background-color: #e2d9ef !important; }

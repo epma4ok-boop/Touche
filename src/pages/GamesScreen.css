@@ -104,6 +104,7 @@
 .touche-games__choice:hover { transform: translateY(-2px); box-shadow: 0 14px 26px -15px rgba(64,24,43,.62), inset 0 1px rgba(255,255,255,.28); }
 .touche-games__choice:active { transform: translateY(0) scale(.99); }
 .touche-games__choice--wheel { --game-card-rgb: 79, 28, 49; --game-card-ink: #fff8ef; --game-card-muted: rgba(255, 248, 239, .84); --game-card-action: #592037; --game-art-wash: .4; }
+.touche-games__choice--pose-ball { --game-card-rgb: 62, 42, 80; --game-card-ink: #fffaff; --game-card-muted: rgba(255, 250, 255, .84); --game-card-action: #4e3262; --game-art-wash: .08; }
 .touche-games__choice--dice { --game-card-rgb: 231, 213, 197; --game-card-ink: #3d302e; --game-card-muted: rgba(61, 48, 46, .8); --game-card-action: #e6d1c3; --game-art-wash: .06; }
 .touche-games__choice--strip { --game-card-rgb: 55, 34, 48; --game-card-ink: #fff7ee; --game-card-muted: rgba(255, 247, 238, .82); --game-card-action: #49253a; --game-art-wash: .46; }
 .touche-games__choice::before {
@@ -144,6 +145,7 @@
 .touche-games__art-image--dice,
 .touche-games__art-image--strip { object-position: center center; }
 .touche-games__art-image--wheel { object-fit: contain; object-position: right center; }
+.touche-games__art-image--pose-ball { width: 68%; left: auto; right: 0; object-fit: contain; object-position: right center; }
 .touche-games__art-image--strip { object-position: center bottom; }
 .touche-games__choice-copy { position: absolute; z-index: 2; top: 50%; left: 16px; display: flex; flex-direction: column; align-items: flex-start; gap: 4px; width: min(46%, 210px); margin: 0; padding: 0; transform: translateY(-50%); }
 .touche-games__choice-copy .touche-games__choice-mood { margin-bottom: 0; color: var(--game-card-muted); font-size: 8px; font-weight: 700; letter-spacing: .17em; opacity: .9; }

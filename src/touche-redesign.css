@@ -275,28 +275,16 @@ button:focus-visible, [role="button"]:focus-visible {
 .touche-games__choice--dice { background:linear-gradient(135deg,#fff1d8,#ffc679) !important; }
 .touche-games__choice--strip { background:linear-gradient(135deg,#ff9a75,#ec542c) !important; color:#fff8ee !important; }
 .touche-games__art-wrap {
-  inset: 0 0 0 auto !important;
-  width: 54% !important; height: 100% !important; border: 0 !important; border-radius: 0 22px 22px 0 !important;
+  inset: 0 !important; top: 0 !important; right: 0 !important; bottom: 0 !important; left: 0 !important;
+  width: 100% !important; height: 100% !important; border: 0 !important; border-radius: inherit !important;
   background: none !important; box-shadow: none !important;
 }
 .touche-games__art-image {
   position: absolute !important; inset: 0 !important; display: block !important;
   width: 100% !important; height: 100% !important; border-radius: inherit !important;
   object-fit: cover !important; object-position: center !important;
-  opacity: 1 !important; filter: none !important;
-  transform: none !important; mix-blend-mode: normal !important;
-  -webkit-mask-image: linear-gradient(90deg, transparent 0%, rgba(0,0,0,.03) 14%, rgba(0,0,0,.2) 28%, rgba(0,0,0,.56) 48%, rgba(0,0,0,.9) 66%, #000 80%) !important;
-  mask-image: linear-gradient(90deg, transparent 0%, rgba(0,0,0,.03) 14%, rgba(0,0,0,.2) 28%, rgba(0,0,0,.56) 48%, rgba(0,0,0,.9) 66%, #000 80%) !important;
 }
-.touche-games__choice-copy {
-  position: absolute !important; z-index: 2 !important; top: 50% !important; left: 16px !important;
-  width: min(46%, 210px) !important; margin: 0 !important; padding: 0 !important;
-  transform: translateY(-50%) !important; align-self: auto !important;
-}
-.touche-games__choice-copy strong {
-  font: 800 clamp(18px,5.4vw,22px)/1.05 "Manrope",sans-serif !important;
-  letter-spacing: -.045em !important;
-}
+.touche-games__choice-copy strong { font-size:clamp(19px,5.6vw,26px) !important; }
 .touche-games__choice-mood,.touche-games__choice-index { color:inherit !important; }
 .touche-games__footnote { color:rgba(255,246,233,.78) !important; }
 .touche-games__footnote span { background:#ffd18b !important; }
@@ -761,35 +749,30 @@ button:focus-visible, [role="button"]:focus-visible {
   top: 0 !important;
   right: 0 !important;
   bottom: 0 !important;
-  left: auto !important;
+  left: 0 !important;
   z-index: 0;
-  width: 56% !important;
+  width: 100% !important;
   height: 100% !important;
-  border-radius: 0 19px 19px 0 !important;
+  border-radius: inherit !important;
   object-fit: cover !important;
   object-position: center center !important;
-  opacity: 1 !important;
+  opacity: .9 !important;
   transform: none !important;
-  filter: none !important;
-  mix-blend-mode: normal !important;
-  -webkit-mask-image: linear-gradient(90deg, transparent 0%, rgba(0,0,0,.08) 12%, rgba(0,0,0,.45) 30%, rgba(0,0,0,.82) 48%, #000 62%) !important;
-  mask-image: linear-gradient(90deg, transparent 0%, rgba(0,0,0,.08) 12%, rgba(0,0,0,.45) 30%, rgba(0,0,0,.82) 48%, #000 62%) !important;
+  filter: saturate(1.02) contrast(1.02);
+  mix-blend-mode: normal;
 }
 .pop-home[data-home-layout="list"] .pop-entry-action--path .pop-entry-action__art {
   top: 0 !important;
   right: 0 !important;
   bottom: 0 !important;
-  left: auto !important;
-  width: 56% !important;
+  left: 0 !important;
+  width: 100% !important;
   height: 100% !important;
-  border-radius: 0 19px 19px 0 !important;
+  border-radius: inherit !important;
   object-fit: cover !important;
   object-position: center center !important;
-  opacity: 1 !important;
-  filter: none !important;
-  mix-blend-mode: normal !important;
-  -webkit-mask-image: linear-gradient(90deg, transparent 0%, rgba(0,0,0,.08) 12%, rgba(0,0,0,.45) 30%, rgba(0,0,0,.82) 48%, #000 62%) !important;
-  mask-image: linear-gradient(90deg, transparent 0%, rgba(0,0,0,.08) 12%, rgba(0,0,0,.45) 30%, rgba(0,0,0,.82) 48%, #000 62%) !important;
+  opacity: .9 !important;
+  mix-blend-mode: normal;
 }
 .pop-home[data-home-layout="list"] .pop-entry-action__index {
   position: absolute !important;
@@ -951,58 +934,132 @@ button:focus-visible, [role="button"]:focus-visible {
   font: 800 9px/1 "DM Sans", sans-serif !important;
 }
 
-/* Keep the list-card photo on the right and the branded copy anchored left. */
+/* The old HomePop ::after was a 140px circular decoration. Reset its size
+   as well as its inset so the photo wash fills the card instead of a circle. */
 .pop-home[data-home-layout="list"] .pop-entry-action::after {
   content: "" !important;
-  position: absolute !important;
   inset: 0 !important;
-  z-index: 1 !important;
   width: auto !important;
   height: auto !important;
   border: 0 !important;
   border-radius: inherit !important;
-  pointer-events: none !important;
-  background: linear-gradient(90deg,
-    rgb(var(--home-card-rgb)) 0%,
-    rgb(var(--home-card-rgb)) 36%,
-    rgba(var(--home-card-rgb), .8) 48%,
-    rgba(var(--home-card-rgb), .4) 62%,
-    rgba(var(--home-card-rgb), .12) 78%,
-    rgba(var(--home-card-rgb), var(--home-art-wash, .1)) 100%) !important;
+  background:
+    linear-gradient(90deg,
+      rgba(var(--home-card-rgb), .58) 0%,
+      rgba(var(--home-card-rgb), .42) 44%,
+      rgba(var(--home-card-rgb), .08) 100%),
+    linear-gradient(0deg, rgba(40, 31, 48, .12), transparent 34%, transparent 78%, rgba(40, 31, 48, .06)) !important;
 }
 .pop-home[data-home-layout="list"] .pop-entry-action > .pop-entry-action__art {
-  top: 0 !important; right: 0 !important; bottom: 0 !important; left: auto !important;
-  width: 56% !important;
-  height: 100% !important;
-  z-index: 0 !important;
+  inset: -8% -4% -8% auto !important;
+  width: 55% !important;
+  height: 116% !important;
   object-fit: cover !important;
-  object-position: center center !important;
+  object-position: center 52% !important;
   border: 0 !important;
-  border-radius: 0 19px 19px 0 !important;
+  border-radius: 0 17px 17px 0 !important;
   opacity: 1 !important;
-  filter: none !important;
-  transform: none !important;
+  filter: saturate(.86) contrast(.96) !important;
+  -webkit-mask-image: linear-gradient(90deg, transparent 0%, rgba(0,0,0,.34) 17%, #000 43%) !important;
+  mask-image: linear-gradient(90deg, transparent 0%, rgba(0,0,0,.34) 17%, #000 43%) !important;
+}
+
+/* Override the older square-card and dark-game rules in this legacy stylesheet. */
+.pop-home[data-home-layout="list"] .pop-entry-actions {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) !important;
+  gap: 9px !important;
+  width: min(calc(100% - 36px), 520px) !important;
+  margin: 8px auto 0 !important;
+}
+.pop-home[data-home-layout="list"] .pop-entry-action {
+  --home-card-rgb: 238, 230, 245 !important;
+  height: 98px !important;
+  min-height: 98px !important;
+  aspect-ratio: auto !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  padding: 12px 15px !important;
+  border: 1px solid rgba(75,59,96,.16) !important;
+  border-radius: 18px !important;
+  color: #342a42 !important;
+  background: rgb(var(--home-card-rgb)) !important;
+}
+.pop-home[data-home-layout="list"] .pop-entry-action:nth-child(2) { --home-card-rgb: 233, 224, 242 !important; }
+.pop-home[data-home-layout="list"] .pop-entry-action:nth-child(3) { --home-card-rgb: 227, 217, 239 !important; }
+.pop-home[data-home-layout="list"] .pop-entry-action:nth-child(4) { --home-card-rgb: 220, 208, 235 !important; }
+.pop-home[data-home-layout="list"] .pop-entry-action::after {
+  content: "" !important;
+  position: absolute !important;
+  z-index: 1 !important;
+  inset: 0 !important;
+  border-radius: inherit !important;
+  background: linear-gradient(90deg, rgb(var(--home-card-rgb)) 0%, rgba(var(--home-card-rgb),.98) 36%, rgba(var(--home-card-rgb),.76) 53%, rgba(var(--home-card-rgb),.08) 100%) !important;
   pointer-events: none !important;
-  -webkit-mask-image: linear-gradient(90deg, transparent 0%, rgba(0,0,0,.08) 12%, rgba(0,0,0,.45) 30%, rgba(0,0,0,.82) 48%, #000 62%) !important;
-  mask-image: linear-gradient(90deg, transparent 0%, rgba(0,0,0,.08) 12%, rgba(0,0,0,.45) 30%, rgba(0,0,0,.82) 48%, #000 62%) !important;
 }
 .pop-home[data-home-layout="list"] .pop-entry-action__copy {
   position: absolute !important;
-  z-index: 2 !important;
   top: 50% !important;
-  left: 18px !important;
-  width: min(48%, 190px) !important;
+  left: 15px !important;
+  width: min(48%, 175px) !important;
   max-width: 48% !important;
   margin: 0 !important;
   padding: 0 !important;
-  transform: translateY(-50%) !important;
+  color: #342a42 !important;
   text-align: left !important;
+  transform: translateY(-50%) !important;
 }
-.pop-home[data-home-layout="list"] .pop-entry-action__copy strong {
-  font: 800 clamp(18px, 5.1vw, 21px)/1.05 "Manrope", sans-serif !important;
-  letter-spacing: -.045em !important;
+.pop-home[data-home-layout="list"] .pop-entry-action__copy strong { color: #342a42 !important; }
+.pop-home[data-home-layout="list"] .pop-entry-action__copy small { color: #62566f !important; }
+.pop-home[data-home-layout="list"] .pop-entry-action__index,
+.pop-home[data-home-layout="list"] .pop-entry-action__arrow { display: none !important; }
+
+.touche-games {
+  --games-ink: #342a42 !important;
+  --games-muted: #62566f !important;
+  --games-wine: #765b99 !important;
+  color: #342a42 !important;
+  background: #f1edf8 !important;
 }
-@media (max-width: 380px) {
-  .pop-home[data-home-layout="list"] .pop-entry-action__copy { left: 14px !important; }
-  .touche-games__choice-copy { left: 14px !important; }
+.touche-games__choice {
+  --game-card-rgb: 238, 230, 245 !important;
+  --game-card-ink: #342a42 !important;
+  --game-card-muted: rgba(98,86,111,.94) !important;
+  height: 116px !important;
+  min-height: 116px !important;
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  border-color: rgba(75,59,96,.16) !important;
+  border-radius: 19px !important;
+  color: #342a42 !important;
+  background: rgb(var(--game-card-rgb)) !important;
 }
+.touche-games__choice--pose-ball { --game-card-rgb: 238, 230, 245 !important; background: rgb(238,230,245) !important; color: #342a42 !important; }
+.touche-games__choice--dice { --game-card-rgb: 231, 221, 242 !important; background: rgb(231,221,242) !important; color: #342a42 !important; }
+.touche-games__choice--strip { --game-card-rgb: 225, 215, 238 !important; background: rgb(225,215,238) !important; color: #342a42 !important; }
+.touche-games__art-wrap {
+  inset: -8% -4% -8% auto !important;
+  width: 59% !important;
+  height: 116% !important;
+  transform: none !important;
+}
+.touche-games__art-image {
+  transform: none !important;
+  filter: saturate(.86) contrast(.96) !important;
+  -webkit-mask-image: linear-gradient(90deg, transparent 0%, rgba(0,0,0,.34) 17%, #000 43%) !important;
+  mask-image: linear-gradient(90deg, transparent 0%, rgba(0,0,0,.34) 17%, #000 43%) !important;
+}
+.touche-games__choice-copy {
+  position: absolute !important;
+  top: 50% !important;
+  left: 15px !important;
+  width: min(56%, 230px) !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  transform: translateY(-50%) !important;
+}
+.touche-games__choice-copy strong { color: #342a42 !important; }
+.touche-games__choice-copy > small:last-child { color: rgba(98,86,111,.94) !important; }

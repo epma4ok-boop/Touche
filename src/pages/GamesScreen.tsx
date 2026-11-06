@@ -1,7 +1,7 @@
 import { useState } from "react";
 import type { CSSProperties } from "react";
 import type { Lang } from "@/data/i18n";
-import WheelScreen from "./LotteryScreen";
+import PoseBallScreen from "./PoseBallScreen";
 import DiceScreen from "./DiceScreen";
 import StripGameScreen from "./StripGameScreen";
 import useTelegramTopInset from "./useTelegramTopInset";
@@ -40,7 +40,7 @@ const COPY: Record<Lang, {
   },
   pt: {
     title: "Jogos", subtitle: "Escolham como a noite vai começar.",
-    wheel: "Bola das poses", wheelNote: "Agite e revele uma das 20 poses", wheelMood: "SURPRESA",
+    wheel: "Bola das poses", wheelNote: "Agitem e revelem uma das 20 poses", wheelMood: "SURPRESA",
     dice: "Dados de ação", diceNote: "Dois lançamentos para aproximar vocês", diceMood: "SURPRESA",
      back: "Voltar",
     strip: "Tire ou ouse", stripNote: "Cinco níveis. A próxima escolha é sua.", stripMood: "JOGO 18+",
@@ -58,7 +58,7 @@ export default function GamesScreen({ lang, onBack }: Props) {
   const [game, setGame] = useState<Game | null>(null);
   const top = useTelegramTopInset();
   const copy = COPY[lang];
-  if (game === "wheel") return <WheelScreen lang={lang} onBack={() => setGame(null)} />;
+  if (game === "wheel") return <PoseBallScreen lang={lang} onBack={() => setGame(null)} />;
   if (game === "dice") return <DiceScreen lang={lang} onBack={() => setGame(null)} />;
   if (game === "strip") return <StripGameScreen lang={lang} onBack={() => setGame(null)} />;
 

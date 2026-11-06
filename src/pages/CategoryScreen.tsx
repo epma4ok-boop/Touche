@@ -26,6 +26,13 @@ const POP_COLORS: Record<Category, { r: number; g: number; b: number }> = {
   passion: { r: 155, g: 130, b: 189 },
   hard: { r: 77, g: 62, b: 96 },
 };
+const GENERATOR_SURFACES: Record<Category, string> = {
+  compliments: "#fbf9fe",
+  tenderness: "#f4eff8",
+  desire: "#ede6f4",
+  passion: "#e1d7eb",
+  hard: "#d2c5e0",
+};
 
 function loadHistory(): HistoryEntry[] {
   try {
@@ -546,7 +553,7 @@ export default function CategoryScreen({ lang, gender, category, onBack, onCateg
   const height = viewportHeight ? `${viewportHeight}px` : "100dvh";
   const enterX = swipeDir === "left" ? 60 : -60;
   return (
-    <main className="category-pop" style={{ height, opacity: mounted ? 1 : 0, transform: mounted ? "translateX(0)" : `translateX(${enterX}px)` }} onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
+    <main className="category-pop" data-category={category} style={{ height, opacity: mounted ? 1 : 0, transform: mounted ? "translateX(0)" : `translateX(${enterX}px)` }} onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
       <header className="category-pop__top" style={{ paddingTop: topPadding }}>
         <button data-testid="button-category-back" className="category-pop__menu" onClick={onBack} aria-label={t.backLabel}>
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 18 9 12l6-6" /></svg>
@@ -583,7 +590,7 @@ export default function CategoryScreen({ lang, gender, category, onBack, onCateg
         <section className="category-pop__generator">
            <div className="category-pop__generator-head"><span>{t.hint}</span><b>{String(index + 1).padStart(2, "0")} / {String(CATEGORIES_ORDER.length).padStart(2, "0")}</b></div>
           <div className="category-pop__heartbeat" data-testid="tutorial-heartbeat-target">
-              <HeartbeatCanvas onHoldComplete={tutorialDemo ? showTutorialSample : generate} isCasting={tutorialDemo ? false : isCasting} color={popColor} hintText={tutorialDemo ? TUTORIAL_SAMPLE[lang].holdHint : isCasting ? t.tapping : t.hint} holdDuration={2600} baseRScale={0.42} bgColor="#f8f5fc" />
+              <HeartbeatCanvas onHoldComplete={tutorialDemo ? showTutorialSample : generate} isCasting={tutorialDemo ? false : isCasting} color={popColor} hintText={tutorialDemo ? TUTORIAL_SAMPLE[lang].holdHint : isCasting ? t.tapping : t.hint} holdDuration={2600} baseRScale={0.45} bgColor={GENERATOR_SURFACES[category]} />
           </div>
           {errorKind && errorKind !== "subscription_required" && errorKind !== "limit_exceeded" && <div className="category-pop__error" role="alert" data-testid="status-task-error"><strong>{errorCopy[errorKind]}</strong>{errorKind === "unknown" && generatedErrorCode && <small>{generatedErrorCode}</small>}<button onClick={() => setErrorKind(null)}>{lang === "ru" ? "Понятно" : "Dismiss"}</button></div>}
         </section>

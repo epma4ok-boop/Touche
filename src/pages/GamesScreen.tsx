@@ -79,7 +79,7 @@ export default function GamesScreen({ lang, onBack }: Props) {
         </div>
         <section className="touche-games__choices" aria-label={copy.title}>
           <button type="button" className="touche-games__choice touche-games__choice--pose-ball" onClick={() => setGame("wheel")} data-testid="button-game-wheel">
-            <span className="touche-games__art-wrap"><img className="touche-games__art-image touche-games__art-image--pose-ball" src="/images/lottery-poses/pose-ball.png" alt="" aria-hidden="true" /></span>
+            <span className="touche-games__art-wrap"><img className="touche-games__art-image touche-games__art-image--pose-ball" src="/images/game-cards/pose-ball-button.jpg" alt="" aria-hidden="true" /></span>
             <span className="touche-games__choice-copy"><small className="touche-games__choice-mood">{copy.wheelMood}</small><strong>{copy.wheel}</strong><small>{copy.wheelNote}</small></span>
           </button>
           <button type="button" className="touche-games__choice touche-games__choice--dice" onClick={() => setGame("dice")} data-testid="button-game-dice">

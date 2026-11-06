@@ -17,6 +17,14 @@ const HERO_COPY: Record<Lang, { first: string; last: string; sub: string }> = {
   es: { first: "Encuentra", last: "tu vibra.", sub: "Elige un ánimo. Lo demás queda entre ustedes." },
 };
 
+const HOME_SECTION_LABELS: Record<Lang, string> = {
+  ru: "Ваш вечер",
+  en: "Your evening",
+  hi: "आपकी शाम",
+  pt: "Sua noite",
+  es: "Su noche",
+};
+
 const TASKS_COPY: Record<Lang, { title: string; sub: string; chooseTitle: string; chooseSub: string }> = {
   ru: { title: "Задания", sub: "Соло или вместе — выберите режим", chooseTitle: "Выберите формат", chooseSub: "Начните с задания для себя или для двоих." },
   en: { title: "Tasks", sub: "Solo or together — choose your mode", chooseTitle: "Choose your format", chooseSub: "Start with a moment for yourself or a shared task." },
@@ -1374,6 +1382,7 @@ export default function Home({
               <h1>{HERO_COPY[lang].first}<br /><span>{HERO_COPY[lang].last}</span></h1>
               <p>{HERO_COPY[lang].sub}</p>
             </section>
+            <div className="pop-home-section-label">{HOME_SECTION_LABELS[lang]}</div>
             <div className="pop-entry-actions">
               <button type="button" className="pop-entry-action pop-entry-action--tasks" onClick={() => setHomeSection("tasks")} data-testid="button-open-tasks">
                 <img className="pop-entry-action__art" src="/images/home-cards/tasks.jpg" alt="" aria-hidden="true" />
@@ -1392,6 +1401,10 @@ export default function Home({
                 <span className="pop-entry-action__copy"><strong>{NIGHT_GAMES_LABELS[lang]}</strong></span>
               </button>
             </div>
+            <p className="pop-home-footnote">
+              <span aria-hidden="true" />
+              {lang === "ru" ? "Только для вас двоих" : lang === "hi" ? "सिर्फ़ आप दोनों के लिए" : lang === "pt" ? "Só para vocês dois" : lang === "es" ? "Solo para ustedes dos" : "Just for the two of you"}
+            </p>
           </div>
         ) : homeSection === "tasks" ? (
           <div className="pop-list pop-home-subpage pop-task-mode-picker" style={{ flex: 1, overflowY: "auto", overflowX: "hidden", padding: `10px 14px max(28px,env(safe-area-inset-bottom))`, display: "flex", flexDirection: "column", gap: 12, position: "relative", zIndex: 1, scrollbarWidth: "none" as const }}>

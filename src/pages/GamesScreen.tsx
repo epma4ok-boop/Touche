@@ -11,42 +11,42 @@ type Game = "wheel" | "dice" | "strip";
 type Props = { lang: Lang; onBack: () => void };
 
 const COPY: Record<Lang, {
-  title: string; subtitle: string;
+  title: string; subtitle: string; sectionLabel: string;
   wheel: string; wheelNote: string; wheelMood: string;
   dice: string; diceNote: string; diceMood: string;
   back: string;
   strip: string; stripNote: string; stripMood: string;
 }> = {
   ru: {
-    title: "Игры", subtitle: "Выберите, с чего начнётся ваш вечер.",
+    title: "Игры", subtitle: "Выберите, с чего начнётся ваш вечер.", sectionLabel: "Выберите игру",
     wheel: "Шар ответов", wheelNote: "Встряхни — получи одну из 20 поз", wheelMood: "СЛУЧАЙ",
     dice: "Кубики действий", diceNote: "Два броска — новый повод сблизиться", diceMood: "ИМПУЛЬС",
      back: "Назад",
     strip: "Стрип или действие", stripNote: "Пять уровней. Только ваш выбор.", stripMood: "ИГРА 18+",
   },
   en: {
-    title: "Games", subtitle: "Choose how your evening begins.",
+    title: "Games", subtitle: "Choose how your evening begins.", sectionLabel: "Choose a game",
     wheel: "Pose ball", wheelNote: "Shake to reveal one of 20 poses", wheelMood: "CHANCE",
     dice: "Action dice", diceNote: "Two rolls to bring you closer", diceMood: "SPONTANEITY",
      back: "Back",
     strip: "Strip or dare", stripNote: "Five levels. Your next move.", stripMood: "GAME 18+",
   },
   hi: {
-    title: "खेल", subtitle: "चुनें, आपकी शाम कैसे शुरू होगी।",
+    title: "खेल", subtitle: "चुनें, आपकी शाम कैसे शुरू होगी।", sectionLabel: "एक खेल चुनें",
     wheel: "पोज़ बॉल", wheelNote: "हिलाएँ और 20 पोज़ में से एक देखें", wheelMood: "क़िस्मत",
     dice: "क्रिया के पासे", diceNote: "दो दाँव, और भी क़रीब आने का नया बहाना", diceMood: "रोमांच",
      back: "वापस",
     strip: "स्ट्रिप या डेयर", stripNote: "पाँच स्तर। अगला कदम आपका।", stripMood: "18+ खेल",
   },
   pt: {
-    title: "Jogos", subtitle: "Escolham como a noite vai começar.",
+    title: "Jogos", subtitle: "Escolham como a noite vai começar.", sectionLabel: "Escolham um jogo",
     wheel: "Bola das poses", wheelNote: "Agitem e revelem uma das 20 poses", wheelMood: "SURPRESA",
     dice: "Dados de ação", diceNote: "Dois lançamentos para aproximar vocês", diceMood: "SURPRESA",
      back: "Voltar",
     strip: "Tire ou ouse", stripNote: "Cinco níveis. A próxima escolha é sua.", stripMood: "JOGO 18+",
   },
   es: {
-    title: "Juegos", subtitle: "Elijan cómo empieza su noche.",
+    title: "Juegos", subtitle: "Elijan cómo empieza su noche.", sectionLabel: "Elijan un juego",
     wheel: "Bola de poses", wheelNote: "Agítala y descubre una de las 20 poses", wheelMood: "AZAR",
     dice: "Dados de acción", diceNote: "Dos lanzamientos para acercarse", diceMood: "SORPRESA",
      back: "Volver",
@@ -77,6 +77,7 @@ export default function GamesScreen({ lang, onBack }: Props) {
           <h1>{copy.title}</h1>
           <p>{copy.subtitle}</p>
         </div>
+        <div className="touche-games__section-label">{copy.sectionLabel}</div>
         <section className="touche-games__choices" aria-label={copy.title}>
           <button type="button" className="touche-games__choice touche-games__choice--pose-ball" onClick={() => setGame("wheel")} data-testid="button-game-wheel">
             <span className="touche-games__art-wrap"><img className="touche-games__art-image touche-games__art-image--pose-ball" src="/images/game-cards/pose-ball-button.jpg" alt="" aria-hidden="true" /></span>

@@ -1043,8 +1043,8 @@ function MenuPanel({ lang, gender, onGenderSwitch, onClose, onLanguageOpen, onSu
         width: "calc(100% + 48px)", margin: "-4px -24px 18px",
         height: 140, position: "relative", overflow: "hidden",
         borderRadius: "20px 20px 0 0",
-        backgroundImage: "url('/images/menu-hero.png')",
-        backgroundSize: "cover", backgroundPosition: "center top",
+        backgroundImage: "url('/images/menu-hero-hands.jpg')",
+        backgroundSize: "cover", backgroundPosition: "center 48%",
       }}>
         <div style={{ position: "absolute", inset: 0, background: `linear-gradient(to bottom, rgba(13,6,16,0.05) 0%, rgba(13,6,16,0.55) 55%, rgba(17,7,16,0.97) 100%)` }} />
         <div style={{ position: "absolute", bottom: 14, left: 20 }}>
@@ -1058,7 +1058,7 @@ function MenuPanel({ lang, gender, onGenderSwitch, onClose, onLanguageOpen, onSu
         <button className="pop-menu-card pop-menu-card--instructions" onClick={() => setSection("instructions")} style={{
           position: "relative", height: 130, borderRadius: 20, overflow: "hidden",
           border: `1px solid rgba(${PR},${PG},${PB},0.22)`, cursor: "pointer", padding: 0, background: "none",
-          backgroundImage: "url('/images/menu-about.png')", backgroundSize: "cover", backgroundPosition: "center",
+          backgroundImage: "url('/images/menu-tiles/instructions.jpg')", backgroundSize: "cover", backgroundPosition: "center 18%",
         }}>
           <div style={{ position: "absolute", inset: 0, background: `linear-gradient(145deg, rgba(13,6,16,0.15) 0%, rgba(13,6,16,0.72) 100%)` }} />
           <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "12px 14px", textAlign: "left" }}>
@@ -1072,7 +1072,7 @@ function MenuPanel({ lang, gender, onGenderSwitch, onClose, onLanguageOpen, onSu
         <button className="pop-menu-card pop-menu-card--premium" onClick={() => setSection("subscription")} style={{
           position: "relative", height: 130, borderRadius: 20, overflow: "hidden",
           border: `1.5px solid rgba(${PR},${PG},${PB},0.42)`, cursor: "pointer", padding: 0, background: "none",
-          backgroundImage: "url('/images/menu-premium.png')", backgroundSize: "cover", backgroundPosition: "center",
+          backgroundImage: "url('/images/menu-tiles/premium.jpg')", backgroundSize: "cover", backgroundPosition: "center 16%",
           boxShadow: `0 0 22px rgba(${PR},${PG},${PB},0.18)`,
         }}>
           <div style={{ position: "absolute", inset: 0, background: `linear-gradient(145deg, rgba(${PR},${PG},${PB},0.12) 0%, rgba(13,6,16,0.68) 100%)` }} />
@@ -1118,7 +1118,7 @@ function MenuPanel({ lang, gender, onGenderSwitch, onClose, onLanguageOpen, onSu
       {/* ── Bottom mini-grid: Language + About ── */}
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 14 }}>
         <button
-          className="pop-menu-small"
+          className="pop-menu-small pop-menu-small--language"
           type="button"
           onClick={() => { onLanguageOpen(); onClose(); }}
           data-testid="button-language-menu"
@@ -1126,7 +1126,9 @@ function MenuPanel({ lang, gender, onGenderSwitch, onClose, onLanguageOpen, onSu
           style={{
           padding: "14px 10px", borderRadius: 16,
           border: `1px solid rgba(${PR},${PG},${PB},0.16)`,
-          background: `rgba(${PR},${PG},${PB},0.06)`, cursor: "pointer",
+          background: `rgba(${PR},${PG},${PB},0.06)`,
+          backgroundImage: "url('/images/menu-tiles/language.jpg')",
+          backgroundSize: "cover", backgroundPosition: "center 12%", cursor: "pointer",
           display: "flex", flexDirection: "column", alignItems: "center", gap: 5,
         }}
         >

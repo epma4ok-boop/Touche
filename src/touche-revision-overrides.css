@@ -46,9 +46,13 @@
   gap: 9px !important;
 }
 .pop-home[data-home-layout="task-picker"] .pop-entry-action {
+  position: relative !important;
+  height: 98px !important;
   min-height: 98px !important;
   aspect-ratio: auto !important;
   padding: 0 !important;
+  overflow: hidden !important;
+  isolation: isolate !important;
   border: 1px solid var(--touche-violet-line) !important;
   border-radius: 18px !important;
   background: linear-gradient(145deg,#fbf9fe,#e9e2f1) !important;
@@ -56,19 +60,27 @@
   box-shadow: 0 8px 20px rgba(64,51,79,.09) !important;
 }
 .pop-home[data-home-layout="task-picker"] .pop-entry-action__art {
-  top: -8% !important;
-  right: -4% !important;
-  bottom: -8% !important;
+  position: absolute !important;
+  top: 0 !important;
+  right: 0 !important;
+  bottom: auto !important;
   left: auto !important;
-  width: 58% !important;
-  height: 116% !important;
-  border-radius: 0 !important;
+  width: 45% !important;
+  height: 100% !important;
+  max-width: none !important;
+  max-height: none !important;
+  border-radius: 0 17px 17px 0 !important;
   object-fit: cover !important;
-  object-position: center 40% !important;
+  object-position: center !important;
+  transform: none !important;
   opacity: .96 !important;
   filter: brightness(1.06) saturate(.94) !important;
-  -webkit-mask-image: linear-gradient(90deg, transparent 0%, rgba(0,0,0,.08) 9%, rgba(0,0,0,.34) 24%, rgba(0,0,0,.74) 43%, #000 62%) !important;
-  mask-image: linear-gradient(90deg, transparent 0%, rgba(0,0,0,.08) 9%, rgba(0,0,0,.34) 24%, rgba(0,0,0,.74) 43%, #000 62%) !important;
+  -webkit-mask-image: none !important;
+  mask-image: none !important;
+}
+.pop-home[data-home-layout="task-picker"] .pop-entry-action__index,
+.pop-home[data-home-layout="task-picker"] .pop-entry-action__arrow {
+  display: none !important;
 }
 .pop-home[data-home-layout="task-picker"] .pop-entry-action__copy {
   position: absolute !important;
@@ -76,8 +88,8 @@
   z-index: 2 !important;
   left: 42px !important;
   display: flex !important;
-  width: 52% !important;
-  max-width: 52% !important;
+  width: 48% !important;
+  max-width: 48% !important;
   flex-direction: column !important;
   gap: 3px !important;
   padding-right: 0 !important;
@@ -101,7 +113,16 @@
   text-overflow: clip !important;
 }
 .pop-home[data-home-layout="task-picker"] .pop-entry-action::after {
+  content: "" !important;
+  position: absolute !important;
+  inset: 0 !important;
+  z-index: 1 !important;
+  width: auto !important;
+  height: auto !important;
+  border: 0 !important;
+  border-radius: inherit !important;
   background: linear-gradient(90deg,#f8f5fc 0%,rgba(248,245,252,.94) 38%,rgba(248,245,252,.62) 56%,rgba(248,245,252,.08) 100%) !important;
+  pointer-events: none !important;
 }
 .pop-activity-section-label {
   margin: 2px 0 -3px !important;
@@ -118,6 +139,7 @@
   gap: 9px !important;
 }
 .pop-home[data-home-layout="task-detail"] .pop-tiles .pop-card {
+  position: relative !important;
   display: block !important;
   width: 100% !important;
   height: 122px !important;
@@ -130,17 +152,18 @@
   box-shadow: 0 7px 16px rgba(64,51,79,.08) !important;
 }
 .pop-home[data-home-layout="task-detail"] .pop-card > div:first-child {
-  top: -5% !important;
-  right: -12% !important;
-  bottom: -5% !important;
-  width: 78% !important;
-  height: 110% !important;
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
   background-size: cover !important;
-  background-position: center center !important;
+  background-position: center 42% !important;
   opacity: .92 !important;
   filter: saturate(.88) brightness(1.05) !important;
 }
 .pop-home[data-home-layout="task-detail"] .pop-card > div:nth-child(2) {
+  position: absolute !important;
+  inset: 0 !important;
   background:
     linear-gradient(180deg,transparent 28%,rgba(248,245,252,.4) 58%,rgba(248,245,252,.96) 100%) !important;
 }

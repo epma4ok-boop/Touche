@@ -101,14 +101,22 @@ const PINK      = `rgb(${PR},${PG},${PB})`;
 const PINK_GLOW = `drop-shadow(0 0 6px rgba(${PR},${PG},${PB},1)) drop-shadow(0 0 14px rgba(${PR},${PG},${PB},0.55))`;
 
 const CAT_IMG: Record<Category | "scenarios" | "invite" | "pair", string> = {
-  compliments: "/images/touche-button-art/compliments.webp",
-  tenderness:  "/images/touche-button-art/tenderness.webp",
-  desire:      "/images/touche-button-art/desire.webp",
-  passion:     "/images/touche-button-art/passion.webp",
-  hard:        "/images/touche-button-art/hard.webp",
-  scenarios:   "/images/touche-button-art/scenarios.webp",
-  invite:      "/images/touche-button-art/invite-friend.webp",
-  pair:        "/images/touche-button-art/link-pair.webp",
+  compliments: "/images/activity-cards/cat-compliments.jpg",
+  tenderness:  "/images/activity-cards/cat-tenderness.jpg",
+  desire:      "/images/activity-cards/cat-desire.jpg",
+  passion:     "/images/activity-cards/cat-passion.jpg",
+  hard:        "/images/activity-cards/cat-hard.jpg",
+  scenarios:   "/images/activity-cards/cat-scenarios.jpg",
+  invite:      "/images/activity-cards/cat-invite-friend.jpg",
+  pair:        "/images/activity-cards/cat-link-pair.jpg",
+};
+
+const ACTIVITY_SECTION_LABELS: Record<Lang, { format: string; mood: string }> = {
+  ru: { format: "Формат", mood: "Настроение" },
+  en: { format: "Format", mood: "Mood" },
+  hi: { format: "रूप", mood: "मूड" },
+  pt: { format: "Formato", mood: "Clima" },
+  es: { format: "Formato", mood: "Ánimo" },
 };
 
 /* ─── NeonIcon ─────────────────────────────────────────────────── */
@@ -1395,13 +1403,14 @@ export default function Home({
               <h1>{TASKS_COPY[lang].chooseTitle}</h1>
               <p>{TASKS_COPY[lang].chooseSub}</p>
             </section>
+            <h2 className="pop-activity-section-label">{ACTIVITY_SECTION_LABELS[lang].format}</h2>
             <div className="pop-entry-actions">
               <button type="button" className="pop-entry-action pop-entry-action--solo" onClick={() => openHomeSection("solo")} data-testid="button-mode-solo">
-                <img className="pop-entry-action__art" src="/images/touche-button-art/solo.webp" alt="" aria-hidden="true" />
+                <img className="pop-entry-action__art" src="/images/activity-cards/cat-solo.jpg" alt="" aria-hidden="true" />
                 <span className="pop-entry-action__index">01</span><span className="pop-entry-action__copy"><strong>{lang === "ru" ? "Соло" : lang === "hi" ? "अकेले" : lang === "pt" ? "Solo" : lang === "es" ? "A solas" : "Solo"}</strong><small>{lang === "ru" ? "Нежное задание только для себя" : lang === "hi" ? "सिर्फ़ अपने लिए एक कोमल चुनौती" : lang === "pt" ? "Um convite delicado só para você" : lang === "es" ? "Un reto íntimo solo para ti" : "A little moment, just for you"}</small></span><span className="pop-entry-action__arrow" aria-hidden="true">▶</span>
               </button>
               <button type="button" className="pop-entry-action pop-entry-action--together" onClick={() => openHomeSection("together")} data-testid="button-mode-together">
-                <img className="pop-entry-action__art" src="/images/touche-button-art/together.webp" alt="" aria-hidden="true" />
+                <img className="pop-entry-action__art" src="/images/activity-cards/cat-together.jpg" alt="" aria-hidden="true" />
                 <span className="pop-entry-action__index">02</span><span className="pop-entry-action__copy"><strong>{lang === "ru" ? "Вместе" : lang === "hi" ? "साथ में" : lang === "pt" ? "A dois" : lang === "es" ? "En pareja" : "Together"}</strong><small>{lang === "ru" ? "Общие задания и ваши желания" : lang === "hi" ? "साझा चुनौतियाँ और इच्छाएँ" : lang === "pt" ? "Desafios e desejos compartilhados" : lang === "es" ? "Retos y deseos compartidos" : "Shared prompts and your wishes"}</small></span><span className="pop-entry-action__arrow" aria-hidden="true">▶</span>
               </button>
             </div>
@@ -1430,12 +1439,13 @@ export default function Home({
             ) : (
               <>
                 {homeSection === "together" && <WishMap lang={lang} coupleId={coupleId} onOpenTask={onOpenSharedTask} refreshKey={wishMapKey} />}
+                <h2 className="pop-activity-section-label">{ACTIVITY_SECTION_LABELS[lang].mood}</h2>
                 <div className="pop-tiles" style={{ display: "grid", gridTemplateColumns: "repeat(2,minmax(0,1fr))", gap: 10 }}>
                   {homeSection === "together" ? togetherCards : soloCards}
+                  {homeSection === "solo"
+                    ? <Card type="invite" title={INVITE_LABELS[lang].title} sub={INVITE_LABELS[lang].sub} onClick={handleInvite} index={5} />
+                    : <Card type="pair" title={t.linked} sub={PAIR_LABELS[lang].sub} onClick={() => setShowCoupleModal(true)} index={6} />}
                 </div>
-                {homeSection === "solo"
-                  ? <Card type="invite" title={INVITE_LABELS[lang].title} sub={INVITE_LABELS[lang].sub} onClick={handleInvite} index={5} />
-                  : <Card type="pair" title={t.linked} sub={PAIR_LABELS[lang].sub} onClick={() => setShowCoupleModal(true)} index={6} />}
               </>
             )}
           </div>

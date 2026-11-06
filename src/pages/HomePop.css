@@ -738,3 +738,49 @@
 @media (max-width: 380px) {
   .pop-home[data-home-layout="list"] .pop-entry-action__copy { left: 14px !important; }
 }
+
+/* The four home destinations share the soft, tactile finish of Solo/Together. */
+.pop-home[data-home-layout="list"] .pop-entry-action {
+  min-height: 138px;
+  aspect-ratio: 1.32;
+  border: 1.5px solid rgba(48, 35, 43, .28);
+  border-radius: 19px;
+  background: rgb(var(--home-card-rgb));
+  box-shadow: 0 5px 13px rgba(48, 35, 43, .08), inset 0 1px 0 rgba(255, 255, 255, .76);
+}
+.pop-home[data-home-layout="list"] .pop-entry-action--tasks { --home-card-rgb: 244, 234, 209; }
+.pop-home[data-home-layout="list"] .pop-entry-action--path { --home-card-rgb: 244, 229, 220; }
+.pop-home[data-home-layout="list"] .pop-entry-action--tarot { --home-card-rgb: 231, 238, 224; }
+.pop-home[data-home-layout="list"] .pop-entry-action--lottery { --home-card-rgb: 242, 226, 215; }
+.pop-home[data-home-layout="list"] .pop-entry-action::after {
+  background: linear-gradient(90deg,
+    rgb(var(--home-card-rgb)) 0%,
+    rgb(var(--home-card-rgb)) 35%,
+    rgba(var(--home-card-rgb), .9) 49%,
+    rgba(var(--home-card-rgb), .58) 64%,
+    rgba(var(--home-card-rgb), .18) 82%,
+    rgba(var(--home-card-rgb), .04) 100%) !important;
+}
+.pop-home[data-home-layout="list"] .pop-entry-action__art {
+  width: 56% !important;
+  border-radius: 0 18px 18px 0 !important;
+  -webkit-mask-image: linear-gradient(90deg, transparent 0%, rgba(0,0,0,.08) 12%, rgba(0,0,0,.45) 31%, rgba(0,0,0,.84) 50%, #000 66%);
+  mask-image: linear-gradient(90deg, transparent 0%, rgba(0,0,0,.08) 12%, rgba(0,0,0,.45) 31%, rgba(0,0,0,.84) 50%, #000 66%);
+}
+.pop-home[data-home-layout="list"] .pop-entry-action__copy {
+  color: var(--pop-ink);
+}
+.pop-home[data-home-layout="list"] .pop-entry-action__copy strong {
+  font-size: clamp(16px, 4.4vw, 19px) !important;
+  line-height: 1.08 !important;
+}
+.pop-home[data-home-layout="list"] .pop-entry-action:focus-visible {
+  outline: 3px solid rgba(156, 101, 115, .42);
+  outline-offset: 3px;
+}
+@media (max-width: 380px) {
+  .pop-home[data-home-layout="list"] .pop-entry-action {
+    min-height: 126px;
+    border-radius: 17px;
+  }
+}

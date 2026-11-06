@@ -465,3 +465,113 @@
     transition-duration: .01ms !important;
   }
 }
+
+/* Menu artwork from the supplied collage, plus the matching hands hero. */
+.pop-menu-main .pop-menu-hero {
+  height: 140px !important;
+  border: 1px solid rgba(75, 59, 96, .18) !important;
+  border-radius: 20px 20px 0 0 !important;
+  background-color: #40334f !important;
+  background-image:
+    linear-gradient(180deg, rgba(35, 26, 47, .04) 28%, rgba(35, 26, 47, .72) 100%),
+    url("/images/menu-hero-hands.jpg") !important;
+  background-size: cover !important;
+  background-position: center 48% !important;
+}
+
+.pop-menu-main .pop-menu-hero > div:first-child {
+  display: block !important;
+  z-index: 1 !important;
+  background: linear-gradient(180deg, rgba(35, 26, 47, .02), rgba(35, 26, 47, .55)) !important;
+}
+
+.pop-menu-main .pop-menu-hero > div:last-child {
+  z-index: 2 !important;
+}
+
+.pop-menu-main .pop-menu-hero > div:last-child,
+.pop-menu-main .pop-menu-hero > div:last-child * {
+  color: #fff !important;
+  text-shadow: 0 2px 14px rgba(32, 20, 42, .48) !important;
+}
+
+.pop-menu-main .pop-menu-card {
+  height: 130px !important;
+  border: 1px solid rgba(75, 59, 96, .2) !important;
+  border-radius: 18px !important;
+  box-shadow: 0 8px 20px rgba(52, 42, 66, .16) !important;
+  isolation: isolate !important;
+}
+
+.pop-menu-main .pop-menu-card--instructions {
+  background-image:
+    linear-gradient(180deg, rgba(36, 24, 48, .02) 16%, rgba(36, 24, 48, .78) 100%),
+    url("/images/menu-tiles/instructions.jpg") !important;
+  background-size: cover !important;
+  background-position: center 18% !important;
+}
+
+.pop-menu-main .pop-menu-card--premium {
+  background-image:
+    linear-gradient(180deg, rgba(36, 24, 48, .02) 14%, rgba(36, 24, 48, .76) 100%),
+    url("/images/menu-tiles/premium.jpg") !important;
+  background-size: cover !important;
+  background-position: center 16% !important;
+}
+
+.pop-menu-main .pop-menu-card > div:first-child {
+  display: block !important;
+  z-index: 0 !important;
+  background: linear-gradient(180deg, rgba(36, 24, 48, .02) 10%, rgba(36, 24, 48, .32) 100%) !important;
+}
+
+.pop-menu-main .pop-menu-card > div:last-child {
+  z-index: 1 !important;
+}
+
+.pop-menu-main .pop-menu-card > div:last-child,
+.pop-menu-main .pop-menu-card > div:last-child * {
+  color: #fff !important;
+  text-shadow: 0 1px 10px rgba(32, 20, 42, .5) !important;
+}
+
+.pop-menu-main .pop-menu-card svg {
+  stroke: #fff !important;
+}
+
+.pop-menu-main .pop-menu-small--language {
+  position: relative !important;
+  min-height: 108px !important;
+  overflow: hidden !important;
+  border: 1px solid rgba(75, 59, 96, .2) !important;
+  border-radius: 16px !important;
+  background-color: #40334f !important;
+  background-image:
+    linear-gradient(180deg, rgba(36, 24, 48, .04) 12%, rgba(36, 24, 48, .78) 100%),
+    url("/images/menu-tiles/language.jpg") !important;
+  background-size: cover !important;
+  background-position: center 12% !important;
+  box-shadow: 0 7px 18px rgba(52, 42, 66, .13) !important;
+}
+
+.pop-menu-main .pop-menu-small--language svg,
+.pop-menu-main .pop-menu-small--language span {
+  position: relative !important;
+  z-index: 1 !important;
+  color: #fff !important;
+  stroke: #fff !important;
+  text-shadow: 0 1px 8px rgba(32, 20, 42, .62) !important;
+}
+
+/* Keep the hands visible on the intro without hiding the brand text. */
+.touche-splash__image {
+  opacity: .78 !important;
+  filter: saturate(.82) contrast(1.12) brightness(.76) !important;
+  object-position: center 44% !important;
+}
+
+.touche-splash__veil {
+  background:
+    radial-gradient(ellipse at 50% 44%, rgba(92, 71, 119, .02) 0%, rgba(42, 32, 57, .30) 75%),
+    linear-gradient(180deg, rgba(56, 43, 74, .16), rgba(39, 30, 53, .60)) !important;
+}

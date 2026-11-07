@@ -202,9 +202,9 @@ function wrapText(ctx: CanvasRenderingContext2D, text: string, maxWidth: number)
   return lines;
 }
 
-function TaskReveal({ text, color, visible, onDismiss, onGenerateAgain, lang, catLabel, source, isShared, isTutorialDemo }: {
+function TaskReveal({ text, color, visible, onDismiss, onGenerateAgain, lang, catLabel, isShared, isTutorialDemo }: {
   text: string; color: { r: number; g: number; b: number }; visible: boolean;
-  onDismiss: () => void; onGenerateAgain: () => void; lang: Lang; catLabel: string; source?: "ai" | "fallback";
+  onDismiss: () => void; onGenerateAgain: () => void; lang: Lang; catLabel: string;
   isShared?: boolean;
   isTutorialDemo?: boolean;
 }) {
@@ -265,7 +265,6 @@ function TaskReveal({ text, color, visible, onDismiss, onGenerateAgain, lang, ca
           <small style={{ display: "block", marginTop: 4, lineHeight: 1.45 }}>{pairCopy.checkInHint}</small>
         </div>
       )}
-      {!isTutorialDemo && source === "ai" && <span className="task-reveal__source">AI prompt</span>}
       {!isTutorialDemo && (
         <div className="task-reveal__actions">
           <button data-testid="button-task-again" onClick={onGenerateAgain}>{t.taskAgain}</button>
@@ -633,7 +632,6 @@ export default function CategoryScreen({ lang, gender, category, onBack, onCateg
         onGenerateAgain={() => { setShowReveal(false); setTimeout(generate, 120); }}
         lang={lang}
         catLabel={label}
-        source={taskSource}
         isShared={mode === "together" && !!sharedTask}
         isTutorialDemo={tutorialDemo}
       />

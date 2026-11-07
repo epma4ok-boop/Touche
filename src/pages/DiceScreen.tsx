@@ -342,21 +342,17 @@ export default function DiceScreen({ lang, onBack }: Props) {
       </header>
       <div className="touche-dice__body">
         <section className="touche-dice__intro">
-          <span className="touche-dice__eyebrow">18+ <i /> TOUCHÉ</span>
-          <span className="touche-dice__sequence" aria-hidden="true">02 / 03</span>
           <h1>{copy.title}</h1>
           <p>{copy.subtitle}</p>
         </section>
         <section className="touche-dice__table" aria-label={copy.result}>
           <div className="touche-dice__dice-pair">
-            <div className="touche-dice__player">
+            <div className="touche-dice__player" role="group" aria-label={copy.male}>
               <Die kind="male" faces={MALE_FACES} selected={maleIndex} lang={lang} rotation={rotation.male} />
-              <span className="touche-dice__player-label">{copy.male}</span>
             </div>
             <div className="touche-dice__join" aria-hidden="true"><i /></div>
-            <div className="touche-dice__player">
+            <div className="touche-dice__player" role="group" aria-label={copy.female}>
               <Die kind="female" faces={FEMALE_FACES} selected={femaleIndex} lang={lang} rotation={rotation.female} />
-              <span className="touche-dice__player-label">{copy.female}</span>
             </div>
           </div>
           <p className={`touche-dice__status${rollNumber ? " is-result" : ""}`} aria-live="polite" role="status" data-testid="status-dice-result">

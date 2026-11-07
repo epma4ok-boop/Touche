@@ -11,8 +11,8 @@ const ROLL_MS = 1450;
 const REDUCED_MOTION = "(prefers-reduced-motion: reduce)";
 
 const MALE_FACES: Face[] = [
-  { file: "hand", label: { ru: "Рука", en: "Hand", hi: "हाथ", pt: "Mão", es: "Mano" } },
-  { file: "tongue", label: { ru: "Язык", en: "Tongue", hi: "जीभ", pt: "Língua", es: "Lengua" } },
+  { file: "male-hand", label: { ru: "Рука", en: "Hand", hi: "हाथ", pt: "Mão", es: "Mano" } },
+  { file: "male-tongue", label: { ru: "Язык", en: "Tongue", hi: "जीभ", pt: "Língua", es: "Lengua" } },
   { file: "male-chest", label: { ru: "Грудь", en: "Chest", hi: "छाती", pt: "Peito", es: "Pecho" } },
   { file: "male-pelvis", label: { ru: "Пенис", en: "Penis", hi: "लिंग", pt: "Pênis", es: "Pene" } },
   { file: "eggs", label: { ru: "Яички", en: "Testicles", hi: "अंडकोष", pt: "Testículos", es: "Testículos" } },
@@ -20,10 +20,10 @@ const MALE_FACES: Face[] = [
 ];
 const FEMALE_FACES: Face[] = [
   { file: "female-buttocks", label: { ru: "Ягодицы", en: "Buttocks", hi: "नितंब", pt: "Nádegas", es: "Glúteos" } },
-  { file: "hand", label: { ru: "Рука", en: "Hand", hi: "हाथ", pt: "Mão", es: "Mano" } },
+  { file: "female-hand", label: { ru: "Рука", en: "Hand", hi: "हाथ", pt: "Mão", es: "Mano" } },
   { file: "female-chest", label: { ru: "Грудь", en: "Chest", hi: "छाती", pt: "Peito", es: "Pecho" } },
   { file: "female-pelvis", label: { ru: "Киска", en: "Pussy", hi: "योनि", pt: "Vulva", es: "Vulva" } },
-  { file: "tongue", label: { ru: "Язык", en: "Tongue", hi: "जीभ", pt: "Língua", es: "Lengua" } },
+  { file: "female-tongue", label: { ru: "Язык", en: "Tongue", hi: "जीभ", pt: "Língua", es: "Lengua" } },
   { file: "lips", label: { ru: "Губы", en: "Lips", hi: "होंठ", pt: "Lábios", es: "Labios" } },
 ];
 
@@ -274,7 +274,12 @@ function Die({ kind, faces, selected, lang, rotation }: {
           const face = faces[faceIndex];
           return (
             <div className={`touche-dice__face touche-dice__face--${faceClass}`} key={face.file}>
-              <img src={`/images/dice-parts/${face.file}.png`} alt={face.label[lang]} draggable={false} />
+                <img
+                  className={face.file === "male-pelvis" ? "touche-dice__face-art--compact" : undefined}
+                  src={`/images/dice-parts/${face.file}.png`}
+                  alt={face.label[lang]}
+                  draggable={false}
+                />
             </div>
           );
         })}
@@ -342,17 +347,20 @@ export default function DiceScreen({ lang, onBack }: Props) {
       </header>
       <div className="touche-dice__body">
         <section className="touche-dice__intro">
+          <span className="touche-dice__eyebrow">18+ <i /> TOUCHÉ</span>
+          <span className="touche-dice__sequence" aria-hidden="true">02 / 03</span>
           <h1>{copy.title}</h1>
           <p>{copy.subtitle}</p>
         </section>
         <section className="touche-dice__table" aria-label={copy.result}>
           <div className="touche-dice__dice-pair">
-            <div className="touche-dice__player" role="group" aria-label={copy.male}>
+            <div className="touche-dice__player">
               <Die kind="male" faces={MALE_FACES} selected={maleIndex} lang={lang} rotation={rotation.male} />
+              <span className="touche-dice__player-label">{copy.male}</span>
             </div>
-            <div className="touche-dice__join" aria-hidden="true"><i /></div>
-            <div className="touche-dice__player" role="group" aria-label={copy.female}>
+            <div className="touche-dice__player">
               <Die kind="female" faces={FEMALE_FACES} selected={femaleIndex} lang={lang} rotation={rotation.female} />
+              <span className="touche-dice__player-label">{copy.female}</span>
             </div>
           </div>
           <p className={`touche-dice__status${rollNumber ? " is-result" : ""}`} aria-live="polite" role="status" data-testid="status-dice-result">

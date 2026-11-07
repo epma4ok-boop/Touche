@@ -36,12 +36,13 @@
 .touche-dice__intro h1 { margin: 9px 0 6px; font: 700 clamp(32px, 8vw, 41px)/1.02 "Space Grotesk", sans-serif; letter-spacing: -.065em; }
 .touche-dice__intro p { max-width: 320px; margin: 0 auto; color: var(--dice-muted); font-size: 13px; line-height: 1.45; }
 .touche-dice__table { width: 100%; flex: 1; min-height: 0; display: flex; flex-direction: column; justify-content: center; }
-.touche-dice__dice-pair { width: 100%; display: grid; grid-template-columns: 1fr 26px 1fr; align-items: center; gap: 1px; }
-.touche-dice__player { min-width: 0; display: flex; flex-direction: column; align-items: center; gap: 18px; }
+.touche-dice__dice-pair { width: 100%; display: grid; grid-template-columns: 1fr 1fr; align-items: center; gap: 14px; }
+.touche-dice__player { min-width: 0; display: flex; flex-direction: column; align-items: center; gap: 22px; }
 .touche-dice__die-stage { --cube-edge: clamp(132px, 38vw, 186px); position: relative; width: var(--cube-edge); aspect-ratio: 1; display: grid; place-items: center; perspective: 720px; }
 .touche-dice__cube { position: relative; z-index: 1; width: 70%; height: 70%; transform-style: preserve-3d; transform: rotateX(-14deg) rotateY(-22deg) rotateX(var(--die-x, 0deg)) rotateY(var(--die-y, 0deg)); transition: transform 1.45s cubic-bezier(.18,.72,.16,1); will-change: transform; }
 .touche-dice__face { position: absolute; inset: 0; overflow: hidden; display: grid; place-items: center; border: 1px solid rgba(94,35,56,.28); border-radius: 15px; background: linear-gradient(145deg, #fff3e7, #e9c9ba 88%); box-shadow: inset 0 1px 0 rgba(255,255,255,.82), inset 0 -9px 18px rgba(102,43,61,.08); backface-visibility: hidden; }
-.touche-dice__face img { display: block; width: 78%; height: 78%; object-fit: contain; user-select: none; pointer-events: none; }
+.touche-dice__face img { display: block; width: 68%; height: 68%; object-fit: contain; object-position: center; user-select: none; pointer-events: none; }
+.touche-dice__face .touche-dice__face-art--compact { width: 52%; height: 58%; }
 .touche-dice__face--front { transform: rotateY(0deg) translateZ(calc(var(--cube-edge) * .35)); }
 .touche-dice__face--right { transform: rotateY(90deg) translateZ(calc(var(--cube-edge) * .35)); }
 .touche-dice__face--back { transform: rotateY(180deg) translateZ(calc(var(--cube-edge) * .35)); }
@@ -51,9 +52,6 @@
 .touche-dice__die-shadow { position: absolute; bottom: 8%; left: 14%; width: 72%; height: 15%; border-radius: 50%; background: rgba(86,37,54,.18); filter: blur(12px); transform: scaleX(.9); transition: transform .5s ease, opacity .5s ease; }
 .touche-dice[data-rolling="true"] .touche-dice__die-shadow { transform: scaleX(.65); opacity: .45; }
 .touche-dice__player-label { color: var(--dice-muted); font-size: 11px; font-weight: 600; letter-spacing: .015em; text-align: center; }
-.touche-dice__join { display: grid; place-items: center; width: 26px; height: 26px; border: 1px solid rgba(120,24,61,.18); border-radius: 50%; color: var(--dice-wine); }
-.touche-dice__join::before, .touche-dice__join::after { content: ""; width: 7px; height: 1px; background: currentColor; transform: translateY(3px); }
-.touche-dice__join::after { transform: translateY(-3px); }
 .touche-dice__status { min-height: 25px; margin: 23px 0 0; color: var(--dice-muted); font-size: 12px; text-align: center; transition: opacity .2s ease; }
 .touche-dice__status.is-result { color: var(--dice-wine); font-weight: 700; }
 .touche-dice__joke { width: min(100%, 360px); min-height: 38px; margin: 5px auto 0; color: var(--dice-wine); font-size: 13px; font-style: italic; line-height: 1.45; text-align: center; }
@@ -68,13 +66,13 @@
 @media (max-width: 380px) {
   .touche-dice__header { padding-inline: 14px; }
   .touche-dice__body { padding: 13px 15px max(14px, env(safe-area-inset-bottom)); }
-  .touche-dice__player { gap: 13px; }
+  .touche-dice__player { gap: 16px; }
   .touche-dice__die-stage { --cube-edge: clamp(126px, 37vw, 145px); }
 }
 @media (max-height: 700px) {
   .touche-dice__body { padding-top: 7px; }
   .touche-dice__die-stage { --cube-edge: clamp(118px, 32vw, 150px); }
-  .touche-dice__player { gap: 9px; }
+  .touche-dice__player { gap: 12px; }
   .touche-dice__status { margin-top: 12px; }
   .touche-dice__joke { min-height: 34px; font-size: 12px; }
   .touche-dice__button { min-height: 50px; margin-top: 8px; }
@@ -96,189 +94,14 @@
   border:1px solid rgba(72,40,50,.12); border-radius:28px;
   background:rgba(255,250,242,.65); box-shadow:0 12px 30px rgba(62,38,44,.055);
 }
-.touche-dice__dice-pair { gap:5px !important; }
+.touche-dice__dice-pair { grid-template-columns:1fr 1fr !important; gap:14px !important; }
 .touche-dice__die-stage { --cube-edge:clamp(132px,39vw,198px) !important; }
-.touche-dice__cube { width:var(--cube-size) !important; height:var(--cube-size) !important; }
+.touche-dice__cube { width:73% !important; height:73% !important; }
 .touche-dice__face { border-radius:22px !important; box-shadow:inset 0 2px 0 rgba(255,255,255,.9),0 14px 25px rgba(88,49,60,.09) !important; }
 .touche-dice__player-label { font:700 9px var(--font-mono) !important; text-transform:uppercase; letter-spacing:.08em; }
-.touche-dice__join { border:0 !important; color:#a95e60 !important; }
 .touche-dice__status { margin-top:14px !important; color:#75656b !important; font-size:11px !important; }
 .touche-dice__status.is-result { color:#783449 !important; font-family:var(--font-display); font-size:16px !important; }
 .touche-dice__joke { min-height:40px !important; max-width:32ch !important; margin-top:0 !important; color:#4f3943 !important; font:500 18px/1.35 var(--font-display) !important; }
 .touche-dice__button { width:100% !important; max-width:440px !important; min-height:58px !important; margin-top:auto !important; font:700 13px var(--font-mono) !important; }
 @media(max-width:390px) { .touche-dice__body { padding-inline:15px !important; } .touche-dice__table { padding-inline:6px; } .touche-dice__die-stage { --cube-edge:clamp(116px,37vw,145px) !important; } }
 @media(max-height:700px) { .touche-dice__intro { padding-bottom:8px; } .touche-dice__table { padding-top:8px; } .touche-dice__joke { font-size:15px !important; } }
-
-/* Use valid length variables for every face offset; CSS multiplication in calc()
-   is unsupported in several Telegram WebViews and collapses the cube to a plane. */
-.touche-dice .touche-dice__die-stage {
-  --cube-size: clamp(94px, 28.2vw, 142px) !important;
-  --cube-depth: clamp(47px, 14.1vw, 71px) !important;
-  perspective: 900px !important;
-  perspective-origin: 50% 42% !important;
-}
-
-.touche-dice .touche-dice__cube {
-  width: var(--cube-size) !important;
-  height: var(--cube-size) !important;
-  transform-style: preserve-3d !important;
-  filter: none !important;
-  transform: rotateX(-22deg) rotateY(-27deg) rotateX(var(--die-x, 0deg)) rotateY(var(--die-y, 0deg)) !important;
-  transition: transform 1.45s cubic-bezier(.18, .72, .16, 1) !important;
-}
-
-.touche-dice .touche-dice__face {
-  inset: 0 !important;
-  overflow: hidden !important;
-  border: 1px solid rgba(95, 71, 121, .35) !important;
-  border-radius: 20px !important;
-  box-shadow:
-    inset 0 2px 0 rgba(255, 255, 255, .92),
-    inset 0 -10px 16px rgba(78, 55, 103, .12),
-    0 10px 18px rgba(63, 43, 83, .1) !important;
-  backface-visibility: hidden !important;
-  -webkit-backface-visibility: hidden !important;
-}
-
-.touche-dice .touche-dice__face::before {
-  content: "" !important;
-  position: absolute !important;
-  inset: 5px !important;
-  z-index: 0 !important;
-  border: 1px solid rgba(255, 255, 255, .58) !important;
-  border-radius: 15px !important;
-  box-shadow: inset 0 1px 3px rgba(89, 67, 112, .12) !important;
-  pointer-events: none !important;
-}
-
-.touche-dice .touche-dice__face::after {
-  content: "" !important;
-  position: absolute !important;
-  inset: 0 !important;
-  z-index: 0 !important;
-  background: linear-gradient(145deg, rgba(255, 255, 255, .42), transparent 48%, rgba(75, 55, 96, .08)) !important;
-  pointer-events: none !important;
-}
-
-.touche-dice .touche-dice__face img {
-  position: relative !important;
-  z-index: 1 !important;
-  width: 68% !important;
-  height: 68% !important;
-  filter: drop-shadow(0 2px 3px rgba(74, 49, 91, .2)) !important;
-}
-
-.touche-dice .touche-dice__face--front { transform: rotateY(0deg) translateZ(var(--cube-depth)) !important; }
-.touche-dice .touche-dice__face--right { transform: rotateY(90deg) translateZ(var(--cube-depth)) !important; }
-.touche-dice .touche-dice__face--back { transform: rotateY(180deg) translateZ(var(--cube-depth)) !important; }
-.touche-dice .touche-dice__face--left { transform: rotateY(-90deg) translateZ(var(--cube-depth)) !important; }
-.touche-dice .touche-dice__face--top { transform: rotateX(90deg) translateZ(var(--cube-depth)) !important; }
-.touche-dice .touche-dice__face--bottom { transform: rotateX(-90deg) translateZ(var(--cube-depth)) !important; }
-
-.touche-dice .touche-dice__face--front {
-  background: linear-gradient(145deg, #fffaff 0%, #f0eaf7 72%, #dfd4eb 100%) !important;
-}
-.touche-dice .touche-dice__face--right {
-  background: linear-gradient(145deg, #ded3eb 0%, #c5b4d9 100%) !important;
-}
-.touche-dice .touche-dice__face--back {
-  background: linear-gradient(145deg, #d8cce7 0%, #bca9d2 100%) !important;
-}
-.touche-dice .touche-dice__face--left {
-  background: linear-gradient(145deg, #e6dcf0 0%, #cbbddd 100%) !important;
-}
-.touche-dice .touche-dice__face--top {
-  background: linear-gradient(145deg, #fffaff 0%, #f5effa 100%) !important;
-}
-.touche-dice .touche-dice__face--bottom {
-  background: linear-gradient(145deg, #bba9d0 0%, #a492bd 100%) !important;
-}
-
-.touche-dice .touche-dice__die-shadow {
-  width: 78% !important;
-  height: 18% !important;
-  background: rgba(75, 55, 96, .22) !important;
-  filter: blur(14px) !important;
-}
-
-@media (max-width: 380px) {
-  .touche-dice .touche-dice__die-stage {
-    --cube-size: clamp(88px, 28.6vw, 108px) !important;
-    --cube-depth: clamp(44px, 14.3vw, 54px) !important;
-  }
-}
-
-@media (max-height: 700px) {
-  .touche-dice .touche-dice__die-stage {
-    --cube-size: clamp(86px, 24vw, 116px) !important;
-    --cube-depth: clamp(43px, 12vw, 58px) !important;
-  }
-}
-
-/* Cleaner table and higher-detail porcelain finish. */
-.touche-dice .touche-dice__intro {
-  padding: 12px 2px 8px !important;
-  text-align: center !important;
-}
-.touche-dice .touche-dice__intro h1 {
-  max-width: 16ch !important;
-  margin: 7px auto 6px !important;
-  font-size: clamp(32px, 8vw, 43px) !important;
-  line-height: 1.04 !important;
-}
-.touche-dice .touche-dice__intro p {
-  max-width: 30ch !important;
-  margin-inline: auto !important;
-  font-size: 13px !important;
-}
-.touche-dice .touche-dice__table {
-  margin: 6px 0 12px !important;
-  padding: 18px 10px 12px !important;
-  border: 1px solid rgba(72,40,50,.1) !important;
-  border-radius: 30px !important;
-  background: linear-gradient(155deg, rgba(255,252,248,.78), rgba(238,229,221,.56)) !important;
-  box-shadow: 0 18px 42px rgba(62,38,44,.08), inset 0 1px 0 rgba(255,255,255,.8) !important;
-}
-.touche-dice .touche-dice__player { gap: 0 !important; }
-.touche-dice .touche-dice__player-label { display: none !important; }
-.touche-dice .touche-dice__face {
-  border: 1px solid rgba(95,71,121,.38) !important;
-  border-radius: 18px !important;
-  box-shadow:
-    inset 0 2px 0 rgba(255,255,255,.96),
-    inset 1px 0 0 rgba(255,255,255,.58),
-    inset 0 -11px 17px rgba(69,48,90,.14),
-    0 12px 22px rgba(63,43,83,.13) !important;
-}
-.touche-dice .touche-dice__face img {
-  width: 72% !important;
-  height: 72% !important;
-  filter: drop-shadow(0 1px 2px rgba(74,49,91,.13)) !important;
-}
-.touche-dice .touche-dice__face--front {
-  background: linear-gradient(145deg,#fffdfd 0%,#f4eff7 60%,#e7deef 100%) !important;
-}
-.touche-dice .touche-dice__face--right {
-  background: linear-gradient(145deg,#e1d8e9 0%,#c9bdd6 62%,#b9a9cb 100%) !important;
-}
-.touche-dice .touche-dice__face--back {
-  background: linear-gradient(145deg,#d9cfe4 0%,#bcaecf 100%) !important;
-}
-.touche-dice .touche-dice__face--left {
-  background: linear-gradient(145deg,#ece5f1 0%,#d1c5dc 72%,#c3b5d1 100%) !important;
-}
-.touche-dice .touche-dice__face--top {
-  background: linear-gradient(145deg,#fffefe 0%,#f7f2fa 76%,#e9e0f0 100%) !important;
-}
-.touche-dice .touche-dice__face--bottom {
-  background: linear-gradient(145deg,#c2b5d1 0%,#a997bf 100%) !important;
-}
-@media (max-width: 390px) {
-  .touche-dice .touche-dice__intro { padding-top: 8px !important; }
-  .touche-dice .touche-dice__table { padding-inline: 5px !important; }
-}
-@media (max-height: 700px) {
-  .touche-dice .touche-dice__intro { padding-top: 5px !important; }
-  .touche-dice .touche-dice__table { margin-block: 2px 8px !important; padding-block: 8px !important; }
-  .touche-dice .touche-dice__intro h1 { font-size: clamp(28px, 7vw, 36px) !important; }
-}

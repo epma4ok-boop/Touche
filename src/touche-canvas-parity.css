@@ -588,7 +588,7 @@
     rgba(var(--game-card-rgb), .02) 100%) !important;
 }
 
-.touche-games .touche-games__art-wrap {
+.touche-games .touche-games__choice > .touche-games__art-wrap {
   inset: -8% -4% -8% auto !important;
   width: 58% !important;
   height: 116% !important;
@@ -600,13 +600,13 @@
   transform: none !important;
 }
 
-.touche-games .touche-games__choice--pose-ball .touche-games__art-wrap { width: 55% !important; }
-.touche-games .touche-games__choice--dice .touche-games__art-wrap { width: 52% !important; }
-.touche-games .touche-games__choice--strip .touche-games__art-wrap { width: 54% !important; }
+.touche-games .touche-games__choice--pose-ball > .touche-games__art-wrap { width: 55% !important; }
+.touche-games .touche-games__choice--dice > .touche-games__art-wrap { width: 52% !important; }
+.touche-games .touche-games__choice--strip > .touche-games__art-wrap { width: 54% !important; }
 
-.touche-games .touche-games__choice--pose-ball .touche-games__art-image--pose-ball,
-.touche-games .touche-games__choice--dice .touche-games__art-image--dice,
-.touche-games .touche-games__choice--strip .touche-games__art-image--strip {
+.touche-games .touche-games__choice--pose-ball > .touche-games__art-wrap > .touche-games__art-image--pose-ball,
+.touche-games .touche-games__choice--dice > .touche-games__art-wrap > .touche-games__art-image--dice,
+.touche-games .touche-games__choice--strip > .touche-games__art-wrap > .touche-games__art-image--strip {
   opacity: 1 !important;
   filter: none !important;
   transform: none !important;
@@ -614,6 +614,6 @@
   mask-image: linear-gradient(90deg, transparent 0%, rgba(0,0,0,.08) 9%, rgba(0,0,0,.34) 24%, rgba(0,0,0,.74) 43%, #000 62%) !important;
 }
 
-.touche-games .touche-games__choice--pose-ball .touche-games__art-image--pose-ball { object-position: center 50% !important; }
-.touche-games .touche-games__choice--dice .touche-games__art-image--dice { object-position: center 69% !important; }
-.touche-games .touche-games__choice--strip .touche-games__art-image--strip { object-position: center 68% !important; }
+.touche-games .touche-games__choice--pose-ball > .touche-games__art-wrap > .touche-games__art-image--pose-ball { object-position: center 50% !important; }
+.touche-games .touche-games__choice--dice > .touche-games__art-wrap > .touche-games__art-image--dice { object-position: center 69% !important; }
+.touche-games .touche-games__choice--strip > .touche-games__art-wrap > .touche-games__art-image--strip { object-position: center 68% !important; }

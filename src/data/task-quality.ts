@@ -94,6 +94,11 @@ export const TASK_VARIATION_TAGS = [
   "bath_shower",
   "parked_car",
   "intimate_photo",
+  "intimate_video",
+  "short_video",
+  "written_note",
+  "slow_dance",
+  "anal_play",
   "submission",
   "whipped_cream",
 ] as const;
@@ -218,12 +223,53 @@ const TASK_VARIATION_RULES: Record<string, Array<{ tag: TaskVariationTag; patter
   ],
 };
 
+const ADDITIONAL_TASK_VARIATION_RULES: Record<string, Array<{ tag: TaskVariationTag; pattern: RegExp }>> = {
+  ru: [
+    { tag: "anal_play", pattern: /анальн\p{L}*\s+(?:стимуляц\p{L}*|проникнов\p{L}*|секс|ласк\p{L}*)|анус.{0,30}(?:пальц|игрушк|стимул|ласк)/iu },
+    { tag: "intimate_video", pattern: /интимн\p{L}*.{0,25}видео|видео.{0,25}интимн\p{L}*/iu },
+    { tag: "short_video", pattern: /коротк\p{L}*.{0,20}видео|видеообращ|видеосообщ/iu },
+    { tag: "written_note", pattern: /записк\p{L}*|от\s+руки.{0,20}напис/iu },
+    { tag: "slow_dance", pattern: /медленн\p{L}*.{0,15}(?:танц|танец)|(?:танц|танец)\p{L}*.{0,15}медленн/iu },
+  ],
+  en: [
+    { tag: "anal_play", pattern: /anal\s+(?:stimulation|play|penetration|sex)|anus.{0,30}(?:finger|toy|stimulat|penetrat)/iu },
+    { tag: "intimate_video", pattern: /intimate.{0,20}video|video.{0,20}intimate/iu },
+    { tag: "short_video", pattern: /short video|video message/iu },
+    { tag: "written_note", pattern: /handwritten note|note on paper/iu },
+    { tag: "slow_dance", pattern: /slow dance|dance slowly/iu },
+  ],
+  hi: [
+    { tag: "anal_play", pattern: /गुदा\s+(?:उत्तेजना|प्रवेश|सेक्स)|गुदा.{0,30}(?:उंगली|खिलौना|स्पर्श)/u },
+    { tag: "intimate_video", pattern: /अंतरंग.{0,20}वीडियो|वीडियो.{0,20}अंतरंग/u },
+    { tag: "short_video", pattern: /छोटा वीडियो|संक्षिप्त वीडियो|वीडियो संदेश/u },
+    { tag: "written_note", pattern: /हस्तलिखित नोट|हाथ से लिख[ीाे].{0,20}(?:चिट्ठी|नोट)/u },
+    { tag: "slow_dance", pattern: /धीमा नृत्य|धीरे.{0,10}नाच/u },
+  ],
+  pt: [
+    { tag: "anal_play", pattern: /(?:estimulaç\p{L}*|penetraç\p{L}*|sexo|toque)\s+anal|ânus.{0,30}(?:dedo|brinquedo|estimula|penetra)/iu },
+    { tag: "intimate_video", pattern: /vídeo íntim[ao]|íntim[ao].{0,15}vídeo/iu },
+    { tag: "short_video", pattern: /vídeo curto|mensagem.{0,12}vídeo/iu },
+    { tag: "written_note", pattern: /bilhete escrito à mão|nota manuscrita/iu },
+    { tag: "slow_dance", pattern: /dança lenta|dançar lentamente/iu },
+  ],
+  es: [
+    { tag: "anal_play", pattern: /(?:estimula\p{L}*|penetr\p{L}*|sexo|caricia)\s+anal|ano.{0,30}(?:dedo|juguete|estimula|penetr)/iu },
+    { tag: "intimate_video", pattern: /vídeo íntim[ao]|íntim[ao].{0,15}vídeo/iu },
+    { tag: "short_video", pattern: /vídeo corto|mensaje.{0,12}vídeo/iu },
+    { tag: "written_note", pattern: /nota escrita a mano|nota manuscrita/iu },
+    { tag: "slow_dance", pattern: /baile lento|bailar lentamente/iu },
+  ],
+};
+
 export function isTaskVariationTag(value: unknown): value is TaskVariationTag {
   return typeof value === "string" && (TASK_VARIATION_TAGS as readonly string[]).includes(value);
 }
 
 export function getTaskVariationTag(text: string, lang: string): TaskVariationTag | null {
-  const rules = TASK_VARIATION_RULES[lang] ?? TASK_VARIATION_RULES.en;
+  const rules = [
+    ...(ADDITIONAL_TASK_VARIATION_RULES[lang] ?? ADDITIONAL_TASK_VARIATION_RULES.en),
+    ...(TASK_VARIATION_RULES[lang] ?? TASK_VARIATION_RULES.en),
+  ];
   return rules.find(({ pattern }) => pattern.test(text))?.tag ?? null;
 }
 
@@ -390,11 +436,20 @@ export function hasConcreteSexualAct(text: string, lang: string): boolean {
   return marker.test(text.replace(/\s+/gu, " ").trim());
 }
 
+const ANAL_SEXUAL_ACT_MARKERS: Record<string, RegExp> = {
+  ru: /анальн\p{L}*\s+(?:стимуляц\p{L}*|проникнов\p{L}*|секс|ласк\p{L}*)|анус.{0,35}(?:ласк|стимул|пальц|игрушк|проник)/iu,
+  en: /anal\s+(?:stimulation|play|penetration|sex)|anus.{0,35}(?:touch|stimulat|finger|toy|penetrat)/iu,
+  hi: /गुदा\s+(?:उत्तेजना|प्रवेश|सेक्स)|गुदा.{0,35}(?:स्पर्श|उंगली|खिलौना)/u,
+  pt: /(?:estimulaç\p{L}*|penetraç\p{L}*|sexo|toque)\s+anal|ânus.{0,35}(?:toque|dedo|brinquedo|penetra)/iu,
+  es: /(?:estimula\p{L}*|penetr\p{L}*|sexo|caricia)\s+anal|ano.{0,35}(?:caricia|dedo|juguete|penetr)/iu,
+};
+
 export function hasHardSexualAct(text: string, lang: string): boolean {
   const normalized = text.replace(/\s+/gu, " ").trim();
   const directMarker = HARD_SEXUAL_ACT_MARKERS[lang] ?? HARD_SEXUAL_ACT_MARKERS.en;
   const auxiliaryMarker = HARD_AUXILIARY_ACT_MARKERS[lang] ?? HARD_AUXILIARY_ACT_MARKERS.en;
-  return directMarker.test(normalized) || auxiliaryMarker.test(normalized);
+  const analMarker = ANAL_SEXUAL_ACT_MARKERS[lang] ?? ANAL_SEXUAL_ACT_MARKERS.en;
+  return directMarker.test(normalized) || auxiliaryMarker.test(normalized) || analMarker.test(normalized);
 }
 
 const EXPLICIT_SEX_ACT_MARKERS: Record<string, RegExp> = {
@@ -416,11 +471,13 @@ const NONSEXUAL_CATEGORY_MARKERS: Record<string, RegExp> = {
 export function isTaskTextCategoryAppropriate(text: string, category: string, lang: string): boolean {
   const normalized = text.replace(/\s+/gu, " ").trim();
   const sexActs = EXPLICIT_SEX_ACT_MARKERS[lang] ?? EXPLICIT_SEX_ACT_MARKERS.en;
+  const analActs = ANAL_SEXUAL_ACT_MARKERS[lang] ?? ANAL_SEXUAL_ACT_MARKERS.en;
   const nonsexualMarkers = NONSEXUAL_CATEGORY_MARKERS[lang] ?? NONSEXUAL_CATEGORY_MARKERS.en;
+  const isSexualAct = sexActs.test(normalized) || analActs.test(normalized);
   if (category === "hard" || category === "passion") return hasHardSexualAct(normalized, lang);
-  if (category === "desire") return !sexActs.test(normalized);
+  if (category === "desire") return !isSexualAct;
   if (category === "tenderness" || category === "compliments") {
-    return !sexActs.test(normalized) && !nonsexualMarkers.test(normalized);
+    return !isSexualAct && !nonsexualMarkers.test(normalized);
   }
   return false;
 }

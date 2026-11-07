@@ -796,11 +796,12 @@
 .touche-games__choice::before {
   background: linear-gradient(90deg,
     rgb(var(--game-card-rgb)) 0%,
-    rgb(var(--game-card-rgb)) 28%,
-    rgba(var(--game-card-rgb),.92) 40%,
-    rgba(var(--game-card-rgb),.68) 53%,
-    rgba(var(--game-card-rgb),.28) 70%,
-    rgba(var(--game-card-rgb),.04) 92%) !important;
+    rgb(var(--game-card-rgb)) 31%,
+    rgba(var(--game-card-rgb),.96) 41%,
+    rgba(var(--game-card-rgb),.77) 55%,
+    rgba(var(--game-card-rgb),.39) 72%,
+    rgba(var(--game-card-rgb),.08) 91%,
+    rgba(var(--game-card-rgb),.02) 100%) !important;
 }
 .touche-games__choice--strip .touche-games__art-wrap {
   inset: -8% -4% -8% auto !important;

@@ -463,7 +463,7 @@ function getTaskExamples(category: string, lang: string, requestId: string, mode
   const familyCounts = new Map<string, number>();
   for (const candidate of ordered) {
     const family = getTaskVariationTag(candidate, lang) ?? "unclassified";
-    if ((familyCounts.get(family) ?? 0) >= (family === "unclassified" ? 3 : 2)) continue;
+    if ((familyCounts.get(family) ?? 0) >= (family === "unclassified" ? 2 : 1)) continue;
     const candidateWords = new Set(candidate.toLowerCase().match(/[\p{L}\p{N}]{3,}/gu) ?? []);
     const tooSimilar = examples.some((selected) => {
       const selectedWords = new Set(selected.toLowerCase().match(/[\p{L}\p{N}]{3,}/gu) ?? []);
@@ -720,6 +720,50 @@ const VARIATION_FOCI: Record<string, { ru: string[]; en: string[] }> = {
   },
 };
 
+const CATEGORY_VARIETY_GUIDANCE: Record<string, Record<string, string>> = {
+  ru: {
+    compliments: "Не своди задания к «я скучаю» и обычным сообщениям: чередуй конкретную похвалу вслух, голосовую записку, записку от руки, обычное селфи или короткое видео с точным комплиментом, благодарность за характер или навык. Выбирай один формат; комплимент должен быть правдивым и конкретным.",
+    tenderness: "Оставайся в несексуальной нежности: чередуй объятия и поцелуи, успокаивающие прикосновения, массаж рук/плеч/ступней, заботу о волосах, медленный танец, тёплый напиток и обычное ласковое фото или видео. Не своди категорию к переписке.",
+    desire: "Это прелюдия, не сам секс: чередуй флирт, поцелуй, дразнящий жест через одежду, чувственный массаж с интимным прикосновением, совместный душ, личное интимное фото или короткое видео-приветствие партнёру. Фото и видео — только по желанию, лично партнёру, без отправки кому-либо ещё и без публикации.",
+    passion: "Чередуй конкретные сексуальные действия: оральные ласки, взаимную оральную позу 69, ручную или клиторальную стимуляцию, игрушки, разные позы вагинального секса, анальную стимуляцию или анальный секс, секс в душе или ванне. Выбирай один основной акт, соблюдай анатомию и взаимное желание; не своди категорию к вагинальному сексу или доведению рукой.",
+    hard: "Называй один прямой сексуальный акт: оральный секс, вагинальное или анальное проникновение, игрушка, более напористый темп или конкретная поза. Можно добавить грязные слова, повязку на глаза или лёгкое связывание только при взаимном желании и с сигналом остановки. Домашняя интимная съёмка — только вместе, приватно и рядом с конкретным актом; ничего не публиковать и не пересылать.",
+  },
+  en: {
+    compliments: "Do not default to “I miss you” or plain texts. Rotate specific spoken praise, a short voice note, a handwritten note, an ordinary selfie or short video with a precise compliment, and appreciation of a real skill or quality. Choose one format; keep praise truthful and specific.",
+    tenderness: "Keep it nonsexual. Rotate hugs and kisses, reassuring touch, hand/shoulder/foot care, gentle hair care, a slow dance, a warm drink, and an ordinary affectionate photo or video. Do not reduce the category to texting.",
+    desire: "Keep this at foreplay, not sex itself. Rotate flirtation, a kiss, teasing through clothing, sensual massage with intimate touch, a shared shower, a private intimate photo, or a short private greeting video for the partner. Media is optional, only for the partner, never forwarded or posted.",
+    passion: "Rotate concrete sexual acts: oral pleasure, mutual 69, hand or clitoral stimulation, toys, varied vaginal positions, anal stimulation or anal sex, and sex in a shower or bath. Choose one main act, keep anatomy clear and desire mutual; do not default to vaginal sex or manual finishing.",
+    hard: "Name one direct sexual act: oral sex, vaginal or anal penetration, a toy, a firmer rhythm, or a specific position. Dirty talk, a blindfold, or light restraint may be added only by mutual choice and with a stop signal. Home erotic filming is Together-only, private, and paired with a concrete act; never post or forward it.",
+  },
+  hi: {
+    compliments: "हर बार “मुझे तुम्हारी याद आती है” जैसे संदेश न चुनें। खास और सच्ची मौखिक तारीफ़, छोटा वॉइस नोट, हाथ से लिखा नोट, सटीक तारीफ़ वाला सामान्य सेल्फ़ी या छोटा वीडियो, और किसी वास्तविक गुण या हुनर की सराहना—इनका बारी-बारी से उपयोग करें। एक ही तरीका चुनें।",
+    tenderness: "इसे गैर-यौन कोमलता तक रखें। गले लगना और चूमना, आश्वस्त करने वाला स्पर्श, हाथ/कंधे/पैर की देखभाल, बालों को प्यार से सँवारना, धीमा नृत्य, गर्म पेय, और सामान्य स्नेहपूर्ण फोटो या वीडियो—इनमें विविधता रखें। इसे केवल संदेशों तक सीमित न करें।",
+    desire: "इसे सेक्स नहीं, बल्कि शुरुआती अंतरंगता रखें: फ़्लर्ट, चुंबन, कपड़ों के ऊपर से चिढ़ाना, अंतरंग स्पर्श वाला कामुक मसाज, साथ में शॉवर, निजी अंतरंग फ़ोटो, या साथी के लिए छोटा निजी वीडियो-संदेश। मीडिया वैकल्पिक हो, केवल साथी के लिए; आगे न भेजें और प्रकाशित न करें।",
+    passion: "ठोस यौन क्रियाओं में विविधता रखें: ओरल आनंद, आपसी 69, हाथ या भगांकुर की उत्तेजना, सेक्स टॉय, अलग-अलग योनि-सेक्स पोज़िशन, गुदा उत्तेजना या गुदा सेक्स, और शॉवर या बाथ में सेक्स। एक मुख्य क्रिया चुनें, शरीर-विज्ञान स्पष्ट रखें और दोनों की इच्छा ज़रूरी है; केवल योनि-सेक्स या हाथ से चरमोत्कर्ष पर न लौटें।",
+    hard: "एक सीधी यौन क्रिया साफ़ बताएँ: ओरल सेक्स, योनि या गुदा में प्रवेश, सेक्स टॉय, तेज़ गति या कोई खास पोज़िशन। गंदी बातें, आँखों पर पट्टी या हल्का बाँधना केवल दोनों की सहमति और रुकने के संकेत के साथ। घर पर अंतरंग वीडियो केवल साथ में, निजी तौर पर और किसी ठोस क्रिया के साथ; इसे साझा या प्रकाशित न करें।",
+  },
+  pt: {
+    compliments: "Não use sempre “estou com saudades” ou uma mensagem simples. Alterne elogios específicos ditos ao vivo, um áudio curto, um bilhete escrito à mão, uma selfie comum ou um vídeo curto com um elogio preciso, e o reconhecimento de uma qualidade ou habilidade real. Escolha um formato e seja sincero.",
+    tenderness: "Mantenha o carinho não sexual. Varie entre abraços e beijos, toque reconfortante, cuidado com mãos/ombros/pés, carinho no cabelo, dança lenta, uma bebida quente e uma foto ou vídeo afetuoso comum. Não reduza a categoria a mensagens.",
+    desire: "Fique nas preliminares, sem descrever o sexo: flerte, beijo, provocação por cima da roupa, massagem sensual com toque íntimo, banho juntos, foto íntima privada ou um vídeo curto de saudação para o parceiro. A mídia é opcional, só para o parceiro; nunca encaminhe nem publique.",
+    passion: "Varie os atos sexuais concretos: prazer oral, 69 mútuo, estímulo manual ou do clitóris, brinquedos, posições vaginais variadas, estímulo anal ou sexo anal, e sexo no chuveiro ou na banheira. Escolha um ato principal, mantenha a anatomia clara e o desejo mútuo; não fique só no sexo vaginal ou em levar alguém ao orgasmo com a mão.",
+    hard: "Nomeie um ato sexual direto: sexo oral, penetração vaginal ou anal, brinquedo, ritmo mais firme ou uma posição específica. Fala provocante, venda nos olhos ou amarração leve só por escolha mútua e com sinal para parar. Filmagem erótica caseira apenas a dois, em privado e junto de um ato concreto; nunca compartilhe nem publique.",
+  },
+  es: {
+    compliments: "No uses siempre “te extraño” ni mensajes genéricos. Alterna elogios específicos en voz alta, una nota de voz breve, una nota escrita a mano, un selfie normal o un vídeo corto con un elogio preciso, y el reconocimiento de una habilidad o cualidad real. Elige un formato y sé sincero.",
+    tenderness: "Mantén la ternura en lo no sexual. Alterna abrazos y besos, contacto reconfortante, cuidado de manos/hombros/pies, caricias en el pelo, un baile lento, una bebida caliente y una foto o vídeo afectuoso normal. No reduzcas la categoría a mensajes.",
+    desire: "Quédate en los preliminares, sin describir el sexo: coqueteo, un beso, provocación sobre la ropa, masaje sensual con contacto íntimo, una ducha juntos, una foto íntima privada o un vídeo breve de saludo para la pareja. El contenido es opcional, solo para la pareja; no lo reenvíes ni publiques.",
+    passion: "Alterna actos sexuales concretos: placer oral, 69 mutuo, estimulación manual o del clítoris, juguetes, distintas posturas vaginales, estimulación anal o sexo anal, y sexo en la ducha o la bañera. Elige un acto principal, mantén clara la anatomía y el deseo mutuo; no recurras solo al sexo vaginal o a llevar al orgasmo con la mano.",
+    hard: "Nombra un acto sexual directo: sexo oral, penetración vaginal o anal, un juguete, un ritmo más firme o una postura concreta. Las palabras provocadoras, una venda o ataduras suaves solo por decisión mutua y con una señal para parar. La grabación erótica casera solo a dos, en privado y junto a un acto concreto; nunca se comparte ni se publica.",
+  },
+};
+
+function getCategoryVarietyGuidance(category: string, lang: string): string {
+  return CATEGORY_VARIETY_GUIDANCE[lang]?.[category]
+    ?? CATEGORY_VARIETY_GUIDANCE.en[category]
+    ?? "";
+}
+
 function getVariationInstruction(
   category: string,
   lang: string,
@@ -843,7 +887,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const timeout = setTimeout(() => controller.abort(), 12_000);
     try {
         const roleInstruction = getGenderLine(lang, gender);
-        const systemPrompt = `${getPrompt(category, lang)}\n\n${WRITING_STYLE_INSTRUCTIONS[lang] ?? WRITING_STYLE_INSTRUCTIONS.en}\n\n${MODE_INSTRUCTIONS[mode][lang]}\n\n${getVariationInstruction(category, lang, requestId, mode, gender, recentVariationTags)}\n\n${roleInstruction}\n\n${getTaskQualityRules(lang, mode)}\n\n${LANGUAGE_INSTRUCTIONS[lang]}`;
+        const systemPrompt = `${getPrompt(category, lang)}\n\n${WRITING_STYLE_INSTRUCTIONS[lang] ?? WRITING_STYLE_INSTRUCTIONS.en}\n\n${MODE_INSTRUCTIONS[mode][lang]}\n\n${getCategoryVarietyGuidance(category, lang)}\n\n${getVariationInstruction(category, lang, requestId, mode, gender, recentVariationTags)}\n\n${roleInstruction}\n\n${getTaskQualityRules(lang, mode)}\n\n${LANGUAGE_INSTRUCTIONS[lang]}`;
       const aiRes = await fetch(DEEPSEEK_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${DEEPSEEK_API_KEY}` },
@@ -860,12 +904,16 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         const data = await aiRes.json();
         const candidate = String(data.choices?.[0]?.message?.content ?? "").replace(/^["']|["']$/g, "").replace(/^\d+\.\s*/, "").trim();
         const forbidden = ["я рекомендую", "тебе стоит", "можешь попробовать"];
+        const candidateVariationTag = getTaskVariationTag(candidate, lang);
+        const repeatsRecentVariation = candidateVariationTag !== null
+          && recentVariationTags.includes(candidateVariationTag);
         if (candidate.length >= 15 && candidate.length <= MAX_TASK_CHARS
           && matchesRequestedLanguage(candidate, lang)
           && isTaskTextWellFormed(candidate, lang, mode)
           && isTaskTextModeAppropriate(candidate, lang, mode)
           && hasAnatomicallyClearOralAct(candidate, lang, mode, gender === "female" ? "female" : "male")
           && hasCategorySexualAct(candidate, category, lang)
+          && !repeatsRecentVariation
           && !(mode === "solo" && (MUTUAL_ONLY_TASK_MARKERS[lang] ?? MUTUAL_ONLY_TASK_MARKERS.en).test(candidate))
           && isTaskExampleMediaAllowed(candidate, category, lang, mode)
           && !forbidden.some(f => candidate.toLowerCase().includes(f))) {

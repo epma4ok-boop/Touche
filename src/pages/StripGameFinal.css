@@ -24,6 +24,7 @@
 .strip-final-choices svg { width:80px; max-width:100%; height:65px; }
 .strip-final-mini button:focus-visible { outline:3px solid #c27594; outline-offset:3px; }
 .strip-premium__reveal-actions .strip-btn:disabled { opacity:.4; cursor:not-allowed; }
+.strip-premium__reveal-actions .strip-btn--fail:disabled { opacity:.78 !important; filter:saturate(.72) !important; cursor:not-allowed; }
 .strip-final-counter { text-align:center; color:#7c3755; font-size:13px; }
 @keyframes strip-final-idle { 0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)} }
 @keyframes strip-final-out { 0%,12%{opacity:1}100%{opacity:0} }

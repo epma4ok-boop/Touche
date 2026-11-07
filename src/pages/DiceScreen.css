@@ -98,7 +98,7 @@
 }
 .touche-dice__dice-pair { gap:5px !important; }
 .touche-dice__die-stage { --cube-edge:clamp(132px,39vw,198px) !important; }
-.touche-dice__cube { width:73% !important; height:73% !important; }
+.touche-dice__cube { width:var(--cube-size) !important; height:var(--cube-size) !important; }
 .touche-dice__face { border-radius:22px !important; box-shadow:inset 0 2px 0 rgba(255,255,255,.9),0 14px 25px rgba(88,49,60,.09) !important; }
 .touche-dice__player-label { font:700 9px var(--font-mono) !important; text-transform:uppercase; letter-spacing:.08em; }
 .touche-dice__join { border:0 !important; color:#a95e60 !important; }
@@ -108,3 +108,109 @@
 .touche-dice__button { width:100% !important; max-width:440px !important; min-height:58px !important; margin-top:auto !important; font:700 13px var(--font-mono) !important; }
 @media(max-width:390px) { .touche-dice__body { padding-inline:15px !important; } .touche-dice__table { padding-inline:6px; } .touche-dice__die-stage { --cube-edge:clamp(116px,37vw,145px) !important; } }
 @media(max-height:700px) { .touche-dice__intro { padding-bottom:8px; } .touche-dice__table { padding-top:8px; } .touche-dice__joke { font-size:15px !important; } }
+
+/* Use valid length variables for every face offset; CSS multiplication in calc()
+   is unsupported in several Telegram WebViews and collapses the cube to a plane. */
+.touche-dice .touche-dice__die-stage {
+  --cube-size: clamp(94px, 28.2vw, 142px) !important;
+  --cube-depth: clamp(47px, 14.1vw, 71px) !important;
+  perspective: 900px !important;
+  perspective-origin: 50% 42% !important;
+}
+
+.touche-dice .touche-dice__cube {
+  width: var(--cube-size) !important;
+  height: var(--cube-size) !important;
+  transform-style: preserve-3d !important;
+  filter: none !important;
+  transform: rotateX(-22deg) rotateY(-27deg) rotateX(var(--die-x, 0deg)) rotateY(var(--die-y, 0deg)) !important;
+  transition: transform 1.45s cubic-bezier(.18, .72, .16, 1) !important;
+}
+
+.touche-dice .touche-dice__face {
+  inset: 0 !important;
+  overflow: hidden !important;
+  border: 1px solid rgba(95, 71, 121, .35) !important;
+  border-radius: 20px !important;
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, .92),
+    inset 0 -10px 16px rgba(78, 55, 103, .12),
+    0 10px 18px rgba(63, 43, 83, .1) !important;
+  backface-visibility: hidden !important;
+  -webkit-backface-visibility: hidden !important;
+}
+
+.touche-dice .touche-dice__face::before {
+  content: "" !important;
+  position: absolute !important;
+  inset: 5px !important;
+  z-index: 0 !important;
+  border: 1px solid rgba(255, 255, 255, .58) !important;
+  border-radius: 15px !important;
+  box-shadow: inset 0 1px 3px rgba(89, 67, 112, .12) !important;
+  pointer-events: none !important;
+}
+
+.touche-dice .touche-dice__face::after {
+  content: "" !important;
+  position: absolute !important;
+  inset: 0 !important;
+  z-index: 0 !important;
+  background: linear-gradient(145deg, rgba(255, 255, 255, .42), transparent 48%, rgba(75, 55, 96, .08)) !important;
+  pointer-events: none !important;
+}
+
+.touche-dice .touche-dice__face img {
+  position: relative !important;
+  z-index: 1 !important;
+  width: 68% !important;
+  height: 68% !important;
+  filter: drop-shadow(0 2px 3px rgba(74, 49, 91, .2)) !important;
+}
+
+.touche-dice .touche-dice__face--front { transform: rotateY(0deg) translateZ(var(--cube-depth)) !important; }
+.touche-dice .touche-dice__face--right { transform: rotateY(90deg) translateZ(var(--cube-depth)) !important; }
+.touche-dice .touche-dice__face--back { transform: rotateY(180deg) translateZ(var(--cube-depth)) !important; }
+.touche-dice .touche-dice__face--left { transform: rotateY(-90deg) translateZ(var(--cube-depth)) !important; }
+.touche-dice .touche-dice__face--top { transform: rotateX(90deg) translateZ(var(--cube-depth)) !important; }
+.touche-dice .touche-dice__face--bottom { transform: rotateX(-90deg) translateZ(var(--cube-depth)) !important; }
+
+.touche-dice .touche-dice__face--front {
+  background: linear-gradient(145deg, #fffaff 0%, #f0eaf7 72%, #dfd4eb 100%) !important;
+}
+.touche-dice .touche-dice__face--right {
+  background: linear-gradient(145deg, #ded3eb 0%, #c5b4d9 100%) !important;
+}
+.touche-dice .touche-dice__face--back {
+  background: linear-gradient(145deg, #d8cce7 0%, #bca9d2 100%) !important;
+}
+.touche-dice .touche-dice__face--left {
+  background: linear-gradient(145deg, #e6dcf0 0%, #cbbddd 100%) !important;
+}
+.touche-dice .touche-dice__face--top {
+  background: linear-gradient(145deg, #fffaff 0%, #f5effa 100%) !important;
+}
+.touche-dice .touche-dice__face--bottom {
+  background: linear-gradient(145deg, #bba9d0 0%, #a492bd 100%) !important;
+}
+
+.touche-dice .touche-dice__die-shadow {
+  width: 78% !important;
+  height: 18% !important;
+  background: rgba(75, 55, 96, .22) !important;
+  filter: blur(14px) !important;
+}
+
+@media (max-width: 380px) {
+  .touche-dice .touche-dice__die-stage {
+    --cube-size: clamp(88px, 28.6vw, 108px) !important;
+    --cube-depth: clamp(44px, 14.3vw, 54px) !important;
+  }
+}
+
+@media (max-height: 700px) {
+  .touche-dice .touche-dice__die-stage {
+    --cube-size: clamp(86px, 24vw, 116px) !important;
+    --cube-depth: clamp(43px, 12vw, 58px) !important;
+  }
+}

@@ -299,28 +299,30 @@
   border: 1px solid var(--touche-violet-line) !important;
   box-shadow: 0 9px 22px rgba(64,51,79,.09), inset 0 1px 0 rgba(255,255,255,.72) !important;
 }
-.touche-games__choice--wheel .touche-games__art-wrap {
-  width: 65% !important;
+.touche-games__choice--pose-ball .touche-games__art-wrap {
+  width: 55% !important;
   opacity: 1 !important;
 }
-.touche-games__choice--wheel .touche-games__art-image--wheel {
-  object-position: 94% center !important;
-  transform: scale(1.1) !important;
-  filter: brightness(1.16) saturate(1.14) contrast(1.08) !important;
+.touche-games__choice--pose-ball .touche-games__art-image--pose-ball {
+  object-position: center 50% !important;
+  transform: none !important;
+  filter: none !important;
 }
 .touche-games__choice--dice .touche-games__art-wrap {
-  width: 46% !important;
+  width: 52% !important;
 }
 .touche-games__choice--dice .touche-games__art-image--dice {
-  object-position: 64% center !important;
-  transform: scale(.94) !important;
+  object-position: center 69% !important;
+  transform: none !important;
+  filter: none !important;
 }
 .touche-games__choice--strip .touche-games__art-wrap {
-  width: 50% !important;
+  width: 54% !important;
 }
 .touche-games__choice--strip .touche-games__art-image--strip {
-  object-position: 70% center !important;
-  transform: translateX(18px) scale(.94) !important;
+  object-position: center 68% !important;
+  transform: none !important;
+  filter: none !important;
 }
 
 .touche-dice {
@@ -496,8 +498,10 @@
 
 @media (max-width: 380px) {
   .pop-home[data-home-layout="task-picker"] .pop-entry-action { min-height: 98px !important; }
-  .touche-games__choice--wheel .touche-games__art-wrap { width: 58% !important; }
-  .touche-games__choice--strip .touche-games__art-image--strip { transform: translateX(14px) scale(.92) !important; }
+  .touche-games__choice--pose-ball .touche-games__art-wrap { width: 55% !important; }
+  .touche-games__choice--dice .touche-games__art-wrap { width: 52% !important; }
+  .touche-games__choice--strip .touche-games__art-wrap { width: 54% !important; }
+  .touche-games__choice--strip .touche-games__art-image--strip { transform: none !important; }
 }
 @media (max-width: 350px) {
   .pop-home[data-home-layout="task-detail"] .pop-tiles .pop-card {
@@ -799,22 +803,19 @@
     rgba(var(--game-card-rgb),.04) 92%) !important;
 }
 .touche-games__choice--strip .touche-games__art-wrap {
-  top: 0 !important;
-  right: 0 !important;
-  bottom: 0 !important;
+  inset: -8% -4% -8% auto !important;
   left: auto !important;
-  width: 58% !important;
-  height: 100% !important;
+  width: 54% !important;
+  height: 116% !important;
   overflow: hidden !important;
-  border-radius: 0 21px 21px 0 !important;
+  border-radius: 0 20px 20px 0 !important;
 }
 .touche-games__choice--strip .touche-games__art-image--strip {
   object-fit: cover !important;
-  object-position: 54% 70% !important;
-  opacity: .96 !important;
-  filter: saturate(.94) contrast(1.03) !important;
-  transform: translateX(6px) scale(.92) !important;
-  transform-origin: right center !important;
+  object-position: center 68% !important;
+  opacity: 1 !important;
+  filter: none !important;
+  transform: none !important;
 }
 
 /* More dimensional, softly lit cubes instead of thin, flat-looking cards. */

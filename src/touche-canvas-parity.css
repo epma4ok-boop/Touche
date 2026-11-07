@@ -388,6 +388,10 @@
   transform: none !important;
 }
 
+.touche-games__choice--pose-ball .touche-games__art-wrap { width: 55% !important; }
+.touche-games__choice--dice .touche-games__art-wrap { width: 52% !important; }
+.touche-games__choice--strip .touche-games__art-wrap { width: 54% !important; }
+
 .touche-games__art-image {
   object-fit: cover !important;
   opacity: 1 !important;

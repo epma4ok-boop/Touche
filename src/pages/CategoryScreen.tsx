@@ -152,6 +152,14 @@ const SHARED_TASK_COPY: Record<Lang, {
   },
 };
 
+const TASK_SOURCE_COPY: Record<Lang, string> = {
+  ru: "Задание от ИИ",
+  en: "Made with AI",
+  hi: "AI द्वारा तैयार",
+  pt: "Criada por IA",
+  es: "Creada por IA",
+};
+
 const TUTORIAL_SAMPLE: Record<Lang, { text: string; label: string; holdHint: string }> = {
   ru: {
     text: "По очереди назовите одну маленькую вещь, за которую вы особенно цените друг друга сегодня.",
@@ -202,9 +210,9 @@ function wrapText(ctx: CanvasRenderingContext2D, text: string, maxWidth: number)
   return lines;
 }
 
-function TaskReveal({ text, color, visible, onDismiss, onGenerateAgain, lang, catLabel, isShared, isTutorialDemo }: {
+function TaskReveal({ text, color, visible, onDismiss, onGenerateAgain, lang, catLabel, source, isShared, isTutorialDemo }: {
   text: string; color: { r: number; g: number; b: number }; visible: boolean;
-  onDismiss: () => void; onGenerateAgain: () => void; lang: Lang; catLabel: string;
+  onDismiss: () => void; onGenerateAgain: () => void; lang: Lang; catLabel: string; source?: "ai" | "fallback";
   isShared?: boolean;
   isTutorialDemo?: boolean;
 }) {
@@ -265,6 +273,7 @@ function TaskReveal({ text, color, visible, onDismiss, onGenerateAgain, lang, ca
           <small style={{ display: "block", marginTop: 4, lineHeight: 1.45 }}>{pairCopy.checkInHint}</small>
         </div>
       )}
+      {!isTutorialDemo && source === "ai" && <span className="task-reveal__source">{TASK_SOURCE_COPY[lang]}</span>}
       {!isTutorialDemo && (
         <div className="task-reveal__actions">
           <button data-testid="button-task-again" onClick={onGenerateAgain}>{t.taskAgain}</button>
@@ -632,6 +641,7 @@ export default function CategoryScreen({ lang, gender, category, onBack, onCateg
         onGenerateAgain={() => { setShowReveal(false); setTimeout(generate, 120); }}
         lang={lang}
         catLabel={label}
+        source={taskSource}
         isShared={mode === "together" && !!sharedTask}
         isTutorialDemo={tutorialDemo}
       />

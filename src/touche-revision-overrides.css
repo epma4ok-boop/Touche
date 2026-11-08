@@ -290,9 +290,9 @@
   padding: max(86px, calc(env(safe-area-inset-top) + 74px)) 20px
     max(176px, calc(env(safe-area-inset-bottom) + 148px)) !important;
   background:
-    radial-gradient(ellipse 78% 46% at 50% 38%, rgba(255,255,255,.78), transparent 78%),
-    radial-gradient(ellipse 56% 36% at 100% 6%, rgba(205,190,224,.38), transparent 74%),
-    linear-gradient(165deg, #f7f3fb 0%, #eee8f6 100%) !important;
+    radial-gradient(ellipse 74% 42% at 50% 39%, rgba(255,255,255,.9), transparent 78%),
+    radial-gradient(ellipse 64% 40% at 100% 8%, rgba(207,192,228,.4), transparent 75%),
+    linear-gradient(160deg, #f6f1fa 0%, #ede6f4 100%) !important;
 }
 .task-reveal::before {
   content: "";
@@ -307,32 +307,45 @@
 .task-reveal__folio {
   position: relative;
   z-index: 1;
-  width: min(100%, 384px) !important;
-  max-height: max(220px, calc(100dvh - 286px));
+  width: min(100%, 356px) !important;
+  max-width: min(100%, 350px) !important;
+  max-height: max(230px, calc(100dvh - 294px));
   overflow-y: auto;
   margin-block: auto;
-  padding: clamp(25px, 6.5vw, 34px) clamp(23px, 6vw, 35px) clamp(22px, 5.5vw, 29px) !important;
-  border: 1px solid rgba(128,100,162,.22) !important;
-  border-radius: 28px !important;
-  background: linear-gradient(155deg, rgba(255,255,255,.99), rgba(250,247,253,.96)) !important;
-  box-shadow: 0 20px 48px rgba(64,51,79,.13), inset 0 1px 0 rgba(255,255,255,.95) !important;
+  padding: 27px 25px 24px !important;
+  border: 1px solid rgba(118,91,153,.22) !important;
+  border-radius: 30px !important;
+  background: linear-gradient(150deg, #fff 0%, #fbf9fe 62%, #f7f2fb 100%) !important;
+  box-shadow: 0 22px 54px rgba(64,51,79,.16), inset 0 1px 0 rgba(255,255,255,.98) !important;
+}
+.task-reveal__folio::before {
+  content: "";
+  position: absolute;
+  top: 13px;
+  left: 50%;
+  width: 34px;
+  height: 3px;
+  border-radius: 99px;
+  background: linear-gradient(90deg, #c4b2d8, #8b70ad);
+  transform: translateX(-50%);
+  pointer-events: none;
 }
 .task-reveal__label {
-  padding: 7px 13px !important;
-  border: 1px solid rgba(128,100,162,.18) !important;
+  padding: 6px 12px !important;
+  border: 1px solid rgba(118,91,153,.16) !important;
   border-radius: 999px !important;
   background: #f3eef8 !important;
-  color: #715890 !important;
-  font: 700 9px/1.2 "DM Sans", sans-serif !important;
-  letter-spacing: .13em !important;
+  color: #69527f !important;
+  font: 700 8px/1.2 "DM Sans", sans-serif !important;
+  letter-spacing: .14em !important;
 }
 .task-reveal__text {
   width: 100%;
   max-width: 100% !important;
-  margin: 22px 0 19px !important;
-  color: #352b40 !important;
-  font: 600 clamp(23px, 6.5vw, 31px)/1.22 "Playfair Display", Georgia, serif !important;
-  letter-spacing: -.018em !important;
+  margin: 18px 0 15px !important;
+  color: #40334f !important;
+  font: 500 clamp(17px, 4.6vw, 19px)/1.43 "Playfair Display", Georgia, serif !important;
+  letter-spacing: 0 !important;
   text-wrap: balance;
   overflow-wrap: anywhere;
 }
@@ -340,36 +353,36 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  margin-top: 2px;
-  padding: 7px 12px !important;
-  border: 1px solid rgba(128,100,162,.18) !important;
+  margin-top: 1px;
+  padding: 6px 11px !important;
+  border: 1px solid rgba(118,91,153,.15) !important;
   border-radius: 999px !important;
-  background: #f4eff8 !important;
-  color: #715890 !important;
-  font: 600 10px/1.2 "DM Sans", sans-serif !important;
+  background: #f5f0f9 !important;
+  color: #69527f !important;
+  font: 600 9px/1.2 "DM Sans", sans-serif !important;
   letter-spacing: .02em !important;
   text-transform: none !important;
 }
 .task-reveal__source::before {
-  content: "✦";
-  color: #8064a2;
-  font-size: 11px;
+  content: none !important;
 }
 .task-reveal__actions {
+  position: fixed !important;
+  z-index: 5;
   left: 50% !important;
   right: auto !important;
   bottom: max(20px, env(safe-area-inset-bottom)) !important;
   width: min(420px, calc(100% - 36px));
-  gap: 10px !important;
+  gap: 9px !important;
   transform: translateX(-50%);
 }
 .task-reveal__actions button {
-  min-height: 52px !important;
-  border: 1px solid rgba(128,100,162,.25) !important;
+  min-height: 49px !important;
+  border: 1px solid #d1c6e0 !important;
   border-radius: 999px !important;
-  background: rgba(255,255,255,.82) !important;
-  color: #4b3d5e !important;
-  box-shadow: 0 7px 18px rgba(64,51,79,.08);
+  background: #fbf9fe !important;
+  color: #40334f !important;
+  box-shadow: 0 8px 20px rgba(64,51,79,.1);
   font: 700 13px "DM Sans", sans-serif !important;
   transition: transform .18s ease, box-shadow .18s ease, background .18s ease;
 }
@@ -381,13 +394,13 @@
 .task-reveal__actions .task-reveal__done {
   min-height: 58px !important;
   border: 0 !important;
-  background: linear-gradient(135deg, #8b70ad, #735790) !important;
+  background: linear-gradient(135deg, #8d73ad, #735790) !important;
   color: #fff !important;
-  box-shadow: 0 11px 24px rgba(91,67,119,.23);
+  box-shadow: 0 12px 25px rgba(91,67,119,.24);
 }
 @media (max-width: 390px) {
   .task-reveal { padding-inline: 16px !important; }
-  .task-reveal__folio { width: 100% !important; padding-inline: 21px !important; }
+  .task-reveal__folio { width: 100% !important; }
   .task-reveal__actions { width: calc(100% - 32px); }
   .task-reveal__actions button { font-size: 12px !important; }
 }
@@ -397,12 +410,11 @@
     padding-bottom: max(146px, calc(env(safe-area-inset-bottom) + 120px)) !important;
   }
   .task-reveal__folio {
-    max-height: max(190px, calc(100dvh - 252px));
-    padding-block: 21px !important;
+    padding-block: 22px !important;
   }
   .task-reveal__text {
-    margin-block: 16px !important;
-    font-size: clamp(21px, 6vw, 27px) !important;
+    margin-block: 14px !important;
+    font-size: clamp(16px, 4.4vw, 18px) !important;
   }
   .task-reveal__actions { bottom: max(14px, env(safe-area-inset-bottom)) !important; }
   .task-reveal__actions button { min-height: 46px !important; }

@@ -2,15 +2,32 @@ import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { createClient } from "@supabase/supabase-js";
 import { validateTelegramInitData } from "./_auth.js";
 import { appDate } from "../limits.js";
+import { handleFeatureTrial } from "./_feature-trial.js";
 import { handleLovePath } from "./_love-path.js";
+import { handleNewFeaturesBroadcast } from "./_new-features-broadcast.js";
 
 const sb = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!);
 const BOT = process.env.BOT_TOKEN!;
 const APP_URL = (process.env.APP_URL ?? "").replace(/\/$/, "");
 const LANGS = new Set(["ru", "en", "hi", "pt", "es"]);
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-const ANALYTICS_EVENTS = new Set(["app_open", "screen_view", "task_generated"]);
-const ANALYTICS_SCREENS = new Set(["home", "category", "scenario", "shared_task_error"]);
+const ANALYTICS_EVENTS = new Set([
+  "app_open",
+  "screen_view",
+  "task_generated",
+  "language_selected",
+  "onboarding_completed",
+  "gender_selected",
+]);
+const ANALYTICS_SCREENS = new Set([
+  "language",
+  "onboarding",
+  "gender",
+  "home",
+  "category",
+  "scenario",
+  "shared_task_error",
+]);
 
 function safeAnalyticsUtm(value: unknown): string | null {
   if (typeof value !== "string") return null;
@@ -709,13 +726,39 @@ async function handleGetScenario(couple: Couple, userId: number, sessionId: stri
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type, x-telegram-init-data");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization, x-telegram-init-data");
   if (req.method === "OPTIONS") return res.status(204).end();
+
+  const action = String(req.query.action ?? "");
+  if (action === "broadcast") return handleNewFeaturesBroadcast(req, res);
 
   const user = validateTelegramInitData(req.headers["x-telegram-init-data"] as string, BOT);
   if (!user) return res.status(401).json({ error: "unauthorized" });
 
-  const action = String(req.query.action ?? "");
+  if (req.method === "POST" && action === "feature_usage") {
+    const result = await handleFeatureTrial(sb, user.id, req.body);
+    return res.status(result.status).json(result.body);
+  }
+
+  if (req.method === "POST" && action === "language") {
+    const body = req.body && typeof req.body === "object"
+      ? req.body as Record<string, unknown>
+      : {};
+    const lang = typeof body.lang === "string" ? body.lang : "";
+    if (!LANGS.has(lang)) return res.status(400).json({ error: "invalid_language" });
+
+    const { error } = await sb.from("touche_user_languages").upsert({
+      user_id: user.id,
+      lang,
+      updated_at: new Date().toISOString(),
+    }, { onConflict: "user_id" });
+    if (error) {
+      console.error("Language preference write failed:", error.code);
+      return res.status(500).json({ error: "language_write_failed" });
+    }
+    return res.status(204).end();
+  }
+
   if (req.method === "POST" && action === "analytics") {
     const body = req.body && typeof req.body === "object"
       ? req.body as Record<string, unknown>

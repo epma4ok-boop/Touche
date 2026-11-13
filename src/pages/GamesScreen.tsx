@@ -8,7 +8,7 @@ import useTelegramTopInset from "./useTelegramTopInset";
 import "./GamesScreen.css";
 
 type Game = "wheel" | "dice" | "strip";
-type Props = { lang: Lang; onBack: () => void };
+type Props = { lang: Lang; onBack: () => void; onUpgrade: () => void | Promise<boolean> };
 
 const COPY: Record<Lang, {
   title: string; subtitle: string; sectionLabel: string;
@@ -16,6 +16,7 @@ const COPY: Record<Lang, {
   dice: string; diceNote: string; diceMood: string;
   back: string;
   strip: string; stripNote: string; stripMood: string;
+  trialNote: string;
 }> = {
   ru: {
     title: "Игры", subtitle: "Выберите, с чего начнётся ваш вечер.", sectionLabel: "Выберите игру",
@@ -23,6 +24,7 @@ const COPY: Record<Lang, {
     dice: "Кубики действий", diceNote: "Два броска — новый повод сблизиться", diceMood: "ИМПУЛЬС",
      back: "Назад",
     strip: "Стрип или действие", stripNote: "Пять уровней. Только ваш выбор.", stripMood: "ИГРА 18+",
+    trialNote: "Бесплатно — по 1 игре каждого типа в день · Premium без ограничений",
   },
   en: {
     title: "Games", subtitle: "Choose how your evening begins.", sectionLabel: "Choose a game",
@@ -30,6 +32,7 @@ const COPY: Record<Lang, {
     dice: "Action dice", diceNote: "Two rolls to bring you closer", diceMood: "SPONTANEITY",
      back: "Back",
     strip: "Strip or dare", stripNote: "Five levels. Your next move.", stripMood: "GAME 18+",
+    trialNote: "Free: 1 game of each type daily · unlimited with Premium",
   },
   hi: {
     title: "खेल", subtitle: "चुनें, आपकी शाम कैसे शुरू होगी।", sectionLabel: "एक खेल चुनें",
@@ -37,6 +40,7 @@ const COPY: Record<Lang, {
     dice: "क्रिया के पासे", diceNote: "दो दाँव, और भी क़रीब आने का नया बहाना", diceMood: "रोमांच",
      back: "वापस",
     strip: "स्ट्रिप या डेयर", stripNote: "पाँच स्तर। अगला कदम आपका।", stripMood: "18+ खेल",
+    trialNote: "मुफ़्त: हर खेल रोज़ 1 बार · Premium में असीमित",
   },
   pt: {
     title: "Jogos", subtitle: "Escolham como a noite vai começar.", sectionLabel: "Escolham um jogo",
@@ -44,6 +48,7 @@ const COPY: Record<Lang, {
     dice: "Dados de ação", diceNote: "Dois lançamentos para aproximar vocês", diceMood: "SURPRESA",
      back: "Voltar",
     strip: "Tire ou ouse", stripNote: "Cinco níveis. A próxima escolha é sua.", stripMood: "JOGO 18+",
+    trialNote: "Grátis: 1 partida de cada tipo por dia · ilimitado no Premium",
   },
   es: {
     title: "Juegos", subtitle: "Elijan cómo empieza su noche.", sectionLabel: "Elijan un juego",
@@ -51,16 +56,17 @@ const COPY: Record<Lang, {
     dice: "Dados de acción", diceNote: "Dos lanzamientos para acercarse", diceMood: "SORPRESA",
      back: "Volver",
     strip: "Quítate o atrévete", stripNote: "Cinco niveles. Tú eliges el siguiente paso.", stripMood: "JUEGO 18+",
+    trialNote: "Gratis: 1 partida de cada tipo al día · ilimitado con Premium",
   },
 };
 
-export default function GamesScreen({ lang, onBack }: Props) {
+export default function GamesScreen({ lang, onBack, onUpgrade }: Props) {
   const [game, setGame] = useState<Game | null>(null);
   const top = useTelegramTopInset();
   const copy = COPY[lang];
-  if (game === "wheel") return <PoseBallScreen lang={lang} onBack={() => setGame(null)} />;
-  if (game === "dice") return <DiceScreen lang={lang} onBack={() => setGame(null)} />;
-  if (game === "strip") return <StripGameScreen lang={lang} onBack={() => setGame(null)} />;
+  if (game === "wheel") return <PoseBallScreen lang={lang} onBack={() => setGame(null)} onUpgrade={onUpgrade} />;
+  if (game === "dice") return <DiceScreen lang={lang} onBack={() => setGame(null)} onUpgrade={onUpgrade} />;
+  if (game === "strip") return <StripGameScreen lang={lang} onBack={() => setGame(null)} onUpgrade={onUpgrade} />;
 
   return (
     <main className="touche-games" style={{ "--games-top": `${top}px` } as CSSProperties}>
@@ -92,7 +98,7 @@ export default function GamesScreen({ lang, onBack }: Props) {
             <span className="touche-games__choice-copy"><small className="touche-games__choice-mood">{copy.stripMood}</small><strong>{copy.strip}</strong><small>{copy.stripNote}</small></span>
           </button>
         </section>
-        <p className="touche-games__footnote"><span /> {lang === "ru" ? "Только для вас двоих" : lang === "hi" ? "सिर्फ़ आप दोनों के लिए" : lang === "pt" ? "Só para vocês dois" : lang === "es" ? "Solo para ustedes dos" : "Just for the two of you"}</p>
+        <p className="touche-games__footnote"><span /> {copy.trialNote}</p>
       </div>
     </main>
   );

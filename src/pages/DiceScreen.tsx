@@ -1,10 +1,12 @@
 import { useEffect, useRef, useState } from "react";
 import type { CSSProperties } from "react";
 import type { Lang } from "@/data/i18n";
+import FeatureLimitNotice from "@/components/FeatureLimitNotice";
+import { useFeatureTrial } from "@/hooks/useFeatureTrial";
 import useTelegramTopInset from "./useTelegramTopInset";
 import "./DiceScreen.css";
 
-type Props = { lang: Lang; onBack: () => void };
+type Props = { lang: Lang; onBack: () => void; onUpgrade: () => void | Promise<boolean> };
 type DieKey = "male" | "female";
 type Face = { file: string; label: Record<Lang, string> };
 const ROLL_MS = 1450;
@@ -288,9 +290,10 @@ function Die({ kind, faces, selected, lang, rotation }: {
   );
 }
 
-export default function DiceScreen({ lang, onBack }: Props) {
+export default function DiceScreen({ lang, onBack, onUpgrade }: Props) {
   const copy = COPY[lang];
   const top = useTelegramTopInset();
+  const trial = useFeatureTrial("dice");
   const [rolling, setRolling] = useState(false);
   const [maleIndex, setMaleIndex] = useState(0);
   const [femaleIndex, setFemaleIndex] = useState(5);
@@ -307,8 +310,8 @@ export default function DiceScreen({ lang, onBack }: Props) {
     if (timer.current) window.clearTimeout(timer.current);
   }, []);
 
-  function roll() {
-    if (busyRef.current) return;
+  async function roll() {
+    if (busyRef.current || !(await trial.consume())) return;
     busyRef.current = true;
     setRolling(true);
     const male = Math.floor(Math.random() * 6);
@@ -368,11 +371,12 @@ export default function DiceScreen({ lang, onBack }: Props) {
           </p>
           <p className="touche-dice__joke" data-testid="text-dice-joke" aria-live="polite">{joke}</p>
         </section>
-        <button type="button" className="touche-dice__button" onClick={roll} disabled={rolling} data-testid="button-dice-roll">
+        <button type="button" className="touche-dice__button" onClick={roll} disabled={rolling || trial.busy} data-testid="button-dice-roll">
           <span className="touche-dice__button-mark" aria-hidden="true"><i /><i /><i /></span>
           {rolling ? copy.rolling : rollNumber ? copy.again : copy.throw}
         </button>
       </div>
+      <FeatureLimitNotice lang={lang} kind="game" notice={trial.notice} onUpgrade={onUpgrade} onDismiss={trial.dismiss} />
     </main>
   );
 }

@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { CSSProperties } from "react";
+import FeatureLimitNotice from "@/components/FeatureLimitNotice";
+import { useFeatureTrial } from "@/hooks/useFeatureTrial";
 import type { Lang } from "../data/i18n";
 import stripGameTranslations from "./stripGameTranslations.json";
 import useTelegramTopInset from "./useTelegramTopInset";
@@ -22,7 +24,7 @@ type Session = {
   winner: PlayerIndex | null;
   mini?: MiniRound | null;
 };
-type Props = { lang: Lang; onBack: () => void };
+type Props = { lang: Lang; onBack: () => void; onUpgrade: () => void | Promise<boolean> };
 
 const STORAGE_KEY = "touche.strip.session.v1";
 const LAYER_SETS = STRIP_CLOTHES;
@@ -415,9 +417,10 @@ function PlayerFigure({ player, removed, active, copy, lang, fromStage }: { play
   );
 }
 
-export default function StripGameScreen({ lang, onBack }: Props) {
+export default function StripGameScreen({ lang, onBack, onUpgrade }: Props) {
   const top = useTelegramTopInset();
   const copy = COPY[lang];
+  const trial = useFeatureTrial("strip");
   const [session, setSession] = useState<Session | null>(() => loadSession());
   const [first, setFirst] = useState<PlayerIndex>(0);
   const [confirming, setConfirming] = useState(false);
@@ -436,7 +439,8 @@ export default function StripGameScreen({ lang, onBack }: Props) {
   }, [session?.card?.id]);
 
   const playerNames = [copy.woman, copy.man] as const;
-  const startGame = () => {
+  const startGame = async () => {
+    if (!(await trial.consume())) return;
     setRemoval(null);
     setSession(createSession(first));
     setConfirming(false);
@@ -648,6 +652,7 @@ export default function StripGameScreen({ lang, onBack }: Props) {
           </div>
         </section>
       )}
+      <FeatureLimitNotice lang={lang} kind="game" notice={trial.notice} onUpgrade={onUpgrade} onDismiss={trial.dismiss} />
     </main>
   );
 }

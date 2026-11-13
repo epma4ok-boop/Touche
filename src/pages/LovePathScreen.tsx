@@ -1,5 +1,6 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import type { Lang } from "@/data/i18n";
+import { LOVE_PATH_LABELS, LOVE_PATH_TRANSLATED_DAYS, LOVE_PATH_TRANSLATED_FINALE } from "@/data/lovePathLocales";
 import "./LovePathScreen.css";
 
 type Task = { title: string; action: string; receive: string };
@@ -142,10 +143,10 @@ const DAY_POINTS = [
 ];
 
 export default function LovePathScreen({ lang, onBack }: { lang: Lang; onBack: () => void }) {
-  const isRu = lang === "ru";
   const topInset = useTelegramTopInset();
-  const days = isRu ? DAYS : EN_DAYS;
-  const finale = isRu ? FINALE : EN_FINALE;
+  const labels = LOVE_PATH_LABELS[lang];
+  const days = lang === "ru" ? DAYS : lang === "en" ? EN_DAYS : LOVE_PATH_TRANSLATED_DAYS[lang]!;
+  const finale = lang === "ru" ? FINALE : lang === "en" ? EN_FINALE : LOVE_PATH_TRANSLATED_FINALE[lang]!;
   const [game, setGame] = useState<GameState | null>(null);
   const [step, setStep] = useState<Step>("board");
   const [selectedTask, setSelectedTask] = useState<number | null>(null);
@@ -161,9 +162,12 @@ export default function LovePathScreen({ lang, onBack }: { lang: Lang; onBack: (
   const finalChoiceNumber = game?.finale?.myChoice ? Number(game.finale.myChoice.slice(-1)) - 1 : null;
   const matchedFinal = game?.finale?.matched === true;
   const currentTurn = game?.todayMove
-    ? (game.todayMove.actorUserId === game.selfUserId ? (isRu ? "Ход сделан сегодня" : "Today’s move is taken") : (isRu ? "Партнёр уже сделал ход" : "Partner has played today"))
-    : game?.canChoose ? (isRu ? "Ваш ход" : "Your turn")
-      : (isRu ? "Ход партнёра" : "Partner’s turn");
+    ? (game.todayMove.actorUserId === game.selfUserId ? labels.moveTaken : labels.partnerPlayed)
+    : game?.canChoose ? labels.yourTurn : labels.partnersTurn;
+  const playLabel = !game?.started ? labels.start
+    : completedDays >= 7 ? labels.finaleUnlocked
+      : game?.todayMove?.cardId ? labels.openTask
+        : game?.canChoose ? labels.makeMove(dayNumber) : labels.waitTomorrow;
 
   useEffect(() => {
     let alive = true;
@@ -227,44 +231,6 @@ export default function LovePathScreen({ lang, onBack }: { lang: Lang; onBack: (
   }
 
   function finishDay() { setStep("board"); }
-  const labels = useMemo(() => isRu ? {
-    back: "Назад", kicker: "ПУТЬ ЛЮБВИ", title: "Семь шагов ближе",
-    intro: "Один человек — один ход в день. Завтра очередь перейдёт к партнёру.",
-    progress: `Ходов сделано: ${completedDays} из 7`,
-    boardTitle: "Ваш путь", play: !game?.started ? "Начать игру" : completedDays >= 7 ? "Вы уже у финала" : game?.todayMove?.cardId ? "Открыть задание" : game?.canChoose ? `Сделать ход · день ${dayNumber}` : "Ждём следующего дня",
-    day: "ДЕНЬ", choose: "Выбери одно задание", chooseHint: "Выбор сразу фиксирует ход на сегодня. Завтра очередь партнёра.",
-    action: "Твоё задание", receive: "Сообщение партнёру", done: "Вернуться к полю",
-    pause: "Отложить", pauseHint: "Прогресс сохранится. Вернёшься, когда будет удобно.",
-    finalTitle: "Встреча в центре", finalText: "Каждый выбирает финальное задание отдельно. Совпадут выборы — откроется общий сценарий.",
-    chooseFor: "Сейчас выбирает", me: "Я", partner: "Партнёр",
-    mismatch: "Пока выбрали разное. Поменяйте только свой финальный выбор — неделя сохранена.",
-    match: "Вы совпали. Финальное задание открыто.",
-    chooseAgain: "Изменить мой выбор", scenario: "Ваш общий сценарий",
-    consent: "Можно остановиться или изменить план в любой момент. Прогресс игры не пропадёт.",
-    wait: "Сегодняшний ход уже сделан. Следующий участник сможет выбрать задание завтра.",
-    pairRequired: "Сначала подключите партнёра в Touché, чтобы начать игру.",
-    genericError: "Не удалось загрузить игру. Проверьте соединение и попробуйте снова.",
-    waitingFinal: "Ваш выбор сохранён. Финал откроется, когда партнёр выберет свой вариант.",
-  } : {
-    back: "Back", kicker: "THE LOVE PATH", title: "Seven steps closer",
-    intro: "One person makes one move each day. Tomorrow, it’s the other partner’s turn.",
-    progress: `Moves made: ${completedDays} of 7`,
-    boardTitle: "Your path", play: !game?.started ? "Start the game" : completedDays >= 7 ? "Finale unlocked" : game?.todayMove?.cardId ? "Open your task" : game?.canChoose ? `Make your move · day ${dayNumber}` : "Wait until tomorrow",
-    day: "DAY", choose: "Choose one task", chooseHint: "Choosing locks today’s move. Tomorrow is your partner’s turn.",
-    action: "Your task", receive: "Note for your partner", done: "Back to the board",
-    pause: "Pause for now", pauseHint: "Your progress is saved. Return when it feels right.",
-    finalTitle: "Meet in the center", finalText: "Choose the final task separately. When your choices match, the shared scenario opens.",
-    chooseFor: "Choosing now", me: "Me", partner: "Partner",
-    mismatch: "Your choices differ. Change only your own finale choice; the week stays saved.",
-    match: "You matched. Your shared finale is ready.",
-    chooseAgain: "Change my choice", scenario: "Your shared scenario",
-    consent: "You can pause or change the plan at any time. Game progress stays saved.",
-    wait: "Today’s move is already taken. The next partner can choose tomorrow.",
-    pairRequired: "Connect your partner in Touché before starting the game.",
-    genericError: "Could not load the game. Check your connection and try again.",
-    waitingFinal: "Your choice is saved. The finale opens when your partner chooses too.",
-  }, [completedDays, game, isRu, dayNumber]);
-
   return (
     <main className="love-path-screen" data-testid="screen-love-path" style={{ paddingTop: topInset }}>
       <header className="lp-header">
@@ -282,8 +248,8 @@ export default function LovePathScreen({ lang, onBack }: { lang: Lang; onBack: (
         <p>{labels.intro}</p>
       </section>
 
-      <div className="lp-progress" aria-label={labels.progress}>
-        <div className="lp-progress-top"><span>{labels.progress}</span><span>{Math.round(completedDays / 7 * 100)}%</span></div>
+      <div className="lp-progress" aria-label={labels.progress(completedDays)}>
+        <div className="lp-progress-top"><span>{labels.progress(completedDays)}</span><span>{Math.round(completedDays / 7 * 100)}%</span></div>
         <div className="lp-progress-track"><span style={{ width: `${completedDays / 7 * 100}%` }} /></div>
       </div>
 
@@ -294,7 +260,7 @@ export default function LovePathScreen({ lang, onBack }: { lang: Lang; onBack: (
             <span className="lp-turn">{loading ? "…" : completedDays >= 7 ? "∞" : currentTurn}</span>
           </div>
           <div className="lp-heart-board" data-testid="board-heart-path">
-            <svg className="lp-heart-svg" viewBox="0 0 300 280" role="img" aria-label={isRu ? "Игровое поле в форме сердца, путь от нижнего кончика к центру" : "Heart-shaped game board, path from the point to the center"}>
+            <svg className="lp-heart-svg" viewBox="0 0 300 280" role="img" aria-label={labels.boardAria}>
               <path className="lp-heart-fill" d="M150 260 C120 235 40 187 37 125 C34 70 93 50 127 78 C140 88 147 102 150 113 C153 102 160 88 173 78 C207 50 266 70 263 125 C260 187 180 235 150 260Z" />
               <path className="lp-route" d="M150 246 C121 226 75 190 56 147 C38 106 63 78 96 83 C123 87 143 113 150 151" />
               {DAY_POINTS.map((point, index) => {
@@ -309,13 +275,13 @@ export default function LovePathScreen({ lang, onBack }: { lang: Lang; onBack: (
                   </g>
                 );
               })}
-              <text className="lp-heart-word" x="194" y="161">{isRu ? "вместе" : "together"}</text>
+              <text className="lp-heart-word" x="194" y="161">{labels.together}</text>
             </svg>
           </div>
           <div className="lp-board-legend">
-            <span><i className="lp-legend-dot lp-legend-done" /> {isRu ? "Пройдено" : "Done"}</span>
-            <span><i className="lp-legend-dot lp-legend-current" /> {isRu ? "Текущий шаг" : "Current step"}</span>
-            <span><i className="lp-legend-dot lp-legend-final" /> {isRu ? "Финал" : "Finale"}</span>
+            <span><i className="lp-legend-dot lp-legend-done" /> {labels.doneLegend}</span>
+            <span><i className="lp-legend-dot lp-legend-current" /> {labels.currentLegend}</span>
+            <span><i className="lp-legend-dot lp-legend-final" /> {labels.finaleLegend}</span>
           </div>
           <div className="lp-day-summary">
             <div><span className="lp-day-number">{completedDays >= 7 ? "07" : String(dayNumber).padStart(2, "0")}</span><div><strong>{completedDays >= 7 ? labels.finalTitle : activeDay.category}</strong><small>{completedDays >= 7 ? labels.finalText : currentTurn}</small></div></div>
@@ -324,7 +290,7 @@ export default function LovePathScreen({ lang, onBack }: { lang: Lang; onBack: (
               else if (completedDays >= 7) setStep("final");
               else if (game.todayMove?.cardId) setStep("instructions");
               else if (game.canChoose) setStep("choices");
-            }} data-testid="button-love-path-open-day">{loading || busy ? "…" : labels.play}</button>
+            }} data-testid="button-love-path-open-day">{loading || busy ? "…" : playLabel}</button>
           </div>
           {game?.todayMove && !game.todayMove.cardId && <p className="lp-muted">{labels.wait}</p>}
           {!!error && <div className="lp-match-status is-mismatch" role="alert">{error === "no_couple" ? labels.pairRequired : labels.genericError}</div>}
@@ -359,7 +325,7 @@ export default function LovePathScreen({ lang, onBack }: { lang: Lang; onBack: (
 
       {step === "final" && (
         <section className="lp-panel lp-final-panel">
-          <div className="lp-section-heading"><div><p className="lp-eyebrow">{isRu ? "ЦЕНТР СЕРДЦА" : "HEART CENTER"}</p><h2>{labels.finalTitle}</h2></div><span className="lp-final-heart" aria-hidden="true" /></div>
+          <div className="lp-section-heading"><div><p className="lp-eyebrow">{labels.centerKicker}</p><h2>{labels.finalTitle}</h2></div><span className="lp-final-heart" aria-hidden="true" /></div>
           <p className="lp-muted">{labels.finalText}</p>
           <div className="lp-choice-list lp-finale-choices">
             {finale.map((option, index) => (
@@ -371,7 +337,7 @@ export default function LovePathScreen({ lang, onBack }: { lang: Lang; onBack: (
           {finalChoiceNumber !== null && game?.finale?.partnerHasChosen && (
             <div className={`lp-match-status ${matchedFinal ? "is-match" : "is-mismatch"}`} role="status" data-testid="status-final-match">
               <strong>{matchedFinal ? labels.match : labels.mismatch}</strong>
-              {matchedFinal && <button type="button" className="lp-primary lp-full" onClick={() => setStep("scenario")} data-testid="button-reveal-scenario">{isRu ? "Открыть общий сценарий" : "Reveal shared scenario"}</button>}
+              {matchedFinal && <button type="button" className="lp-primary lp-full" onClick={() => setStep("scenario")} data-testid="button-reveal-scenario">{labels.revealScenario}</button>}
             </div>
           )}
           {finalChoiceNumber !== null && !game?.finale?.partnerHasChosen && <p className="lp-muted">{labels.waitingFinal}</p>}
@@ -387,7 +353,7 @@ export default function LovePathScreen({ lang, onBack }: { lang: Lang; onBack: (
           <h2>{finale[finalChoiceNumber].title}</h2>
           <p className="lp-scenario-copy">{finale[finalChoiceNumber].scenario}</p>
           <p className="lp-consent-note">{labels.consent}</p>
-          <button type="button" className="lp-primary lp-full" onClick={onBack} data-testid="button-love-path-finish">{isRu ? "Вернуться на главную" : "Back to home"}</button>
+          <button type="button" className="lp-primary lp-full" onClick={onBack} data-testid="button-love-path-finish">{labels.backHome}</button>
         </section>
       )}
       </div>

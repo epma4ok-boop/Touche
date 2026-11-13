@@ -1,10 +1,12 @@
 import { useEffect, useRef, useState } from "react";
 import type { CSSProperties } from "react";
 import type { Lang } from "@/data/i18n";
+import FeatureLimitNotice from "@/components/FeatureLimitNotice";
+import { useFeatureTrial } from "@/hooks/useFeatureTrial";
 import useTelegramTopInset from "./useTelegramTopInset";
 import "./PoseBallScreen.css";
 
-type Props = { lang: Lang; onBack: () => void };
+type Props = { lang: Lang; onBack: () => void; onUpgrade: () => void | Promise<boolean> };
 type Phase = "idle" | "shaking" | "revealed";
 
 const SHAKE_DURATION_MS = 1450;
@@ -22,6 +24,7 @@ const COPY: Record<Lang, {
   again: string;
   hint: string;
   result: string;
+  footnote: string;
   status: (number: number) => string;
 }> = {
   ru: {
@@ -33,6 +36,7 @@ const COPY: Record<Lang, {
     again: "Встряхнуть ещё раз",
     hint: "Поза появится на экране шара",
     result: "Ваш вариант на сегодня",
+    footnote: "Бесплатно — 1 попытка в день · Premium без ограничений",
     status: n => `Шар выбрал позу ${n}`,
   },
   en: {
@@ -44,6 +48,7 @@ const COPY: Record<Lang, {
     again: "Shake again",
     hint: "The pose will appear on the ball's screen",
     result: "Your pose for today",
+    footnote: "Free: 1 try a day · unlimited with Premium",
     status: n => `The ball chose pose ${n}`,
   },
   hi: {
@@ -55,6 +60,7 @@ const COPY: Record<Lang, {
     again: "फिर से हिलाएँ",
     hint: "पोज़ बॉल की स्क्रीन पर दिखाई देगी",
     result: "आज की आपकी पोज़",
+    footnote: "मुफ़्त: रोज़ 1 बार · Premium में असीमित",
     status: n => `बॉल ने पोज़ ${n} चुनी`,
   },
   pt: {
@@ -66,6 +72,7 @@ const COPY: Record<Lang, {
     again: "Agitar novamente",
     hint: "A pose aparecerá no ecrã da bola",
     result: "A pose de hoje",
+    footnote: "Grátis: 1 tentativa por dia · ilimitado no Premium",
     status: n => `A bola escolheu a pose ${n}`,
   },
   es: {
@@ -77,13 +84,15 @@ const COPY: Record<Lang, {
     again: "Agitar de nuevo",
     hint: "La pose aparecerá en la pantalla de la bola",
     result: "La pose de hoy",
+    footnote: "Gratis: 1 intento al día · ilimitado con Premium",
     status: n => `La bola eligió la pose ${n}`,
   },
 };
 
-export default function PoseBallScreen({ lang, onBack }: Props) {
+export default function PoseBallScreen({ lang, onBack, onUpgrade }: Props) {
   const copy = COPY[lang];
   const top = useTelegramTopInset();
+  const trial = useFeatureTrial("pose_ball");
   const [phase, setPhase] = useState<Phase>("idle");
   const [poseIndex, setPoseIndex] = useState<number | null>(null);
   const timerRef = useRef<number | null>(null);
@@ -94,8 +103,8 @@ export default function PoseBallScreen({ lang, onBack }: Props) {
     if (timerRef.current !== null) window.clearTimeout(timerRef.current);
   }, []);
 
-  function shakeBall() {
-    if (phase === "shaking") return;
+  async function shakeBall() {
+    if (phase === "shaking" || !(await trial.consume())) return;
     if (timerRef.current !== null) window.clearTimeout(timerRef.current);
 
     setPoseIndex(null);
@@ -149,15 +158,14 @@ export default function PoseBallScreen({ lang, onBack }: Props) {
           type="button"
           className="pose-ball__button"
           onClick={shakeBall}
-          disabled={phase === "shaking"}
+          disabled={phase === "shaking" || trial.busy}
           data-testid="button-pose-wheel-spin"
         >
           {phase === "shaking" ? copy.shaking : phase === "revealed" ? copy.again : copy.shake}
         </button>
-        <p className="pose-ball__footnote">
-          {lang === "ru" ? "Один случайный вариант · Можно попробовать снова" : "One random pose · Shake again anytime"}
-        </p>
+        <p className="pose-ball__footnote">{copy.footnote}</p>
       </div>
+      <FeatureLimitNotice lang={lang} kind="game" notice={trial.notice} onUpgrade={onUpgrade} onDismiss={trial.dismiss} />
     </main>
   );
 }

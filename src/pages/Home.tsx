@@ -5,6 +5,7 @@ import { UI, CATEGORIES_ORDER, type Lang, type Category } from "@/data/i18n";
 import type { AppMode } from "@/App";
 import WishMap from "@/components/WishMap";
 import SmokeBackground from "@/components/SmokeBackground";
+import splashHands from "@/assets/touche-splash-hands.jpg";
 import { BRAND } from "@/theme/palette";
 import { BOT_USERNAME, TELEGRAM_MINI_APP_SHORT_NAME } from "@/config";
 import "./HomePop.css";
@@ -26,11 +27,11 @@ const HOME_SECTION_LABELS: Record<Lang, string> = {
 };
 
 const TASKS_COPY: Record<Lang, { title: string; sub: string; chooseTitle: string; chooseSub: string }> = {
-  ru: { title: "Задания", sub: "Соло или вместе — выберите режим", chooseTitle: "Выберите формат", chooseSub: "Начните с задания для себя или для двоих." },
-  en: { title: "Tasks", sub: "Solo or together — choose your mode", chooseTitle: "Choose your format", chooseSub: "Start with a moment for yourself or a shared task." },
-  hi: { title: "कार्य", sub: "अकेले या साथ — अपना तरीका चुनें", chooseTitle: "अपना तरीका चुनें", chooseSub: "अपने लिए या साथ में एक काम से शुरुआत करें।" },
-  pt: { title: "Tarefas", sub: "Solo ou a dois — escolha o formato", chooseTitle: "Escolha o formato", chooseSub: "Comece com um momento só seu ou uma tarefa a dois." },
-  es: { title: "Retos", sub: "A solas o en pareja — tú eliges", chooseTitle: "Elige el formato", chooseSub: "Empieza con un momento para ti o una tarea en pareja." },
+  ru: { title: "Задания", sub: "Соло, вместе или Путь любви", chooseTitle: "Выберите направление", chooseSub: "Короткое задание или общий путь на неделю." },
+  en: { title: "Tasks", sub: "Solo, Together, or the Love Path", chooseTitle: "Choose how to connect", chooseSub: "Pick a quick task or a shared seven-day journey." },
+  hi: { title: "कार्य", sub: "अकेले, साथ में या प्यार का रास्ता", chooseTitle: "जुड़ने का तरीका चुनें", chooseSub: "एक छोटा काम या सात दिनों की साझा यात्रा चुनें।" },
+  pt: { title: "Tarefas", sub: "Solo, a dois ou Caminho do amor", chooseTitle: "Escolha como se conectar", chooseSub: "Uma tarefa rápida ou uma jornada a dois de sete dias." },
+  es: { title: "Retos", sub: "A solas, en pareja o Camino del amor", chooseTitle: "Elige cómo conectar", chooseSub: "Un reto breve o un recorrido compartido de siete días." },
 };
 
 const NIGHT_GAMES_LABELS: Record<Lang, string> = {
@@ -39,6 +40,22 @@ const NIGHT_GAMES_LABELS: Record<Lang, string> = {
   hi: "रात के खेल",
   pt: "Jogos da noite",
   es: "Juegos nocturnos",
+};
+
+const HOME_FEATURE_NOTES: Record<Lang, { tarot: string; games: string }> = {
+  ru: { tarot: "1 расклад в день · Premium без ограничений", games: "По 1 игре каждого типа · Premium без ограничений" },
+  en: { tarot: "1 reading daily · unlimited with Premium", games: "1 of each game daily · unlimited with Premium" },
+  hi: { tarot: "रोज़ 1 स्प्रेड · Premium में असीमित", games: "हर खेल रोज़ 1 बार · Premium में असीमित" },
+  pt: { tarot: "1 tiragem por dia · ilimitadas no Premium", games: "1 de cada jogo por dia · ilimitados no Premium" },
+  es: { tarot: "1 tirada al día · ilimitadas con Premium", games: "1 de cada juego al día · ilimitados con Premium" },
+};
+
+const LOVE_PATH_LABELS: Record<Lang, { title: string; sub: string }> = {
+  ru: { title: "Путь любви", sub: "Семь дней, один общий маршрут" },
+  en: { title: "Love Path", sub: "Seven days, one shared journey" },
+  hi: { title: "प्यार का रास्ता", sub: "सात दिन, एक साझा सफ़र" },
+  pt: { title: "Caminho do amor", sub: "Sete dias, uma jornada a dois" },
+  es: { title: "Camino del amor", sub: "Siete días, un recorrido compartido" },
 };
 
 declare global {
@@ -318,6 +335,68 @@ function Backdrop({ visible, onClick }: { visible: boolean; onClick: () => void 
 
 /* ─── Labels ───────────────────────────────────────────────────── */
 const LANG_ABBREV: Record<Lang, string> = { ru: "RU", en: "EN", hi: "HI", pt: "PT", es: "ES" };
+const HOME_STATUS_COPY: Record<Lang, {
+  pairConnectFailed: string; pairUnlinkFailed: string; paymentOpenFailed: string;
+  back: string; close: string; openMenu: string; premiumActive: string; monthlyPrice: string;
+  home: string; soloMode: string; togetherMode: string; pairRequiredTitle: string;
+  pairRequiredBody: string; connectPartner: string;
+}> = {
+  ru: {
+    pairConnectFailed: "Не удалось связать пару. Попробуйте ещё раз.",
+    pairUnlinkFailed: "Не удалось отвязать пару. Попробуйте ещё раз.",
+    paymentOpenFailed: "Не удалось открыть оплату. Попробуйте ещё раз.",
+    back: "Назад", close: "Закрыть", openMenu: "Открыть меню",
+    premiumActive: "Premium активен", monthlyPrice: "199 Stars / мес",
+    home: "На главную", soloMode: "Одиночный режим", togetherMode: "Совместный режим",
+    pairRequiredTitle: "Сначала свяжите пару",
+    pairRequiredBody: "Совместные задания и Дневник желаний откроются после подключения партнёра.",
+    connectPartner: "Подключить партнёра",
+  },
+  en: {
+    pairConnectFailed: "Could not connect the pair. Try again.",
+    pairUnlinkFailed: "Could not unlink the pair. Try again.",
+    paymentOpenFailed: "Could not open payment. Try again.",
+    back: "Back", close: "Close", openMenu: "Open menu",
+    premiumActive: "Premium active", monthlyPrice: "199 Stars / mo",
+    home: "Home", soloMode: "Solo mode", togetherMode: "Together mode",
+    pairRequiredTitle: "Connect your pair first",
+    pairRequiredBody: "Shared tasks and Wish Diary are available once your partner joins.",
+    connectPartner: "Connect partner",
+  },
+  hi: {
+    pairConnectFailed: "जोड़ी नहीं जुड़ सकी। फिर कोशिश करें।",
+    pairUnlinkFailed: "जोड़ी अलग नहीं हो सकी। फिर कोशिश करें।",
+    paymentOpenFailed: "भुगतान नहीं खुल सका। फिर कोशिश करें।",
+    back: "वापस", close: "बंद करें", openMenu: "मेनू खोलें",
+    premiumActive: "Premium सक्रिय है", monthlyPrice: "199 Stars / माह",
+    home: "होम", soloMode: "अकेले खेलें", togetherMode: "साथ में खेलें",
+    pairRequiredTitle: "पहले अपनी जोड़ी जोड़ें",
+    pairRequiredBody: "साथी के जुड़ने पर साझा टास्क और Wish Diary उपलब्ध होंगे।",
+    connectPartner: "साथी को जोड़ें",
+  },
+  pt: {
+    pairConnectFailed: "Não foi possível conectar o casal. Tente novamente.",
+    pairUnlinkFailed: "Não foi possível desconectar o casal. Tente novamente.",
+    paymentOpenFailed: "Não foi possível abrir o pagamento. Tente novamente.",
+    back: "Voltar", close: "Fechar", openMenu: "Abrir menu",
+    premiumActive: "Premium ativo", monthlyPrice: "199 Stars / mês",
+    home: "Início", soloMode: "Modo solo", togetherMode: "Modo a dois",
+    pairRequiredTitle: "Conecte seu par primeiro",
+    pairRequiredBody: "As tarefas compartilhadas e o Wish Diary ficam disponíveis quando seu par se conecta.",
+    connectPartner: "Conectar parceiro",
+  },
+  es: {
+    pairConnectFailed: "No se pudo vincular la pareja. Inténtalo de nuevo.",
+    pairUnlinkFailed: "No se pudo desvincular la pareja. Inténtalo de nuevo.",
+    paymentOpenFailed: "No se pudo abrir el pago. Inténtalo de nuevo.",
+    back: "Volver", close: "Cerrar", openMenu: "Abrir menú",
+    premiumActive: "Premium activo", monthlyPrice: "199 Stars / mes",
+    home: "Inicio", soloMode: "Modo individual", togetherMode: "Modo en pareja",
+    pairRequiredTitle: "Vincula tu pareja primero",
+    pairRequiredBody: "Las tareas compartidas y Wish Diary estarán disponibles cuando se conecte tu pareja.",
+    connectPartner: "Conectar pareja",
+  },
+};
 
 const SCENARIO_LABELS: Record<Lang, { title: string; sub: string }> = {
   ru: { title: "Сценарии",   sub: "Ролевые игры и фантазии"    },
@@ -328,11 +407,11 @@ const SCENARIO_LABELS: Record<Lang, { title: string; sub: string }> = {
 };
 
 const INVITE_LABELS: Record<Lang, { title: string; sub: string }> = {
-  ru: { title: "Пригласи друга",       sub: "Новый друг: +3 в обычных, +1 в 18+ категориях" },
-  en: { title: "Invite a friend",      sub: "New friend joins: +3 free, +1 in each 18+ category" },
-  hi: { title: "मित्र को आमंत्रित करें", sub: "नया दोस्त जुड़े: +3 सामान्य, +1 हर 18+ श्रेणी में" },
-  pt: { title: "Convidar amigo",       sub: "Novo amigo: +3 grátis, +1 em cada 18+" },
-  es: { title: "Invitar amigo",        sub: "Amigo nuevo: +3 gratis y +1 en cada 18+" },
+  ru: { title: "Пригласи друга", sub: "За первый вход друга — 1 день Premium" },
+  en: { title: "Invite a friend", sub: "Friend's first visit earns 1 Premium day" },
+  hi: { title: "मित्र को आमंत्रित करें", sub: "मित्र के पहले प्रवेश पर 1 दिन Premium" },
+  pt: { title: "Convide um amigo", sub: "Primeira entrada do amigo: 1 dia Premium" },
+  es: { title: "Invita a un amigo", sub: "Primera visita del amigo: 1 día Premium" },
 };
 
 const PAIR_LABELS: Record<Lang, { title: string; sub: string }> = {
@@ -511,9 +590,9 @@ const SUBSCRIPTION: Record<Lang, { title: string; features: string[]; price: str
   ru: {
     title: "Touché Premium",
     features: [
-      "«Страсть» и «Хард» — откровенные задания 18+",
-      "ИИ-сценарии — уникальные ролевые истории",
-      "3 задания в каждой обычной категории и 3 в «Страсти» и «Харде» в день",
+      "«Страсть» и «Хард» — по 3 задания в день",
+      "Таро и все три игры — без ограничений",
+      "1 ИИ-сценарий в день",
       "Приоритетная генерация",
       "Новые категории первыми",
     ],
@@ -524,9 +603,9 @@ const SUBSCRIPTION: Record<Lang, { title: string; features: string[]; price: str
   en: {
     title: "Touché Premium",
     features: [
-      "Passion & Hard — explicit 18+ tasks",
-      "AI scenarios — unique roleplay stories",
-      "3 daily tasks in each regular category and 3 in Passion and Hard",
+      "Passion & Hard — 3 tasks per day each",
+      "Unlimited Tarot and all three games",
+      "1 AI scenario per day",
       "Priority generation",
       "Exclusive new categories first",
     ],
@@ -537,9 +616,9 @@ const SUBSCRIPTION: Record<Lang, { title: string; features: string[]; price: str
   hi: {
     title: "Touché Premium",
     features: [
-      "जुनून और साहसिक श्रेणियां — 18+ कार्य",
-      "AI रोलप्ले — अनोखी कहानियां",
-      "हर नियमित श्रेणी में 3 और जुनून तथा साहसिक श्रेणियों में 3 दैनिक कार्य",
+      "जुनून और साहसिक — हर दिन 3 कार्य",
+      "टैरो और तीनों खेल असीमित",
+      "रोज़ 1 AI दृश्य",
       "प्राथमिकता जनरेशन",
       "नई श्रेणियां पहले",
     ],
@@ -550,9 +629,9 @@ const SUBSCRIPTION: Record<Lang, { title: string; features: string[]; price: str
   pt: {
     title: "Touché Premium",
     features: [
-      "Paixão e Intenso — tarefas 18+",
-      "Cenários de IA — histórias únicas",
-      "3 tarefas diárias em cada categoria normal e 3 em Paixão e Intenso",
+      "Paixão e Intenso — 3 tarefas por dia cada",
+      "Tarô e os três jogos ilimitados",
+      "1 cenário de IA por dia",
       "Geração prioritária",
       "Novas categorias primeiro",
     ],
@@ -563,9 +642,9 @@ const SUBSCRIPTION: Record<Lang, { title: string; features: string[]; price: str
   es: {
     title: "Touché Premium",
     features: [
-      "Pasión e Intenso — tareas 18+",
-      "Escenarios de IA — historias únicas",
-      "3 tareas diarias en cada categoría normal y 3 en Pasión e Intenso",
+      "Pasión e Intenso — 3 retos diarios cada uno",
+      "Tarot y los tres juegos sin límites",
+      "1 escenario de IA al día",
       "Generación prioritaria",
       "Nuevas categorías primero",
     ],
@@ -743,7 +822,7 @@ function CoupleModal({ lang, coupleId, pendingRefUserId, onLink, onUnlink, onClo
     const ok = await onLink(pendingRefUserId);
     setLinking(false);
     if (ok) onClose();
-    else setError(lang === "ru" ? "Не удалось связать пару. Попробуйте ещё раз." : "Could not connect the pair. Try again.");
+    else setError(HOME_STATUS_COPY[lang].pairConnectFailed);
   }
 
   /* ── No pair ── */
@@ -848,7 +927,7 @@ function CoupleModal({ lang, coupleId, pendingRefUserId, onLink, onUnlink, onClo
             const ok = await onUnlink();
             setUnlinking(false);
             if (ok) onClose();
-            else setError(lang === "ru" ? "Не удалось отвязать пару. Попробуйте ещё раз." : "Could not unlink the pair. Try again.");
+            else setError(HOME_STATUS_COPY[lang].pairUnlinkFailed);
           }}>{unlinking ? "..." : lb.unlinkConfirm}</PrimaryBtn>
           {error && <div role="alert" style={{ color: "rgba(255,150,170,.9)", fontSize: 12, textAlign: "center" }}>{error}</div>}
           <GhostBtn onClick={() => setConfirm(false)}>{lb.cancel}</GhostBtn>
@@ -935,7 +1014,7 @@ function MenuPanel({ lang, gender, onGenderSwitch, onClose, onLanguageOpen, onSu
   const backBtn = (
     <button onClick={() => setSection("main")} style={{ background: "none", border: "none", color: `rgba(${PR},${PG},${PB},0.75)`, fontFamily: "'Plus Jakarta Sans',sans-serif", fontSize: 14, cursor: "pointer", padding: "0 0 18px", display: "flex", alignItems: "center", gap: 6 }}>
       <svg width={13} height={13} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
-      {lang === "ru" ? "Назад" : "Back"}
+      {HOME_STATUS_COPY[lang].back}
     </button>
   );
 
@@ -1014,7 +1093,7 @@ function MenuPanel({ lang, gender, onGenderSwitch, onClose, onLanguageOpen, onSu
         const ok = await onSubscribe();
         if (!ok) {
           setSubState("error");
-          setSubError(lang === "ru" ? "Не удалось открыть оплату. Попробуйте ещё раз." : "Could not open payment. Try again.");
+          setSubError(HOME_STATUS_COPY[lang].paymentOpenFailed);
         } else {
           window.setTimeout(refreshSubscription, 1500);
         }
@@ -1024,7 +1103,7 @@ function MenuPanel({ lang, gender, onGenderSwitch, onClose, onLanguageOpen, onSu
         color: "rgba(255,238,248,0.97)",
         fontFamily: "'Plus Jakarta Sans',sans-serif", fontWeight: 700, fontSize: 16,
         cursor: "pointer", boxShadow: `0 4px 24px rgba(${PR},${PG},${PB},0.45)`,
-      }}>{subState === "loading" ? "…" : subState === "active" ? (lang === "ru" ? "Premium активен" : "Premium active") : sub.cta}</button>
+      }}>{subState === "loading" ? "…" : subState === "active" ? HOME_STATUS_COPY[lang].premiumActive : sub.cta}</button>
       {subExpires && subState === "active" && (
         <div style={{ textAlign: "center", color: `rgba(${PR},${PG},${PB},.72)`, fontSize: 11, marginTop: 8 }}>
           {new Date(subExpires).toLocaleDateString(lang === "ru" ? "ru-RU" : "en-US")}
@@ -1043,9 +1122,9 @@ function MenuPanel({ lang, gender, onGenderSwitch, onClose, onLanguageOpen, onSu
         width: "calc(100% + 48px)", margin: "-4px -24px 18px",
         height: 140, position: "relative", overflow: "hidden",
         borderRadius: "20px 20px 0 0",
-        backgroundImage: "url('/images/menu-hero-hands.jpg')",
+        "--menu-hero-image": `url(${splashHands})`,
         backgroundSize: "cover", backgroundPosition: "center 48%",
-      }}>
+      } as React.CSSProperties}>
         <div style={{ position: "absolute", inset: 0, background: `linear-gradient(to bottom, rgba(13,6,16,0.05) 0%, rgba(13,6,16,0.55) 55%, rgba(17,7,16,0.97) 100%)` }} />
         <div style={{ position: "absolute", bottom: 14, left: 20 }}>
           <div style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", fontWeight: 800, fontSize: 24, color: "rgba(255,238,248,0.97)", letterSpacing: "-0.03em", textShadow: `0 0 24px rgba(${PR},${PG},${PB},0.55)` }}>Touché</div>
@@ -1082,7 +1161,7 @@ function MenuPanel({ lang, gender, onGenderSwitch, onClose, onLanguageOpen, onSu
             </svg>
             <div style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", fontWeight: 700, fontSize: 13, color: "rgba(255,238,248,0.95)", lineHeight: 1.2 }}>{ml.subscription}</div>
             <div style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", fontWeight: 600, fontSize: 10, color: `rgba(${PR},${PG},${PB},0.80)`, marginTop: 3, letterSpacing: "0.04em" }}>
-              {lang === "ru" ? "199 Stars / мес" : "199 Stars / mo"}
+              {HOME_STATUS_COPY[lang].monthlyPrice}
             </div>
           </div>
         </button>
@@ -1162,7 +1241,7 @@ function MenuPanel({ lang, gender, onGenderSwitch, onClose, onLanguageOpen, onSu
         border: "1px solid rgba(255,238,248,0.07)", background: "rgba(255,238,248,0.03)",
         color: "rgba(255,238,248,0.28)", fontFamily: "'Plus Jakarta Sans',sans-serif", fontWeight: 500, fontSize: 14, cursor: "pointer",
       }}>
-        {lang === "ru" ? "Закрыть" : "Close"}
+        {HOME_STATUS_COPY[lang].close}
       </button>
       </div>
     </BottomSheet>
@@ -1336,7 +1415,7 @@ export default function Home({
         {/* ── Header ── */}
         <div className="pop-header" style={{ paddingTop: topPx, paddingLeft: 20, paddingRight: 20, paddingBottom: 4, display: "flex", alignItems: "center", justifyContent: "space-between", position: "relative", zIndex: 1, flexShrink: 0 }}>
           {/* Hamburger */}
-          <button aria-label={lang === "ru" ? "Открыть меню" : "Open menu"} onClick={() => { setShowMenu(true); window.Telegram?.WebApp?.HapticFeedback?.impactOccurred("light"); }} style={{ width: 38, height: 38, borderRadius: 12, background: "rgba(255,238,248,0.05)", border: `1px solid rgba(${PR},${PG},${PB},0.22)`, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 4.5, cursor: "pointer", flexShrink: 0, padding: 0, animation: "menuBtnPulse 4s ease-in-out 2s infinite" }}>
+            <button aria-label={HOME_STATUS_COPY[lang].openMenu} onClick={() => { setShowMenu(true); window.Telegram?.WebApp?.HapticFeedback?.impactOccurred("light"); }} style={{ width: 38, height: 38, borderRadius: 12, background: "rgba(255,238,248,0.05)", border: `1px solid rgba(${PR},${PG},${PB},0.22)`, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 4.5, cursor: "pointer", flexShrink: 0, padding: 0, animation: "menuBtnPulse 4s ease-in-out 2s infinite" }}>
             {[0,1,2].map(i => <div key={i} style={{ width: i===1?12:16, height: 1.5, borderRadius: 99, background: `rgba(${PR},${PG},${PB},0.80)` }} />)}
           </button>
 
@@ -1388,19 +1467,20 @@ export default function Home({
             <div className="pop-entry-actions">
               <button type="button" className="pop-entry-action pop-entry-action--tasks" onClick={() => setHomeSection("tasks")} data-testid="button-open-tasks">
                 <img className="pop-entry-action__art" src="/images/home-cards/tasks.jpg" alt="" aria-hidden="true" />
-                <span className="pop-entry-action__copy"><strong>{TASKS_COPY[lang].title}</strong></span>
-              </button>
-              <button type="button" className="pop-entry-action pop-entry-action--path" onClick={onLovePathOpen} data-testid="button-open-love-path">
-                <img className="pop-entry-action__art" src="/images/touche-button-art/love-path.webp" alt="" aria-hidden="true" />
-                <span className="pop-entry-action__copy"><strong>{lang === "ru" ? "Путь любви" : lang === "hi" ? "प्यार का путь" : lang === "pt" ? "Caminho do amor" : lang === "es" ? "Camino del amor" : "Love Path"}</strong></span>
+                <span className="pop-entry-action__copy"><strong>{TASKS_COPY[lang].title}</strong><small>{TASKS_COPY[lang].sub}</small></span>
               </button>
               <button type="button" className="pop-entry-action pop-entry-action--tarot" onClick={onTarotOpen} data-testid="button-open-tarot">
                 <img className="pop-entry-action__art" src="/images/home-cards/tarot.jpg" alt="" aria-hidden="true" />
-                <span className="pop-entry-action__copy"><strong>{lang === "ru" ? "Таро для двоих" : lang === "hi" ? "दो के लिए टैरो" : lang === "pt" ? "Tarô para dois" : lang === "es" ? "Tarot para dos" : "Tarot for two"}</strong></span>
+                <span className="pop-entry-action__copy"><strong>{lang === "ru" ? "Таро для двоих" : lang === "hi" ? "दो के लिए टैरो" : lang === "pt" ? "Tarô para dois" : lang === "es" ? "Tarot para dos" : "Tarot for two"}</strong><small>{HOME_FEATURE_NOTES[lang].tarot}</small></span>
               </button>
               <button type="button" className="pop-entry-action pop-entry-action--lottery" onClick={onGamesOpen} data-testid="button-open-games">
                 <img className="pop-entry-action__art" src="/images/home-cards/night-games.jpg" alt="" aria-hidden="true" />
-                <span className="pop-entry-action__copy"><strong>{NIGHT_GAMES_LABELS[lang]}</strong></span>
+                <span className="pop-entry-action__copy"><strong>{NIGHT_GAMES_LABELS[lang]}</strong><small>{HOME_FEATURE_NOTES[lang].games}</small></span>
+              </button>
+              <button type="button" className="pop-entry-action pop-entry-action--invite" onClick={handleInvite} data-testid="button-home-invite">
+                <img className="pop-entry-action__art" src="/images/activity-cards/cat-invite-friend.jpg" alt="" aria-hidden="true" />
+                <span className="pop-entry-action__copy"><strong>{INVITE_LABELS[lang].title}</strong><small>{INVITE_LABELS[lang].sub}</small></span>
+                <span className="pop-entry-action__arrow" aria-hidden="true">↗</span>
               </button>
             </div>
             <p className="pop-home-footnote">
@@ -1411,7 +1491,7 @@ export default function Home({
         ) : homeSection === "tasks" ? (
           <div className="pop-list pop-home-subpage pop-task-mode-picker" style={{ flex: 1, overflowY: "auto", overflowX: "hidden", padding: `10px 14px max(28px,env(safe-area-inset-bottom))`, display: "flex", flexDirection: "column", gap: 12, position: "relative", zIndex: 1, scrollbarWidth: "none" as const }}>
             <button type="button" className="pop-subpage-back" onClick={() => setHomeSection("home")} data-testid="button-home-back">
-              <span aria-hidden="true">←</span> {lang === "ru" ? "На главную" : lang === "hi" ? "होम" : lang === "pt" ? "Início" : lang === "es" ? "Inicio" : "Home"}
+              <span aria-hidden="true">←</span> {HOME_STATUS_COPY[lang].home}
             </button>
             <section className="pop-subpage-heading">
               <span>01 · TOUCHÉ</span>
@@ -1428,18 +1508,20 @@ export default function Home({
                 <img className="pop-entry-action__art" src="/images/activity-cards/cat-together.jpg" alt="" aria-hidden="true" />
                 <span className="pop-entry-action__index">02</span><span className="pop-entry-action__copy"><strong>{lang === "ru" ? "Вместе" : lang === "hi" ? "साथ में" : lang === "pt" ? "A dois" : lang === "es" ? "En pareja" : "Together"}</strong><small>{lang === "ru" ? "Общие задания и ваши желания" : lang === "hi" ? "साझा चुनौतियाँ और इच्छाएँ" : lang === "pt" ? "Desafios e desejos compartilhados" : lang === "es" ? "Retos y deseos compartidos" : "Shared prompts and your wishes"}</small></span><span className="pop-entry-action__arrow" aria-hidden="true">▶</span>
               </button>
+              <button type="button" className="pop-entry-action pop-entry-action--path" onClick={onLovePathOpen} data-testid="button-open-love-path">
+                <img className="pop-entry-action__art" src="/images/touche-button-art/love-path.webp" alt="" aria-hidden="true" />
+                <span className="pop-entry-action__index">03</span><span className="pop-entry-action__copy"><strong>{LOVE_PATH_LABELS[lang].title}</strong><small>{LOVE_PATH_LABELS[lang].sub}</small></span><span className="pop-entry-action__arrow" aria-hidden="true">▶</span>
+              </button>
             </div>
           </div>
         ) : (
           <div className="pop-list pop-home-subpage" style={{ flex: 1, overflowY: "auto", overflowX: "hidden", padding: `10px 14px max(28px,env(safe-area-inset-bottom))`, display: "flex", flexDirection: "column", gap: 12, position: "relative", zIndex: 1, scrollbarWidth: "none" as const }}>
             <button type="button" className="pop-subpage-back" onClick={() => setHomeSection("home")} data-testid="button-home-back">
-              <span aria-hidden="true">←</span> {lang === "ru" ? "На главную" : lang === "hi" ? "होम" : lang === "pt" ? "Início" : lang === "es" ? "Inicio" : "Home"}
+              <span aria-hidden="true">←</span> {HOME_STATUS_COPY[lang].home}
             </button>
             <section className="pop-subpage-heading">
               <span>{homeSection === "solo" ? "01" : "02"} · TOUCHÉ</span>
-              <h1>{homeSection === "solo"
-                ? (lang === "ru" ? "Одиночный режим" : "Solo mode")
-                : (lang === "ru" ? "Совместный режим" : "Together mode")}</h1>
+              <h1>{homeSection === "solo" ? HOME_STATUS_COPY[lang].soloMode : HOME_STATUS_COPY[lang].togetherMode}</h1>
               <p>{homeSection === "solo"
                 ? (lang === "ru" ? "Выберите настроение и получите своё задание." : lang === "hi" ? "मूड चुनें और अपना काम पाएँ।" : lang === "pt" ? "Escolha o clima e receba sua tarefa." : lang === "es" ? "Elige el ánimo y recibe tu tarea." : "Choose a mood and receive your task.")
                 : (lang === "ru" ? "Общие задания, история желаний и игра на двоих." : lang === "hi" ? "साझा काम, Wish Diary और दो लोगों का खेल।" : lang === "pt" ? "Tarefas compartilhadas, diário de desejos e jogo a dois." : lang === "es" ? "Tareas compartidas, diario de deseos y un juego para dos." : "Shared tasks, your wish history, and a game for two.")}</p>
@@ -1447,9 +1529,9 @@ export default function Home({
             {homeSection === "together" && !coupleId ? (
               <section className="pop-connect-panel" data-testid="card-pair-required">
                 <span className="pop-connect-mark" aria-hidden="true" />
-                <p>{lang === "ru" ? "Сначала свяжите пару" : "Connect your pair first"}</p>
-                <small>{lang === "ru" ? "Совместные задания и Дневник желаний откроются после подключения партнёра." : lang === "hi" ? "साथी जुड़ने पर साझा काम और Wish Diary खुलेंगे।" : lang === "pt" ? "As tarefas e o diário abrem quando seu parceiro se conectar." : lang === "es" ? "Las tareas y el diario se abren cuando se conecte tu pareja." : "Shared tasks and Wish Diary are available once your partner is connected."}</small>
-                <button type="button" onClick={() => setShowCoupleModal(true)}>{lang === "ru" ? "Подключить партнёра" : lang === "hi" ? "साथी को जोड़ें" : lang === "pt" ? "Conectar parceiro" : lang === "es" ? "Conectar pareja" : "Connect partner"} <span aria-hidden="true">→</span></button>
+                <p>{HOME_STATUS_COPY[lang].pairRequiredTitle}</p>
+                <small>{HOME_STATUS_COPY[lang].pairRequiredBody}</small>
+                <button type="button" onClick={() => setShowCoupleModal(true)}>{HOME_STATUS_COPY[lang].connectPartner} <span aria-hidden="true">→</span></button>
               </section>
             ) : (
               <>
@@ -1457,9 +1539,7 @@ export default function Home({
                 <h2 className="pop-activity-section-label">{ACTIVITY_SECTION_LABELS[lang].mood}</h2>
                 <div className="pop-tiles" style={{ display: "grid", gridTemplateColumns: "repeat(2,minmax(0,1fr))", gap: 10 }}>
                   {homeSection === "together" ? togetherCards : soloCards}
-                  {homeSection === "solo"
-                    ? <Card type="invite" title={INVITE_LABELS[lang].title} sub={INVITE_LABELS[lang].sub} onClick={handleInvite} index={5} />
-                    : <Card type="pair" title={t.linked} sub={PAIR_LABELS[lang].sub} onClick={() => setShowCoupleModal(true)} index={6} />}
+                  {homeSection === "together" && <Card type="pair" title={t.linked} sub={PAIR_LABELS[lang].sub} onClick={() => setShowCoupleModal(true)} index={6} />}
                 </div>
               </>
             )}

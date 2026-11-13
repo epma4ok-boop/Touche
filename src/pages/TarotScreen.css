@@ -24,6 +24,7 @@
 .tarot__body { position: relative; z-index: 1; width: min(100%, 520px); margin: 0 auto; padding: 22px 20px 12px; flex: 1; }
 .tarot h1:focus { outline: none; }
 .tarot h1:focus-visible { outline: 3px solid rgba(120,24,61,.35); outline-offset: 4px; border-radius: 6px; }
+.tarot h1[tabindex="-1"]:focus-visible { outline: none; }
 .tarot__intro { text-align: center; }
 .tarot__eyebrow { display: inline-flex; align-items: center; gap: 8px; color: var(--t-wine); font-size: 9px; font-weight: 800; letter-spacing: .2em; }
 .tarot__eyebrow i { width: 4px; height: 4px; border-radius: 50%; background: var(--t-wine); opacity: .55; }
@@ -136,3 +137,4 @@
 .tarot-btn { min-height:54px !important; }
 @media(max-width:480px) { .tarot__intro { grid-template-columns:1fr; } .tarot__intro > * { grid-column:1 !important; } .tarot__panel:first-of-type { grid-row:auto; } }
 @media(max-width:380px) { .tarot__body { padding-inline:15px !important; } }
+.tarot__trial-note { margin: 0; padding: 10px 13px; border: 1px solid #d9cfe6; border-radius: 13px; background: #f1ecf7; color: #514365; font-size: 12px; font-weight: 600; line-height: 1.4; text-align: center; }

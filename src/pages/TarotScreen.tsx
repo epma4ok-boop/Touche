@@ -1,7 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import type { CSSProperties } from "react";
 import type { Lang } from "@/data/i18n";
-import { TAROT_POSITIONS, drawTarotSpread, getTarotCard, getTarotText, isTarotSpread, tarotImageUrl } from "@/data/tarot";
+import FeatureLimitNotice from "@/components/FeatureLimitNotice";
+import { useFeatureTrial } from "@/hooks/useFeatureTrial";
+import { TAROT_POSITIONS, drawTarotSpread, getTarotCard, getTarotCardTitle, getTarotText, isTarotSpread, tarotImageUrl } from "@/data/tarot";
 import type { TarotDraw } from "@/data/tarot";
 import tarotCardBack from "@/assets/tarot-card-back.svg";
 import useTelegramTopInset from "./useTelegramTopInset";
@@ -9,11 +11,9 @@ import "./TarotScreen.css";
 
 type Phase = "cards" | "reflection" | "done";
 type Session = { v: 1; spread: TarotDraw[]; step: 0 | 1 | 2; revealed: boolean; phase: Phase };
-type Props = { lang: Lang; onBack: () => void };
+type Props = { lang: Lang; onBack: () => void; onUpgrade: () => void | Promise<boolean> };
 
 const KEY = "touche.tarot.session.v1";
-const FINAL_QUESTION = "Что ты услышал(а) о себе сегодня? Что ты услышал(а) о нас?";
-
 function loadSession(): Session | null {
   try {
     const raw = window.sessionStorage.getItem(KEY);
@@ -34,20 +34,24 @@ function saveSession(s: Session | null) {
 }
 
 type Copy = {
-  title: string; back: string; lead: string; positionsHead: string; positions: [string, string, string];
+  title: string; back: string; lead: string; freeUse: string; positionsHead: string; positions: [string, string, string];
+  positionTitles: [string, string, string]; positionSubtitles: [string, string, string];
   rulesHead: string; rules: string[]; notice: string; start: string; resume: string; resumeNote: string; reset: string;
   confirmReset: string; confirmYes: string; confirmNo: string; cardOf: string; cardBack: string; reveal: string;
   pause: string; discussed: string; toReflection: string; reflectionHead: string; reflectionNote: string; finish: string;
   doneHead: string; doneNote: string; newSpread: string; toGames: string; loading: string; imgError: string; retry: string;
-  authorNote: string; artAlt: string;
+  finalQuestion: string; artAlt: string;
 };
 
 const COPY: Record<Lang, Copy> = {
   ru: {
     title: "Таро для двоих", back: "На главную",
     lead: "Три карты — три слоя одной встречи. Вы открываете их по очереди и говорите о каждой, прежде чем идти дальше.",
+    freeUse: "Бесплатно — один расклад в день · Premium — без ограничений",
     positionsHead: "Три позиции",
     positions: ["Что видите — но не говорите", "Что чувствуете — но не показываете", "Что хотите — но не просите"],
+    positionTitles: ["Что видите", "Что чувствуете", "Что хотите"],
+    positionSubtitles: ["Но не говорите", "Но не показываете", "Но не просите"],
     rulesHead: "Правила разговора",
     rules: ["Говорят оба — по очереди, не перебивая.", "Каждый говорит только о себе: «я замечаю», «мне», «я хочу».", "Не спорим, не защищаемся, не даём советов."],
     notice: "Карта — образ для разговора, а не диагноз и не предсказание. Можно не соглашаться с толкованием: важно то, что откликается именно вам.",
@@ -58,13 +62,17 @@ const COPY: Record<Lang, Copy> = {
     discussed: "Мы обсудили — дальше", toReflection: "Мы обсудили — к итогу",
     reflectionHead: "Последний вопрос", reflectionNote: "Ответьте вслух, каждый по очереди. Ничего не нужно записывать.",
     finish: "Завершить", doneHead: "Ваш расклад", doneNote: "Спасибо, что выслушали друг друга.", newSpread: "Новый расклад", toGames: "На главную",
-    loading: "Загружаем изображение", imgError: "Изображение не загрузилось.", retry: "Повторить", authorNote: "", artAlt: "Иллюстрация карты",
+    loading: "Загружаем изображение", imgError: "Изображение не загрузилось.", retry: "Повторить",
+    finalQuestion: "Что ты услышал(а) о себе сегодня? Что ты услышал(а) о нас?", artAlt: "Иллюстрация карты",
   },
   en: {
     title: "Tarot for two", back: "Home",
     lead: "Three cards, three layers of one conversation. Open them one at a time and talk about each before moving on.",
+    freeUse: "Free: one reading a day · unlimited with Premium",
     positionsHead: "Three positions",
     positions: ["What you see but don't say", "What you feel but don't show", "What you want but don't ask for"],
+    positionTitles: ["What you see", "What you feel", "What you want"],
+    positionSubtitles: ["But don't say", "But don't show", "But don't ask for"],
     rulesHead: "Conversation rules",
     rules: ["You both speak, in turn, without interrupting.", "Each speaks only about themselves: \"I notice\", \"I feel\", \"I want\".", "No arguing, no defending, no advice."],
     notice: "A card is an image for conversation, not a diagnosis or a prediction. You don't have to agree with the interpretation.",
@@ -76,13 +84,16 @@ const COPY: Record<Lang, Copy> = {
     reflectionHead: "Closing question", reflectionNote: "Answer aloud, one at a time. Nothing is recorded.",
     finish: "Finish", doneHead: "Your spread", doneNote: "Thank you for hearing each other.", newSpread: "New spread", toGames: "Home",
     loading: "Loading image", imgError: "The image didn't load.", retry: "Retry",
-    authorNote: "Card names and the closing question remain in Russian, as in the original.", artAlt: "Card illustration",
+    finalQuestion: "What did you hear about yourself today? What did you hear about us?", artAlt: "Card illustration",
   },
   hi: {
     title: "दो के लिए टैरो", back: "होम",
     lead: "तीन कार्ड, एक बातचीत की तीन परतें। उन्हें एक-एक करके खोलें और आगे बढ़ने से पहले हर एक पर बात करें।",
+    freeUse: "मुफ़्त: रोज़ एक स्प्रेड · Premium में असीमित",
     positionsHead: "तीन स्थितियाँ",
     positions: ["जो आप देखते हैं पर कहते नहीं", "जो आप महसूस करते हैं पर दिखाते नहीं", "जो आप चाहते हैं पर माँगते नहीं"],
+    positionTitles: ["जो आप देखते हैं", "जो आप महसूस करते हैं", "जो आप चाहते हैं"],
+    positionSubtitles: ["पर कहते नहीं", "पर दिखाते नहीं", "पर माँगते नहीं"],
     rulesHead: "बातचीत के नियम",
     rules: ["दोनों बोलें, बारी-बारी से, बिना टोके।", "हर कोई सिर्फ़ अपने बारे में बोले: \"मैं महसूस करता/करती हूँ\"।", "बहस नहीं, बचाव नहीं, सलाह नहीं।"],
     notice: "कार्ड बातचीत के लिए एक छवि है, निदान या भविष्यवाणी नहीं। व्याख्या से सहमत होना ज़रूरी नहीं।",
@@ -94,13 +105,16 @@ const COPY: Record<Lang, Copy> = {
     reflectionHead: "अंतिम प्रश्न", reflectionNote: "बारी-बारी से ज़ोर से जवाब दें। कुछ भी दर्ज नहीं होता।",
     finish: "समाप्त", doneHead: "आपका स्प्रेड", doneNote: "एक-दूसरे को सुनने के लिए धन्यवाद।", newSpread: "नया स्प्रेड", toGames: "होम",
     loading: "छवि लोड हो रही है", imgError: "छवि लोड नहीं हुई।", retry: "फिर कोशिश करें",
-    authorNote: "मूल रूप में कार्डों के नाम और अंतिम प्रश्न रूसी में ही रखे गए हैं।", artAlt: "कार्ड चित्र",
+    finalQuestion: "आज आपने अपने बारे में क्या सुना? आपने हम दोनों के बारे में क्या सुना?", artAlt: "कार्ड चित्र",
   },
   pt: {
     title: "Tarô para dois", back: "Início",
     lead: "Três cartas, três camadas de uma conversa. Abram uma de cada vez e conversem sobre cada uma antes de seguir.",
+    freeUse: "Grátis: uma tiragem por dia · ilimitadas no Premium",
     positionsHead: "Três posições",
     positions: ["O que veem, mas não dizem", "O que sentem, mas não mostram", "O que querem, mas não pedem"],
+    positionTitles: ["O que veem", "O que sentem", "O que querem"],
+    positionSubtitles: ["Mas não dizem", "Mas não mostram", "Mas não pedem"],
     rulesHead: "Regras da conversa",
     rules: ["Os dois falam, em turnos, sem interromper.", "Cada um fala só de si: \"eu percebo\", \"eu sinto\", \"eu quero\".", "Sem discutir, sem se defender, sem dar conselhos."],
     notice: "A carta é uma imagem para conversar, não um diagnóstico nem uma previsão. Não precisam concordar com a interpretação.",
@@ -112,13 +126,16 @@ const COPY: Record<Lang, Copy> = {
     reflectionHead: "Pergunta final", reflectionNote: "Respondam em voz alta, um de cada vez. Nada é registrado.",
     finish: "Concluir", doneHead: "Sua tiragem", doneNote: "Obrigado por se ouvirem.", newSpread: "Nova tiragem", toGames: "Início",
     loading: "Carregando imagem", imgError: "A imagem não carregou.", retry: "Tentar de novo",
-    authorNote: "Os nomes das cartas e a pergunta final permanecem em russo, como no original.", artAlt: "Ilustração da carta",
+    finalQuestion: "O que você ouviu sobre si hoje? O que ouviu sobre vocês dois?", artAlt: "Ilustração da carta",
   },
   es: {
     title: "Tarot para dos", back: "Inicio",
     lead: "Tres cartas, tres capas de una conversación. Ábranlas una a una y hablen de cada una antes de seguir.",
+    freeUse: "Gratis: una tirada al día · ilimitadas con Premium",
     positionsHead: "Tres posiciones",
     positions: ["Lo que ven pero no dicen", "Lo que sienten pero no muestran", "Lo que quieren pero no piden"],
+    positionTitles: ["Lo que ven", "Lo que sienten", "Lo que quieren"],
+    positionSubtitles: ["Pero no dicen", "Pero no muestran", "Pero no piden"],
     rulesHead: "Reglas de la conversación",
     rules: ["Hablan los dos, por turnos, sin interrumpir.", "Cada uno habla solo de sí: \"yo noto\", \"yo siento\", \"yo quiero\".", "Sin discutir, sin defenderse, sin dar consejos."],
     notice: "La carta es una imagen para conversar, no un diagnóstico ni una predicción. No hace falta estar de acuerdo con la interpretación.",
@@ -130,7 +147,7 @@ const COPY: Record<Lang, Copy> = {
     reflectionHead: "Pregunta final", reflectionNote: "Respondan en voz alta, por turnos. No se guarda nada.",
     finish: "Terminar", doneHead: "Su tirada", doneNote: "Gracias por escucharse.", newSpread: "Nueva tirada", toGames: "Inicio",
     loading: "Cargando imagen", imgError: "La imagen no se cargó.", retry: "Reintentar",
-    authorNote: "Los nombres de las cartas y la pregunta final se mantienen en ruso, como en el original.", artAlt: "Ilustración de la carta",
+    finalQuestion: "¿Qué han escuchado hoy sobre ustedes? ¿Qué han escuchado sobre su relación?", artAlt: "Ilustración de la carta",
   },
 };
 
@@ -158,9 +175,10 @@ function BackIcon() {
   return <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 18 9 12l6-6" /></svg>;
 }
 
-export default function TarotScreen({ lang, onBack }: Props) {
+export default function TarotScreen({ lang, onBack, onUpgrade }: Props) {
   const top = useTelegramTopInset();
   const copy = COPY[lang];
+  const trial = useFeatureTrial("tarot");
   const [session, setSession] = useState<Session | null>(() => loadSession());
   const [view, setView] = useState<"intro" | "play">("intro");
   const [confirming, setConfirming] = useState(false);
@@ -169,7 +187,8 @@ export default function TarotScreen({ lang, onBack }: Props) {
   useEffect(() => { saveSession(session); }, [session]);
   useEffect(() => { headingRef.current?.focus(); }, [view, session?.step, session?.phase, session?.revealed]);
 
-  const start = () => {
+  const start = async () => {
+    if (!(await trial.consume())) return;
     setSession({ v: 1, spread: drawTarotSpread(), step: 0, revealed: false, phase: "cards" });
     setConfirming(false);
     setView("play");
@@ -187,8 +206,6 @@ export default function TarotScreen({ lang, onBack }: Props) {
     </header>
   );
 
-  const authorNote = copy.authorNote && <p className="tarot__ru-note" data-testid="text-tarot-original-language">{copy.authorNote}</p>;
-
   let body;
   if (view === "intro" || !session) {
     body = (
@@ -200,7 +217,7 @@ export default function TarotScreen({ lang, onBack }: Props) {
           <h2>{copy.positionsHead}</h2>
           <ol className="tarot__positions">
             {TAROT_POSITIONS.map((p, i) => (
-              <li key={p.layer}><span>0{i + 1}</span><div><strong lang="ru">{p.title}</strong><small lang="ru">{p.subtitle}</small>{lang !== "ru" && <small>{copy.positions[i]}</small>}</div></li>
+              <li key={p.layer}><span>0{i + 1}</span><div><strong lang={lang}>{copy.positions[i]}</strong></div></li>
             ))}
           </ol>
         </div>
@@ -209,7 +226,7 @@ export default function TarotScreen({ lang, onBack }: Props) {
           <ul className="tarot__rules">{copy.rules.map(r => <li key={r}>{r}</li>)}</ul>
         </div>
         <p className="tarot__notice">{copy.notice}</p>
-        {authorNote}
+        <p className="tarot__trial-note">{copy.freeUse}</p>
         <div className="tarot__actions">
           {unfinished ? (
             <>
@@ -219,16 +236,16 @@ export default function TarotScreen({ lang, onBack }: Props) {
                 <div className="tarot__confirm" role="alertdialog" aria-label={copy.confirmReset}>
                   <p>{copy.confirmReset}</p>
                   <div>
-                    <button type="button" className="tarot-btn tarot-btn--danger" onClick={start} data-testid="button-tarot-reset-confirm">{copy.confirmYes}</button>
+                    <button type="button" className="tarot-btn tarot-btn--danger" onClick={start} disabled={trial.busy} data-testid="button-tarot-reset-confirm">{copy.confirmYes}</button>
                     <button type="button" className="tarot-btn tarot-btn--ghost" onClick={() => setConfirming(false)} data-testid="button-tarot-reset-cancel">{copy.confirmNo}</button>
                   </div>
                 </div>
               ) : (
-                <button type="button" className="tarot-btn tarot-btn--ghost" onClick={() => setConfirming(true)} data-testid="button-tarot-reset">{copy.reset}</button>
+                <button type="button" className="tarot-btn tarot-btn--ghost" onClick={() => setConfirming(true)} disabled={trial.busy} data-testid="button-tarot-reset">{copy.reset}</button>
               )}
             </>
           ) : (
-            <button type="button" className="tarot-btn" onClick={start} data-testid="button-tarot-start">{copy.start}</button>
+            <button type="button" className="tarot-btn" onClick={start} disabled={trial.busy} data-testid="button-tarot-start">{copy.start}</button>
           )}
         </div>
       </section>
@@ -244,8 +261,8 @@ export default function TarotScreen({ lang, onBack }: Props) {
           {[0, 1, 2].map(i => <span key={i} data-on={i <= session.step} />)}
         </div>
         <p className="tarot__pos-index">{copy.cardOf} {session.step + 1} / 3</p>
-        <h1 ref={headingRef} tabIndex={-1} lang="ru" className="tarot__pos-title" data-testid="text-tarot-position">{pos.title}</h1>
-        <p lang="ru" className="tarot__pos-sub">{pos.subtitle}{lang !== "ru" && <span lang={lang}> · {copy.positions[session.step]}</span>}</p>
+        <h1 ref={headingRef} tabIndex={-1} lang={lang} className="tarot__pos-title" data-testid="text-tarot-position">{copy.positionTitles[session.step]}</h1>
+        <p lang={lang} className="tarot__pos-sub">{copy.positionSubtitles[session.step]}</p>
         {!session.revealed ? (
           <div className="tarot-enter">
             <button type="button" className="tarot-cardback" onClick={() => update({ revealed: true })} aria-label={`${copy.reveal}. ${copy.cardBack}`} data-testid="button-tarot-cardback">
@@ -256,10 +273,9 @@ export default function TarotScreen({ lang, onBack }: Props) {
           </div>
         ) : (
           <div className="tarot-reveal">
-            <CardArt image={draw.image} alt={`${copy.artAlt}: ${card.title}`} copy={copy} />
-            <h2 lang="ru" className="tarot__card-title" data-testid="text-tarot-card-title">{card.title}</h2>
+            <CardArt image={draw.image} alt={`${copy.artAlt}: ${getTarotCardTitle(card, lang)}`} copy={copy} />
+            <h2 lang={lang} className="tarot__card-title" data-testid="text-tarot-card-title">{getTarotCardTitle(card, lang)}</h2>
             <p lang={lang} className="tarot__card-text" data-testid="text-tarot-card-text">{getTarotText(card, pos.layer, lang)}</p>
-            {authorNote}
             <p className="tarot__pause" role="note">{copy.pause}</p>
             <button type="button" className="tarot-btn" data-testid="button-tarot-next"
               onClick={() => (last ? update({ phase: "reflection" }) : update({ step: (session.step + 1) as 1 | 2, revealed: false }))}>
@@ -273,8 +289,7 @@ export default function TarotScreen({ lang, onBack }: Props) {
     body = (
       <section className="tarot__stage tarot-enter">
         <p className="tarot__pos-index">{copy.reflectionHead}</p>
-        <h1 ref={headingRef} tabIndex={-1} lang="ru" className="tarot__question" data-testid="text-tarot-final-question">{FINAL_QUESTION}</h1>
-        {authorNote}
+        <h1 ref={headingRef} tabIndex={-1} lang={lang} className="tarot__question" data-testid="text-tarot-final-question">{copy.finalQuestion}</h1>
         <p className="tarot__hint">{copy.reflectionNote}</p>
         <button type="button" className="tarot-btn" onClick={() => update({ phase: "done" })} data-testid="button-tarot-finish">{copy.finish}</button>
       </section>
@@ -289,13 +304,13 @@ export default function TarotScreen({ lang, onBack }: Props) {
             return (
               <li key={d.cardId} data-testid={`row-tarot-summary-${i}`}>
                 <span>0{i + 1}</span>
-                <div><small lang="ru">{TAROT_POSITIONS[i].title}</small><strong lang="ru">{c.title}</strong></div>
+                <div><small lang={lang}>{copy.positionTitles[i]}</small><strong lang={lang}>{getTarotCardTitle(c, lang)}</strong></div>
               </li>
             );
           })}
         </ol>
         <p className="tarot__hint">{copy.doneNote}</p>
-        <button type="button" className="tarot-btn" onClick={start} data-testid="button-tarot-restart">{copy.newSpread}</button>
+        <button type="button" className="tarot-btn" onClick={start} disabled={trial.busy} data-testid="button-tarot-restart">{copy.newSpread}</button>
         <button type="button" className="tarot-btn tarot-btn--ghost" onClick={onBack} data-testid="button-tarot-to-home">{copy.toGames}</button>
       </section>
     );
@@ -310,6 +325,7 @@ export default function TarotScreen({ lang, onBack }: Props) {
           {body}
         </div>
       </div>
+      <FeatureLimitNotice lang={lang} kind="tarot" notice={trial.notice} onUpgrade={onUpgrade} onDismiss={trial.dismiss} />
     </main>
   );
 }

@@ -10,7 +10,7 @@ import { LANG_KEY, ONBOARDED_KEY, CATEGORIES_ORDER, type Lang, type Category } f
 import { ACTIVE_SCENARIO_KEY, getActiveScenarioStorageKey, type ActiveScenario } from "@/pages/ScenarioScreen";
 import type { SharedTaskSnapshot } from "@/data/sharedPair";
 import FirstRunTutorial, { type TutorialStep } from "@/components/FirstRunTutorial";
-import { trackAnalyticsEvent } from "@/analytics";
+import { saveLanguagePreference, trackAnalyticsEvent } from "@/analytics";
 import LovePathScreen from "@/pages/LovePathScreen";
 import GamesScreen from "@/pages/GamesScreen";
 import TarotScreen from "@/pages/TarotScreen";
@@ -25,6 +25,34 @@ const MODE_KEY = "touche_mode";
 const USER_ID_KEY = "touche_user_id";
 const HISTORY_KEY = "touche_history_v2";
 const TUTORIAL_KEY = "touche_tutorial_v1";
+
+const SHARED_TASK_ERROR_COPY: Record<Lang, { back: string; title: string; body: string; retry: string; home: string }> = {
+  ru: {
+    back: "Назад", title: "Не удалось открыть общее задание",
+    body: "Проверьте подключение и попробуйте ещё раз. Задание доступно только участникам этой пары.",
+    retry: "Попробовать снова", home: "На главную",
+  },
+  en: {
+    back: "Back", title: "Could not open the shared task",
+    body: "Check your connection and try again. This task is only available to members of this pair.",
+    retry: "Try again", home: "Go home",
+  },
+  hi: {
+    back: "वापस", title: "साझा टास्क नहीं खुल सका",
+    body: "कनेक्शन जाँचें और फिर कोशिश करें। यह टास्क केवल इस जोड़ी के सदस्यों के लिए है।",
+    retry: "फिर कोशिश करें", home: "होम जाएँ",
+  },
+  pt: {
+    back: "Voltar", title: "Não foi possível abrir a tarefa compartilhada",
+    body: "Verifique sua conexão e tente novamente. Esta tarefa está disponível apenas para os membros deste casal.",
+    retry: "Tentar novamente", home: "Ir para o início",
+  },
+  es: {
+    back: "Volver", title: "No se pudo abrir la tarea compartida",
+    body: "Comprueba tu conexión e inténtalo de nuevo. Esta tarea solo está disponible para los miembros de esta pareja.",
+    retry: "Intentar de nuevo", home: "Ir al inicio",
+  },
+};
 
 function getTutorialStorageKey(userId: number): string {
   return `${TUTORIAL_KEY}_${userId}`;
@@ -298,6 +326,14 @@ export default function App() {
      const tutorialSeenRef = useRef(false);
     const analyticsOpenTrackedRef = useRef(false);
     const analyticsScreenRef = useRef<AppPhase | null>(null);
+    const languagePreferenceSyncedRef = useRef<Lang | null>(null);
+
+    useEffect(() => {
+      if (phase === "splash" || phase === "lang") return;
+      if (languagePreferenceSyncedRef.current === lang) return;
+      languagePreferenceSyncedRef.current = lang;
+      saveLanguagePreference(lang);
+    }, [lang, phase]);
 
     useEffect(() => {
       if (analyticsOpenTrackedRef.current) return;
@@ -306,10 +342,11 @@ export default function App() {
     }, []);
 
     useEffect(() => {
-      if (!["home", "category", "scenario", "shared_task_error"].includes(phase)) return;
+      if (!["lang", "onboarding", "gender", "home", "category", "scenario", "shared_task_error"].includes(phase)) return;
       if (analyticsScreenRef.current === phase) return;
       analyticsScreenRef.current = phase;
-      trackAnalyticsEvent("screen_view", phase as "home" | "category" | "scenario" | "shared_task_error");
+      const screen = phase === "lang" ? "language" : phase;
+      trackAnalyticsEvent("screen_view", screen as "language" | "onboarding" | "gender" | "home" | "category" | "scenario" | "shared_task_error");
     }, [phase]);
 
     useEffect(() => {
@@ -511,6 +548,7 @@ export default function App() {
 
     const handleLangSelect = useCallback((chosen: Lang) => {
       try { localStorage.setItem(LANG_KEY, chosen); } catch {}
+      trackAnalyticsEvent("language_selected");
       setLang(chosen);
       if (!isOnboarded()) setPhase("onboarding");
       else setPhase(gender ? phaseAfterGender : "gender");
@@ -518,11 +556,13 @@ export default function App() {
 
     const handleOnboardingDone = useCallback(() => {
       markOnboarded();
+      trackAnalyticsEvent("onboarding_completed");
       setPhase(gender ? phaseAfterGender : "gender");
     }, [gender, phaseAfterGender]);
 
     const handleGenderSelect = useCallback((chosen: Gender) => {
       try { localStorage.setItem(GENDER_KEY, chosen); } catch {}
+      trackAnalyticsEvent("gender_selected");
       setGender(chosen);
       setPhase(phaseAfterGender);
     }, [phaseAfterGender]);
@@ -646,10 +686,10 @@ export default function App() {
           />
         )}
         {phase === "games" && (
-          <GamesScreen lang={lang} onBack={() => setPhase("home")} />
+          <GamesScreen lang={lang} onBack={() => setPhase("home")} onUpgrade={() => apiSubscribe(lang)} />
         )}
         {phase === "tarot" && (
-          <TarotScreen lang={lang} onBack={() => setPhase("home")} />
+          <TarotScreen lang={lang} onBack={() => setPhase("home")} onUpgrade={() => apiSubscribe(lang)} />
         )}
         {phase === "love_path" && (
           <LovePathScreen
@@ -678,13 +718,13 @@ export default function App() {
         {phase === "scenario"    && <ScenarioScreen lang={lang} gender={gender} onBack={handleBack} onUpgrade={() => apiSubscribe(lang)} />}
         {phase === "shared_task_error" && (
           <main style={{ minHeight: "100dvh", display: "grid", placeContent: "center", gap: 16, padding: 24, textAlign: "center", background: "#f1edf8", color: "#40334f", fontFamily: "sans-serif", position: "relative" }}>
-            <button type="button" className="shared-task-error__back" onClick={() => setPhase("home")} aria-label={lang === "ru" ? "Назад" : "Back"} data-testid="button-shared-task-error-back">
+            <button type="button" className="shared-task-error__back" onClick={() => setPhase("home")} aria-label={SHARED_TASK_ERROR_COPY[lang].back} data-testid="button-shared-task-error-back">
               <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 18 9 12l6-6" /></svg>
             </button>
-            <h1 style={{ fontSize: 22 }}>{lang === "ru" ? "Не удалось открыть общее задание" : "Could not open the shared task"}</h1>
-            <p style={{ maxWidth: 320, lineHeight: 1.5, opacity: 0.75 }}>{lang === "ru" ? "Проверьте подключение и попробуйте ещё раз. Задание доступно только участникам этой пары." : "Check your connection and try again. This task is only available to members of this pair."}</p>
-            <button type="button" onClick={handleRetrySharedTask} style={{ padding: "13px 18px", borderRadius: 14, border: 0, background: "#8064a2", color: "#fffaff", fontWeight: 700 }}>{lang === "ru" ? "Попробовать снова" : "Try again"}</button>
-            <button type="button" onClick={() => setPhase("home")} style={{ padding: "10px 18px", borderRadius: 14, border: "1px solid #c9bdd9", background: "transparent", color: "#594573" }}>{lang === "ru" ? "На главную" : "Go home"}</button>
+            <h1 style={{ fontSize: 22 }}>{SHARED_TASK_ERROR_COPY[lang].title}</h1>
+            <p style={{ maxWidth: 320, lineHeight: 1.5, opacity: 0.75 }}>{SHARED_TASK_ERROR_COPY[lang].body}</p>
+            <button type="button" onClick={handleRetrySharedTask} style={{ padding: "13px 18px", borderRadius: 14, border: 0, background: "#8064a2", color: "#fffaff", fontWeight: 700 }}>{SHARED_TASK_ERROR_COPY[lang].retry}</button>
+            <button type="button" onClick={() => setPhase("home")} style={{ padding: "10px 18px", borderRadius: 14, border: "1px solid #c9bdd9", background: "transparent", color: "#594573" }}>{SHARED_TASK_ERROR_COPY[lang].home}</button>
           </main>
         )}
         {tutorialStep !== null && (

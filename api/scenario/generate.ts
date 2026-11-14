@@ -7,15 +7,14 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { createClient } from "@supabase/supabase-js";
 import { validateTelegramInitData } from "../couple/_auth.js";
+import { getEffectivePremiumAccess } from "../_premium.js";
 import { appDate } from "../limits.js";
-import { OWNER_TELEGRAM_ID } from "../../src/config.js";
 import { sanitizeScenarioTitle } from "../../src/data/scenarioTitle.js";
 
 const DEEPSEEK_API_KEY = process.env.DEEPSEEK_API_KEY!;
 const DEEPSEEK_URL = "https://api.deepseek.com/v1/chat/completions";
 const BOT_TOKEN = process.env.BOT_TOKEN!;
 const APP_URL = process.env.APP_URL!;
-const OWNER_ID = OWNER_TELEGRAM_ID;
 const LANGS = new Set(["ru", "en", "hi", "pt", "es"]);
 const INTENSITIES = new Set(["romantic", "passion", "hard"]);
 const GENDERS = new Set(["male", "female"]);
@@ -466,8 +465,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(403).json({ error: "couple_access_denied" });
   }
   const partnerUserId = couple.user_a_id === caller.id ? couple.user_b_id : couple.user_a_id;
-  const isOwner = caller.id === OWNER_ID;
-  const premium = isOwner || !!(await supabase.from("user_subscriptions").select("expires_at").eq("user_id", caller.id).gt("expires_at", new Date().toISOString()).maybeSingle()).data;
+  let premium: boolean;
+  try {
+    premium = (await getEffectivePremiumAccess(supabase, caller.id)).active;
+  } catch {
+    return res.status(500).json({ error: "premium_status_failed" });
+  }
   if (!premium) return res.status(403).json({ error: "subscription_required" });
   const { data: allowance, error: allowanceError } = await supabase.rpc("consume_daily_limit", {
     p_user_id: caller.id, p_category: "scenarios", p_date: appDate(), p_limit: 1,

@@ -873,8 +873,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     partnerUserId = data.user_a_id === caller.id ? data.user_b_id : data.user_a_id;
   }
   let premium: boolean;
+  let isOwner: boolean;
   try {
-    premium = (await getEffectivePremiumAccess(supabase, caller.id)).active;
+    const premiumAccess = await getEffectivePremiumAccess(supabase, caller.id);
+    premium = premiumAccess.active;
+    isOwner = premiumAccess.source === "owner";
   } catch {
     return res.status(500).json({ error: "premium_status_failed" });
   }
@@ -888,7 +891,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const baseLimit = PAID_CATEGORIES.has(category) && !premium ? 0 : FREE_LIMIT + Number(dailyUsage?.bonus ?? 0);
   const available = Math.max(0, baseLimit - Number(dailyUsage?.count ?? 0))
     + Number(referralCredit?.balance ?? 0) + Number(paidCredit?.balance ?? 0);
-  if (available < 1) {
+  if (!isOwner && available < 1) {
     const error = PAID_CATEGORIES.has(category) && !premium ? "subscription_required" : "limit_exceeded";
     return res.status(403).json({ error, remaining: 0, isPremium: premium });
   }
@@ -941,12 +944,17 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
   }
 
-  const { data: saved, error: saveError } = await supabase.rpc("create_task_with_allowance", {
+  const taskArguments = {
     p_user_id: caller.id, p_couple_id: mode === "together" ? coupleId : null,
     p_category: category, p_mode: mode, p_task_text: task,
     p_points: ({ compliments: 10, tenderness: 15, desire: 25, passion: 40, hard: 50 } as Record<string, number>)[category],
-    p_source: source, p_request_id: requestId, p_date: appDate(), p_premium: premium,
-  });
+    p_source: source, p_request_id: requestId,
+  };
+  const { data: saved, error: saveError } = isOwner
+    ? await supabase.rpc("create_owner_task_unlimited", taskArguments)
+    : await supabase.rpc("create_task_with_allowance", {
+      ...taskArguments, p_date: appDate(), p_premium: premium,
+    });
   if (saveError) return res.status(500).json({ error: "task_save_failed" });
   if (saved?.ok !== true) return res.status(403).json({ error: saved?.error ?? "limit_exceeded", remaining: 0, isPremium: false });
   const savedTaskText = String(saved.task ?? task);
@@ -955,6 +963,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     : false;
   return res.status(200).json({
     ok: true, task: savedTaskText, taskId: saved.taskId,
-    source: saved.source, remaining: saved.remaining, isPremium: premium, partnerNotified,
+    source: saved.source, remaining: isOwner ? null : saved.remaining,
+    unlimited: isOwner, isPremium: premium, partnerNotified,
   });
 }

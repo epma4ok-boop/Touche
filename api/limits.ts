@@ -29,10 +29,19 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (!CATEGORIES.has(category)) return res.status(400).json({ error: "invalid_category" });
   const date = appDate();
   let premium: boolean;
+  let isOwner: boolean;
   try {
-    premium = (await getEffectivePremiumAccess(sb, caller.id)).active;
+    const access = await getEffectivePremiumAccess(sb, caller.id);
+    premium = access.active;
+    isOwner = access.source === "owner";
   } catch {
     return res.status(500).json({ error: "premium_status_failed" });
+  }
+  if (isOwner) {
+    return res.status(200).json({
+      ok: true, remaining: null, used: 0, bonus: 0, credits: 0, premiumTaskCredits: 0,
+      total: null, unlimited: true, isPremium: true, date,
+    });
   }
   const [{ data, error }, { data: credits, error: creditsError }, { data: paidCredits, error: paidCreditsError }] = await Promise.all([
     sb.from("user_daily_limits")

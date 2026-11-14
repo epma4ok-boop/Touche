@@ -249,18 +249,6 @@
   stroke: currentColor !important; filter: none !important;
 }
 .pop-home .pop-card > div:last-child > div:nth-child(2) > div { color: var(--pop-ink) !important; }
-.pop-home .pop-card::before {
-  content: "01"; position: absolute; top: 14px; left: 14px;
-  font: 600 10px "Space Grotesk", sans-serif; opacity: .6;
-}
-.pop-home .pop-card-tenderness::before { content: "02"; }
-.pop-home .pop-card-desire::before { content: "03"; }
-.pop-home .pop-card-passion::before { content: "04"; }
-.pop-home .pop-card-hard::before { content: "05"; }
-.pop-home .pop-card-scenarios::before { content: "06 · FOR TWO"; }
-.pop-home .pop-card-invite::before { content: "SHARE"; }
-.pop-home .pop-card-pair::before { content: "02 · TOGETHER"; }
-
 /* Illustrated tiles: one shared paper-and-ink language across every action. */
 .pop-home .pop-tiles .pop-card { min-height: 174px !important; }
 .pop-home .pop-card > div:first-child {
@@ -288,7 +276,6 @@
 .pop-home .pop-tiles .pop-card > div:last-child > div:nth-child(2) > div:last-child {
   opacity: .8 !important;
 }
-.pop-home .pop-card::before { z-index: 3; opacity: .75; }
 .pop-home .pop-card__remaining {
   position: absolute; z-index: 4; top: 9px; right: 9px;
   padding: 4px 6px; background: var(--pop-paper);
@@ -786,3 +773,7 @@
   .pop-home[data-home-layout="list"] .pop-entry-action__art { width: 58%; }
   .pop-home[data-home-layout="list"] .pop-entry-action__copy { left: 13px; width: 50%; max-width: 50%; }
 }
+
+/* Keep destination cards quiet: labels and copy carry the meaning. */
+.pop-home .pop-card::before,
+.pop-home .pop-entry-action__index { display: none !important; content: none !important; }

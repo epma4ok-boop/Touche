@@ -50,12 +50,12 @@ const INTENSITY_META: Record<Intensity, IntensityMeta> = {
   hard: { color: "var(--pop-blue)", tone: "blue", labels: { ru: { label: "Жёстко", sub: "откровенно · 18+" }, en: { label: "Hard", sub: "explicit · 18+" }, hi: { label: "साहसिक", sub: "खुलकर · 18+" }, pt: { label: "Intenso", sub: "explícito · 18+" }, es: { label: "Intenso", sub: "explícito · 18+" } } },
 };
 
-const T: Record<Lang, { title: string; sub: string; holdHint: string; casting: string; back: string; noPartner: string; noPartnerSub: string; invite: string; yourRole: string; partnerSent: string; partnerWait: string; partnerPending: string; complete: string; aiLabel: string; missed: string }> = {
-  en: { title: "Scenarios", sub: "roleplay · for two", holdHint: "HOLD · DRAW YOUR SCENARIO", casting: "GENERATING...", back: "← back", noPartner: "No partner linked yet", noPartnerSub: "Invite your partner first — so you both get complementary roles tonight.", invite: "Invite partner", yourRole: "YOUR ROLE", partnerSent: "Your partner received their role", partnerWait: "They got a Telegram notification with their card", partnerPending: "Partner will see their role when they open the app", complete: "Task completed", aiLabel: "AI SCENARIO", missed: "missed" },
-  ru: { title: "Сценарии", sub: "ролевые · на двоих", holdHint: "ДЕРЖИ · ТЯНИ СЦЕНАРИЙ", casting: "ГЕНЕРИРУЕМ...", back: "← назад", noPartner: "Партнёр ещё не подключён", noPartnerSub: "Сначала пригласи партнёра — чтобы у вас были разные роли одного сценария.", invite: "Пригласить партнёра", yourRole: "ТВОЯ РОЛЬ", partnerSent: "Партнёр получил свою роль", partnerWait: "Ему пришло уведомление в Telegram с его карточкой", partnerPending: "Партнёр увидит роль при следующем открытии", complete: "Задание выполнено", aiLabel: "AI СЦЕНАРИЙ", missed: "пропущено" },
-  hi: { title: "दृश्य", sub: "रोलप्ले · दो के लिए", holdHint: "दबाएं · दृश्य खींचें", casting: "तैयार हो रहा है...", back: "← वापस", noPartner: "साथी अभी नहीं जुड़ा", noPartnerSub: "पहले साथी को आमंत्रित करें — ताकि आप दोनों को पूरक भूमिकाएं मिलें।", invite: "साथी को आमंत्रित करें", yourRole: "आपकी भूमिका", partnerSent: "साथी को उनकी भूमिका मिल गई", partnerWait: "उन्हें Telegram पर उनका कार्ड मिला", partnerPending: "साथी अगली बार ऐप खोलने पर भूमिका देखेंगे", complete: "कार्य पूरा हुआ", aiLabel: "AI दृश्य", missed: "चूका" },
-  pt: { title: "Cenários", sub: "roleplay · para dois", holdHint: "SEGURE · SORTEAR CENÁRIO", casting: "GERANDO...", back: "← voltar", noPartner: "Parceiro ainda não conectado", noPartnerSub: "Convide seu parceiro primeiro — para que vocês dois recebam papéis complementares.", invite: "Convidar parceiro", yourRole: "SEU PAPEL", partnerSent: "Seu parceiro recebeu o papel dele", partnerWait: "Ele recebeu uma notificação no Telegram com o cartão", partnerPending: "O parceiro verá o papel quando abrir o app", complete: "Tarefa concluída", aiLabel: "CENÁRIO IA", missed: "perdida" },
-  es: { title: "Escenarios", sub: "roleplay · para dos", holdHint: "MANTÉN · SORTEAR ESCENARIO", casting: "GENERANDO...", back: "← atrás", noPartner: "Pareja aún no conectada", noPartnerSub: "Invita a tu pareja primero — para que ambos reciban roles complementarios.", invite: "Invitar pareja", yourRole: "TU ROL", partnerSent: "Tu pareja recibió su rol", partnerWait: "Recibió una notificación de Telegram con su tarjeta", partnerPending: "La pareja verá su rol cuando abra la app", complete: "Tarea completada", aiLabel: "ESCENARIO IA", missed: "perdida" },
+const T: Record<Lang, { title: string; holdHint: string; casting: string; back: string; noPartner: string; noPartnerSub: string; invite: string; yourRole: string; partnerSent: string; partnerWait: string; partnerPending: string; complete: string; missed: string }> = {
+  en: { title: "Scenarios", holdHint: "HOLD · DRAW YOUR SCENARIO", casting: "GENERATING...", back: "← back", noPartner: "No partner linked yet", noPartnerSub: "Invite your partner first — so you both get complementary roles tonight.", invite: "Invite partner", yourRole: "YOUR ROLE", partnerSent: "Your partner received their role", partnerWait: "They got a Telegram notification with their card", partnerPending: "Partner will see their role when they open the app", complete: "Task completed", missed: "missed" },
+  ru: { title: "Сценарии", holdHint: "ДЕРЖИ · ТЯНИ СЦЕНАРИЙ", casting: "ГЕНЕРИРУЕМ...", back: "← назад", noPartner: "Партнёр ещё не подключён", noPartnerSub: "Сначала пригласи партнёра — чтобы у вас были разные роли одного сценария.", invite: "Пригласить партнёра", yourRole: "ТВОЯ РОЛЬ", partnerSent: "Партнёр получил свою роль", partnerWait: "Ему пришло уведомление в Telegram с его карточкой", partnerPending: "Партнёр увидит роль при следующем открытии", complete: "Задание выполнено", missed: "пропущено" },
+  hi: { title: "दृश्य", holdHint: "दबाएं · दृश्य खींचें", casting: "तैयार हो रहा है...", back: "← वापस", noPartner: "साथी अभी नहीं जुड़ा", noPartnerSub: "पहले साथी को आमंत्रित करें — ताकि आप दोनों को पूरक भूमिकाएं मिलें।", invite: "साथी को आमंत्रित करें", yourRole: "आपकी भूमिका", partnerSent: "साथी को उनकी भूमिका मिल गई", partnerWait: "उन्हें Telegram पर उनका कार्ड मिला", partnerPending: "साथी अगली बार ऐप खोलने पर भूमिका देखेंगे", complete: "कार्य पूरा हुआ", missed: "चूका" },
+  pt: { title: "Cenários", holdHint: "SEGURE · SORTEAR CENÁRIO", casting: "GERANDO...", back: "← voltar", noPartner: "Parceiro ainda não conectado", noPartnerSub: "Convide seu parceiro primeiro — para que vocês dois recebam papéis complementares.", invite: "Convidar parceiro", yourRole: "SEU PAPEL", partnerSent: "Seu parceiro recebeu o papel dele", partnerWait: "Ele recebeu uma notificação no Telegram com o cartão", partnerPending: "O parceiro verá o papel quando abrir o app", complete: "Tarefa concluída", missed: "perdida" },
+  es: { title: "Escenarios", holdHint: "MANTÉN · SORTEAR ESCENARIO", casting: "GENERANDO...", back: "← atrás", noPartner: "Pareja aún no conectada", noPartnerSub: "Invita a tu pareja primero — para que ambos reciban roles complementarios.", invite: "Invitar pareja", yourRole: "TU ROL", partnerSent: "Tu pareja recibió su rol", partnerWait: "Recibió una notificación de Telegram con su tarjeta", partnerPending: "La pareja verá su rol cuando abra la app", complete: "Tarea completada", missed: "perdida" },
 };
 const ROLE_PRIVATE_COPY: Record<Lang, string> = {
   en: "Your partner has a separate private role card.",
@@ -70,10 +70,6 @@ const SCENARIO_COPY: Record<Lang, { adult: string; subscription: string; rate: s
   hi: { adult: "18+. सभी पात्र वयस्क हैं। विरोध केवल अभिनय है; असली रोकने का संकेत मिलते ही दृश्य रुकता है।", subscription: "दृश्य Premium में उपलब्ध हैं।", rate: "बहुत अधिक अनुरोध। बाद में प्रयास करें।", unknown: "दृश्य नहीं बन सका। फिर प्रयास करें।", upgrade: "Premium खोलें", dismiss: "समझ गया" },
   pt: { adult: "18+. Todas as personagens são adultas. A resistência é encenada; um pedido real para parar encerra a cena imediatamente.", subscription: "Cenários estão disponíveis no Premium.", rate: "Muitas solicitações. Tente mais tarde.", unknown: "Não foi possível criar o cenário. Tente novamente.", upgrade: "Abrir Premium", dismiss: "Entendi" },
   es: { adult: "18+. Todos los personajes son adultos. La resistencia es actuada; una petición real para parar termina la escena de inmediato.", subscription: "Los escenarios están disponibles en Premium.", rate: "Demasiadas solicitudes. Inténtalo más tarde.", unknown: "No se pudo crear el escenario. Inténtalo de nuevo.", upgrade: "Abrir Premium", dismiss: "Entendido" },
-};
-const SCENARIO_STAMP: Record<Lang, string> = {
-  ru: "ДЛЯ ДВОИХ · 18+", en: "FOR TWO · 18+", hi: "दो के लिए · 18+",
-  pt: "PARA DOIS · 18+", es: "PARA DOS · 18+",
 };
 type RoleSectionKey = "task" | "role" | "firstMove";
 type RoleSections = Record<RoleSectionKey, string>;
@@ -128,7 +124,7 @@ function RoleCard({ title, roleText, intensity, lang, notified, isMissed, onHide
   title: string; roleText: string; intensity: Intensity; lang: Lang; notified: boolean; isMissed?: boolean;
   onHideCard: () => void; topPadding: string;
 }) {
-  const t = T[lang]; const meta = INTENSITY_META[intensity]; const labels = meta.labels[lang] ?? meta.labels.en;
+  const t = T[lang]; const meta = INTENSITY_META[intensity];
   const roleSections = parseRoleSections(roleText);
   const sectionCopy = ROLE_SECTION_COPY[lang];
   const [visible, setVisible] = useState(false);
@@ -136,24 +132,30 @@ function RoleCard({ title, roleText, intensity, lang, notified, isMissed, onHide
   return <section className={`scenario-pop role-overlay ${meta.tone} ${visible ? "is-revealed" : ""}`} style={{ paddingTop: topPadding }}>
     <div className="role-top"><button className="pop-back" onClick={onHideCard} data-testid="button-role-back">{t.back}</button>{isMissed && <span className="pop-status">{t.missed}</span>}</div>
     <div className={`role-content ${visible ? "is-visible" : ""}`}>
-      <div className="role-heading"><span className="pop-eyebrow">{labels.sub}</span><h1 data-testid="text-scenario-title">{title}</h1></div>
+      <div className="role-heading"><h1 data-testid="text-scenario-title">{title}</h1></div>
       {roleSections ? <div className="role-sections" data-testid="text-role-content">
         <section className="role-task-card" aria-label={sectionCopy.task} data-testid="scenario-task">
-          <div className="role-task-label"><span className="role-task-index">01</span>{sectionCopy.task}</div>
+          <div className="role-task-label">{sectionCopy.task}</div>
           <p className="role-task-copy">{roleSections.task}</p>
         </section>
-        <div className="role-support-grid">
-          <section className="role-detail-card" aria-label={sectionCopy.role}>
-            <span className="role-detail-label">{sectionCopy.role}</span>
-            <p>{roleSections.role}</p>
-          </section>
-          <section className="role-detail-card role-first-card" aria-label={sectionCopy.firstMove}>
-            <span className="role-detail-label">{sectionCopy.firstMove}</span>
-            <p>{roleSections.firstMove}</p>
-          </section>
-        </div>
+        <details className="role-context">
+          <summary className="role-context-toggle">
+            <span>{sectionCopy.role}</span><span aria-hidden="true">·</span><span>{sectionCopy.firstMove}</span>
+            <svg viewBox="0 0 20 20" aria-hidden="true"><path d="m5 7.5 5 5 5-5" /></svg>
+          </summary>
+          <div className="role-support-grid">
+            <section className="role-detail-card" aria-label={sectionCopy.role}>
+              <span className="role-detail-label">{sectionCopy.role}</span>
+              <p>{roleSections.role}</p>
+            </section>
+            <section className="role-detail-card role-first-card" aria-label={sectionCopy.firstMove}>
+              <span className="role-detail-label">{sectionCopy.firstMove}</span>
+              <p>{roleSections.firstMove}</p>
+            </section>
+          </div>
+        </details>
       </div> : <section className="role-task-card role-task-card--legacy" data-testid="text-role-content">
-        <div className="role-task-label"><span className="role-task-index">01</span>{sectionCopy.legacy}</div>
+        <div className="role-task-label">{sectionCopy.legacy}</div>
         <p className="role-task-copy">{roleText}</p>
       </section>}
     </div>
@@ -166,7 +168,6 @@ function RoleCard({ title, roleText, intensity, lang, notified, isMissed, onHide
               {notified && <span>{t.partnerWait}</span>}
             </>}
       </div>
-      <span className="ai-label">{t.aiLabel}</span>
     </div>
   </section>;
 }
@@ -237,12 +238,11 @@ export default function ScenarioScreen({ lang, gender, onBack, onUpgrade }: Scen
   const tone = INTENSITY_META[intensity].tone;
   return <>
     <main className={`scenario-pop scenario-main ${tone}`} style={{ paddingTop: topPadding, opacity: mounted ? 1 : 0 }}>
-    <header className="scenario-header"><button className="pop-back" onClick={onBack} data-testid="button-scenarios-back">{t.back}</button><div className="scenario-brand">Touch<em>é</em></div><span className="premium-tag">PREMIUM</span></header>
-    <section className="scenario-intro"><span className="pop-stamp">{SCENARIO_STAMP[lang]}</span><h1>{t.title}</h1><p>{t.sub}</p><div className="scenario-orb" aria-hidden="true"><svg viewBox="0 0 48 48"><path d="M24 40s-17-10.6-17-22a9.3 9.3 0 0 1 17-5.5A9.3 9.3 0 0 1 41 18C41 29.4 24 40 24 40Z" /></svg></div></section>
+    <header className="scenario-header"><button className="pop-back" onClick={onBack} data-testid="button-scenarios-back">{t.back}</button><div className="scenario-brand">Touch<em>é</em></div></header>
+     <section className="scenario-intro"><h1>{t.title}</h1><div className="scenario-orb" aria-hidden="true"><svg viewBox="0 0 48 48"><path d="M24 40s-17-10.6-17-22a9.3 9.3 0 0 1 17-5.5A9.3 9.3 0 0 1 41 18C41 29.4 24 40 24 40Z" /></svg></div></section>
     <IntensitySelector value={intensity} onChange={setIntensity} lang={lang} />
     {intensity !== "romantic" && <p className="adult-note" data-testid="text-adult-notice">{SCENARIO_COPY[lang].adult}</p>}
     <div className="heartbeat-stage"><HeartbeatCanvas onHoldComplete={handleHoldComplete} isCasting={isCasting} color={intensity === "romantic" ? { r: 220, g: 211, b: 234 } : intensity === "passion" ? { r: 158, g: 132, b: 185 } : { r: 120, g: 94, b: 151 }} hintText={hintText} holdDuration={2600} baseRScale={0.42} bgColor="#f8f5fc" /></div>
-    <footer className="scenario-footer"><span>TOUCHÉ / AI SCENARIO</span></footer>
     {errorKind && <div className="scenario-error" role="alert"><p>{errorKind === "subscription_required" ? SCENARIO_COPY[lang].subscription : errorKind === "rate_limited" ? SCENARIO_COPY[lang].rate : SCENARIO_COPY[lang].unknown}</p>{errorKind === "subscription_required" && onUpgrade && <button className="pop-primary" onClick={onUpgrade}>{SCENARIO_COPY[lang].upgrade}</button>}<button className="error-dismiss" onClick={() => setErrorKind(null)}>{SCENARIO_COPY[lang].dismiss}</button></div>}
     </main>
     {phase === "revealed" && <RoleCard title={revealTitle} roleText={revealRoleText} intensity={revealIntensity} lang={lang} notified={notified} onHideCard={handleHideCard} isMissed={isMissed} topPadding={topPadding} />}

@@ -398,12 +398,12 @@ const HOME_STATUS_COPY: Record<Lang, {
   },
 };
 
-const SCENARIO_LABELS: Record<Lang, { title: string; sub: string }> = {
-  ru: { title: "Сценарии",   sub: "Ролевые игры и фантазии"    },
-  en: { title: "Scenarios",  sub: "Roleplay · for two"          },
-  hi: { title: "परिदृश्य",    sub: "रोलप्ले · दो के लिए"        },
-  pt: { title: "Cenários",   sub: "Roleplay · para dois"        },
-  es: { title: "Escenarios", sub: "Roleplay · para dos"         },
+const SCENARIO_LABELS: Record<Lang, string> = {
+  ru: "Сценарии",
+  en: "Scenarios",
+  hi: "परिदृश्य",
+  pt: "Cenários",
+  es: "Escenarios",
 };
 
 const INVITE_LABELS: Record<Lang, { title: string; sub: string }> = {
@@ -586,7 +586,7 @@ const INSTRUCTIONS: Record<Lang, { title: string; steps: { icon: string; head: s
 };
 
 /* ─── Subscription content ─────────────────────────────────────── */
-const SUBSCRIPTION: Record<Lang, { title: string; features: string[]; price: string; note: string; cta: string }> = {
+const SUBSCRIPTION: Record<Lang, { title: string; features: string[]; price: string; note: string; cta: string; creatorLabel: string; creatorDescription: string; creatorFeatures: string[] }> = {
   ru: {
     title: "Touché Premium",
     features: [
@@ -599,6 +599,9 @@ const SUBSCRIPTION: Record<Lang, { title: string; features: string[]; price: str
     price: "199 Stars / месяц",
     note: "≈ 260 ₽ · отмена в любой момент",
     cta: "Подписаться — 199 ★",
+    creatorLabel: "Безлимит автора",
+    creatorDescription: "Без срока окончания",
+    creatorFeatures: ["Все задания без дневных лимитов", "ИИ-сценарии без ограничений", "Premium-игры без дневных лимитов"],
   },
   en: {
     title: "Touché Premium",
@@ -612,6 +615,9 @@ const SUBSCRIPTION: Record<Lang, { title: string; features: string[]; price: str
     price: "199 Stars / month",
     note: "≈ $2.60 · cancel anytime",
     cta: "Subscribe — 199 ★",
+    creatorLabel: "Creator unlimited",
+    creatorDescription: "No expiration date",
+    creatorFeatures: ["All tasks without daily limits", "Unlimited AI scenarios", "Premium games without daily limits"],
   },
   hi: {
     title: "Touché Premium",
@@ -625,6 +631,9 @@ const SUBSCRIPTION: Record<Lang, { title: string; features: string[]; price: str
     price: "199 Stars / माह",
     note: "≈ ₹220 · कभी भी रद्द करें",
     cta: "सदस्यता लें — 199 ★",
+    creatorLabel: "निर्माता के लिए असीमित",
+    creatorDescription: "कोई समाप्ति तिथि नहीं",
+    creatorFeatures: ["बिना दैनिक सीमा के सभी कार्य", "असीमित AI दृश्य", "बिना दैनिक सीमा के Premium गेम"],
   },
   pt: {
     title: "Touché Premium",
@@ -638,6 +647,9 @@ const SUBSCRIPTION: Record<Lang, { title: string; features: string[]; price: str
     price: "199 Stars / mês",
     note: "≈ R$15 · cancele quando quiser",
     cta: "Assinar — 199 ★",
+    creatorLabel: "Acesso ilimitado do criador",
+    creatorDescription: "Sem data de término",
+    creatorFeatures: ["Todas as tarefas sem limite diário", "Cenários de IA ilimitados", "Jogos Premium sem limite diário"],
   },
   es: {
     title: "Touché Premium",
@@ -651,6 +663,9 @@ const SUBSCRIPTION: Record<Lang, { title: string; features: string[]; price: str
     price: "199 Stars / mes",
     note: "≈ $2.60 · cancela cuando quieras",
     cta: "Suscribirse — 199 ★",
+    creatorLabel: "Acceso ilimitado del creador",
+    creatorDescription: "Sin fecha de vencimiento",
+    creatorFeatures: ["Todas las tareas sin límites diarios", "Escenarios de IA ilimitados", "Juegos Premium sin límites diarios"],
   },
 };
 
@@ -976,11 +991,14 @@ function MenuPanel({ lang, gender, onGenderSwitch, onClose, onLanguageOpen, onSu
   const sub = SUBSCRIPTION[lang];
   const [subState, setSubState] = useState<"loading" | "active" | "idle" | "error">("loading");
   const [subExpires, setSubExpires] = useState<string | null>(null);
+  const [subUnlimited, setSubUnlimited] = useState(false);
   const [subError, setSubError] = useState("");
 
   const refreshSubscription = useCallback(() => {
     let cancelled = false;
     setSubState("loading");
+    setSubUnlimited(false);
+    setSubExpires(null);
     fetch("/api/subscription/status", {
       headers: { "x-telegram-init-data": window.Telegram?.WebApp?.initData ?? "" },
     }).then(async (res) => {
@@ -990,6 +1008,7 @@ function MenuPanel({ lang, gender, onGenderSwitch, onClose, onLanguageOpen, onSu
       if (!cancelled) {
         setSubState(data.active ? "active" : "idle");
         setSubExpires(data.expiresAt ?? null);
+        setSubUnlimited(data.unlimited === true);
       }
     }).catch(() => { if (!cancelled) setSubState("idle"); });
     return () => { cancelled = true; };
@@ -1074,11 +1093,11 @@ function MenuPanel({ lang, gender, onGenderSwitch, onClose, onLanguageOpen, onSu
           </svg>
         </div>
         <div style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", fontWeight: 700, fontSize: 22, color: "rgba(255,238,248,0.95)", marginBottom: 8 }}>{sub.title}</div>
-        <div style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", fontWeight: 700, fontSize: 20, color: PINK, marginBottom: 4 }}>{sub.price}</div>
-        <div style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", fontSize: 12, color: "rgba(255,238,248,0.32)" }}>{sub.note}</div>
+        <div style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", fontWeight: 700, fontSize: 20, color: PINK, marginBottom: 4 }}>{subUnlimited ? sub.creatorLabel : sub.price}</div>
+        <div style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", fontSize: 12, color: "rgba(255,238,248,0.32)" }}>{subUnlimited ? sub.creatorDescription : sub.note}</div>
       </div>
       <div style={{ display: "flex", flexDirection: "column", gap: 9, marginBottom: 20 }}>
-        {sub.features.map((f, i) => (
+        {(subUnlimited ? sub.creatorFeatures : sub.features).map((f, i) => (
           <div key={i} style={{
             padding: "12px 15px", borderRadius: 14,
             background: `rgba(${PR},${PG},${PB},0.06)`, border: `1px solid rgba(${PR},${PG},${PB},0.16)`,
@@ -1103,7 +1122,7 @@ function MenuPanel({ lang, gender, onGenderSwitch, onClose, onLanguageOpen, onSu
         color: "rgba(255,238,248,0.97)",
         fontFamily: "'Plus Jakarta Sans',sans-serif", fontWeight: 700, fontSize: 16,
         cursor: "pointer", boxShadow: `0 4px 24px rgba(${PR},${PG},${PB},0.45)`,
-      }}>{subState === "loading" ? "…" : subState === "active" ? HOME_STATUS_COPY[lang].premiumActive : sub.cta}</button>
+      }}>{subState === "loading" ? "…" : subState === "active" && subUnlimited ? sub.creatorLabel : subState === "active" ? HOME_STATUS_COPY[lang].premiumActive : sub.cta}</button>
       {subExpires && subState === "active" && (
         <div style={{ textAlign: "center", color: `rgba(${PR},${PG},${PB},.72)`, fontSize: 11, marginTop: 8 }}>
           {new Date(subExpires).toLocaleDateString(lang === "ru" ? "ru-RU" : "en-US")}
@@ -1323,7 +1342,7 @@ export default function Home({
           const res = await fetch(`/api/limits?category=${category}`, { headers: { "x-telegram-init-data": initData } });
           if (!res.ok) return [category, undefined] as const;
           const data = await res.json();
-          return [category, data.isPremium ? null : Number(data.remaining)] as const;
+          return [category, data.unlimited === true || data.isPremium === true ? null : Number(data.remaining)] as const;
         } catch { return [category, undefined] as const; }
       }));
       if (active) setLimits(Object.fromEntries(results.filter(([, n]) => n === null || Number.isFinite(n))));
@@ -1376,7 +1395,7 @@ export default function Home({
       <Card type="desire" title={t.catDesire} sub={t.catDesireSub} onClick={() => onCategorySelect("desire")} index={2} {...cardLimit("desire")} />
       <Card type="passion" title={t.catPassion} sub={t.catPassionSub} onClick={() => onCategorySelect("passion")} index={3} {...cardLimit("passion")} />
       <Card type="hard" title={t.catHard} sub={t.catHardSub} onClick={() => onCategorySelect("hard")} index={4} {...cardLimit("hard")} />
-      <Card type="scenarios" title={SCENARIO_LABELS[lang].title} sub={SCENARIO_LABELS[lang].sub} onClick={handleScenarioClick} index={5} />
+      <Card type="scenarios" title={SCENARIO_LABELS[lang]} onClick={handleScenarioClick} index={5} />
     </>
   );
 
@@ -1494,7 +1513,6 @@ export default function Home({
               <span aria-hidden="true">←</span> {HOME_STATUS_COPY[lang].home}
             </button>
             <section className="pop-subpage-heading">
-              <span>01 · TOUCHÉ</span>
               <h1>{TASKS_COPY[lang].chooseTitle}</h1>
               <p>{TASKS_COPY[lang].chooseSub}</p>
             </section>
@@ -1502,15 +1520,15 @@ export default function Home({
             <div className="pop-entry-actions">
               <button type="button" className="pop-entry-action pop-entry-action--solo" onClick={() => openHomeSection("solo")} data-testid="button-mode-solo">
                 <img className="pop-entry-action__art" src="/images/activity-cards/cat-solo.jpg" alt="" aria-hidden="true" />
-                <span className="pop-entry-action__index">01</span><span className="pop-entry-action__copy"><strong>{lang === "ru" ? "Соло" : lang === "hi" ? "अकेले" : lang === "pt" ? "Solo" : lang === "es" ? "A solas" : "Solo"}</strong><small>{lang === "ru" ? "Нежное задание только для себя" : lang === "hi" ? "सिर्फ़ अपने लिए एक कोमल चुनौती" : lang === "pt" ? "Um convite delicado só para você" : lang === "es" ? "Un reto íntimo solo para ti" : "A little moment, just for you"}</small></span><span className="pop-entry-action__arrow" aria-hidden="true">▶</span>
+                <span className="pop-entry-action__copy"><strong>{lang === "ru" ? "Соло" : lang === "hi" ? "अकेले" : lang === "pt" ? "Solo" : lang === "es" ? "A solas" : "Solo"}</strong><small>{lang === "ru" ? "Нежное задание только для себя" : lang === "hi" ? "सिर्फ़ अपने लिए एक कोमल चुनौती" : lang === "pt" ? "Um convite delicado só para você" : lang === "es" ? "Un reto íntimo solo para ti" : "A little moment, just for you"}</small></span><span className="pop-entry-action__arrow" aria-hidden="true">▶</span>
               </button>
               <button type="button" className="pop-entry-action pop-entry-action--together" onClick={() => openHomeSection("together")} data-testid="button-mode-together">
                 <img className="pop-entry-action__art" src="/images/activity-cards/cat-together.jpg" alt="" aria-hidden="true" />
-                <span className="pop-entry-action__index">02</span><span className="pop-entry-action__copy"><strong>{lang === "ru" ? "Вместе" : lang === "hi" ? "साथ में" : lang === "pt" ? "A dois" : lang === "es" ? "En pareja" : "Together"}</strong><small>{lang === "ru" ? "Общие задания и ваши желания" : lang === "hi" ? "साझा चुनौतियाँ और इच्छाएँ" : lang === "pt" ? "Desafios e desejos compartilhados" : lang === "es" ? "Retos y deseos compartidos" : "Shared prompts and your wishes"}</small></span><span className="pop-entry-action__arrow" aria-hidden="true">▶</span>
+                <span className="pop-entry-action__copy"><strong>{lang === "ru" ? "Вместе" : lang === "hi" ? "साथ में" : lang === "pt" ? "A dois" : lang === "es" ? "En pareja" : "Together"}</strong><small>{lang === "ru" ? "Общие задания и ваши желания" : lang === "hi" ? "साझा चुनौतियाँ और इच्छाएँ" : lang === "pt" ? "Desafios e desejos compartilhados" : lang === "es" ? "Retos y deseos compartidos" : "Shared prompts and your wishes"}</small></span><span className="pop-entry-action__arrow" aria-hidden="true">▶</span>
               </button>
               <button type="button" className="pop-entry-action pop-entry-action--path" onClick={onLovePathOpen} data-testid="button-open-love-path">
                 <img className="pop-entry-action__art" src="/images/touche-button-art/love-path.webp" alt="" aria-hidden="true" />
-                <span className="pop-entry-action__index">03</span><span className="pop-entry-action__copy"><strong>{LOVE_PATH_LABELS[lang].title}</strong><small>{LOVE_PATH_LABELS[lang].sub}</small></span><span className="pop-entry-action__arrow" aria-hidden="true">▶</span>
+                <span className="pop-entry-action__copy"><strong>{LOVE_PATH_LABELS[lang].title}</strong><small>{LOVE_PATH_LABELS[lang].sub}</small></span><span className="pop-entry-action__arrow" aria-hidden="true">▶</span>
               </button>
             </div>
           </div>
@@ -1520,7 +1538,6 @@ export default function Home({
               <span aria-hidden="true">←</span> {HOME_STATUS_COPY[lang].home}
             </button>
             <section className="pop-subpage-heading">
-              <span>{homeSection === "solo" ? "01" : "02"} · TOUCHÉ</span>
               <h1>{homeSection === "solo" ? HOME_STATUS_COPY[lang].soloMode : HOME_STATUS_COPY[lang].togetherMode}</h1>
               <p>{homeSection === "solo"
                 ? (lang === "ru" ? "Выберите настроение и получите своё задание." : lang === "hi" ? "मूड चुनें और अपना काम पाएँ।" : lang === "pt" ? "Escolha o clima e receba sua tarefa." : lang === "es" ? "Elige el ánimo y recibe tu tarea." : "Choose a mood and receive your task.")

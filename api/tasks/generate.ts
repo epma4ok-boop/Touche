@@ -6,21 +6,21 @@ import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { randomUUID } from "crypto";
 import { createClient } from "@supabase/supabase-js";
 import { validateTelegramInitData } from "../couple/_auth.js";
+import { getEffectivePremiumAccess } from "../_premium.js";
 import { appDate, FREE_LIMIT } from "../limits.js";
 import { claimFriendInvite } from "../referrals/_claim.js";
 import { getTaskQualityRules, getTaskVariationTag, hasAnatomicallyClearOralAct, hasConcreteSexualAct, hasHardSexualAct, isTaskTextCategoryAppropriate, isSharedTaskText, isTaskTextModeAppropriate, isTaskTextWellFormed, isTaskVariationTag, type TaskVariationTag } from "../../src/data/task-quality.js";
-import { OWNER_TELEGRAM_ID } from "../../src/config.js";
 import { TASKS_RU } from "../../src/data/tasks-ru.js";
 import { TASKS_EN } from "../../src/data/tasks-en.js";
 import { TASKS_HI } from "../../src/data/tasks-hi.js";
 import { TASKS_PT } from "../../src/data/tasks-pt.js";
 import { TASKS_ES } from "../../src/data/tasks-es.js";
+import { TASK_VARIATIONS } from "../../src/data/task-variations.js";
 
 const DEEPSEEK_API_KEY = process.env.DEEPSEEK_API_KEY!;
 const DEEPSEEK_URL = "https://api.deepseek.com/v1/chat/completions";
 const BOT_TOKEN = process.env.BOT_TOKEN;
 const APP_URL = (process.env.APP_URL ?? "").replace(/\/$/, "");
-const OWNER_ID = OWNER_TELEGRAM_ID;
 const CATEGORIES = new Set(["compliments", "tenderness", "desire", "passion", "hard"]);
 const PAID_CATEGORIES = new Set(["passion", "hard"]);
 const LANGS = new Set(["ru", "en", "hi", "pt", "es"]);
@@ -31,12 +31,20 @@ const MAX_TASK_CHARS = 280;
 const supabase = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!);
 
 type StaticPool = Record<string, string[]>;
+function withTaskVariety(base: StaticPool, additions: StaticPool): StaticPool {
+  const merged: StaticPool = {};
+  for (const [category, tasks] of Object.entries(base)) {
+    merged[category] = [...tasks, ...(additions[category] ?? [])];
+  }
+  return merged;
+}
+
 const SOURCE_TASKS: Record<string, StaticPool> = {
-  ru: TASKS_RU,
-  en: TASKS_EN,
-  hi: TASKS_HI,
-  pt: TASKS_PT,
-  es: TASKS_ES,
+  ru: withTaskVariety(TASKS_RU, TASK_VARIATIONS.ru),
+  en: withTaskVariety(TASKS_EN, TASK_VARIATIONS.en),
+  hi: withTaskVariety(TASKS_HI, TASK_VARIATIONS.hi),
+  pt: withTaskVariety(TASKS_PT, TASK_VARIATIONS.pt),
+  es: withTaskVariety(TASKS_ES, TASK_VARIATIONS.es),
 };
 
 async function notifyPartner(
@@ -864,7 +872,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     if (!data || (data.user_a_id !== caller.id && data.user_b_id !== caller.id)) return res.status(403).json({ error: "couple_access_denied" });
     partnerUserId = data.user_a_id === caller.id ? data.user_b_id : data.user_a_id;
   }
-  const premium = caller.id === OWNER_ID || !!(await supabase.from("user_subscriptions").select("expires_at").eq("user_id", caller.id).gt("expires_at", new Date().toISOString()).maybeSingle()).data;
+  let premium: boolean;
+  try {
+    premium = (await getEffectivePremiumAccess(supabase, caller.id)).active;
+  } catch {
+    return res.status(500).json({ error: "premium_status_failed" });
+  }
   const dailyCategory = premium && PAID_CATEGORIES.has(category) ? `premium_${category}` : category;
   const [{ data: dailyUsage, error: dailyUsageError }, { data: referralCredit, error: referralError }, { data: paidCredit, error: paidCreditError }] = await Promise.all([
     supabase.from("user_daily_limits").select("count,bonus").eq("user_id", caller.id).eq("category", dailyCategory).eq("date", appDate()).maybeSingle(),

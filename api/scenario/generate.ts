@@ -5,6 +5,7 @@
 // Headers: x-telegram-init-data
 
 import type { VercelRequest, VercelResponse } from "@vercel/node";
+import { randomInt } from "crypto";
 import { createClient } from "@supabase/supabase-js";
 import { validateTelegramInitData } from "../couple/_auth.js";
 import { getEffectivePremiumAccess } from "../_premium.js";
@@ -39,12 +40,23 @@ const CROSS_CARD_DISCLOSURE = /(?:role[_\s-]?[ab]\s*[:：]|(?:the other|your par
 type FallbackEntry = { title: string; role_a: string; role_b: string };
 type FallbackByGender = { male: FallbackEntry; female: FallbackEntry };
 type FallbackPool = Record<string, Record<string, FallbackByGender>>;
+type TaggedFallbackScenario = FallbackByGender & { variation_tags: string[] };
 type GeneratedScenario = FallbackEntry & { variation_tags: string[] };
 type ScenarioVariationSignals = {
   recent: string[];
   mutuallyLiked: string[];
   avoid: string[];
 };
+
+function sharedFallback(
+  title: string,
+  role_a: string,
+  role_b: string,
+  variation_tags: string[],
+): TaggedFallbackScenario {
+  const entry = { title, role_a, role_b };
+  return { male: entry, female: entry, variation_tags };
+}
 
 const FALLBACK_VARIATION_TAGS: Record<string, string[]> = {
   romantic: ["setting:home_photoshoot", "dynamic:playful_flirting", "tone:slow_burn"],
@@ -169,10 +181,132 @@ const FALLBACKS: FallbackPool = {
   },
 };
 
-function getFallback(intensity: string, lang: string, gender: string): FallbackEntry {
+const EXTRA_SCENARIO_FALLBACKS: Record<string, Record<string, TaggedFallbackScenario[]>> = {
+  romantic: {
+    ru: [sharedFallback("Последний поезд",
+      "ТВОЁ ЗАДАНИЕ: Познакомься со взрослым попутчиком в последнем поезде и реши, стоит ли продолжить встречу.\nТВОЯ РОЛЬ: Ты едешь после долгого дня; выбери обычный дорожный образ и оставь одну историю при себе.\nПЕРВЫЙ ШАГ: Предложи соседу место у окна и спроси: «Ты тоже не хочешь, чтобы поездка заканчивалась?»",
+      "ТВОЁ ЗАДАНИЕ: Поддержи разговор со взрослым попутчиком и постепенно покажи, что тебе приятно его внимание.\nТВОЯ РОЛЬ: Ты возвращаешься с концерта; выбери любимую деталь одежды и сохрани свой повод для поездки.\nПЕРВЫЙ ШАГ: Покажи билет и улыбнись: «Похоже, у нас ещё будет время познакомиться».",
+      ["setting:late_train", "dynamic:chance_meeting", "tone:curious"])],
+    en: [sharedFallback("The Last Train",
+      "YOUR TASK: Meet an adult fellow passenger on the last train and decide whether to extend the encounter.\nYOUR ROLE: You are traveling after a long day; choose an everyday coat and keep one story to yourself.\nFIRST MOVE: Offer the window seat and ask, “Do you wish this ride were longer?”",
+      "YOUR TASK: Keep the conversation with an adult fellow traveler going and show that their attention is welcome.\nYOUR ROLE: You are returning from a concert; choose one favorite outfit detail and keep your reason for traveling private.\nFIRST MOVE: Show your ticket and smile: “Looks like we still have time to meet.”",
+      ["setting:late_train", "dynamic:chance_meeting", "tone:curious"])],
+    hi: [sharedFallback("आख़िरी ट्रेन",
+      "आपका काम: आख़िरी ट्रेन में एक वयस्क सहयात्री से मिलें और तय करें कि मुलाक़ात आगे बढ़ानी है या नहीं।\nआपकी भूमिका: आप लंबे दिन के बाद यात्रा कर रहे हैं; घर के कपड़ों से साधारण यात्रा वाला रूप चुनें।\nपहला कदम: खिड़की वाली सीट दें और पूछें, “क्या आप भी चाहते हैं कि यह सफ़र थोड़ा और चले?”",
+      "आपका काम: वयस्क सहयात्री से बातचीत जारी रखें और दिखाएँ कि उनका ध्यान आपको अच्छा लग रहा है।\nआपकी भूमिका: आप एक संगीत कार्यक्रम से लौट रहे हैं; पहनावे की अपनी पसंदीदा चीज़ चुनें और यात्रा का कारण निजी रखें।\nपहला कदम: टिकट दिखाकर मुस्कराएँ, “लगता है, हमारे पास परिचय का समय है।”",
+      ["setting:late_train", "dynamic:chance_meeting", "tone:curious"])],
+    pt: [sharedFallback("O Último Trem",
+      "SUA TAREFA: Conheça uma pessoa adulta no último trem e decida se quer prolongar o encontro.\nSEU PAPEL: Você viaja depois de um dia longo; escolha um casaco comum e guarde uma história para si.\nPRIMEIRO PASSO: Ofereça o lugar perto da janela e pergunte: “Também queria que a viagem durasse mais?”",
+      "SUA TAREFA: Continue a conversa com uma pessoa adulta e mostre que a atenção dela é bem-vinda.\nSEU PAPEL: Você está voltando de um show; escolha um detalhe favorito da roupa e mantenha seu motivo em segredo.\nPRIMEIRO PASSO: Mostre a passagem e sorria: “Parece que ainda temos tempo para nos conhecer.”",
+      ["setting:late_train", "dynamic:chance_meeting", "tone:curious"])],
+    es: [sharedFallback("El Último Tren",
+      "TU TAREA: Conoce a una persona adulta en el último tren y decide si quieres prolongar el encuentro.\nTU ROL: Viajas después de un día largo; elige un abrigo cotidiano y guarda una historia para ti.\nPRIMER PASO: Ofrece el asiento junto a la ventana y pregunta: «¿También quieres que el viaje dure más?»",
+      "TU TAREA: Sigue conversando con una persona adulta y muestra que su atención te agrada.\nTU ROL: Vuelves de un concierto; elige un detalle favorito de tu ropa y reserva para ti el motivo del viaje.\nPRIMER PASO: Enseña tu billete y sonríe: «Parece que aún tenemos tiempo para conocernos».",
+      ["setting:late_train", "dynamic:chance_meeting", "tone:curious"])],
+  },
+  passion: {
+    ru: [sharedFallback("После закрытия бара",
+      "ТВОЁ ЗАДАНИЕ: Продолжи знакомство со взрослым музыкантом в пустом баре отеля; после ясной взаимности перейди к ласкам гениталий руками.\nТВОЯ РОЛЬ: Ты — гость отеля после концерта; надень рубашку из своего шкафа и не раскрывай, почему задержался.\nПЕРВЫЙ ШАГ: Подвинь бокал ближе и скажи: «Кажется, вечер ещё не закончился».",
+      "ТВОЁ ЗАДАНИЕ: Ответь на флирт взрослого гостя; после ясного взаимного сигнала направь его руку к своим гениталиям.\nТВОЯ РОЛЬ: Ты — музыкант, закончивший выступление; выбери сценическую деталь из одежды и прибереги личный повод для разговора.\nПЕРВЫЙ ШАГ: Сними пиджак, коснись его руки и спроси: «Ты всегда так внимательно слушаешь музыку?»",
+      ["setting:hotel_bar", "dynamic:mutual_seduction", "tone:sensual"])],
+    en: [sharedFallback("After the Bar Closes",
+      "YOUR TASK: Continue meeting an adult musician in the quiet hotel bar; after clear mutual interest, begin intimate hand stimulation.\nYOUR ROLE: You are a hotel guest after a concert; choose a shirt you own and keep your reason for staying private.\nFIRST MOVE: Slide your glass closer and say, “I don't think the evening is over yet.”",
+      "YOUR TASK: Answer an adult guest's flirting; after a clear mutual cue, guide their hand toward your genitals.\nYOUR ROLE: You are a musician after the show; choose one stage-inspired clothing detail and keep a personal story for later.\nFIRST MOVE: Remove your jacket, touch their hand, and ask, “Do you always listen this closely?”",
+      ["setting:hotel_bar", "dynamic:mutual_seduction", "tone:sensual"])],
+    hi: [sharedFallback("बार बंद होने के बाद",
+      "आपका काम: होटल के शांत बार में एक वयस्क संगीतकार से मिलना जारी रखें; स्पष्ट आपसी रुचि के बाद हाथों से अंतरंग स्पर्श शुरू करें।\nआपकी भूमिका: आप संगीत कार्यक्रम के बाद होटल के मेहमान हैं; अपनी कमीज़ चुनें और रुकने का कारण निजी रखें।\nपहला कदम: अपना गिलास पास रखें और कहें, “लगता है, शाम अभी खत्म नहीं हुई।”",
+      "आपका काम: वयस्क मेहमान के फ़्लर्ट का जवाब दें; स्पष्ट आपसी संकेत के बाद उनका हाथ अपने जननांगों की ओर ले जाएँ।\nआपकी भूमिका: आप कार्यक्रम के बाद संगीतकार हैं; घर की पोशाक से एक मंच वाला रूप चुनें और अपनी निजी कहानी बाद के लिए रखें।\nपहला कदम: जैकेट उतारें, उनका हाथ छुएँ और पूछें, “क्या आप हमेशा इतनी ध्यान से सुनते हैं?”",
+      ["setting:hotel_bar", "dynamic:mutual_seduction", "tone:sensual"])],
+    pt: [sharedFallback("Depois que o Bar Fecha",
+      "SUA TAREFA: Continue conhecendo uma pessoa adulta no bar tranquilo do hotel; após um sinal mútuo claro, comece carícias íntimas com as mãos.\nSEU PAPEL: Você é hóspede depois de um show; escolha uma camisa que já tenha e guarde para si o motivo de ficar.\nPRIMEIRO PASSO: Aproxime o copo e diga: “Acho que a noite ainda não acabou.”",
+      "SUA TAREFA: Responda ao flerte de uma pessoa adulta; após um sinal mútuo claro, guie a mão dela até seus genitais.\nSEU PAPEL: Você é músico depois do show; escolha um detalhe de roupa inspirado no palco e deixe uma história para depois.\nPRIMEIRO PASSO: Tire o casaco, toque a mão da pessoa e pergunte: “Você sempre escuta com tanta atenção?”",
+      ["setting:hotel_bar", "dynamic:mutual_seduction", "tone:sensual"])],
+    es: [sharedFallback("Cuando Cierra el Bar",
+      "TU TAREA: Sigue conociendo a una persona adulta en el bar tranquilo del hotel; tras una señal mutua clara, inicia caricias íntimas con las manos.\nTU ROL: Eres huésped después de un concierto; elige una camisa que ya tengas y guarda para ti el motivo de quedarte.\nPRIMER PASO: Acerca tu vaso y di: «Creo que la noche aún no ha terminado».",
+      "TU TAREA: Responde al coqueteo de una persona adulta; tras una señal mutua clara, guía su mano hacia tus genitales.\nTU ROL: Eres músico después del concierto; elige un detalle de ropa inspirado en el escenario y reserva una historia para después.\nPRIMER PASO: Quítate la chaqueta, toca su mano y pregunta: «¿Siempre escuchas con tanta atención?»",
+      ["setting:hotel_bar", "dynamic:mutual_seduction", "tone:sensual"])],
+  },
+  hard: {
+    ru: [
+      sharedFallback("Вопросы после смены",
+        "ТВОЁ ЗАДАНИЕ: Вымышленно проведи допрос взрослого партнёра в домашнем «участке»; по ясному сигналу направь его руку к своим гениталиям.\nТВОЯ РОЛЬ: Ты — инспектор только в игре; используй рубашку и бумажный бейдж, не изображая реальную власть.\nПЕРВЫЙ ШАГ: Положи блокнот на стол и скажи: «У меня остался один личный вопрос».",
+        "ТВОЁ ЗАДАНИЕ: Вымышленно сыграй посетителя участка и после ясного сигнала стимулируй гениталии партнёра рукой по его команде.\nТВОЯ РОЛЬ: Ты — взрослый собеседник инспектора; выбери тёмную рубашку и сам решай, как далеко вести сцену.\nПЕРВЫЙ ШАГ: Подвинь стул ближе и спроси: «А если теперь вопросы задаю я?»",
+        ["setting:fictional_station", "dynamic:adult_interrogation", "tone:commanding"]),
+      sharedFallback("Десять минут правил",
+        "ТВОЁ ЗАДАНИЕ: Предложи взрослому партнёру десятиминутную игру с добровольным подчинением; попроси стимулировать твои гениталии рукой по коротким командам.\nТВОЯ РОЛЬ: Ты задаёшь темп и правила игры; надень строгую домашнюю одежду и оставь партнёру право остановиться.\nПЕРВЫЙ ШАГ: Протяни ладонь и скажи: «Сегодня ты выбираешь, как именно меня слушаться».",
+        "ТВОЁ ЗАДАНИЕ: Добровольно прими роль подчинённого на десять минут и стимулируй гениталии партнёра рукой, следуя его командам.\nТВОЯ РОЛЬ: Ты сам выбираешь границы и степень смелости; надень удобную одежду и не используй настоящие ограничения движений.\nПЕРВЫЙ ШАГ: Встань ближе и спроси: «Какое будет первое правило?»",
+        ["setting:private_suite", "dynamic:consensual_submission", "tone:bold"]),
+    ],
+    en: [
+      sharedFallback("One More Question",
+        "YOUR TASK: Stage a fictional interview at home with an adult partner; after a clear cue, guide their hand toward your genitals.\nYOUR ROLE: You are an investigator only in the game; use a shirt and paper badge, never real authority.\nFIRST MOVE: Set down a notebook and say, “I have one more personal question.”",
+        "YOUR TASK: Play an adult visitor in a fictional station and, after a clear cue, stimulate your partner's genitals by hand on request.\nYOUR ROLE: You are the investigator's adult visitor; choose a dark shirt and decide how far the scene goes.\nFIRST MOVE: Move the chair closer and ask, “What if I'm the one asking questions now?”",
+        ["setting:fictional_station", "dynamic:adult_interrogation", "tone:commanding"]),
+      sharedFallback("Ten Minutes of Rules",
+        "YOUR TASK: Invite your adult partner into a ten-minute consensual submission game; ask them to stimulate your genitals by hand on short commands.\nYOUR ROLE: You set the pace and rules; choose a neat outfit you own and leave room to stop.\nFIRST MOVE: Offer your hand and say, “Tonight, you decide how you follow my lead.”",
+        "YOUR TASK: Choose the submissive role for ten minutes and stimulate your partner's genitals by hand, following their requests.\nYOUR ROLE: You choose your own limits and intensity; wear comfortable clothes and use no real restraints.\nFIRST MOVE: Step closer and ask, “What's the first rule?”",
+        ["setting:private_suite", "dynamic:consensual_submission", "tone:bold"]),
+    ],
+    hi: [
+      sharedFallback("ड्यूटी के बाद का सवाल",
+        "आपका काम: घर पर एक वयस्क साथी के साथ काल्पनिक पूछताछ करें; साफ़ संकेत मिलने पर उनका हाथ अपने जननांगों तक ले जाएँ।\nआपकी भूमिका: आप केवल अभिनय में जाँच अधिकारी हैं; कमीज़ और काग़ज़ का बैज रखें, असली अधिकार नहीं।\nपहला कदम: नोटबुक रखें और कहें, “एक निजी सवाल अभी बाकी है।”",
+        "आपका काम: काल्पनिक थाने में वयस्क आगंतुक की भूमिका निभाएँ और साफ़ संकेत के बाद साथी के जननांगों को हाथ से सहलाएँ।\nआपकी भूमिका: आप जाँच अधिकारी के वयस्क साथी हैं; गहरी कमीज़ चुनें और तय करें कि दृश्य कितना आगे जाए।\nपहला कदम: कुर्सी पास खिसकाएँ और पूछें, “अगर अब सवाल मैं पूछूँ तो?”",
+        ["setting:fictional_station", "dynamic:adult_interrogation", "tone:commanding"]),
+      sharedFallback("दस मिनट के नियम",
+        "आपका काम: वयस्क साथी को दस मिनट की स्वैच्छिक समर्पण-भूमिका दें और छोटे निर्देशों पर अपने जननांगों को हाथ से सहलाने को कहें।\nआपकी भूमिका: आप गति और नियम तय करते हैं; घर की सुथरी पोशाक पहनें और रुकने की गुंजाइश रखें।\nपहला कदम: हाथ आगे करके कहें, “आज तुम मेरी बात कैसे मानोगे, यह तुम तय करो।”",
+        "आपका काम: दस मिनट के लिए स्वेच्छा से समर्पण की भूमिका लें और साथी के निर्देश पर उसके जननांगों को हाथ से सहलाएँ।\nआपकी भूमिका: अपनी सीमा और तीव्रता खुद चुनें; आरामदायक कपड़े पहनें और असली बंधन न इस्तेमाल करें।\nपहला कदम: पास आकर पूछें, “पहला नियम क्या है?”",
+        ["setting:private_suite", "dynamic:consensual_submission", "tone:bold"]),
+    ],
+    pt: [
+      sharedFallback("Mais Uma Pergunta",
+        "SUA TAREFA: Encene uma entrevista fictícia em casa com uma pessoa adulta; após um sinal claro, conduza a mão dela até seus genitais.\nSEU PAPEL: Você é investigador apenas na brincadeira; use uma camisa e um crachá de papel, sem autoridade real.\nPRIMEIRO PASSO: Coloque um caderno na mesa e diga: “Ainda tenho uma pergunta pessoal.”",
+        "SUA TAREFA: Interprete uma pessoa adulta na delegacia fictícia e, após um sinal claro, estimule os genitais do parceiro com a mão, conforme combinado.\nSEU PAPEL: Você é visitante adulto do investigador; escolha uma camisa escura e decida até onde a cena vai.\nPRIMEIRO PASSO: Aproxime a cadeira e pergunte: “E se agora eu fizer as perguntas?”",
+        ["setting:fictional_station", "dynamic:adult_interrogation", "tone:commanding"]),
+      sharedFallback("Dez Minutos de Regras",
+        "SUA TAREFA: Convide seu par adulto para dez minutos de submissão consensual e peça que estimule seus genitais com a mão sob comandos curtos.\nSEU PAPEL: Você conduz o ritmo e as regras; escolha uma roupa alinhada que já tenha e mantenha a opção de parar.\nPRIMEIRO PASSO: Estenda a mão e diga: “Hoje, você decide como vai seguir minha orientação.”",
+        "SUA TAREFA: Escolha o papel submisso por dez minutos e estimule os genitais do parceiro com a mão, seguindo os pedidos dele.\nSEU PAPEL: Você escolhe seus limites e a intensidade; use roupa confortável e não use restrições reais.\nPRIMEIRO PASSO: Chegue mais perto e pergunte: “Qual é a primeira regra?”",
+        ["setting:private_suite", "dynamic:consensual_submission", "tone:bold"]),
+    ],
+    es: [
+      sharedFallback("Una Pregunta Más",
+        "TU TAREA: Representa una entrevista ficticia en casa con una persona adulta; tras una señal clara, guía su mano hacia tus genitales.\nTU ROL: Eres investigador solo en el juego; usa una camisa y una placa de papel, nunca autoridad real.\nPRIMER PASO: Deja una libreta sobre la mesa y di: «Me queda una pregunta personal».",
+        "TU TAREA: Interpreta a una persona adulta en la comisaría ficticia y, tras una señal clara, estimula con la mano los genitales de tu pareja.\nTU ROL: Eres visitante adulto del investigador; elige una camisa oscura y decide hasta dónde llega la escena.\nPRIMER PASO: Acerca la silla y pregunta: «¿Y si ahora hago yo las preguntas?»",
+        ["setting:fictional_station", "dynamic:adult_interrogation", "tone:commanding"]),
+      sharedFallback("Diez Minutos de Reglas",
+        "TU TAREA: Invita a tu pareja adulta a diez minutos de sumisión consensuada y pídele que estimule tus genitales con la mano siguiendo órdenes breves.\nTU ROL: Marcas el ritmo y las reglas; elige ropa formal que ya tengas y deja abierta la opción de parar.\nPRIMER PASO: Extiende la mano y di: «Esta noche tú decides cómo seguir mis indicaciones».",
+        "TU TAREA: Elige el papel sumiso durante diez minutos y estimula con la mano los genitales de tu pareja según sus indicaciones.\nTU ROL: Tú eliges tus límites e intensidad; ponte ropa cómoda y no uses sujeciones reales.\nPRIMER PASO: Acércate y pregunta: «¿Cuál es la primera regla?»",
+        ["setting:private_suite", "dynamic:consensual_submission", "tone:bold"]),
+    ],
+  },
+};
+
+function getFallback(
+  intensity: string,
+  lang: string,
+  gender: string,
+  signals: ScenarioVariationSignals,
+): GeneratedScenario {
   const pool = FALLBACKS[intensity] ?? FALLBACKS.passion;
   const byLang = pool[lang] ?? pool["en"];
-  return byLang[gender === "female" ? "female" : "male"];
+  const selectedGender = gender === "female" ? "female" : "male";
+  const additional = (EXTRA_SCENARIO_FALLBACKS[intensity]?.[lang] ?? []).map((scenario) => ({
+      ...scenario[selectedGender],
+      variation_tags: scenario.variation_tags,
+    }));
+  const original: GeneratedScenario = {
+    ...byLang[selectedGender],
+    variation_tags: FALLBACK_VARIATION_TAGS[intensity] ?? [],
+  };
+  const candidates = [...additional, original];
+  const avoidedTags = new Set([...signals.recent, ...signals.avoid]);
+  const freshAdditional = additional.filter((candidate) =>
+    !candidate.variation_tags.some((tag) => avoidedTags.has(tag))
+  );
+  const fresh = candidates.filter((candidate) =>
+    !candidate.variation_tags.some((tag) => avoidedTags.has(tag))
+  );
+  const choices = freshAdditional.length ? freshAdditional : (fresh.length ? fresh : candidates);
+  return choices[randomInt(choices.length)];
 }
 
 function cleanVariationTags(value: unknown): string[] {
@@ -251,9 +385,9 @@ function variationContext(lang: string, signals: ScenarioVariationSignals): stri
 
 // ─── Персоны ─────────────────────────────────────────────────────────────────
 
-const PERSONA_RU = `Ты — автор коротких ролевых сценариев для взрослых пар. Создавай живые сцены с разными характерами, конкретными действиями и репликами.`;
+const PERSONA_RU = `Ты — автор насыщенных, но коротких ролевых сценариев для взрослых пар. Дай ясную завязку, выразительные роли, костюмные детали и последовательное развитие сцены; не ограничивайся разговором.`;
 
-const PERSONA_EN = `You write short, engaging roleplay scenarios for adult couples. Create distinct characters, concrete actions, and natural dialogue.`;
+const PERSONA_EN = `You write vivid but concise roleplay scenarios for adult couples. Give each scene a clear hook, distinct roles, costume details, and a progressing action arc; do not reduce it to conversation.`;
 
 // ─── Гендерный контекст ───────────────────────────────────────────────────────
 
@@ -273,15 +407,15 @@ function genderContextEn(gender: string): string {
 
 const ROLE_LIST_EN = `
 Scenario ideas are examples, not a fixed menu:
-- romantic: an intriguing first meeting, private performance, neighbors sharing a late-night conversation, a playful photo session, or an original low-stakes fantasy.
-- passion: adult lecturer/adult university student with acted resistance and a clear positive turn, or any other original adult dynamic with mutual intimacy.
-- hard: fictional adult-film casting, an adult power-play scene, or another bold adult roleplay where both characters keep agency.
+- romantic: an intriguing first meeting, private dance, late-night neighbors, or a playful at-home performance.
+- passion: an after-hours hotel encounter, a fictional adult police-station interrogation that turns flirtatious, or an original adult seduction.
+- hard: fictional adult-film casting, consensual dominant/submissive roles, an adult police-station fantasy, or another bold power dynamic.
 Invent many different role pairings and premises. Do not default to photographer/model, lecturer/student, or casting. Never use minors, schoolchildren, or characters whose age is unclear.
 
 Intensity:
 - romantic: intrigue and flirting, no explicit sexual content.
-- passion: sensual, direct adult flirting and intimacy after clear reciprocation.
-- hard: bold adult roleplay and confident power dynamics, while each character keeps agency and an actual refusal is respected.
+- passion: build from a specific story hook into sensual, physical intimacy; include a clear act such as oral pleasure, tongue on nipples, intimate touch, a toy, or intercourse—not only flirting or dialogue.
+- hard: use a bold, clearly fictional adult power dynamic and a named sexual act such as oral pleasure, intimate stimulation, a toy, or intercourse; submission is optional, bounded, and mutually chosen.
 
 Private-card rules:
 - Return one neutral title and two separate role cards. Both partners see the title, so it must not name roles, the pairing, or either character's secret goal.
@@ -290,22 +424,24 @@ Private-card rules:
 - If you use teacher/student, both characters are adults at a university. Resistance is acted, never a real refusal; intimacy begins only after clear reciprocation. Never tell a character to ignore a real no, silence, hesitation, or stop.
 - Casting is fictional: no actual recording, image capture, or saved material.
 
-Write exactly 3 short sentences per card, one sentence in each section, and do not add extra explanation. Aim for 12–14 words or fewer per sentence where natural: one direct assignment, one brief role-context sentence, and one concrete opening move with a natural line in quotes. Use the exact translated section labels specified by CARD_FORMAT, each on its own line. Keep the cards distinct and coherent. Actions must be feasible at home without purchases, risky props, or real restraint.
+Every scene needs a simple outfit or costume suggestion made from clothes the couple already owns; never require purchases. Give the story a clear sequence: hook, rising tension, physical escalation, and a satisfying stopping point. Keep role objectives private and complementary.
+
+Write exactly three labeled sections per card, in the order specified by CARD_FORMAT. The task section comes first and immediately names the scene hook and the reader's main action. The role section gives character, outfit, and private objective. The first-move section gives one playable action and a natural spoken line. Use one or two concise sentences per section; keep the whole card vivid and easy to scan, not clipped to a word-count quota. For passion and hard, both cards must contain concrete physical actions; neither may end at talking about desire. Actions must be feasible at home without purchases, risky props, real restraint, or actual recording.
 Add 3–6 private variation_tags as short lowercase English slugs prefixed by setting:, dynamic:, tone:, or hook:. Describe broad scene elements only, not names, ages, or private card objectives. Tags are internal metadata and must never appear in either role card or title.
 Return ONLY valid JSON: {"title":"...","role_a":"...","role_b":"...","variation_tags":["setting:...","dynamic:...","tone:..."]}`;
 
 const ROLE_LIST_RU = `
 Идеи сцен:
 Примеры — не фиксированный список:
-- romantic: интригующее знакомство, домашний мини-концерт, ночной разговор соседей, фотосессия с телефоном-реквизитом или необычная фантазия без риска.
-- passion: преподаватель и совершеннолетний студент университета с игровым уклонением и ясным встречным сигналом или любая другая оригинальная взрослая динамика с взаимной близостью.
-- hard: вымышленный порнокастинг, ролевая игра взрослых с распределением власти или другая смелая сцена, где каждый сохраняет самостоятельность.
+- romantic: интригующее знакомство, приватный танец, поздняя встреча соседей или домашнее выступление.
+- passion: встреча в отеле после закрытия, вымышленный допрос в полицейском участке с флиртом или оригинальное взрослое соблазнение.
+- hard: вымышленный порнокастинг, согласованные роли доминирующего и подчинённого, фантазия о полицейском участке или другая смелая динамика власти.
 Придумывай разные пары ролей и завязки. Не зацикливайся на фотографе/модели, преподавателе/студенте или кастинге. Не используй несовершеннолетних, школьников или персонажей с неясным возрастом.
 
 Уровни:
-- romantic: интрига и флирт без откровенного сексуального контента.
-- passion: чувственный флирт и близость взрослых только после ясной взаимности.
-- hard: смелая ролевая динамика взрослых; каждый сохраняет право выбирать действия, настоящий отказ принимается.
+- romantic: игривая интрига и флирт без сексуальных действий.
+- passion: развивай ясную завязку до чувственной физической близости; назови оральные ласки, ласки сосков языком, интимные прикосновения, игрушку или секс — не ограничивайся флиртом и разговором.
+- hard: используй смелую вымышленную динамику власти взрослых и назови сексуальное действие: оральные ласки, интимную стимуляцию, игрушку или секс; подчинение — только по взаимному выбору и с ограничениями.
 
 Правила скрытых карточек:
 - Верни одно нейтральное название и две отдельные карточки. Название увидят оба, поэтому в нём нельзя называть роли, их пару или скрытую цель персонажа.
@@ -314,7 +450,9 @@ const ROLE_LIST_RU = `
 - Если выбрана сцена «преподаватель и студент», оба персонажа — взрослые участники университета. Сопротивление — только игровая роль; близость начинается после ясной взаимности. Нельзя приказывать игнорировать настоящий отказ, молчание, сомнение или стоп-сигнал.
 - Кастинг — только вымышленная ролевая сцена: никаких реальных записей, фото или сохранения материалов.
 
-В каждой карточке ровно 3 коротких предложения — по одному в разделе, без дополнительных пояснений. По возможности не больше 12–14 слов в предложении: ясное задание, краткий контекст роли и первый шаг с естественной репликой в кавычках. Используй точные заголовки из CARD_FORMAT, каждый с новой строки. Сделай карточки разными и связанными между собой. Всё должно быть выполнимо дома, без покупок, опасного реквизита и реального связывания.
+В каждой сцене предложи простой костюм или образ из одежды, которая уже есть дома; не требуй покупок. Выстрой ход сцены: завязка, нарастание напряжения, физическое сближение и понятная точка остановки. Личные цели персонажей должны быть разными, но совместимыми, и оставаться скрытыми от партнёра.
+
+В каждой карточке ровно три раздела с заголовками из CARD_FORMAT и в указанном порядке. В первом разделе сразу назови завязку и главное действие читателя. Во втором дай роль, одежду и личную цель. В третьем предложи выполнимый первый шаг и естественную реплику. В каждом разделе можно написать одно-два коротких предложения; не обрезай текст до лимита слов. Для passion и hard обе карточки должны содержать конкретные физические действия — не заканчивай сцену одним разговором о желании. Всё должно быть выполнимо дома, без покупок, опасного реквизита, реального связывания и настоящей записи.
 Добавь 3–6 приватных variation_tags: короткие строчные английские теги с префиксом setting:, dynamic:, tone: или hook:. Описывай только общие элементы сцены — без имён, возраста и тайных целей карточек. Теги нужны только для внутреннего разнообразия и не должны попадать в название или карточки.
 Верни ТОЛЬКО JSON: {"title":"...","role_a":"...","role_b":"...","variation_tags":["setting:...","dynamic:...","tone:..."]}`;
 
@@ -326,16 +464,37 @@ const CARD_FORMAT: Record<string, string> = {
   es: `CARD_FORMAT: In each role string, return exactly these three sections in this order, each on its own line, with plain text labels and a colon: "TU TAREA:", "TU ROL:", "PRIMER PASO:". The first section must state the reader's concrete action. Do not use markdown or add other headings.`,
 };
 
+const SCENARIO_SECTION_LABELS: Record<string, [string, string, string]> = {
+  ru: ["ТВОЁ ЗАДАНИЕ:", "ТВОЯ РОЛЬ:", "ПЕРВЫЙ ШАГ:"],
+  en: ["YOUR TASK:", "YOUR ROLE:", "FIRST MOVE:"],
+  hi: ["आपका काम:", "आपकी भूमिका:", "पहला कदम:"],
+  pt: ["SUA TAREFA:", "SEU PAPEL:", "PRIMEIRO PASSO:"],
+  es: ["TU TAREA:", "TU ROL:", "PRIMER PASO:"],
+};
+
+function hasStructuredRoleCard(text: string, lang: string): boolean {
+  const labels = SCENARIO_SECTION_LABELS[lang] ?? SCENARIO_SECTION_LABELS.en;
+  const indexes = labels.map((label) => text.indexOf(label));
+  if (indexes.some((index) => index < 0) || indexes[0] >= indexes[1] || indexes[1] >= indexes[2]) {
+    return false;
+  }
+  return indexes.every((start, index) => {
+    const contentStart = start + labels[index].length;
+    const contentEnd = index < indexes.length - 1 ? indexes[index + 1] : text.length;
+    return text.slice(contentStart, contentEnd).trim().length >= 18;
+  });
+}
+
 const INTENSITY_RULES_EN: Record<string, string> = {
   romantic: "Current level: romantic. Keep it playful and curious, with no explicit sexual action.",
-  passion: "Current level: passion. Any adult role dynamic is allowed; the lecturer/student example is optional, not a default. If used, resistance is playful acting and the student chooses when to give a clear positive signal that opens the path to intimacy.",
-  hard: "Current level: hard. Any bold adult role dynamic is allowed; fictional adult-film casting is optional, not a default. Keep scenes fictional and unrecorded; every character chooses what to act out and signals any move toward intimacy.",
+  passion: "Current level: passion. Progress into clear sensual physical intimacy such as oral pleasure, nipple play, intimate touch, toy use, or intercourse—not dialogue alone. The lecturer/student example is optional; if used, resistance is acted and intimacy follows a clear positive signal.",
+  hard: "Current level: hard. Include a named sexual act such as oral pleasure, intimate stimulation, toy use, or intercourse within a bold fictional adult power dynamic. Casting is optional; keep it unrecorded, bounded, and mutually chosen.",
 };
 
 const INTENSITY_RULES_RU: Record<string, string> = {
-  romantic: "Текущий уровень: romantic. Сохраняй игривую интригу и не описывай сексуальные действия.",
-  passion: "Текущий уровень: passion. Подходит любая взрослая ролевая динамика; преподаватель и студент — лишь один из вариантов, не сюжет по умолчанию. Если он выбран, уклонение только игровое, а студент сам выбирает момент для ясного встречного сигнала и перехода к близости.",
-  hard: "Текущий уровень: hard. Подходит любая смелая ролевая динамика взрослых; вымышленный порнокастинг — лишь один из вариантов. Сцена не записывается, каждый выбирает, что разыгрывать, а близость начинается только после ясного встречного сигнала.",
+  romantic: "Текущий уровень: romantic. Сохраняй игривую интригу и не описывай сексуальных действий.",
+  passion: "Текущий уровень: passion. Развивай сюжет до чувственной близости: назови оральные ласки, ласки сосков языком, интимные прикосновения, игрушку или секс; одного разговора недостаточно. Преподаватель и студент — необязательный пример; близость следует за ясным встречным сигналом.",
+  hard: "Текущий уровень: hard. Назови сексуальное действие — оральные ласки, интимную стимуляцию, игрушку или секс — внутри смелой вымышленной динамики взрослых. Кастинг необязателен; никаких реальных записей, каждый сохраняет выбор и границы.",
 };
 
 const SYSTEM_PROMPTS: Record<string, (intensity: string, gender: string) => string> = {
@@ -394,11 +553,11 @@ ${INTENSITY_RULES_EN[intensity]}`,
 };
 
 function userPrompt(lang: string, intensity: string): string {
-  if (lang === "ru") return `Придумай новый сценарий уровня ${intensity} для двух взрослых партнёров: две отдельные скрытые карточки, нейтральное название и 3–6 внутренних тегов разнообразия. Не повторяй недавние сцены. Верни ТОЛЬКО JSON.`;
-  if (lang === "hi") return `${intensity} स्तर का नया दृश्य दो वयस्क साथियों के लिए बनाएं: दो अलग गुप्त भूमिका-कार्ड, तटस्थ शीर्षक और विविधता के 3–6 निजी टैग। हाल के दृश्यों को न दोहराएँ। केवल JSON।`;
-  if (lang === "pt") return `Crie um novo cenário ${intensity} para dois adultos, com cartões secretos separados, título neutro e 3–6 tags internas de variedade. Não repita cenas recentes. Apenas JSON.`;
-  if (lang === "es") return `Crea un escenario ${intensity} nuevo para dos adultos, con tarjetas secretas separadas, título neutral y 3–6 etiquetas internas de variedad. No repitas escenas recientes. Solo JSON.`;
-  return `Invent a fresh ${intensity}-level scenario for two adults, with separate private role cards, a neutral title, and 3–6 internal variety tags. Avoid recent scenes. Return ONLY JSON.`;
+  if (lang === "ru") return `Создай новый сценарий уровня ${intensity} для двух взрослых. Дай конкретную завязку, развитие напряжения, образы из домашней одежды и физические действия, соответствующие уровню. В страсти и Харде не ограничивайся разговорами: покажи ясный первый шаг и развитие сцены. Сохрани отдельные скрытые цели role_a и role_b, нейтральное название и 3–6 внутренних тегов. Не повторяй недавние сочетания. Верни только JSON.`;
+  if (lang === "hi") return `${intensity} स्तर का नया दृश्य दो वयस्क साथियों के लिए बनाएँ। स्पष्ट शुरुआत, बढ़ता तनाव, घर के कपड़ों से बने रूप और स्तर के अनुसार शारीरिक क्रियाएँ दें। जुनून और हार्ड में केवल बातचीत न हो; पहला कदम और दृश्य का विकास दिखाएँ। role_a और role_b के अलग गुप्त लक्ष्य, तटस्थ शीर्षक और 3–6 निजी टैग रखें। हाल की जोड़ियों को न दोहराएँ। केवल JSON दें।`;
+  if (lang === "pt") return `Crie um cenário ${intensity} novo para dois adultos. Dê uma situação inicial concreta, tensão crescente, figurinos com roupas que já existem em casa e ações físicas adequadas ao nível. Em paixão e hard, não fique só na conversa: mostre um primeiro passo claro e a evolução da cena. Preserve os objetivos secretos de role_a e role_b, um título neutro e 3–6 tags internas. Evite combinações recentes. Retorne somente JSON.`;
+  if (lang === "es") return `Crea un escenario ${intensity} nuevo para dos adultos. Incluye una premisa concreta, tensión creciente, atuendos con ropa que ya tengan en casa y acciones físicas acordes al nivel. En pasión y hard, no te limites a conversar: muestra un primer paso claro y cómo avanza la escena. Mantén objetivos secretos separados para role_a y role_b, un título neutral y 3–6 etiquetas internas. Evita combinaciones recientes. Devuelve solo JSON.`;
+  return `Invent a fresh ${intensity}-level scenario for two adults. Give it a concrete hook, rising tension, outfits made from clothes they already own, and physical actions suited to the level. Passion and Hard must progress beyond talking: show a clear first move and an advancing scene. Keep role_a and role_b objectives private and separate, use a neutral title, and return 3–6 internal tags. Avoid recent combinations. Return only JSON.`;
 }
 
 async function notifyPartner(chatId: number, partnerUserId: number, coupleId: string, sessionId: string, lang: string): Promise<boolean> {
@@ -521,12 +680,14 @@ ${variationContext(lang, variationSignals)}`;
     const raw = (aiData.choices?.[0]?.message?.content ?? "").trim();
     const parsed = JSON.parse(raw);
     if (parsed?.title && parsed?.role_a && parsed?.role_b) {
-      const roleA = cleanText(parsed.role_a, 1200);
-      const roleB = cleanText(parsed.role_b, 1200);
+      const roleA = cleanText(parsed.role_a, 1800);
+      const roleB = cleanText(parsed.role_b, 1800);
       const variationTags = cleanVariationTags(parsed.variation_tags);
       if (
         roleA.length < 40 ||
         roleB.length < 40 ||
+        !hasStructuredRoleCard(roleA, lang) ||
+        !hasStructuredRoleCard(roleB, lang) ||
         variationTags.length < 3 ||
         roleA === roleB ||
         CROSS_CARD_DISCLOSURE.test(roleA) ||
@@ -545,10 +706,7 @@ ${variationContext(lang, variationSignals)}`;
     }
   } catch {
     source = "fallback";
-    generated = {
-      ...getFallback(intensity, lang, gender),
-      variation_tags: FALLBACK_VARIATION_TAGS[intensity] ?? [],
-    };
+    generated = getFallback(intensity, lang, gender, variationSignals);
   }
 
   generated.title = sanitizeScenarioTitle(generated.title, lang, intensity);

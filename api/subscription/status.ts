@@ -36,5 +36,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     expiresAt: access.expiresAt,
     shared: access.shared,
     source: access.source,
+    unlimited: access.source === "owner",
   });
 }

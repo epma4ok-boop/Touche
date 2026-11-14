@@ -245,6 +245,37 @@ export function getTaskVariationTag(text: string, lang: string): TaskVariationTa
   return rules.find(({ pattern }) => pattern.test(text))?.tag ?? null;
 }
 
+const HAND_CENTRIC_SEXUAL_TASK_MARKERS: Record<string, RegExp> = {
+  ru: /(?:мастурб\p{L}*|дроч\p{L}*|ручн\p{L}*\s+стимуляц\p{L}*|(?:рук\p{L}*|ладон\p{L}*|пальц\p{L}*).{0,55}(?:пенис|член|клитор|вульв|генитал|мастурб|оргазм|конч|до\s+края)|(?:пенис|член|клитор|вульв|генитал).{0,55}(?:рук\p{L}*|ладон\p{L}*|пальц\p{L}*))/iu,
+  en: /(?:masturbat\w*|hand\s?job|manual stimulation|(?:hand|palm|finger\w*).{0,55}(?:genital|penis|clitoris|vulva|masturbat|orgasm|climax|to the edge)|(?:genital|penis|clitoris|vulva).{0,55}(?:by hand|with (?:your )?hand|with (?:your )?finger))/iu,
+  hi: /(?:हस्तमैथुन|मास्टर्बेशन|(?:हाथ|उँगल|उंगली).{0,55}(?:लिंग|भगांकुर|जननांग|हस्तमैथुन|चरमोत्कर्ष|चरम सुख)|(?:लिंग|भगांकुर|जननांग).{0,55}(?:हाथ|उँगल|उंगली))/u,
+  pt: /(?:masturbaç\p{L}*|masturb\p{L}*|(?:mão|mãos|dedo|dedos).{0,55}(?:genitais|pênis|penis|clitóris|vulva|masturb|orgasmo|clímax|limite)|(?:genitais|pênis|penis|clitóris|vulva).{0,55}(?:com as mãos|com a mão|com os dedos|com o dedo))/iu,
+  es: /(?:masturbaci\p{L}*|masturb\p{L}*|(?:mano|manos|dedo|dedos).{0,55}(?:genital\p{L}*|pene|cl[ií]toris|vulva|masturb|orgasmo|cl[ií]max|l[ií]mite)|(?:genital\p{L}*|pene|cl[ií]toris|vulva).{0,55}(?:con las manos|con la mano|con los dedos|con el dedo))/iu,
+};
+
+const SEX_TOY_MARKERS: Record<string, RegExp> = {
+  ru: /вибратор|секс.?игрушк/iu,
+  en: /vibrator|sex toy/iu,
+  hi: /वाइब्रेटर|सेक्स\s*टॉय/u,
+  pt: /vibrador|brinquedo sexual/iu,
+  es: /vibrador|juguete sexual/iu,
+};
+
+const EXPLICIT_HAND_ACT_MARKERS: Record<string, RegExp> = {
+  ru: /(?:рук\p{L}*|ладон\p{L}*|пальц\p{L}*).{0,55}(?:пенис|член|клитор|вульв|генитал|мастурб|оргазм|конч|до\s+края)|(?:пенис|член|клитор|вульв|генитал).{0,55}(?:рук\p{L}*|ладон\p{L}*|пальц\p{L}*)/iu,
+  en: /(?:hand|palm|finger\w*).{0,55}(?:genital|penis|clitoris|vulva|masturbat|orgasm|climax|to the edge)|(?:genital|penis|clitoris|vulva).{0,55}(?:by hand|with (?:your )?hand|with (?:your )?finger)/iu,
+  hi: /(?:हाथ|उँगल|उंगली).{0,55}(?:लिंग|भगांकुर|जननांग|हस्तमैथुन|चरमोत्कर्ष|चरम सुख)|(?:लिंग|भगांकुर|जननांग).{0,55}(?:हाथ|उँगल|उंगली)/u,
+  pt: /(?:mão|mãos|dedo|dedos).{0,55}(?:genitais|pênis|penis|clitóris|vulva|masturb|orgasmo|clímax|limite)|(?:genitais|pênis|penis|clitóris|vulva).{0,55}(?:com as mãos|com a mão|com os dedos|com o dedo)/iu,
+  es: /(?:mano|manos|dedo|dedos).{0,55}(?:genital\p{L}*|pene|cl[ií]toris|vulva|masturb|orgasmo|cl[ií]max|l[ií]mite)|(?:genital\p{L}*|pene|cl[ií]toris|vulva).{0,55}(?:con las manos|con la mano|con los dedos|con el dedo)/iu,
+};
+
+export function isHandCentricSexualTask(text: string, lang: string): boolean {
+  const toyMarker = SEX_TOY_MARKERS[lang] ?? SEX_TOY_MARKERS.en;
+  const explicitHandMarker = EXPLICIT_HAND_ACT_MARKERS[lang] ?? EXPLICIT_HAND_ACT_MARKERS.en;
+  if (toyMarker.test(text) && !explicitHandMarker.test(text)) return false;
+  return (HAND_CENTRIC_SEXUAL_TASK_MARKERS[lang] ?? HAND_CENTRIC_SEXUAL_TASK_MARKERS.en).test(text);
+}
+
 interface OralActMarkers {
   action: RegExp;
   femaleRecipient: RegExp;

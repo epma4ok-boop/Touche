@@ -466,17 +466,22 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
   const partnerUserId = couple.user_a_id === caller.id ? couple.user_b_id : couple.user_a_id;
   let premium: boolean;
+  let isOwner: boolean;
   try {
-    premium = (await getEffectivePremiumAccess(supabase, caller.id)).active;
+    const access = await getEffectivePremiumAccess(supabase, caller.id);
+    premium = access.active;
+    isOwner = access.source === "owner";
   } catch {
     return res.status(500).json({ error: "premium_status_failed" });
   }
   if (!premium) return res.status(403).json({ error: "subscription_required" });
-  const { data: allowance, error: allowanceError } = await supabase.rpc("consume_daily_limit", {
-    p_user_id: caller.id, p_category: "scenarios", p_date: appDate(), p_limit: 1,
-  });
-  if (allowanceError) return res.status(500).json({ error: "scenario_limit_failed" });
-  if (allowance?.allowed === false || allowance?.ok === false) return res.status(429).json({ error: "daily_limit_exceeded" });
+  if (!isOwner) {
+    const { data: allowance, error: allowanceError } = await supabase.rpc("consume_daily_limit", {
+      p_user_id: caller.id, p_category: "scenarios", p_date: appDate(), p_limit: 1,
+    });
+    if (allowanceError) return res.status(500).json({ error: "scenario_limit_failed" });
+    if (allowance?.allowed === false || allowance?.ok === false) return res.status(429).json({ error: "daily_limit_exceeded" });
+  }
 
   let variationSignals: ScenarioVariationSignals;
   try {

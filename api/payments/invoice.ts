@@ -10,8 +10,8 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { createClient } from "@supabase/supabase-js";
 import { validateTelegramInitData } from "../couple/_auth.js";
+import { getEffectivePremiumAccess } from "../_premium.js";
 import { appDate, FREE_LIMIT, PREMIUM_DAILY_LIMIT } from "../limits.js";
-import { OWNER_TELEGRAM_ID } from "../../src/config.js";
 
 const BOT_TOKEN = process.env.BOT_TOKEN;
 const CATEGORIES = new Set(["compliments", "tenderness", "desire", "passion", "hard"]);
@@ -42,14 +42,18 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(400).json({ error: "invalid_product" });
   }
 
-  const [{ data: subscription, error: subscriptionError }, { data: daily, error: dailyError }, { data: referral, error: referralError }, { data: paidCredit, error: paidCreditError }] = await Promise.all([
-    supabase.from("user_subscriptions").select("expires_at").eq("user_id", caller.id).maybeSingle(),
+  let premium: boolean;
+  try {
+    premium = (await getEffectivePremiumAccess(supabase, caller.id)).active;
+  } catch {
+    return res.status(500).json({ error: "premium_status_failed" });
+  }
+  const [{ data: daily, error: dailyError }, { data: referral, error: referralError }, { data: paidCredit, error: paidCreditError }] = await Promise.all([
     supabase.from("user_daily_limits").select("count,bonus").eq("user_id", caller.id).eq("category", PAID_CATEGORIES.has(category) ? `premium_${category}` : category).eq("date", appDate()).maybeSingle(),
     supabase.from("referral_task_credits").select("balance").eq("user_id", caller.id).eq("category", category).maybeSingle(),
     supabase.from("premium_task_credits").select("balance").eq("user_id", caller.id).eq("category", category).maybeSingle(),
   ]);
-  if (subscriptionError || dailyError || referralError || paidCreditError) return res.status(500).json({ error: "limits_read_failed" });
-  const premium = caller.id === OWNER_TELEGRAM_ID || Boolean(subscription?.expires_at && new Date(subscription.expires_at).getTime() > Date.now());
+  if (dailyError || referralError || paidCreditError) return res.status(500).json({ error: "limits_read_failed" });
   const base = PAID_CATEGORIES.has(category) && !premium
     ? 0
     : (PAID_CATEGORIES.has(category) ? PREMIUM_DAILY_LIMIT : FREE_LIMIT) + Number(daily?.bonus ?? 0);

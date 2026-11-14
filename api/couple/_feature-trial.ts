@@ -1,5 +1,5 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { OWNER_TELEGRAM_ID } from "../../src/config.js";
+import { getEffectivePremiumAccess } from "../_premium.js";
 import { appDate } from "../limits.js";
 
 const FEATURES = new Set(["tarot", "pose_ball", "dice", "strip"]);
@@ -17,16 +17,7 @@ export async function handleFeatureTrial(
   if (!UUID.test(requestId)) return { status: 400, body: { error: "invalid_request_id" } };
 
   try {
-    let premium = userId === OWNER_TELEGRAM_ID;
-    if (!premium) {
-      const { data, error } = await supabase
-        .from("user_subscriptions")
-        .select("expires_at")
-        .eq("user_id", userId)
-        .maybeSingle();
-      if (error) throw error;
-      premium = !!data?.expires_at && new Date(data.expires_at).getTime() > Date.now();
-    }
+    const premium = (await getEffectivePremiumAccess(supabase, userId)).active;
 
     const { data, error } = await supabase.rpc("consume_feature_daily_trial", {
       p_user_id: userId,

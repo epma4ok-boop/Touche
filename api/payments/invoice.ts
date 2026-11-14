@@ -43,10 +43,16 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   let premium: boolean;
+  let isOwner: boolean;
   try {
-    premium = (await getEffectivePremiumAccess(supabase, caller.id)).active;
+    const access = await getEffectivePremiumAccess(supabase, caller.id);
+    premium = access.active;
+    isOwner = access.source === "owner";
   } catch {
     return res.status(500).json({ error: "premium_status_failed" });
+  }
+  if (isOwner) {
+    return res.status(409).json({ error: "daily_limit_not_reached", remaining: null, unlimited: true });
   }
   const [{ data: daily, error: dailyError }, { data: referral, error: referralError }, { data: paidCredit, error: paidCreditError }] = await Promise.all([
     supabase.from("user_daily_limits").select("count,bonus").eq("user_id", caller.id).eq("category", PAID_CATEGORIES.has(category) ? `premium_${category}` : category).eq("date", appDate()).maybeSingle(),

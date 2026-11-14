@@ -13,6 +13,81 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
 
+type BotLanguage = "ru" | "en" | "hi" | "pt" | "es";
+
+const BOT_COPY: Record<BotLanguage, {
+  welcome: string;
+  invite: string;
+  open: string;
+  support: string;
+  supportFailed: string;
+}> = {
+  ru: {
+    welcome: "Привет! Открой <b>Touché</b>, выбери формат и начни с идеи для вас двоих.\n\nЕсли возникнет вопрос, напиши сюда — сообщение увидит администратор.",
+    invite: "💝 Тебя пригласил(а) партнёр!\n\nОткрой <b>Touché</b>, чтобы принять приглашение и начать вместе.\n\nЕсли возникнет вопрос, напиши сюда — сообщение увидит администратор.",
+    open: "💕 Открыть Touché",
+    support: "Спасибо! Сообщение передано администратору. Ответ придёт сюда.",
+    supportFailed: "Не удалось передать сообщение администратору. Попробуйте ещё раз позже.",
+  },
+  en: {
+    welcome: "Hi! Open <b>Touché</b>, choose a mode, and find an idea for the two of you.\n\nIf you have a question, message us here — the administrator will see it.",
+    invite: "💝 Your partner invited you!\n\nOpen <b>Touché</b> to accept the invitation and get started together.\n\nIf you have a question, message us here — the administrator will see it.",
+    open: "💕 Open Touché",
+    support: "Thanks! Your message was sent to the administrator. They’ll reply here.",
+    supportFailed: "We couldn’t send your message to the administrator. Please try again later.",
+  },
+  hi: {
+    welcome: "नमस्ते! <b>Touché</b> खोलें, एक मोड चुनें और आप दोनों के लिए कोई विचार पाएँ।\n\nकोई सवाल हो तो यहाँ संदेश भेजें — एडमिन उसे देखेंगे।",
+    invite: "💝 आपके साथी ने आपको आमंत्रित किया है!\n\nनिमंत्रण स्वीकार करने और साथ शुरू करने के लिए <b>Touché</b> खोलें।\n\nकोई सवाल हो तो यहाँ संदेश भेजें — एडमिन उसे देखेंगे।",
+    open: "💕 Touché खोलें",
+    support: "धन्यवाद! आपका संदेश एडमिन को भेज दिया गया है। जवाब यहीं मिलेगा।",
+    supportFailed: "आपका संदेश एडमिन तक नहीं पहुँच सका। कृपया बाद में फिर कोशिश करें।",
+  },
+  pt: {
+    welcome: "Olá! Abra o <b>Touché</b>, escolha um modo e encontre uma ideia para vocês dois.\n\nSe tiver alguma dúvida, escreva aqui — o administrador verá a mensagem.",
+    invite: "💝 Seu par convidou você!\n\nAbra o <b>Touché</b> para aceitar o convite e começar juntos.\n\nSe tiver alguma dúvida, escreva aqui — o administrador verá a mensagem.",
+    open: "💕 Abrir Touché",
+    support: "Obrigado! Sua mensagem foi enviada ao administrador. A resposta chegará por aqui.",
+    supportFailed: "Não foi possível enviar sua mensagem ao administrador. Tente novamente mais tarde.",
+  },
+  es: {
+    welcome: "¡Hola! Abre <b>Touché</b>, elige un modo y encuentra una idea para los dos.\n\nSi tienes alguna pregunta, escríbenos aquí; el administrador verá el mensaje.",
+    invite: "💝 ¡Tu pareja te ha invitado!\n\nAbre <b>Touché</b> para aceptar la invitación y empezar juntos.\n\nSi tienes alguna pregunta, escríbenos aquí; el administrador verá el mensaje.",
+    open: "💕 Abrir Touché",
+    support: "¡Gracias! Tu mensaje se envió al administrador. Te responderá por aquí.",
+    supportFailed: "No pudimos enviar tu mensaje al administrador. Inténtalo de nuevo más tarde.",
+  },
+};
+
+function supportedLanguage(value: unknown): BotLanguage | null {
+  if (typeof value !== "string") return null;
+  const normalized = value.trim().toLowerCase().split(/[-_]/, 1)[0];
+  return normalized === "ru" || normalized === "en" || normalized === "hi"
+    || normalized === "pt" || normalized === "es"
+    ? normalized
+    : null;
+}
+
+async function getBotLanguage(telegramId: number, telegramLanguageCode?: unknown): Promise<BotLanguage> {
+  if (Number.isSafeInteger(telegramId) && telegramId > 0) {
+    try {
+      const { data } = await supabase
+        .from("touche_user_languages")
+        .select("lang")
+        .eq("user_id", telegramId)
+        .maybeSingle();
+      const savedLanguage = supportedLanguage(data?.lang);
+      if (savedLanguage) return savedLanguage;
+    } catch (error) {
+      console.error("[telegram-webhook] saved language lookup failed", {
+        user_id: telegramId,
+        error: error instanceof Error ? error.message : "unknown_error",
+      });
+    }
+  }
+  return supportedLanguage(telegramLanguageCode) ?? "en";
+}
+
 function escapeHtml(value: string) {
   return value.replace(/[&<>"']/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[char] ?? char));
 }
@@ -214,6 +289,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const chatId = msg.chat.id as number;
     const param  = (msg.text as string).replace("/start", "").trim();
     const telegramId = Number(msg.from?.id);
+    const language = await getBotLanguage(telegramId, msg.from?.language_code);
+    const copy = BOT_COPY[language];
 
     if (
       msg.chat?.type === "private"
@@ -253,11 +330,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
       if (isValid) {
         await sendMessage(chatId,
-          `💝 Ты получил(а) приглашение от партнёра!\n\nОткрой <b>Touché</b> и принимай задания вместе.\n\nЕсли возникнет вопрос, напиши сюда — сообщение увидит администратор.`,
+          copy.invite,
           {
             reply_markup: {
               inline_keyboard: [[{
-                text: "💝 Открыть Touché",
+                text: copy.open,
                 url: `https://t.me/${BOT_USERNAME}/app?startapp=ref_${refUserId}`,
               }]],
             },
@@ -265,11 +342,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         );
       } else {
         await sendMessage(chatId,
-          `Привет! Открой <b>Touché</b> — задания для пар на вечер 💕\n\nЕсли возникнет вопрос, напиши сюда — сообщение увидит администратор.`,
+          copy.welcome,
           {
             reply_markup: {
               inline_keyboard: [[{
-                text: "💕 Открыть Touché",
+                text: copy.open,
                 url: `https://t.me/${BOT_USERNAME}/app`,
               }]],
             },
@@ -278,11 +355,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       }
     } else {
       await sendMessage(chatId,
-        `Привет! Открой <b>Touché</b> — задания для пар на вечер 💕\n\nЕсли возникнет вопрос, напиши сюда — сообщение увидит администратор.`,
+        copy.welcome,
         {
           reply_markup: {
             inline_keyboard: [[{
-              text: "💕 Открыть Touché",
+              text: copy.open,
               url: `${APP_URL || `https://t.me/${BOT_USERNAME}/app`}`,
             }]],
           },
@@ -297,7 +374,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (update?.pre_checkout_query) {
     let payload: any = null;
     try { payload = JSON.parse(update.pre_checkout_query.invoice_payload); } catch {}
-    const isSubscription = payload?.type === "subscription";
+    const isSubscription = payload?.type === "subscription" && payload?.months === 1;
     const isBonus = payload?.type === "bonus_tasks"
       && ["compliments", "tenderness", "desire", "passion", "hard"].includes(payload?.category)
       && payload?.count === 3;
@@ -358,7 +435,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       && Number.isSafeInteger(userId)
       && userId === chatId
       && (
-        payload.type === "subscription"
+        (payload.type === "subscription" && payload.months === 1)
         || (
           payload.type === "bonus_tasks"
           && ["compliments", "tenderness", "desire", "passion", "hard"].includes(payload.category ?? "")
@@ -483,6 +560,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const username = typeof incomingMessage.from?.username === "string"
       ? `@${incomingMessage.from.username}`
       : "не указан";
+    const copy = BOT_COPY[await getBotLanguage(senderId, incomingMessage.from?.language_code)];
 
     try {
       const adminNotice = await sendMessage(
@@ -496,7 +574,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           sender_id: senderId,
           http_status: adminNotice.status,
         });
-        await sendMessage(chatId, "Не удалось передать сообщение администратору. Попробуйте ещё раз позже.");
+        await sendMessage(chatId, copy.supportFailed);
         return res.status(200).json({ ok: true });
       }
 
@@ -512,17 +590,17 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           sender_id: senderId,
           http_status: forwarded.status,
         });
-        await sendMessage(chatId, "Не удалось передать сообщение администратору. Попробуйте ещё раз позже.");
+        await sendMessage(chatId, copy.supportFailed);
         return res.status(200).json({ ok: true });
       }
-      await sendMessage(chatId, "Спасибо! Сообщение передано администратору. Ответ придёт сюда.");
+      await sendMessage(chatId, copy.support);
     } catch (error) {
       console.error("[telegram-webhook] incoming message forwarding threw", {
         update_id: updateId,
         sender_id: senderId,
         error: error instanceof Error ? error.message : "unknown_error",
       });
-      await sendMessage(chatId, "Не удалось передать сообщение администратору. Попробуйте ещё раз позже.");
+      await sendMessage(chatId, copy.supportFailed);
     }
     return res.status(200).json({ ok: true });
   }

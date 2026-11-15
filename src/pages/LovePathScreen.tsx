@@ -243,7 +243,7 @@ export default function LovePathScreen({ lang, onBack }: { lang: Lang; onBack: (
 
       <div className="lp-experience">
       <section className="lp-intro">
-        <p className="lp-eyebrow">TOUCHÉ · 18+</p>
+        <p className="lp-eyebrow">TOUCHÉ</p>
         <h1>{labels.title}</h1>
         <p>{labels.intro}</p>
       </section>

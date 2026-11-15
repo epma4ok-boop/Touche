@@ -127,8 +127,8 @@ function localizedCard(card: Card, lang: Lang): Card {
 }
 
 type Copy = {
-  back: string; title: string; subtitle: string; kicker: string; playKicker: string; start: string;
-  rulesTitle: string; rules: string[]; age: string; firstTurn: string; woman: string; man: string;
+  back: string; title: string; subtitle: string; start: string;
+  rulesTitle: string; rules: string[]; firstTurn: string; woman: string; man: string;
   chooseFirst: string; startGame: string; restart: string; restartConfirm: string; confirm: string; cancel: string;
   turn: string; level: string; draw: string; card: string; criteria: string; completed: string; failed: string;
   layers: string; removed: string; left: string; nextLayer: string; removeLayer: string;
@@ -139,10 +139,8 @@ type Copy = {
 const COPY: Record<Lang, Copy> = {
   ru: {
     back: "Назад к играм", title: "Стрип или действие", subtitle: "Игра для двоих на одном телефоне",
-    kicker: "ИГРА ДЛЯ ДВОИХ · ОДИН ТЕЛЕФОН", playKicker: "18+ · TOUCHÉ",
     start: "Начать игру",
     rulesTitle: "Как играть", rules: ["Ходите по очереди и тяните карту своего уровня.", "Выполнено — одежда остаётся, ход переходит партнёру.", "Провал — снимается следующий слой, уровень растёт, ход переходит.", "Пропустить карту нельзя. Слои снимаются только с себя и строго по порядку."],
-    age: "Только для взрослых 18+.",
     firstTurn: "Кто ходит первым?", woman: "Женщина", man: "Мужчина", chooseFirst: "Выберите первого игрока",
     startGame: "Начать раунд", restart: "Начать заново", restartConfirm: "Сбросить сохранённую игру и начать заново?",
     confirm: "Сбросить игру", cancel: "Оставить игру", turn: "Ваш ход", level: "Уровень", draw: "Тянуть карту",
@@ -157,10 +155,8 @@ const COPY: Record<Lang, Copy> = {
   },
   en: {
     back: "Back to games", title: "Strip or dare", subtitle: "A two-player game for one phone",
-    kicker: "A TWO-PLAYER GAME · ONE PHONE", playKicker: "18+ · TOUCHÉ",
     start: "Start game",
     rulesTitle: "How to play", rules: ["Take turns drawing a card for your current level.", "Complete it: your clothes stay on and the turn passes.", "Fail it: remove your next layer, advance a level, and pass the turn.", "There is no skip. Remove only your own layers, in order."],
-    age: "For adults 18+ only.",
     firstTurn: "Who goes first?", woman: "Woman", man: "Man", chooseFirst: "Choose the first player",
     startGame: "Start round", restart: "Start over", restartConfirm: "Reset the saved game and start over?",
     confirm: "Reset game", cancel: "Keep game", turn: "Your turn", level: "Level", draw: "Draw a card",
@@ -175,10 +171,8 @@ const COPY: Record<Lang, Copy> = {
   },
   hi: {
     back: "खेलों पर वापस", title: "स्ट्रिप या डेयर", subtitle: "एक फ़ोन पर दो लोगों का खेल",
-    kicker: "दो लोगों का खेल · एक फ़ोन", playKicker: "18+ · TOUCHÉ",
     start: "खेल शुरू करें",
     rulesTitle: "कैसे खेलें", rules: ["बारी-बारी से अपने स्तर का कार्ड लें।", "पूरा करने पर कपड़े वैसे ही रहते हैं और बारी साथी की होती है।", "असफल होने पर अपनी अगली परत हटाएँ, स्तर बढ़ाएँ और बारी साथी को दें।", "कोई कार्ड छोड़ा नहीं जा सकता। अपनी परतें क्रम से हटाएँ।"],
-    age: "केवल 18+ वयस्कों के लिए।",
     firstTurn: "पहली बारी किसकी?", woman: "महिला", man: "पुरुष", chooseFirst: "पहला खिलाड़ी चुनें",
     startGame: "राउंड शुरू करें", restart: "फिर से शुरू करें", restartConfirm: "सहेजा खेल रीसेट करके फिर शुरू करें?",
     confirm: "खेल रीसेट करें", cancel: "खेल रहने दें", turn: "आपकी बारी", level: "स्तर", draw: "कार्ड लें",
@@ -193,10 +187,8 @@ const COPY: Record<Lang, Copy> = {
   },
   pt: {
     back: "Voltar aos jogos", title: "Tire uma peça ou ouse", subtitle: "Um jogo para dois em um só celular",
-    kicker: "JOGO PARA DOIS · UM CELULAR", playKicker: "18+ · TOUCHÉ",
     start: "Começar jogo",
     rulesTitle: "Como jogar", rules: ["Alternem as jogadas e tirem uma carta do nível atual.", "Cumpriu: as roupas ficam e a vez passa para a outra pessoa.", "Falhou: retire a próxima camada, avance um nível e passe a vez.", "Não é possível pular. Retire apenas suas próprias camadas, na ordem."],
-    age: "Somente para adultos 18+.",
     firstTurn: "Quem começa?", woman: "Mulher", man: "Homem", chooseFirst: "Escolha quem começa",
     startGame: "Começar rodada", restart: "Recomeçar", restartConfirm: "Apagar o jogo salvo e recomeçar?",
     confirm: "Reiniciar jogo", cancel: "Manter jogo", turn: "Sua vez", level: "Nível", draw: "Tirar uma carta",
@@ -211,10 +203,8 @@ const COPY: Record<Lang, Copy> = {
   },
   es: {
     back: "Volver a juegos", title: "Quítate o atrévete", subtitle: "Un juego para dos en un solo móvil",
-    kicker: "JUEGO PARA DOS · UN MÓVIL", playKicker: "18+ · TOUCHÉ",
     start: "Empezar juego",
     rulesTitle: "Cómo jugar", rules: ["Tomen turnos y saquen una carta de su nivel actual.", "Completada: la ropa se queda y el turno pasa a la otra persona.", "Fallida: quítate la siguiente capa, sube un nivel y pasa el turno.", "No se puede saltar. Cada persona se quita sus propias capas, en orden."],
-    age: "Solo para adultos 18+.",
     firstTurn: "¿Quién empieza?", woman: "Mujer", man: "Hombre", chooseFirst: "Elijan quién empieza",
     startGame: "Empezar ronda", restart: "Empezar de nuevo", restartConfirm: "¿Borrar la partida guardada y empezar de nuevo?",
     confirm: "Reiniciar juego", cancel: "Conservar partida", turn: "Tu turno", level: "Nivel", draw: "Sacar una carta",
@@ -505,8 +495,6 @@ export default function StripGameScreen({ lang, onBack, onUpgrade }: Props) {
   if (!session) {
     body = (
       <section className="strip__intro strip-enter">
-        <span className="strip__eyebrow">18+ <i /> TOUCHÉ</span>
-        <p className="strip__kicker">{copy.kicker}</p>
         <h1 tabIndex={-1} data-testid="text-strip-title">{copy.title}</h1>
         <p className="strip__lead">{copy.subtitle}</p>
         <div className="strip-premium__intro-stage" aria-hidden="true">
@@ -520,7 +508,6 @@ export default function StripGameScreen({ lang, onBack, onUpgrade }: Props) {
           <summary>{copy.rulesTitle}</summary>
           <ol className="strip__rules">{copy.rules.map((rule, index) => <li key={rule}><i>0{index + 1}</i><span>{rule}</span></li>)}</ol>
         </details>
-        <div className="strip__age-note" role="note"><span>18+</span><p>{copy.age}</p></div>
         <fieldset className="strip__first">
           <legend>{copy.firstTurn}</legend>
           <div>
@@ -539,7 +526,6 @@ export default function StripGameScreen({ lang, onBack, onUpgrade }: Props) {
     const loser: PlayerIndex = session.winner === 0 ? 1 : 0;
     body = (
       <section className="strip__finish strip-enter" data-testid="panel-strip-finish">
-        <span className="strip__eyebrow">18+ <i /> TOUCHÉ</span>
         <div className="strip-premium__intro-stage strip-premium__finish-stage" aria-hidden="true">
           {session.players.map((player, index) => (
             <div className="strip-premium__intro-doll" key={index}>
@@ -574,7 +560,6 @@ export default function StripGameScreen({ lang, onBack, onUpgrade }: Props) {
     body = (
       <section className="strip__play strip-enter" data-testid="panel-strip-play">
         <div className="strip__play-heading">
-          <p className="strip__kicker">{copy.playKicker}</p>
           <h1>{copy.title}</h1>
           <div className="strip__turn" aria-live="polite" data-testid="status-strip-turn">
             <span>{copy.turn}</span><strong>{playerNames[session.turn]}</strong>
@@ -624,7 +609,6 @@ export default function StripGameScreen({ lang, onBack, onUpgrade }: Props) {
           <div className="strip-premium__reveal-panel">
             <div className="strip-premium__reveal-top">
               <div className="strip-premium__reveal-brand">
-                <strong>18+ · TOUCHÉ</strong>
                 <span className="strip-premium__reveal-level">{copy.card}<b>{copy.level} {Math.min(session.players[session.turn].layersRemoved + 1, 5)}</b></span>
               </div>
               <span className="strip-premium__reveal-turn">{copy.turn}<br /><strong>{playerNames[session.turn]}</strong></span>
@@ -648,7 +632,6 @@ export default function StripGameScreen({ lang, onBack, onUpgrade }: Props) {
               <button type="button" className="strip-btn" disabled={!!session.mini && !session.mini.revealed} onClick={() => resolveTurn(true)} data-testid="button-strip-complete">{copy.completed}</button>
               <button type="button" className="strip-btn strip-btn--fail" disabled={!!session.mini && !session.mini.revealed} onClick={() => resolveTurn(false)} data-testid="button-strip-fail">{copy.failed} <span>· {copy.removeLayer}</span></button>
             </div>}
-            <p className="strip-premium__reveal-foot">{copy.kicker}</p>
           </div>
         </section>
       )}

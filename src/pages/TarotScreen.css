@@ -27,7 +27,6 @@
 .tarot h1[tabindex="-1"]:focus-visible { outline: none; }
 .tarot__intro { text-align: center; }
 .tarot__eyebrow { display: inline-flex; align-items: center; gap: 8px; color: var(--t-wine); font-size: 9px; font-weight: 800; letter-spacing: .2em; }
-.tarot__eyebrow i { width: 4px; height: 4px; border-radius: 50%; background: var(--t-wine); opacity: .55; }
 .tarot__intro h1, .tarot__done-title { margin: 10px 0 8px; font: 700 clamp(30px, 8.5vw, 40px)/1.02 "Space Grotesk", sans-serif; letter-spacing: -.05em; }
 .tarot__lead { max-width: 340px; margin: 0 auto 18px; color: var(--t-muted); font-size: 13.5px; line-height: 1.5; }
 .tarot__panel { text-align: left; margin-bottom: 12px; padding: 16px 18px; border: 1px solid rgba(91,43,63,.14); border-radius: 22px; background: rgba(255,248,238,.8); }

@@ -210,7 +210,7 @@ export default function TarotScreen({ lang, onBack, onUpgrade }: Props) {
   if (view === "intro" || !session) {
     body = (
       <section className="tarot__intro tarot-enter">
-        <span className="tarot__eyebrow">18+ <i /> TOUCHÉ</span>
+        <span className="tarot__eyebrow">TOUCHÉ</span>
         <h1 ref={headingRef} tabIndex={-1}>{copy.title}</h1>
         <p className="tarot__lead">{copy.lead}</p>
         <div className="tarot__panel">
@@ -321,7 +321,7 @@ export default function TarotScreen({ lang, onBack, onUpgrade }: Props) {
       {header}
       <div className="tarot__body">
         <div className={`tarot__composition tarot__composition--${view}`}>
-          <div className="tarot__folio" aria-hidden="true"><span>TOUCHÉ / 18+</span><span>01 — 03</span></div>
+          <div className="tarot__folio" aria-hidden="true"><span>TOUCHÉ</span><span>01 — 03</span></div>
           {body}
         </div>
       </div>

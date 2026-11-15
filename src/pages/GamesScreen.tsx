@@ -11,51 +11,51 @@ type Game = "wheel" | "dice" | "strip";
 type Props = { lang: Lang; onBack: () => void; onUpgrade: () => void | Promise<boolean> };
 
 const COPY: Record<Lang, {
-  title: string; subtitle: string; sectionLabel: string;
-  wheel: string; wheelNote: string; wheelMood: string;
-  dice: string; diceNote: string; diceMood: string;
+  title: string;
+  wheel: string; wheelNote: string;
+  dice: string; diceNote: string;
   back: string;
-  strip: string; stripNote: string; stripMood: string;
+  strip: string; stripNote: string;
   trialNote: string;
 }> = {
   ru: {
-    title: "Игры", subtitle: "Выберите, с чего начнётся ваш вечер.", sectionLabel: "Выберите игру",
-    wheel: "Шар ответов", wheelNote: "Встряхни — получи одну из 20 поз", wheelMood: "СЛУЧАЙ",
-    dice: "Кубики действий", diceNote: "Два броска — новый повод сблизиться", diceMood: "ИМПУЛЬС",
+    title: "Игры",
+    wheel: "Шар ответов", wheelNote: "Встряхни — получи одну из 20 поз",
+    dice: "Кубики действий", diceNote: "Два броска — новый повод сблизиться",
      back: "Назад",
-    strip: "Стрип или действие", stripNote: "Пять уровней. Только ваш выбор.", stripMood: "ИГРА 18+",
+    strip: "Стрип или действие", stripNote: "Пять уровней. Только ваш выбор.",
     trialNote: "Бесплатно — по 1 игре каждого типа в день · Premium без ограничений",
   },
   en: {
-    title: "Games", subtitle: "Choose how your evening begins.", sectionLabel: "Choose a game",
-    wheel: "Pose ball", wheelNote: "Shake to reveal one of 20 poses", wheelMood: "CHANCE",
-    dice: "Action dice", diceNote: "Two rolls to bring you closer", diceMood: "SPONTANEITY",
+    title: "Games",
+    wheel: "Pose ball", wheelNote: "Shake to reveal one of 20 poses",
+    dice: "Action dice", diceNote: "Two rolls to bring you closer",
      back: "Back",
-    strip: "Strip or dare", stripNote: "Five levels. Your next move.", stripMood: "GAME 18+",
+    strip: "Strip or dare", stripNote: "Five levels. Your next move.",
     trialNote: "Free: 1 game of each type daily · unlimited with Premium",
   },
   hi: {
-    title: "खेल", subtitle: "चुनें, आपकी शाम कैसे शुरू होगी।", sectionLabel: "एक खेल चुनें",
-    wheel: "पोज़ बॉल", wheelNote: "हिलाएँ और 20 पोज़ में से एक देखें", wheelMood: "क़िस्मत",
-    dice: "क्रिया के पासे", diceNote: "दो दाँव, और भी क़रीब आने का नया बहाना", diceMood: "रोमांच",
+    title: "खेल",
+    wheel: "पोज़ बॉल", wheelNote: "हिलाएँ और 20 पोज़ में से एक देखें",
+    dice: "क्रिया के पासे", diceNote: "दो दाँव, और भी क़रीब आने का नया बहाना",
      back: "वापस",
-    strip: "स्ट्रिप या डेयर", stripNote: "पाँच स्तर। अगला कदम आपका।", stripMood: "18+ खेल",
+    strip: "स्ट्रिप या डेयर", stripNote: "पाँच स्तर। अगला कदम आपका।",
     trialNote: "मुफ़्त: हर खेल रोज़ 1 बार · Premium में असीमित",
   },
   pt: {
-    title: "Jogos", subtitle: "Escolham como a noite vai começar.", sectionLabel: "Escolham um jogo",
-    wheel: "Bola das poses", wheelNote: "Agitem e revelem uma das 20 poses", wheelMood: "SURPRESA",
-    dice: "Dados de ação", diceNote: "Dois lançamentos para aproximar vocês", diceMood: "SURPRESA",
+    title: "Jogos",
+    wheel: "Bola das poses", wheelNote: "Agitem e revelem uma das 20 poses",
+    dice: "Dados de ação", diceNote: "Dois lançamentos para aproximar vocês",
      back: "Voltar",
-    strip: "Tire ou ouse", stripNote: "Cinco níveis. A próxima escolha é sua.", stripMood: "JOGO 18+",
+    strip: "Tire ou ouse", stripNote: "Cinco níveis. A próxima escolha é sua.",
     trialNote: "Grátis: 1 partida de cada tipo por dia · ilimitado no Premium",
   },
   es: {
-    title: "Juegos", subtitle: "Elijan cómo empieza su noche.", sectionLabel: "Elijan un juego",
-    wheel: "Bola de poses", wheelNote: "Agítala y descubre una de las 20 poses", wheelMood: "AZAR",
-    dice: "Dados de acción", diceNote: "Dos lanzamientos para acercarse", diceMood: "SORPRESA",
+    title: "Juegos",
+    wheel: "Bola de poses", wheelNote: "Agítala y descubre una de las 20 poses",
+    dice: "Dados de acción", diceNote: "Dos lanzamientos para acercarse",
      back: "Volver",
-    strip: "Quítate o atrévete", stripNote: "Cinco niveles. Tú eliges el siguiente paso.", stripMood: "JUEGO 18+",
+    strip: "Quítate o atrévete", stripNote: "Cinco niveles. Tú eliges el siguiente paso.",
     trialNote: "Gratis: 1 partida de cada tipo al día · ilimitado con Premium",
   },
 };
@@ -79,23 +79,20 @@ export default function GamesScreen({ lang, onBack, onUpgrade }: Props) {
       </header>
       <div className="touche-games__body">
         <div className="touche-games__intro">
-          <span className="touche-games__eyebrow">18+ <i /> TOUCHÉ</span>
           <h1>{copy.title}</h1>
-          <p>{copy.subtitle}</p>
         </div>
-        <div className="touche-games__section-label">{copy.sectionLabel}</div>
         <section className="touche-games__choices" aria-label={copy.title}>
           <button type="button" className="touche-games__choice touche-games__choice--pose-ball" onClick={() => setGame("wheel")} data-testid="button-game-wheel">
             <span className="touche-games__art-wrap"><img className="touche-games__art-image touche-games__art-image--pose-ball" src="/images/game-cards/pose-ball-button.jpg" alt="" aria-hidden="true" /></span>
-            <span className="touche-games__choice-copy"><small className="touche-games__choice-mood">{copy.wheelMood}</small><strong>{copy.wheel}</strong><small>{copy.wheelNote}</small></span>
+            <span className="touche-games__choice-copy"><strong>{copy.wheel}</strong><small>{copy.wheelNote}</small></span>
           </button>
           <button type="button" className="touche-games__choice touche-games__choice--dice" onClick={() => setGame("dice")} data-testid="button-game-dice">
             <span className="touche-games__art-wrap"><img className="touche-games__art-image touche-games__art-image--dice" src="/images/game-cards/action-dice.jpg" alt="" aria-hidden="true" /></span>
-            <span className="touche-games__choice-copy"><small className="touche-games__choice-mood">{copy.diceMood}</small><strong>{copy.dice}</strong><small>{copy.diceNote}</small></span>
+            <span className="touche-games__choice-copy"><strong>{copy.dice}</strong><small>{copy.diceNote}</small></span>
           </button>
           <button type="button" className="touche-games__choice touche-games__choice--strip" onClick={() => setGame("strip")} data-testid="button-game-strip">
             <span className="touche-games__art-wrap"><img className="touche-games__art-image touche-games__art-image--strip" src="/images/game-cards/strip-or-action.jpg" alt="" aria-hidden="true" /></span>
-            <span className="touche-games__choice-copy"><small className="touche-games__choice-mood">{copy.stripMood}</small><strong>{copy.strip}</strong><small>{copy.stripNote}</small></span>
+            <span className="touche-games__choice-copy"><strong>{copy.strip}</strong><small>{copy.stripNote}</small></span>
           </button>
         </section>
         <p className="touche-games__footnote"><span /> {copy.trialNote}</p>

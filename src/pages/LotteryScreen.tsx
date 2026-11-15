@@ -122,7 +122,7 @@ export default function LotteryScreen({ lang, onBack }: Props) {
 
       <div className="pose-ball__body">
         <section className="pose-ball__intro" aria-labelledby="pose-ball-title">
-          <span className="pose-ball__eyebrow">18+ <i /> TOUCHÉ</span>
+          <span className="pose-ball__eyebrow">TOUCHÉ</span>
           <h1 id="pose-ball-title">{copy.title}</h1>
           <p>{copy.subtitle}</p>
         </section>

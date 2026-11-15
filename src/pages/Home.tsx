@@ -1147,7 +1147,6 @@ function MenuPanel({ lang, gender, onGenderSwitch, onClose, onLanguageOpen, onSu
         <div style={{ position: "absolute", inset: 0, background: `linear-gradient(to bottom, rgba(13,6,16,0.05) 0%, rgba(13,6,16,0.55) 55%, rgba(17,7,16,0.97) 100%)` }} />
         <div style={{ position: "absolute", bottom: 14, left: 20 }}>
           <div style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", fontWeight: 800, fontSize: 24, color: "rgba(255,238,248,0.97)", letterSpacing: "-0.03em", textShadow: `0 0 24px rgba(${PR},${PG},${PB},0.55)` }}>Touché</div>
-          <div style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", fontWeight: 300, fontSize: 10, color: `rgba(${PR},${PG},${PB},0.65)`, letterSpacing: "0.22em", textTransform: "uppercase", marginTop: 2 }}>18+</div>
         </div>
       </div>
 

@@ -32,7 +32,6 @@
 .intensity-item strong,.intensity-item small { display:block; }.intensity-item strong { font-size:13px; }.intensity-item small { margin-top:4px; font-size:9px; }
 .intensity-item.active { border-color:var(--ink); color:var(--ink); box-shadow:3px 3px 0 var(--ink); transform:translate(-1px,-1px); }
 .intensity-item.romantic.active { background:var(--pop-yellow); }.intensity-item.passion.active { background:var(--pop-coral); color:#fff; }.intensity-item.hard.active { background:var(--pop-blue); color:#fff; }
-.adult-note { max-width:384px; margin:5px auto 0; padding:8px 12px; border:2px solid var(--ink); border-radius:12px; background:var(--pop-lime); font-size:11px; line-height:1.35; text-align:center; }
 .heartbeat-stage { flex:1; min-height:0; position:relative; display:flex; align-items:center; justify-content:center; }
 .heartbeat-stage canvas { max-width:100%; }
 .scenario-footer { padding:7px 20px max(20px,env(safe-area-inset-bottom)); text-align:center; color:#a49a8e; font-size:9px; letter-spacing:.15em; }
@@ -252,7 +251,6 @@
 .intensity-item { min-height:69px !important; padding:11px 13px !important; }
 .intensity-item strong { font-family:var(--font-display); font-size:16px !important; }
 .intensity-item small { font-size:9px !important; }
-.adult-note { width:calc(100% - 40px); max-width:460px !important; }
 .heartbeat-stage { width:min(100%,560px); align-self:center; margin-top:8px; }
 .scenario-footer { padding-top:12px !important; font:700 8px var(--font-mono) !important; color:#967f7b !important; }
 .no-partner { background:#eee4d9 !important; }
@@ -509,4 +507,156 @@
   .role-overlay .role-sections { gap: 7px; padding: 4px 0 8px !important; }
   .role-overlay .role-task-label { margin-bottom: 7px; }
   .role-overlay .role-context-toggle { min-height: 40px; padding-block: 8px; }
+}
+
+/* Photo-first vertical choices, with the draw control kept in view. */
+.scenario-main {
+  display: flex;
+  flex-direction: column;
+  background:
+    radial-gradient(ellipse 360px 300px at 96% 4%,rgba(215,201,232,.5),transparent 74%),
+    linear-gradient(180deg,#f8f5fc 0%,#f2edf8 100%) !important;
+}
+.scenario-main .scenario-header {
+  flex: 0 0 auto;
+  min-height: 36px;
+  padding: 0 18px !important;
+}
+.scenario-main .scenario-intro {
+  flex: 0 0 auto;
+  min-height: 78px;
+  padding: 11px 19px 7px !important;
+}
+.scenario-main .scenario-intro h1 {
+  max-width: calc(100% - 82px);
+  margin: 0 !important;
+  font-size: clamp(34px,10vw,46px) !important;
+  line-height: .96 !important;
+}
+.scenario-main .scenario-orb {
+  top: 50% !important;
+  right: 20px !important;
+  width: 72px !important;
+  height: 72px !important;
+  transform: translateY(-50%) !important;
+}
+.intensity-select {
+  flex: 0 0 auto;
+  width: min(100% - 28px,500px) !important;
+  max-width: 500px !important;
+  grid-template-columns: repeat(3,minmax(0,1fr)) !important;
+  gap: 8px !important;
+  margin: 5px auto 0 !important;
+  padding: 0 !important;
+}
+.intensity-item {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: clamp(150px,24vh,205px) !important;
+  min-height: 0 !important;
+  overflow: hidden;
+  padding: 0 !important;
+  border: 2px solid rgba(255,255,255,.82) !important;
+  border-radius: 17px !important;
+  color: #fff !important;
+  background: #c9bdd9 !important;
+  box-shadow: 0 7px 18px rgba(64,51,79,.12);
+  transform: none !important;
+  transition: transform .18s ease,border-color .18s ease,box-shadow .18s ease;
+}
+.intensity-item__image {
+  position: absolute;
+  z-index: 0;
+  inset: 0 !important;
+  width: 100% !important;
+  display: block;
+}
+.intensity-item__image img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 34%;
+  filter: none;
+}
+.intensity-item::after { display: none; }
+.intensity-item__image::after {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg,rgba(30,19,39,.03) 36%,rgba(30,19,39,.13) 55%,rgba(30,19,39,.82) 100%);
+  content: "";
+}
+.intensity-item__copy {
+  position: absolute;
+  z-index: 1;
+  right: 4px;
+  bottom: 10px;
+  left: 4px;
+  display: block;
+  width: auto;
+  max-width: none;
+  text-align: center;
+}
+.intensity-item__copy strong {
+  display: block;
+  color: #fff !important;
+  font: 700 clamp(12px,3.6vw,15px)/1.12 var(--font-display) !important;
+  letter-spacing: -.02em;
+  text-shadow: 0 1px 8px rgba(16,9,21,.72);
+}
+.intensity-item__check {
+  position: absolute;
+  z-index: 2;
+  top: 8px;
+  right: 8px;
+  display: grid;
+  width: 23px;
+  height: 23px;
+  place-items: center;
+  border: 1px solid rgba(255,255,255,.82);
+  border-radius: 50%;
+  background: rgba(44,31,56,.42);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 800;
+  text-shadow: 0 1px 4px rgba(0,0,0,.5);
+}
+.intensity-item.active {
+  border-color: #fff !important;
+  box-shadow: 0 0 0 2px var(--pop-wine),0 10px 22px rgba(64,51,79,.24);
+  transform: translateY(-3px) !important;
+}
+.intensity-item.active::before { display: none; }
+.intensity-item:focus-visible {
+  outline: 3px solid var(--pop-wine);
+  outline-offset: 3px;
+}
+.scenario-boundary {
+  flex: 0 0 auto;
+  max-width: 500px;
+  margin: 6px auto 0;
+  padding: 0 16px;
+  color: var(--muted);
+  font-size: 10px;
+  line-height: 1.25;
+  text-align: center;
+}
+.scenario-main .heartbeat-stage {
+  flex: 1 1 auto;
+  width: min(100%,560px);
+  min-height: 118px;
+  align-self: center;
+  margin: 3px auto 0;
+}
+@media (max-height: 700px) {
+  .scenario-main .scenario-intro { min-height: 62px; padding-block: 6px 4px !important; }
+  .scenario-main .scenario-intro h1 { font-size: clamp(31px,9vw,40px) !important; }
+  .scenario-main .scenario-orb { width: 58px !important; height: 58px !important; }
+  .intensity-select { margin-top: 2px !important; gap: 6px !important; }
+  .intensity-item { height: clamp(126px,21vh,154px) !important; border-radius: 14px !important; }
+  .intensity-item__copy { bottom: 8px; }
+  .intensity-item__check { top: 6px; right: 6px; width: 21px; height: 21px; }
+  .scenario-boundary { margin-top: 4px; font-size: 9px; }
+  .scenario-main .heartbeat-stage { min-height: 104px; margin-top: 0; }
 }

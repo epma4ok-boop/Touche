@@ -620,7 +620,7 @@ export default function CategoryScreen({ lang, gender, category, onBack, onCateg
         <div className="category-pop__layout">
          <div className="category-pop__context">
         <section className="category-pop__hero">
-          <span className="category-pop__stamp">{mode === "together" ? t.sharedTask : `18+ · ${t.lockSub}`}</span>
+          {mode === "together" && <span className="category-pop__stamp">{t.sharedTask}</span>}
            <div className="category-pop__orb" style={{ backgroundImage: `url(${CATEGORY_ART[category]})` }} aria-hidden="true" />
           <p className="category-pop__eyebrow">{categorySub(category, t)}</p>
           <h1 data-testid="text-category-title">{label}</h1>
@@ -629,7 +629,6 @@ export default function CategoryScreen({ lang, gender, category, onBack, onCateg
              desire: t.catDesireDesc, passion: t.catPassionDesc, hard: t.catHardDesc,
            })[category]}</p>
         </section>
-         {sensitive && <div className="category-pop__warning" role="note">18+ · {t.lockSub}</div>}
          {mode === "together" && <div className="category-pop__mode"><span className="category-pop__mode-dot" style={{ background: `rgb(${popColor.r},${popColor.g},${popColor.b})` }} /><strong>{t.sharedTask}</strong><small>{coupleId ? t.linked : t.appSub}</small></div>}
           {mode === "together" && sharedTask && !showReveal && (
             <div data-testid="card-shared-task-status" role="status" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, padding: "12px 14px", borderRadius: 14, background: "rgba(64,51,79,.05)", border: "1px solid rgba(64,51,79,.10)" }}>
@@ -662,7 +661,7 @@ export default function CategoryScreen({ lang, gender, category, onBack, onCateg
       {(errorKind === "subscription_required" || errorKind === "limit_exceeded") && (
         <div className="category-paywall-backdrop" role="presentation" onClick={() => { if (!paywallBusy) setErrorKind(null); }}>
           <section className="category-paywall" role="dialog" aria-modal="true" aria-labelledby="category-paywall-title" onClick={(event) => event.stopPropagation()}>
-            <header className="category-paywall__topline"><span>18+ · Touché</span><button type="button" aria-label={paywallCopy.close} onClick={() => { setErrorKind(null); setPaywallNotice(null); }} disabled={!!paywallBusy}>×</button></header>
+            <header className="category-paywall__topline"><span>Touché</span><button type="button" aria-label={paywallCopy.close} onClick={() => { setErrorKind(null); setPaywallNotice(null); }} disabled={!!paywallBusy}>×</button></header>
             <div className="category-paywall__letter">
               <span className="category-paywall__index">{String(index + 1).padStart(2, "0")} / 05</span>
               <h2 id="category-paywall-title">{paywallCopy.title}</h2>

@@ -350,7 +350,7 @@ export default function DiceScreen({ lang, onBack, onUpgrade }: Props) {
       </header>
       <div className="touche-dice__body">
         <section className="touche-dice__intro">
-          <span className="touche-dice__eyebrow">18+ <i /> TOUCHÉ</span>
+          <span className="touche-dice__eyebrow">TOUCHÉ</span>
           <span className="touche-dice__sequence" aria-hidden="true">02 / 03</span>
           <h1>{copy.title}</h1>
           <p>{copy.subtitle}</p>

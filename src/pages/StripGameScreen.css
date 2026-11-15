@@ -70,18 +70,7 @@
 .strip h1:focus { outline: none; }
 .strip h1:focus-visible { outline: 3px solid rgba(120,24,61,.35); outline-offset: 5px; border-radius: 7px; }
 .strip__intro { text-align: center; }
-.strip__eyebrow {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  color: var(--strip-wine);
-  font-size: 9px;
-  font-weight: 800;
-  letter-spacing: .2em;
-}
-.strip__eyebrow i { width: 4px; height: 4px; border-radius: 50%; background: var(--strip-wine); opacity: .55; }
 .strip__kicker { margin: 0 0 8px; color: var(--strip-wine); font-size: 9px; font-weight: 800; letter-spacing: .16em; }
-.strip__intro .strip__kicker { margin-top: 17px; }
 .strip__intro h1, .strip__play h1, .strip__finish h1 {
   margin: 8px 0 7px;
   font: 700 clamp(31px, 8.8vw, 43px)/.98 "Space Grotesk", sans-serif;
@@ -100,19 +89,6 @@
 .strip__rules { display: grid; gap: 11px; margin: 0; padding: 0; list-style: none; }
 .strip__rules li { display: grid; grid-template-columns: 26px 1fr; gap: 10px; align-items: start; color: #58464e; font-size: 12.5px; line-height: 1.45; }
 .strip__rules i { color: #a64d64; font: 700 10px "Space Grotesk", sans-serif; font-style: normal; }
-.strip__age-note {
-  display: flex;
-  gap: 11px;
-  align-items: flex-start;
-  margin: 14px 0;
-  padding: 12px 14px;
-  border-radius: 15px;
-  color: #644750;
-  background: rgba(230,165,151,.16);
-  text-align: left;
-}
-.strip__age-note > span { flex: 0 0 auto; color: var(--strip-wine); font: 700 11px "Space Grotesk", sans-serif; }
-.strip__age-note p { margin: 0; font-size: 11.5px; line-height: 1.5; }
 .strip__language-note { margin: 10px 0; color: var(--strip-muted); font-size: 11px; line-height: 1.45; }
 .strip__first { min-width: 0; margin: 18px 0 14px; padding: 0; border: 0; }
 .strip__first legend { width: 100%; margin-bottom: 9px; color: var(--strip-ink); font-size: 13px; font-weight: 700; }

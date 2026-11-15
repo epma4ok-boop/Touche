@@ -777,3 +777,36 @@
 /* Keep destination cards quiet: labels and copy carry the meaning. */
 .pop-home .pop-card::before,
 .pop-home .pop-entry-action__index { display: none !important; content: none !important; }
+
+/* Clearer action hierarchy: labels stay legible over their assigned artwork. */
+.pop-home[data-home-layout="list"] .pop-entry-action__copy strong {
+  font-size: clamp(16px, 4.5vw, 19px);
+  letter-spacing: -.025em;
+  text-shadow: 0 1px 0 rgba(255,255,255,.28);
+}
+.pop-home[data-home-layout="list"] .pop-entry-action__copy small {
+  max-width: 28ch;
+  color: var(--home-card-ink);
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.35;
+  opacity: .9;
+}
+.pop-home .pop-entry-action:focus-visible {
+  outline: 3px solid rgba(120,24,61,.68);
+  outline-offset: 3px;
+}
+.pop-home .pop-card > div:last-child > div:nth-child(2) > div:first-child {
+  font-size: clamp(16px, 4.5vw, 19px) !important;
+  line-height: 1.12;
+}
+.pop-home .pop-card > div:last-child > div:nth-child(2) > div:last-child {
+  color: var(--pop-ink) !important;
+  font-size: 12px !important;
+  font-weight: 600;
+  line-height: 1.35;
+  opacity: .92;
+}
+@media (max-width: 380px) {
+  .pop-home[data-home-layout="list"] .pop-entry-action__copy small { font-size: 10px; }
+}

@@ -56,11 +56,11 @@ const INTENSITY_IMAGES: Record<Intensity, string> = {
 };
 
 const T: Record<Lang, { title: string; holdHint: string; casting: string; back: string; noPartner: string; noPartnerSub: string; invite: string; yourRole: string; partnerSent: string; partnerWait: string; partnerPending: string; complete: string; missed: string }> = {
-  en: { title: "Scenarios", holdHint: "HOLD TO DRAW", casting: "GENERATING...", back: "← back", noPartner: "No partner linked yet", noPartnerSub: "Invite your partner first — so you both get complementary roles tonight.", invite: "Invite partner", yourRole: "YOUR ROLE", partnerSent: "Your partner received their role", partnerWait: "They got a Telegram notification with their card", partnerPending: "Partner will see their role when they open the app", complete: "Task completed", missed: "missed" },
-  ru: { title: "Сценарии", holdHint: "УДЕРЖИВАЙ, ЧТОБЫ ТЯНУТЬ", casting: "ГЕНЕРИРУЕМ...", back: "← назад", noPartner: "Партнёр ещё не подключён", noPartnerSub: "Сначала пригласи партнёра — чтобы у вас были разные роли одного сценария.", invite: "Пригласить партнёра", yourRole: "ТВОЯ РОЛЬ", partnerSent: "Партнёр получил свою роль", partnerWait: "Ему пришло уведомление в Telegram с его карточкой", partnerPending: "Партнёр увидит роль при следующем открытии", complete: "Задание выполнено", missed: "пропущено" },
+  en: { title: "Scenarios", holdHint: "HOLD TO DRAW", casting: "GENERATING...", back: "← Back", noPartner: "No partner linked yet", noPartnerSub: "Invite your partner first — so you both get complementary roles tonight.", invite: "Invite partner", yourRole: "YOUR ROLE", partnerSent: "Your partner received their role", partnerWait: "They got a Telegram notification with their card", partnerPending: "Partner will see their role when they open the app", complete: "Task completed", missed: "missed" },
+  ru: { title: "Сценарии", holdHint: "УДЕРЖИВАЙ, ЧТОБЫ ТЯНУТЬ", casting: "ГЕНЕРИРУЕМ...", back: "← Назад", noPartner: "Партнёр ещё не подключён", noPartnerSub: "Сначала пригласи партнёра — чтобы у вас были разные роли одного сценария.", invite: "Пригласить партнёра", yourRole: "ТВОЯ РОЛЬ", partnerSent: "Партнёр получил свою роль", partnerWait: "Ему пришло уведомление в Telegram с его карточкой", partnerPending: "Партнёр увидит роль при следующем открытии", complete: "Задание выполнено", missed: "пропущено" },
   hi: { title: "दृश्य", holdHint: "खींचने के लिए दबाएँ", casting: "तैयार हो रहा है...", back: "← वापस", noPartner: "साथी अभी नहीं जुड़ा", noPartnerSub: "पहले साथी को आमंत्रित करें — ताकि आप दोनों को पूरक भूमिकाएं मिलें।", invite: "साथी को आमंत्रित करें", yourRole: "आपकी भूमिका", partnerSent: "साथी को उनकी भूमिका मिल गई", partnerWait: "उन्हें Telegram पर उनका कार्ड मिला", partnerPending: "साथी अगली बार ऐप खोलने पर भूमिका देखेंगे", complete: "कार्य पूरा हुआ", missed: "चूका" },
-  pt: { title: "Cenários", holdHint: "SEGURE PARA SORTEAR", casting: "GERANDO...", back: "← voltar", noPartner: "Parceiro ainda não conectado", noPartnerSub: "Convide seu parceiro primeiro — para que vocês dois recebam papéis complementares.", invite: "Convidar parceiro", yourRole: "SEU PAPEL", partnerSent: "Seu parceiro recebeu o papel dele", partnerWait: "Ele recebeu uma notificação no Telegram com o cartão", partnerPending: "O parceiro verá o papel quando abrir o app", complete: "Tarefa concluída", missed: "perdida" },
-  es: { title: "Escenarios", holdHint: "MANTÉN PARA SORTEAR", casting: "GENERANDO...", back: "← atrás", noPartner: "Pareja aún no conectada", noPartnerSub: "Invita a tu pareja primero — para que ambos reciban roles complementarios.", invite: "Invitar pareja", yourRole: "TU ROL", partnerSent: "Tu pareja recibió su rol", partnerWait: "Recibió una notificación de Telegram con su tarjeta", partnerPending: "La pareja verá su rol cuando abra la app", complete: "Tarea completada", missed: "perdida" },
+  pt: { title: "Cenários", holdHint: "SEGURE PARA SORTEAR", casting: "GERANDO...", back: "← Voltar", noPartner: "Parceiro ainda não conectado", noPartnerSub: "Convide seu parceiro primeiro — para que vocês dois recebam papéis complementares.", invite: "Convidar parceiro", yourRole: "SEU PAPEL", partnerSent: "Seu parceiro recebeu o papel dele", partnerWait: "Ele recebeu uma notificação no Telegram com o cartão", partnerPending: "O parceiro verá o papel quando abrir o app", complete: "Tarefa concluída", missed: "perdida" },
+  es: { title: "Escenarios", holdHint: "MANTÉN PARA SORTEAR", casting: "GENERANDO...", back: "← Volver", noPartner: "Pareja aún no conectada", noPartnerSub: "Invita a tu pareja primero — para que ambos reciban roles complementarios.", invite: "Invitar pareja", yourRole: "TU ROL", partnerSent: "Tu pareja recibió su rol", partnerWait: "Recibió una notificación de Telegram con su tarjeta", partnerPending: "La pareja verá su rol cuando abra la app", complete: "Tarea completada", missed: "perdida" },
 };
 const ROLE_PRIVATE_COPY: Record<Lang, string> = {
   en: "Your partner has a separate private role card.",
@@ -69,12 +69,12 @@ const ROLE_PRIVATE_COPY: Record<Lang, string> = {
   pt: "Seu parceiro tem um cartão de papel privado e separado.",
   es: "Tu pareja tiene una tarjeta de rol privada e independiente.",
 };
-const SCENARIO_COPY: Record<Lang, { boundary: string; subscription: string; rate: string; unknown: string; upgrade: string; dismiss: string }> = {
-  ru: { boundary: "Сопротивление — часть роли. Стоп завершает сцену.", subscription: "Сценарии доступны в Premium.", rate: "Слишком много запросов. Попробуйте позже.", unknown: "Не удалось создать сценарий. Попробуйте ещё раз.", upgrade: "Открыть Premium", dismiss: "Понятно" },
-  en: { boundary: "Resistance is roleplay. A real stop ends the scene.", subscription: "Scenarios are available in Premium.", rate: "Too many requests. Try again later.", unknown: "Could not create a scenario. Try again.", upgrade: "Open Premium", dismiss: "Dismiss" },
-  hi: { boundary: "विरोध केवल अभिनय है। असली रोकने का संकेत दृश्य रोक देता है।", subscription: "दृश्य Premium में उपलब्ध हैं।", rate: "बहुत अधिक अनुरोध। बाद में प्रयास करें।", unknown: "दृश्य नहीं बन सका। फिर प्रयास करें।", upgrade: "Premium खोलें", dismiss: "समझ गया" },
-  pt: { boundary: "A resistência faz parte do papel. Um pedido real para parar encerra a cena.", subscription: "Cenários estão disponíveis no Premium.", rate: "Muitas solicitações. Tente mais tarde.", unknown: "Não foi possível criar o cenário. Tente novamente.", upgrade: "Abrir Premium", dismiss: "Entendi" },
-  es: { boundary: "La resistencia es parte del papel. Un «stop» real termina la escena.", subscription: "Los escenarios están disponibles en Premium.", rate: "Demasiadas solicitudes. Inténtalo más tarde.", unknown: "No se pudo crear el escenario. Inténtalo de nuevo.", upgrade: "Abrir Premium", dismiss: "Entendido" },
+const SCENARIO_COPY: Record<Lang, { subscription: string; rate: string; unknown: string; upgrade: string; dismiss: string }> = {
+  ru: { subscription: "Сценарии доступны в Premium.", rate: "Слишком много запросов. Попробуйте позже.", unknown: "Не удалось создать сценарий. Попробуйте ещё раз.", upgrade: "Открыть Premium", dismiss: "Понятно" },
+  en: { subscription: "Scenarios are available in Premium.", rate: "Too many requests. Try again later.", unknown: "Could not create a scenario. Try again.", upgrade: "Open Premium", dismiss: "Dismiss" },
+  hi: { subscription: "दृश्य Premium में उपलब्ध हैं।", rate: "बहुत अधिक अनुरोध। बाद में प्रयास करें।", unknown: "दृश्य नहीं बन सका। फिर प्रयास करें।", upgrade: "Premium खोलें", dismiss: "समझ गया" },
+  pt: { subscription: "Cenários estão disponíveis no Premium.", rate: "Muitas solicitações. Tente mais tarde.", unknown: "Não foi possível criar o cenário. Tente novamente.", upgrade: "Abrir Premium", dismiss: "Entendi" },
+  es: { subscription: "Los escenarios están disponibles en Premium.", rate: "Demasiadas solicitudes. Inténtalo más tarde.", unknown: "No se pudo crear el escenario. Inténtalo de nuevo.", upgrade: "Abrir Premium", dismiss: "Entendido" },
 };
 type RoleSectionKey = "task" | "role" | "firstMove";
 type RoleSections = Record<RoleSectionKey, string>;
@@ -84,6 +84,13 @@ const ROLE_SECTION_COPY: Record<Lang, { task: string; role: string; firstMove: s
   hi: { task: "आपका काम", role: "आपकी भूमिका", firstMove: "पहला कदम", legacy: "आपकी भूमिका" },
   pt: { task: "SUA TAREFA", role: "SEU PAPEL", firstMove: "PRIMEIRO PASSO", legacy: "SEU PAPEL" },
   es: { task: "TU TAREA", role: "TU ROL", firstMove: "PRIMER PASO", legacy: "TU ROL" },
+};
+const ROLE_REVEAL_COPY: Record<Lang, string> = {
+  ru: "Сцена начинается",
+  en: "Your scene is set",
+  hi: "आपका दृश्य तैयार है",
+  pt: "A cena está pronta",
+  es: "La escena está lista",
 };
 const ROLE_SECTION_MARKERS: Record<RoleSectionKey, string[]> = {
   task: ["ТВОЁ ЗАДАНИЕ", "ТВОЕ ЗАДАНИЕ", "YOUR TASK", "आपका काम", "SUA TAREFA", "TU TAREA"],
@@ -119,7 +126,7 @@ function parseRoleSections(text: string): RoleSections | null {
 function NoPartner({ lang, onInvite, onBack }: { lang: Lang; onInvite: () => void; onBack: () => void }) {
   const t = T[lang]; const top = useTelegramTopInset();
   return <main className="scenario-pop no-partner" style={{ paddingTop: top }}>
-    <button className="pop-back" style={{ top }} onClick={onBack} data-testid="button-scenarios-back">{t.back}</button>
+    <button type="button" className="pop-back" style={{ top }} onClick={onBack} aria-label={t.back} data-testid="button-scenarios-back">{t.back}</button>
     <div className="no-partner-art" aria-hidden="true"><svg viewBox="0 0 48 48"><path d="M24 40s-17-10.6-17-22a9.3 9.3 0 0 1 17-5.5A9.3 9.3 0 0 1 41 18C41 29.4 24 40 24 40Z" /></svg></div>
     <div className="no-partner-copy"><span className="pop-eyebrow">{t.title}</span><h1>{t.noPartner}</h1><p>{t.noPartnerSub}</p><button className="pop-primary" onClick={onInvite} data-testid="button-invite-partner">{t.invite}<b>→</b></button></div>
   </main>;
@@ -135,9 +142,9 @@ function RoleCard({ title, roleText, intensity, lang, notified, isMissed, onHide
   const [visible, setVisible] = useState(false);
   useEffect(() => { const timer = setTimeout(() => setVisible(true), 160); return () => clearTimeout(timer); }, []);
   return <section className={`scenario-pop role-overlay ${meta.tone} ${visible ? "is-revealed" : ""}`} style={{ paddingTop: topPadding }}>
-    <div className="role-top"><button className="pop-back" onClick={onHideCard} data-testid="button-role-back">{t.back}</button>{isMissed && <span className="pop-status">{t.missed}</span>}</div>
+    <div className="role-top"><button type="button" className="pop-back" onClick={onHideCard} aria-label={t.back} data-testid="button-role-back">{t.back}</button>{isMissed && <span className="pop-status">{t.missed}</span>}</div>
     <div className={`role-content ${visible ? "is-visible" : ""}`}>
-      <div className="role-heading"><h1 data-testid="text-scenario-title">{title}</h1></div>
+      <div className="role-heading"><span className="role-reveal-kicker">{ROLE_REVEAL_COPY[lang]}</span><h1 data-testid="text-scenario-title">{title}</h1></div>
       {roleSections ? <div className="role-sections" data-testid="text-role-content">
         <section className="role-task-card" aria-label={sectionCopy.task} data-testid="scenario-task">
           <div className="role-task-label">{sectionCopy.task}</div>
@@ -243,10 +250,9 @@ export default function ScenarioScreen({ lang, gender, onBack, onUpgrade }: Scen
   const tone = INTENSITY_META[intensity].tone;
   return <>
     <main className={`scenario-pop scenario-main ${tone}`} style={{ paddingTop: topPadding, opacity: mounted ? 1 : 0 }}>
-    <header className="scenario-header"><button className="pop-back" onClick={onBack} data-testid="button-scenarios-back">{t.back}</button><div className="scenario-brand">Touch<em>é</em></div></header>
+    <header className="scenario-header"><button type="button" className="pop-back" onClick={onBack} aria-label={t.back} data-testid="button-scenarios-back">{t.back}</button><div className="scenario-brand">Touch<em>é</em></div></header>
      <section className="scenario-intro"><h1>{t.title}</h1><div className="scenario-orb" aria-hidden="true"><img src="/images/activity-cards/cat-scenarios.jpg" alt="" /></div></section>
     <IntensitySelector value={intensity} onChange={setIntensity} lang={lang} />
-    {intensity !== "romantic" && <p className="scenario-boundary" data-testid="text-scenario-boundary">{SCENARIO_COPY[lang].boundary}</p>}
     <div className="heartbeat-stage"><HeartbeatCanvas onHoldComplete={handleHoldComplete} isCasting={isCasting} color={intensity === "romantic" ? { r: 220, g: 211, b: 234 } : intensity === "passion" ? { r: 158, g: 132, b: 185 } : { r: 120, g: 94, b: 151 }} hintText={hintText} holdDuration={2600} baseRScale={0.42} bgColor="#f8f5fc" /></div>
     {errorKind && <div className="scenario-error" role="alert"><p>{errorKind === "subscription_required" ? SCENARIO_COPY[lang].subscription : errorKind === "rate_limited" ? SCENARIO_COPY[lang].rate : SCENARIO_COPY[lang].unknown}</p>{errorKind === "subscription_required" && onUpgrade && <button className="pop-primary" onClick={onUpgrade}>{SCENARIO_COPY[lang].upgrade}</button>}<button className="error-dismiss" onClick={() => setErrorKind(null)}>{SCENARIO_COPY[lang].dismiss}</button></div>}
     </main>

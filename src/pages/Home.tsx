@@ -398,12 +398,12 @@ const HOME_STATUS_COPY: Record<Lang, {
   },
 };
 
-const SCENARIO_LABELS: Record<Lang, string> = {
-  ru: "Сценарии",
-  en: "Scenarios",
-  hi: "परिदृश्य",
-  pt: "Cenários",
-  es: "Escenarios",
+const SCENARIO_LABELS: Record<Lang, { title: string; sub: string }> = {
+  ru: { title: "Сценарии", sub: "Один сюжет — две роли" },
+  en: { title: "Scenarios", sub: "One story, two roles" },
+  hi: { title: "दृश्य", sub: "दो अलग भूमिकाएँ" },
+  pt: { title: "Cenários", sub: "Uma história, dois papéis" },
+  es: { title: "Escenarios", sub: "Una historia, dos roles" },
 };
 
 const INVITE_LABELS: Record<Lang, { title: string; sub: string }> = {
@@ -1394,7 +1394,7 @@ export default function Home({
       <Card type="desire" title={t.catDesire} sub={t.catDesireSub} onClick={() => onCategorySelect("desire")} index={2} {...cardLimit("desire")} />
       <Card type="passion" title={t.catPassion} sub={t.catPassionSub} onClick={() => onCategorySelect("passion")} index={3} {...cardLimit("passion")} />
       <Card type="hard" title={t.catHard} sub={t.catHardSub} onClick={() => onCategorySelect("hard")} index={4} {...cardLimit("hard")} />
-      <Card type="scenarios" title={SCENARIO_LABELS[lang]} onClick={handleScenarioClick} index={5} />
+      <Card type="scenarios" title={SCENARIO_LABELS[lang].title} sub={SCENARIO_LABELS[lang].sub} onClick={handleScenarioClick} index={5} testId="button-category-scenarios" />
     </>
   );
 

@@ -632,16 +632,6 @@
   outline: 3px solid var(--pop-wine);
   outline-offset: 3px;
 }
-.scenario-boundary {
-  flex: 0 0 auto;
-  max-width: 500px;
-  margin: 6px auto 0;
-  padding: 0 16px;
-  color: var(--muted);
-  font-size: 10px;
-  line-height: 1.25;
-  text-align: center;
-}
 .scenario-main .heartbeat-stage {
   flex: 1 1 auto;
   width: min(100%,560px);
@@ -657,6 +647,233 @@
   .intensity-item { height: clamp(126px,21vh,154px) !important; border-radius: 14px !important; }
   .intensity-item__copy { bottom: 8px; }
   .intensity-item__check { top: 6px; right: 6px; width: 21px; height: 21px; }
-  .scenario-boundary { margin-top: 4px; font-size: 9px; }
   .scenario-main .heartbeat-stage { min-height: 104px; margin-top: 0; }
+}
+
+/* A definite, thumb-friendly return control below Telegram's close/safe-area zone. */
+.scenario-pop .pop-back {
+  position: relative;
+  z-index: 5;
+  display: inline-flex;
+  min-width: 88px;
+  min-height: 40px;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 7px 12px;
+  border: 1px solid rgba(64,51,79,.2);
+  border-radius: 999px;
+  background: rgba(255,250,243,.94);
+  color: #40334f;
+  box-shadow: 0 3px 10px rgba(64,51,79,.09);
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1;
+  text-align: center;
+  opacity: 1;
+  -webkit-tap-highlight-color: transparent;
+}
+.scenario-pop .pop-back:hover { background: #fff; color: #34243d; }
+.scenario-pop .pop-back:focus-visible {
+  outline: 3px solid #8064a2;
+  outline-offset: 3px;
+}
+.scenario-main .scenario-header { min-height: 44px; }
+.role-overlay .role-top {
+  min-height: 44px;
+  padding-top: 2px;
+}
+.role-overlay .pop-back {
+  border-color: rgba(255,250,243,.44);
+  background: rgba(37,25,43,.28);
+  color: #fffaf3;
+  box-shadow: inset 0 1px rgba(255,255,255,.12);
+}
+.role-overlay .pop-back:hover { background: rgba(255,250,243,.18); color: #fff; }
+.role-overlay .pop-back:focus-visible { outline-color: #fffaf3; }
+.no-partner .pop-back {
+  position: absolute;
+  top: max(96px, env(safe-area-inset-top));
+  left: 18px;
+}
+
+/* Keep the reveal playful in tone while its first card stays the visual anchor. */
+.role-overlay::before {
+  inset: auto;
+  position: absolute;
+  top: 16%;
+  right: -58px;
+  width: 168px;
+  height: 168px;
+  border: 1px solid rgba(255,250,243,.17);
+  border-radius: 46% 54% 58% 42%;
+  box-shadow: 0 0 0 12px rgba(255,250,243,.035), 0 0 0 27px rgba(255,250,243,.025);
+  background: none;
+  opacity: 1;
+  mask-image: none;
+  content: "";
+  pointer-events: none;
+  transform: rotate(18deg);
+}
+.role-overlay .role-heading {
+  position: relative;
+  padding: 0 0 12px;
+}
+.role-overlay .role-reveal-kicker {
+  display: inline-flex;
+  align-items: center;
+  min-height: 25px;
+  margin-bottom: 8px;
+  padding: 4px 9px;
+  border: 1px solid rgba(255,250,243,.35);
+  border-radius: 999px;
+  background: rgba(255,250,243,.1);
+  color: #fff1c9;
+  font: 700 9px/1.2 "DM Sans", sans-serif;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+.role-overlay .role-heading h1 {
+  position: relative;
+  text-wrap: pretty;
+}
+.role-overlay .role-task-card {
+  border-radius: 22px 22px 22px 8px;
+  box-shadow: 0 14px 30px rgba(24,17,34,.2), 4px 4px 0 rgba(255,250,243,.13);
+}
+.role-overlay .role-task-card::after {
+  border-color: rgba(120,52,73,.22);
+  box-shadow: 0 0 0 12px rgba(120,52,73,.045), 0 0 0 24px rgba(120,52,73,.03);
+}
+.role-overlay .role-context { position: relative; z-index: 1; }
+@media (max-height: 700px) {
+  .role-overlay .role-heading { padding-bottom: 8px; }
+  .role-overlay .role-reveal-kicker { min-height: 21px; margin-bottom: 5px; padding-block: 3px; }
+}
+@media (max-width: 360px) {
+  .scenario-pop .pop-back { min-width: 78px; min-height: 38px; padding-inline: 10px; font-size: 12px; }
+}
+
+/* The generated role feels like a playful scene card, not a plain alert screen. */
+.scenario-pop.role-overlay.coral {
+  --reveal-accent: #765b99;
+  --reveal-tint: rgba(118,91,153,.12);
+  background:
+    radial-gradient(ellipse at 92% 7%, rgba(180,151,205,.32), transparent 35%),
+    radial-gradient(ellipse at 2% 87%, rgba(255,212,93,.2), transparent 34%),
+    linear-gradient(155deg,#fbf9fe 0%,#f1eaf6 58%,#e6deef 100%);
+  color: #342a42;
+}
+.scenario-pop.role-overlay.yellow {
+  --reveal-accent: #916342;
+  --reveal-tint: rgba(224,174,126,.17);
+  background:
+    radial-gradient(ellipse at 92% 7%, rgba(255,212,93,.34), transparent 35%),
+    radial-gradient(ellipse at 2% 87%, rgba(255,111,97,.13), transparent 34%),
+    linear-gradient(155deg,#fffaf1 0%,#fbf0dd 58%,#f0e3d2 100%);
+  color: #342a42;
+}
+.scenario-pop.role-overlay.blue {
+  --reveal-accent: #65538f;
+  --reveal-tint: rgba(101,83,143,.14);
+  background:
+    radial-gradient(ellipse at 92% 7%, rgba(171,159,214,.34), transparent 35%),
+    radial-gradient(ellipse at 2% 87%, rgba(255,212,93,.16), transparent 34%),
+    linear-gradient(155deg,#f9f8ff 0%,#ece9f8 58%,#dedaf0 100%);
+  color: #342a42;
+}
+.role-overlay .role-top { position: relative; z-index: 3; }
+.role-overlay .pop-back {
+  border-color: rgba(52,42,66,.18);
+  background: rgba(255,250,243,.9);
+  color: #40334f;
+  box-shadow: 0 3px 10px rgba(64,51,79,.1);
+}
+.role-overlay .pop-back:hover { background: #fff; color: #342a42; }
+.role-overlay .pop-back:focus-visible { outline-color: #65538f; }
+.role-overlay .pop-status {
+  border-color: rgba(52,42,66,.22);
+  background: rgba(255,250,243,.7);
+  color: #40334f;
+  opacity: 1;
+}
+.role-overlay .role-content { position: relative; z-index: 1; }
+.role-overlay::before {
+  border-color: rgba(64,51,79,.13);
+  box-shadow: 0 0 0 12px rgba(64,51,79,.035), 0 0 0 27px rgba(64,51,79,.025);
+}
+.role-overlay .role-reveal-kicker {
+  border-color: rgba(118,91,153,.26);
+  background: rgba(255,250,243,.82);
+  color: var(--reveal-accent);
+  box-shadow: 0 3px 10px var(--reveal-tint);
+}
+.role-overlay .role-heading h1 { color: #342a42; }
+.role-overlay .role-task-card {
+  border: 1.5px solid rgba(64,51,79,.17) !important;
+  background: rgba(255,250,243,.96) !important;
+  box-shadow: 0 14px 30px rgba(64,51,79,.12), 4px 4px 0 var(--reveal-tint);
+}
+.role-overlay .role-task-card::after {
+  border-color: var(--reveal-tint);
+  box-shadow: 0 0 0 12px var(--reveal-tint), 0 0 0 24px rgba(64,51,79,.035);
+}
+.role-overlay .role-context {
+  border-color: rgba(64,51,79,.16);
+  background: rgba(255,250,243,.52);
+}
+.role-overlay .role-context-toggle { color: #40334f; }
+.role-overlay .role-context .role-detail-card {
+  border-color: rgba(64,51,79,.13);
+  background: rgba(255,250,243,.88);
+}
+.role-overlay .role-bottom .partner-note {
+  border-color: rgba(64,51,79,.16);
+  background: rgba(255,250,243,.68);
+  color: #40334f;
+}
+@media (prefers-reduced-motion: reduce) {
+  .role-overlay .role-task-card { transition: none; }
+}
+
+/* Make each scenario level feel tappable, with a clear label and violet glow. */
+.intensity-item {
+  border: 2px solid rgba(255,255,255,.86) !important;
+  box-shadow: 0 7px 18px rgba(64,51,79,.14), 0 0 0 1px rgba(128,100,162,.12);
+}
+.intensity-item:hover:not(.active) {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 9px 20px rgba(64,51,79,.16), 0 0 18px rgba(128,100,162,.24);
+}
+.intensity-item__copy strong {
+  width: fit-content;
+  max-width: 100%;
+  margin-inline: auto;
+  padding: 7px 9px;
+  border: 1px solid rgba(255,255,255,.56);
+  border-radius: 999px;
+  background: rgba(52,42,66,.86);
+  color: #fff !important;
+  font-size: clamp(13px,3.7vw,15px) !important;
+  line-height: 1.12 !important;
+  text-shadow: none !important;
+  box-shadow: 0 2px 9px rgba(28,19,38,.18);
+}
+.intensity-item.active {
+  border-color: #fff !important;
+  box-shadow:
+    0 0 0 2px #8064a2,
+    0 0 0 4px rgba(248,245,252,.76),
+    0 0 22px 7px rgba(128,100,162,.4),
+    0 12px 24px rgba(64,51,79,.2);
+  transform: translateY(-3px) !important;
+}
+.intensity-item:focus-visible {
+  outline: 3px solid #8064a2;
+  outline-offset: 4px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .intensity-item,
+  .intensity-item:hover,
+  .intensity-item.active { transform: none !important; }
 }

@@ -872,6 +872,15 @@
   outline: 3px solid #8064a2;
   outline-offset: 4px;
 }
+.intensity-item__image::after {
+  display: none;
+}
+.intensity-item.blue .intensity-item__image {
+  background: #c9bdd9;
+}
+.intensity-item.blue .intensity-item__image img {
+  transform: scale(.88);
+}
 @media (prefers-reduced-motion: reduce) {
   .intensity-item,
   .intensity-item:hover,

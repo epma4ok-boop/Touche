@@ -280,6 +280,145 @@
   .scenario-orb,.no-partner-art { animation:none !important; }
 }
 
+/* Photo-led scenario choices, matching Touché's horizontal action cards. */
+.scenario-main .scenario-orb {
+  display: block !important;
+  overflow: hidden !important;
+  border: 3px solid rgba(255,255,255,.86) !important;
+  border-radius: 50% !important;
+  background: #c9bdd9 !important;
+  box-shadow: 0 9px 22px rgba(64,51,79,.2), 0 0 0 5px rgba(255,255,255,.34) !important;
+  transform: none !important;
+  animation: none !important;
+}
+.scenario-main .scenario-orb img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 32%;
+}
+.intensity-select {
+  display: grid !important;
+  grid-template-columns: minmax(0,1fr) !important;
+  width: min(100% - 36px,500px) !important;
+  margin: 10px auto 7px !important;
+  padding: 0 !important;
+  gap: 8px !important;
+}
+.intensity-item {
+  --intensity-surface: #eee8f5;
+  position: relative;
+  display: flex;
+  width: 100%;
+  min-height: 72px !important;
+  align-items: center;
+  overflow: hidden;
+  isolation: isolate;
+  padding: 10px 16px !important;
+  border: 1px solid rgba(64,51,79,.15) !important;
+  border-radius: 18px !important;
+  background: var(--intensity-surface) !important;
+  color: #40334f !important;
+  text-align: left;
+  box-shadow: 0 5px 14px rgba(64,51,79,.08);
+  transition: transform .16s ease, box-shadow .16s ease, border-color .16s ease;
+}
+.intensity-item.romantic { --intensity-surface: #eee8f5; }
+.intensity-item.passion { --intensity-surface: #e8e0f0; }
+.intensity-item.hard { --intensity-surface: #e2d8ec; }
+.intensity-item__image {
+  position: absolute;
+  z-index: 0;
+  inset: 0 0 0 auto;
+  width: 54%;
+  overflow: hidden;
+}
+.intensity-item__image img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 27%;
+  filter: saturate(.82);
+}
+.intensity-item::after {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  background: linear-gradient(90deg,
+    var(--intensity-surface) 0%,
+    var(--intensity-surface) 35%,
+    rgba(238,232,245,.9) 52%,
+    rgba(238,232,245,.42) 72%,
+    rgba(238,232,245,.04) 100%);
+  content: "";
+  pointer-events: none;
+}
+.intensity-item__copy {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  gap: 4px;
+  max-width: 68%;
+}
+.intensity-item__copy strong {
+  font: 700 16px/1.1 var(--font-display,"Space Grotesk",sans-serif);
+  color: #40334f;
+}
+.intensity-item__copy small {
+  margin: 0;
+  color: #62566f;
+  font-size: 10px;
+  line-height: 1.25;
+}
+.intensity-item__arrow {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  width: 28px;
+  height: 28px;
+  flex: none;
+  place-items: center;
+  margin-left: auto;
+  border: 1px solid rgba(64,51,79,.18);
+  border-radius: 50%;
+  background: rgba(248,245,252,.76);
+  color: #594573;
+  font-size: 16px;
+  line-height: 1;
+}
+.intensity-item:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 20px rgba(64,51,79,.14);
+}
+.intensity-item.active {
+  border-color: #8064a2 !important;
+  background: var(--intensity-surface) !important;
+  color: #40334f !important;
+  box-shadow: 0 0 0 2px rgba(128,100,162,.16), 0 8px 20px rgba(64,51,79,.13);
+}
+.intensity-item.active::before {
+  position: absolute;
+  z-index: 3;
+  inset: 12px auto 12px 0;
+  width: 4px;
+  border-radius: 0 4px 4px 0;
+  background: #8064a2;
+  content: "";
+}
+.intensity-item:focus-visible {
+  outline: 3px solid rgba(128,100,162,.54);
+  outline-offset: 3px;
+}
+@media (max-height: 700px) {
+  .intensity-item { min-height: 62px !important; }
+  .intensity-item__image { width: 49%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .intensity-item { transition: none; }
+}
+
 /* Reveal hierarchy: the title and assignment lead; role context stays one tap away. */
 .scenario-intro { padding-top: 30px !important; }
 .scenario-intro h1 {

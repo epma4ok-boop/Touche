@@ -49,6 +49,11 @@ const INTENSITY_META: Record<Intensity, IntensityMeta> = {
   passion: { color: "var(--pop-coral)", tone: "coral", labels: { ru: { label: "Страсть", sub: "чувственно · 18+" }, en: { label: "Passion", sub: "sensual · 18+" }, hi: { label: "जुनून", sub: "भावुक · 18+" }, pt: { label: "Paixão", sub: "sensual · 18+" }, es: { label: "Pasión", sub: "sensual · 18+" } } },
   hard: { color: "var(--pop-blue)", tone: "blue", labels: { ru: { label: "Жёстко", sub: "откровенно · 18+" }, en: { label: "Hard", sub: "explicit · 18+" }, hi: { label: "साहसिक", sub: "खुलकर · 18+" }, pt: { label: "Intenso", sub: "explícito · 18+" }, es: { label: "Intenso", sub: "explícito · 18+" } } },
 };
+const INTENSITY_IMAGES: Record<Intensity, string> = {
+  hard: "/images/scenario-levels/hard.jpg",
+  passion: "/images/scenario-levels/medium.jpg",
+  romantic: "/images/scenario-levels/light.jpg",
+};
 
 const T: Record<Lang, { title: string; holdHint: string; casting: string; back: string; noPartner: string; noPartnerSub: string; invite: string; yourRole: string; partnerSent: string; partnerWait: string; partnerPending: string; complete: string; missed: string }> = {
   en: { title: "Scenarios", holdHint: "HOLD · DRAW YOUR SCENARIO", casting: "GENERATING...", back: "← back", noPartner: "No partner linked yet", noPartnerSub: "Invite your partner first — so you both get complementary roles tonight.", invite: "Invite partner", yourRole: "YOUR ROLE", partnerSent: "Your partner received their role", partnerWait: "They got a Telegram notification with their card", partnerPending: "Partner will see their role when they open the app", complete: "Task completed", missed: "missed" },
@@ -173,7 +178,7 @@ function RoleCard({ title, roleText, intensity, lang, notified, isMissed, onHide
 }
 
 function IntensitySelector({ value, onChange, lang }: { value: Intensity; onChange: (v: Intensity) => void; lang: Lang }) {
-  return <div className="intensity-select">{(["romantic", "passion", "hard"] as Intensity[]).map((key) => { const item = INTENSITY_META[key]; const label = item.labels[lang] ?? item.labels.en; return <button key={key} className={`intensity-item ${item.tone} ${value === key ? "active" : ""}`} onClick={() => onChange(key)} data-testid={`button-intensity-${key}`}><strong>{label.label}</strong><small>{label.sub}</small></button>; })}</div>;
+  return <div className="intensity-select">{(["romantic", "passion", "hard"] as Intensity[]).map((key) => { const item = INTENSITY_META[key]; const label = item.labels[lang] ?? item.labels.en; return <button key={key} className={`intensity-item ${item.tone} ${value === key ? "active" : ""}`} onClick={() => onChange(key)} aria-pressed={value === key} data-testid={`button-intensity-${key}`}><span className="intensity-item__image" aria-hidden="true"><img src={INTENSITY_IMAGES[key]} alt="" /></span><span className="intensity-item__copy"><strong>{label.label}</strong><small>{label.sub}</small></span><span className="intensity-item__arrow" aria-hidden="true">→</span></button>; })}</div>;
 }
 
 interface ScenarioScreenProps { lang: Lang; gender?: Gender; onBack: () => void; onUpgrade?: () => Promise<boolean>; }
@@ -239,7 +244,7 @@ export default function ScenarioScreen({ lang, gender, onBack, onUpgrade }: Scen
   return <>
     <main className={`scenario-pop scenario-main ${tone}`} style={{ paddingTop: topPadding, opacity: mounted ? 1 : 0 }}>
     <header className="scenario-header"><button className="pop-back" onClick={onBack} data-testid="button-scenarios-back">{t.back}</button><div className="scenario-brand">Touch<em>é</em></div></header>
-     <section className="scenario-intro"><h1>{t.title}</h1><div className="scenario-orb" aria-hidden="true"><svg viewBox="0 0 48 48"><path d="M24 40s-17-10.6-17-22a9.3 9.3 0 0 1 17-5.5A9.3 9.3 0 0 1 41 18C41 29.4 24 40 24 40Z" /></svg></div></section>
+     <section className="scenario-intro"><h1>{t.title}</h1><div className="scenario-orb" aria-hidden="true"><img src="/images/activity-cards/cat-scenarios.jpg" alt="" /></div></section>
     <IntensitySelector value={intensity} onChange={setIntensity} lang={lang} />
     {intensity !== "romantic" && <p className="adult-note" data-testid="text-adult-notice">{SCENARIO_COPY[lang].adult}</p>}
     <div className="heartbeat-stage"><HeartbeatCanvas onHoldComplete={handleHoldComplete} isCasting={isCasting} color={intensity === "romantic" ? { r: 220, g: 211, b: 234 } : intensity === "passion" ? { r: 158, g: 132, b: 185 } : { r: 120, g: 94, b: 151 }} hintText={hintText} holdDuration={2600} baseRScale={0.42} bgColor="#f8f5fc" /></div>

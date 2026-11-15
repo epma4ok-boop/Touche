@@ -1050,8 +1050,8 @@ export default function WishMap({ lang, coupleId, refreshKey, onOpenTask }: Wish
         .wm-diary-backdrop{background:rgba(43,32,38,.56);backdrop-filter:blur(8px)}
         .wm-diary-panel{--wm-paper:#f4eee4;--wm-ink:#2b2026;--wm-muted:#75656b;--wm-coral:#a95e60;--wm-line:rgba(72,40,50,.14);width:min(100%,620px);border:1px solid rgba(72,40,50,.16);border-radius:30px;background:#f4eee4;color:#2b2026;box-shadow:0 28px 80px rgba(43,32,38,.28);font-family:"DM Sans",sans-serif}
         .wm-diary-cover{height:clamp(145px,30vw,205px);border:0;background:#ead7d1}
-        .wm-diary-cover img{object-position:center 43%;filter:saturate(.72) sepia(.08)}
-        .wm-diary-cover:after{background:linear-gradient(180deg,transparent,rgba(43,32,38,.5))}
+        .wm-diary-cover img{object-position:center 43%;filter:none}
+        .wm-diary-cover:after{background:linear-gradient(180deg,transparent 56%,rgba(244,238,228,.72))}
         .wm-diary-panel .wm-inner{padding:21px 24px 25px}
         .wm-diary-close{top:14px;right:14px;border:1px solid rgba(72,40,50,.16);background:rgba(244,238,228,.92);color:#2b2026;box-shadow:none}
         .wm-diary-close:hover{background:#fffaf2}
@@ -1102,7 +1102,7 @@ export default function WishMap({ lang, coupleId, refreshKey, onOpenTask }: Wish
         .wm-dialog-rule{background:rgba(72,40,50,.14)}
         .wm-dialog-hint{color:#75656b}
         @media(min-width:560px){.wm-diary-panel .wm-inner{padding:24px 29px 28px}.wm-content-grid{gap:18px}}
-        @media(max-width:420px){.wm-diary-panel .wm-inner{padding:16px 15px 18px}.wm-diary-cover{height:132px}}
+        @media(max-width:420px){.wm-diary-panel .wm-inner{padding:16px 15px 18px}.wm-diary-cover{height:148px}}
       `}</style>
       <button
         ref={diaryTriggerRef}
@@ -1152,7 +1152,7 @@ export default function WishMap({ lang, coupleId, refreshKey, onOpenTask }: Wish
             </svg>
           </button>
       <div className="wm-diary-cover" aria-hidden="true">
-        <img src="/images/wish-diary-cover.png" alt="" />
+        <img src="/images/wish-diary-cover.jpg" alt="" />
       </div>
       <div className="wm-inner">
         <header className="wm-head">

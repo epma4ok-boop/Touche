@@ -407,14 +407,14 @@ function genderContextEn(gender: string): string {
 
 const ROLE_LIST_EN = `
 Scenario ideas are examples, not a fixed menu:
-- romantic: an intriguing first meeting, private dance, late-night neighbors, or a playful at-home performance.
-- passion: an after-hours hotel encounter, a fictional adult police-station interrogation that turns flirtatious, or an original adult seduction.
-- hard: fictional adult-film casting, consensual dominant/submissive roles, an adult police-station fantasy, or another bold power dynamic.
-Invent many different role pairings and premises. Do not default to photographer/model, lecturer/student, or casting. Never use minors, schoolchildren, or characters whose age is unclear.
+- light / romantic: strangers meeting on a train or at a hotel bar; neighbors sharing a late-night conversation; artist and adult muse; photographer and adult model in an imagined, unrecorded home shoot; dance partners rehearsing; a private song or cooking lesson.
+- medium / passion: adult massage therapist and client who both invite the scene to change; adult dance instructor and adult student; two rival chefs cooking at home; actors rehearsing a romantic scene; adult travel guide and curious visitor; longtime rivals who discover mutual attraction.
+- hard: adult boss and assistant choosing a bold after-hours fantasy; fictional detective and suspect in a playful, pre-agreed interrogation; adult host and demanding guest; adult performer and director in an imaginary, unrecorded audition; a mutually chosen dominant/submissive scene with clear limits.
+Invent fresh pairings and premises; rotate settings and dynamics instead of repeating these examples. All characters must be adults, with clear ages and adult contexts. Keep every scene fictional and private. Never use minors, school settings, incest, intoxication, assault, real coercion, transactional pressure, or public/risky locations. A fictional power imbalance is only a mutually chosen role; real refusal or a stop signal ends the scene.
 
 Intensity:
-- romantic: intrigue and flirting, no explicit sexual content.
-- passion: build from a specific story hook into sensual, physical intimacy; include a clear act such as oral pleasure, tongue on nipples, intimate touch, a toy, or intercourse—not only flirting or dialogue.
+- light / romantic: intrigue, playful flirting, and affectionate tension; no explicit sexual action.
+- medium / passion: build from a specific story hook into sensual, physical intimacy; include a clear act such as oral pleasure, intimate touch, a toy, or intercourse—not only flirting or dialogue.
 - hard: use a bold, clearly fictional adult power dynamic and a named sexual act such as oral pleasure, intimate stimulation, a toy, or intercourse; submission is optional, bounded, and mutually chosen.
 
 Private-card rules:
@@ -433,15 +433,15 @@ Return ONLY valid JSON: {"title":"...","role_a":"...","role_b":"...","variation_
 const ROLE_LIST_RU = `
 Идеи сцен:
 Примеры — не фиксированный список:
-- romantic: интригующее знакомство, приватный танец, поздняя встреча соседей или домашнее выступление.
-- passion: встреча в отеле после закрытия, вымышленный допрос в полицейском участке с флиртом или оригинальное взрослое соблазнение.
-- hard: вымышленный порнокастинг, согласованные роли доминирующего и подчинённого, фантазия о полицейском участке или другая смелая динамика власти.
-Придумывай разные пары ролей и завязки. Не зацикливайся на фотографе/модели, преподавателе/студенте или кастинге. Не используй несовершеннолетних, школьников или персонажей с неясным возрастом.
+- лайт / romantic: незнакомцы в поезде или баре отеля; соседи, задержавшиеся за разговором; художник и взрослая муза; фотограф и взрослая модель на воображаемой домашней съёмке без записи; партнёры по танцам; личный музыкальный или кулинарный урок.
+- средний / passion: взрослый массажист и клиент, который сам предлагает продолжить сцену; взрослые преподаватель танцев и ученик; два соперничающих повара дома; актёры на репетиции романтической сцены; взрослый экскурсовод и любознательный турист; давние соперники, обнаружившие взаимное влечение.
+- хард: взрослые начальник и помощник, выбравшие смелую фантазию после работы; вымышленные детектив и подозреваемый в игровой заранее согласованной сцене; взрослые хозяин и требовательный гость; взрослые режиссёр и актёр на воображаемом кастинге без записи; динамика доминирования и подчинения с взаимным выбором и ясными границами.
+Чередуй завязки, роли и места, не повторяй примеры по кругу. Все персонажи — взрослые, с ясным взрослым контекстом. Сцены вымышленные и приватные. Не используй несовершеннолетних, школьные сюжеты, инцест, опьянение, сексуальное насилие, настоящее принуждение, давление из-за денег или публичные/опасные места. Разница власти допустима только как взаимно выбранная ролевая фантазия; настоящий отказ или стоп-сигнал немедленно завершает сцену.
 
 Уровни:
-- romantic: игривая интрига и флирт без сексуальных действий.
-- passion: развивай ясную завязку до чувственной физической близости; назови оральные ласки, ласки сосков языком, интимные прикосновения, игрушку или секс — не ограничивайся флиртом и разговором.
-- hard: используй смелую вымышленную динамику власти взрослых и назови сексуальное действие: оральные ласки, интимную стимуляцию, игрушку или секс; подчинение — только по взаимному выбору и с ограничениями.
+- лайт / romantic: интрига, игривый флирт и нежное напряжение без откровенных сексуальных действий.
+- средний / passion: развивай ясную завязку до чувственной физической близости; назови конкретное действие — например, оральные ласки, интимные прикосновения, игрушку или секс, — а не только флирт и разговор.
+- хард: используй смелую вымышленную динамику власти взрослых и назови сексуальное действие — например, оральные ласки, интимную стимуляцию, игрушку или секс; подчинение возможно только по взаимному выбору и с ясными границами.
 
 Правила скрытых карточек:
 - Верни одно нейтральное название и две отдельные карточки. Название увидят оба, поэтому в нём нельзя называть роли, их пару или скрытую цель персонажа.

@@ -1035,72 +1035,75 @@ export default function WishMap({ lang, coupleId, refreshKey, onOpenTask }: Wish
         @media(min-width:560px){.wm-diary-panel .wm-inner{padding:20px 24px 24px}}
         @media(max-width:420px){.wm-diary-panel{border-radius:20px}.wm-diary-panel .wm-inner{padding:17px 15px 18px}.wm-diary-cover{height:132px}}
         @media(prefers-reduced-motion:reduce){.wm-diary-trigger,.wm-diary-panel *,.wm-diary-backdrop{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
-        /* Recompose the diary as a keepsake folio, with a light archive interior. */
-        .wm-shell{--wm-paper:#f4eee4;--wm-ink:#2b2026;--wm-muted:#75656b;--wm-coral:#a95e60;--wm-line:rgba(72,40,50,.14)}
-        .wm-diary-trigger{grid-template-columns:minmax(0,1fr) auto;gap:12px 18px;padding:18px 20px;border:1px solid rgba(72,40,50,.16);border-radius:21px;background:radial-gradient(circle at 100% 0%,rgba(189,116,107,.15),transparent 38%),linear-gradient(120deg,#eee2d6 0%,#f4eee4 70%);color:#2b2026;box-shadow:0 9px 25px rgba(62,38,44,.07)}
+        /* Keep the diary in Touché's shared violet palette; the glow stays restrained. */
+        .wm-shell{--wm-paper:#f8f5fc;--wm-ink:#342a42;--wm-muted:#62566f;--wm-coral:#8064a2;--wm-line:rgba(64,51,79,.12)}
+        .wm-diary-trigger{grid-template-columns:minmax(0,1fr) auto;gap:12px 18px;padding:18px 20px;border:1px solid rgba(108,83,142,.25);border-radius:21px;background:radial-gradient(circle at 100% 0%,rgba(164,138,191,.17),transparent 40%),linear-gradient(125deg,#f8f5fc 0%,#e7def1 100%);color:#40334f;box-shadow:0 0 0 1px rgba(248,245,252,.74),0 8px 24px rgba(91,66,120,.12),0 0 15px rgba(128,100,162,.13),inset 0 1px rgba(255,255,255,.82);transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease}
+        .wm-diary-trigger:hover:not(:disabled){border-color:rgba(108,83,142,.42);box-shadow:0 0 0 1px rgba(248,245,252,.9),0 10px 28px rgba(91,66,120,.16),0 0 19px rgba(128,100,162,.22),inset 0 1px rgba(255,255,255,.9);transform:translateY(-1px)}
+        .wm-diary-trigger:focus-visible{outline:3px solid rgba(128,100,162,.62);outline-offset:3px}
+        .wm-diary-trigger:active:not(:disabled){transform:translateY(1px)}
         .wm-entry-top{grid-column:1/-1}
-        .wm-entry-bottom{grid-column:1/-1;padding-top:10px;border-top:1px solid rgba(72,40,50,.13)}
-        .wm-entry-eyebrow{color:#783449;font-family:"Space Mono",monospace}
+        .wm-entry-bottom{grid-column:1/-1;padding-top:10px;border-top:1px solid rgba(64,51,79,.13)}
+        .wm-entry-eyebrow{color:#765b99;font-family:"Space Mono",monospace}
         .wm-entry-title,.wm-entry-total strong{font-family:"Fraunces",Georgia,serif;font-weight:600;letter-spacing:-.035em}
         .wm-entry-title{font-size:25px}
-        .wm-entry-seal{width:45px;height:45px;border:1px solid rgba(120,52,73,.2);background:#ead7d1;color:#783449;box-shadow:none}
-        .wm-entry-status{color:#783449}
-        .wm-entry-track{height:3px;background:rgba(72,40,50,.1)}
-        .wm-entry-track span{background:#783449}
-        .wm-diary-backdrop{background:rgba(43,32,38,.56);backdrop-filter:blur(8px)}
-        .wm-diary-panel{--wm-paper:#f4eee4;--wm-ink:#2b2026;--wm-muted:#75656b;--wm-coral:#a95e60;--wm-line:rgba(72,40,50,.14);width:min(100%,620px);border:1px solid rgba(72,40,50,.16);border-radius:30px;background:#f4eee4;color:#2b2026;box-shadow:0 28px 80px rgba(43,32,38,.28);font-family:"DM Sans",sans-serif}
-        .wm-diary-cover{height:clamp(145px,30vw,205px);border:0;background:#ead7d1}
+        .wm-entry-seal{width:45px;height:45px;border:1px solid rgba(128,100,162,.22);background:#e9e0f2;color:#594573;box-shadow:0 3px 10px rgba(91,66,120,.1)}
+        .wm-entry-status{color:#765b99}
+        .wm-entry-track{height:3px;background:rgba(64,51,79,.1)}
+        .wm-entry-track span{background:#8064a2}
+        .wm-diary-backdrop{background:rgba(43,34,55,.56);backdrop-filter:blur(8px)}
+        .wm-diary-panel{--wm-paper:#f8f5fc;--wm-ink:#342a42;--wm-muted:#62566f;--wm-coral:#8064a2;--wm-line:rgba(64,51,79,.12);width:min(100%,620px);border:1px solid #d8cde7;border-radius:30px;background:#f8f5fc;color:#342a42;box-shadow:0 28px 80px rgba(43,34,55,.2);font-family:"DM Sans",sans-serif}
+        .wm-diary-cover{height:clamp(145px,30vw,205px);border:0;background:radial-gradient(ellipse at 75% 0%,#d7c9ec,transparent 39%),linear-gradient(160deg,#f4f0f9,#e8e0f1)}
         .wm-diary-cover img{object-position:center 43%;filter:none}
-        .wm-diary-cover:after{background:linear-gradient(180deg,transparent 56%,rgba(244,238,228,.72))}
+        .wm-diary-cover:after{background:linear-gradient(180deg,transparent 56%,rgba(248,245,252,.72))}
         .wm-diary-panel .wm-inner{padding:21px 24px 25px}
-        .wm-diary-close{top:14px;right:14px;border:1px solid rgba(72,40,50,.16);background:rgba(244,238,228,.92);color:#2b2026;box-shadow:none}
-        .wm-diary-close:hover{background:#fffaf2}
-        .wm-diary-panel .wm-eyebrow{color:#783449;font-family:"Space Mono",monospace}
-        .wm-diary-panel .wm-title{font-family:"Fraunces",Georgia,serif;font-size:clamp(30px,7vw,38px);font-weight:600;letter-spacing:-.045em;color:#2b2026}
-        .wm-diary-panel .wm-intro{color:#75656b}
-        .wm-diary-panel .wm-seal{border-color:rgba(120,52,73,.2);background:#ead7d1;color:#783449}
-        .wm-diary-panel .wm-progress{border:1px solid rgba(72,40,50,.12);background:#eee4d8}
-        .wm-diary-panel .wm-count{color:#2b2026}
-        .wm-diary-panel .wm-count strong{font-family:"Fraunces",Georgia,serif;color:#783449}
-        .wm-diary-panel .wm-count-label,.wm-diary-panel .wm-progress-note{color:#75656b}
-        .wm-diary-panel .wm-availability{color:#783449}
-        .wm-diary-panel .wm-track{background:rgba(72,40,50,.12)}
-        .wm-diary-panel .wm-track-fill{background:#783449}
-        .wm-star-dot{border-color:rgba(72,40,50,.12);background:rgba(255,250,242,.5);color:rgba(120,52,73,.26)}
-        .wm-star-dot.is-earned{border-color:rgba(120,52,73,.26);background:#ead7d1;color:#783449}
-        .wm-diary-panel .wm-privacy,.wm-diary-panel .wm-question,.wm-diary-panel .wm-hint{color:#75656b}
-        .wm-diary-panel .wm-privacy svg{color:#a95e60}
-        .wm-diary-panel .wm-rule{background:rgba(72,40,50,.15)}
-        .wm-diary-panel .wm-section-title{color:#2b2026;font-family:"Fraunces",Georgia,serif;font-size:19px;font-weight:600}
-        .wm-diary-panel .wm-task,.wm-diary-panel .wm-form{border-color:rgba(72,40,50,.12);background:rgba(255,250,242,.78)}
-        .wm-diary-panel .wm-task-kicker{color:#783449}
-        .wm-diary-panel .wm-task-name{color:#2b2026}
-        .wm-diary-panel .wm-open-task,.wm-diary-panel .wm-card-open{color:#783449}
-        .wm-diary-panel .wm-btn{border-color:rgba(72,40,50,.16);background:#f4eee4;color:#2b2026}
-        .wm-diary-panel .wm-btn:hover:not(:disabled){background:#ead7d1}
-        .wm-diary-panel .wm-btn-primary{border-color:#783449;background:#783449;color:#fffaf2}
-        .wm-diary-panel .wm-btn-primary:hover:not(:disabled){background:#693044}
-        .wm-diary-panel .wm-textarea{border:1px solid rgba(72,40,50,.16);border-radius:13px;background:#fffaf2;color:#2b2026}
-        .wm-diary-panel .wm-textarea::placeholder{color:#9a8887}
-        .wm-diary-panel .wm-wish-card{border:1px solid rgba(72,40,50,.14);border-radius:16px;background:linear-gradient(140deg,#fffaf2,#eee2d6);color:#2b2026;box-shadow:0 6px 16px rgba(62,38,44,.06)}
-        .wm-diary-panel .wm-wish-card:hover{border-color:rgba(120,52,73,.3);box-shadow:0 10px 22px rgba(62,38,44,.1)}
-        .wm-diary-panel .wm-wish-text{color:#38252e;font-family:"Fraunces",Georgia,serif}
-        .wm-diary-panel .wm-wish-mark{border-color:rgba(120,52,73,.18);background:#ead7d1;color:#783449}
-        .wm-diary-panel .wm-status{background:#e9dfd5;color:#75656b}
+        .wm-diary-close{top:14px;right:14px;border:1px solid rgba(64,51,79,.16);background:rgba(248,245,252,.92);color:#342a42;box-shadow:none}
+        .wm-diary-close:hover{background:#fff}
+        .wm-diary-panel .wm-eyebrow{color:#765b99;font-family:"Space Mono",monospace}
+        .wm-diary-panel .wm-title{font-family:"Fraunces",Georgia,serif;font-size:clamp(30px,7vw,38px);font-weight:600;letter-spacing:-.045em;color:#342a42}
+        .wm-diary-panel .wm-intro{color:#62566f}
+        .wm-diary-panel .wm-seal{border-color:rgba(128,100,162,.2);background:#e9e0f2;color:#765b99}
+        .wm-diary-panel .wm-progress{border:1px solid rgba(64,51,79,.12);background:#eee8f5}
+        .wm-diary-panel .wm-count{color:#342a42}
+        .wm-diary-panel .wm-count strong{font-family:"Fraunces",Georgia,serif;color:#765b99}
+        .wm-diary-panel .wm-count-label,.wm-diary-panel .wm-progress-note{color:#62566f}
+        .wm-diary-panel .wm-availability{color:#765b99}
+        .wm-diary-panel .wm-track{background:rgba(64,51,79,.12)}
+        .wm-diary-panel .wm-track-fill{background:#8064a2}
+        .wm-star-dot{border-color:rgba(64,51,79,.12);background:rgba(251,249,254,.7);color:rgba(118,91,153,.3)}
+        .wm-star-dot.is-earned{border-color:rgba(128,100,162,.26);background:#e9e0f2;color:#765b99}
+        .wm-diary-panel .wm-privacy,.wm-diary-panel .wm-question,.wm-diary-panel .wm-hint{color:#62566f}
+        .wm-diary-panel .wm-privacy svg{color:#8064a2}
+        .wm-diary-panel .wm-rule{background:rgba(64,51,79,.15)}
+        .wm-diary-panel .wm-section-title{color:#342a42;font-family:"Fraunces",Georgia,serif;font-size:19px;font-weight:600}
+        .wm-diary-panel .wm-task,.wm-diary-panel .wm-form{border-color:rgba(64,51,79,.12);background:rgba(251,249,254,.82)}
+        .wm-diary-panel .wm-task-kicker{color:#765b99}
+        .wm-diary-panel .wm-task-name{color:#342a42}
+        .wm-diary-panel .wm-open-task,.wm-diary-panel .wm-card-open{color:#765b99}
+        .wm-diary-panel .wm-btn{border-color:rgba(64,51,79,.16);background:#f8f5fc;color:#342a42}
+        .wm-diary-panel .wm-btn:hover:not(:disabled){background:#e9e0f2}
+        .wm-diary-panel .wm-btn-primary{border-color:#765b99;background:#8064a2;color:#fff}
+        .wm-diary-panel .wm-btn-primary:hover:not(:disabled){background:#765b99}
+        .wm-diary-panel .wm-textarea{border:1px solid rgba(64,51,79,.16);border-radius:13px;background:#fbf9fe;color:#342a42}
+        .wm-diary-panel .wm-textarea::placeholder{color:#81758e}
+        .wm-diary-panel .wm-wish-card{border:1px solid rgba(64,51,79,.14);border-radius:16px;background:linear-gradient(140deg,#fbf9fe,#eee8f5);color:#342a42;box-shadow:0 6px 16px rgba(64,51,79,.06)}
+        .wm-diary-panel .wm-wish-card:hover{border-color:rgba(128,100,162,.3);box-shadow:0 10px 22px rgba(64,51,79,.1)}
+        .wm-diary-panel .wm-wish-text{color:#40334f;font-family:"Fraunces",Georgia,serif}
+        .wm-diary-panel .wm-wish-mark{border-color:rgba(128,100,162,.18);background:#e9e0f2;color:#765b99}
+        .wm-diary-panel .wm-status{background:#eee8f5;color:#62566f}
         .wm-diary-panel .wm-status-accepted{background:#dce4dc;color:#415d4d}
-        .wm-diary-panel .wm-status-adjust{background:#e9d5ad;color:#654830}
-        .wm-diary-panel .wm-status-not_now{background:#ead7d1;color:#783449}
-        .wm-diary-panel .wm-empty{border-color:rgba(72,40,50,.18);color:#75656b}
-        .wm-diary-panel .wm-empty-mark{color:#783449}
-        .wm-diary-panel .wm-dialog-shell{background:#f4eee4;color:#2b2026}
+        .wm-diary-panel .wm-status-adjust{background:#e9e0f2;color:#594573}
+        .wm-diary-panel .wm-status-not_now{background:#e9e0f2;color:#765b99}
+        .wm-diary-panel .wm-empty{border-color:rgba(64,51,79,.18);color:#62566f}
+        .wm-diary-panel .wm-empty-mark{color:#765b99}
+        .wm-diary-panel .wm-dialog-shell{background:#f8f5fc;color:#342a42}
         .wm-delivery-feedback{border-color:rgba(65,93,77,.2);background:#dce4dc;color:#415d4d}
-        .wm-delivery-feedback.is-failed{border-color:rgba(120,52,73,.2);background:#ead7d1;color:#783449}
-        .wm-dialog-shell{border-color:rgba(72,40,50,.16);background:#f4eee4;color:#2b2026}
-        .wm-dialog-kicker{color:#783449}
-        .wm-dialog-text{color:#38252e;font-family:"Fraunces",Georgia,serif}
-        .wm-dialog-close{border-color:rgba(72,40,50,.14);background:#fffaf2;color:#2b2026}
-        .wm-dialog-rule{background:rgba(72,40,50,.14)}
-        .wm-dialog-hint{color:#75656b}
+        .wm-delivery-feedback.is-failed{border-color:rgba(128,100,162,.2);background:#eee8f5;color:#594573}
+        .wm-dialog-shell{border-color:rgba(64,51,79,.16);background:#f8f5fc;color:#342a42}
+        .wm-dialog-kicker{color:#765b99}
+        .wm-dialog-text{color:#40334f;font-family:"Fraunces",Georgia,serif}
+        .wm-dialog-close{border-color:rgba(64,51,79,.14);background:#fbf9fe;color:#342a42}
+        .wm-dialog-rule{background:rgba(64,51,79,.14)}
+        .wm-dialog-hint{color:#62566f}
         @media(min-width:560px){.wm-diary-panel .wm-inner{padding:24px 29px 28px}.wm-content-grid{gap:18px}}
         @media(max-width:420px){.wm-diary-panel .wm-inner{padding:16px 15px 18px}.wm-diary-cover{height:148px}}
       `}</style>

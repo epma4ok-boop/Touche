@@ -223,11 +223,12 @@ function NeonIcon({ type }: { type: Category | "scenarios" | "invite" | "pair" }
 
 /* ─── Card ─────────────────────────────────────────────────────── */
 function Card({
-  type, title, sub, onClick, index, remaining, remainingLabel, testId,
+  type, title, sub, onClick, index, remaining, remainingLabel, hideUnlimited, testId,
 }: {
   type: Category | "scenarios" | "invite" | "pair";
   title: string; sub?: string; onClick: () => void; index: number;
   remaining?: number | null; remainingLabel?: string;
+  hideUnlimited?: boolean;
   testId?: string;
 }) {
   const [pressed, setPressed] = useState(false);
@@ -274,7 +275,7 @@ function Card({
       <div style={{ position: "absolute", inset: 0, background: `linear-gradient(130deg,rgba(${PR},${PG},${PB},0.06) 0%,transparent 50%)` }} />
       <div style={{ position: "absolute", top: 0, left: "6%", right: "6%", height: 1, background: `linear-gradient(90deg,transparent,rgba(${PR},${PG},${PB},0.75),transparent)` }} />
       <div style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: 3, background: `linear-gradient(180deg,rgba(${PR},${PG},${PB},0.95),rgba(${PR},${PG},${PB},0.18))`, borderRadius: "20px 0 0 20px" }} />
-      {remaining !== undefined && <span className="pop-card__remaining" aria-label={`${remainingLabel}: ${remaining ?? "∞"}`}>{remainingLabel} {remaining ?? "∞"}</span>}
+      {remaining !== undefined && !(hideUnlimited && remaining === null) && <span className="pop-card__remaining" aria-label={`${remainingLabel}: ${remaining ?? "∞"}`}>{remainingLabel} {remaining ?? "∞"}</span>}
 
       <div style={{ position: "relative", zIndex: 2, display: "flex", alignItems: "center", width: "100%", padding: "0 15px 0 18px", gap: 13 }}>
         <div className="icon-ring" style={{
@@ -586,7 +587,7 @@ const INSTRUCTIONS: Record<Lang, { title: string; steps: { icon: string; head: s
 };
 
 /* ─── Subscription content ─────────────────────────────────────── */
-const SUBSCRIPTION: Record<Lang, { title: string; features: string[]; price: string; note: string; cta: string; creatorLabel: string; creatorDescription: string; creatorFeatures: string[] }> = {
+const SUBSCRIPTION: Record<Lang, { title: string; features: string[]; price: string; note: string; cta: string }> = {
   ru: {
     title: "Touché Premium",
     features: [
@@ -599,9 +600,6 @@ const SUBSCRIPTION: Record<Lang, { title: string; features: string[]; price: str
     price: "199 Stars / месяц",
     note: "≈ 260 ₽ · отмена в любой момент",
     cta: "Подписаться — 199 ★",
-    creatorLabel: "Безлимит автора",
-    creatorDescription: "Без срока окончания",
-    creatorFeatures: ["Все задания без дневных лимитов", "ИИ-сценарии без ограничений", "Premium-игры без дневных лимитов"],
   },
   en: {
     title: "Touché Premium",
@@ -615,9 +613,6 @@ const SUBSCRIPTION: Record<Lang, { title: string; features: string[]; price: str
     price: "199 Stars / month",
     note: "≈ $2.60 · cancel anytime",
     cta: "Subscribe — 199 ★",
-    creatorLabel: "Creator unlimited",
-    creatorDescription: "No expiration date",
-    creatorFeatures: ["All tasks without daily limits", "Unlimited AI scenarios", "Premium games without daily limits"],
   },
   hi: {
     title: "Touché Premium",
@@ -631,9 +626,6 @@ const SUBSCRIPTION: Record<Lang, { title: string; features: string[]; price: str
     price: "199 Stars / माह",
     note: "≈ ₹220 · कभी भी रद्द करें",
     cta: "सदस्यता लें — 199 ★",
-    creatorLabel: "निर्माता के लिए असीमित",
-    creatorDescription: "कोई समाप्ति तिथि नहीं",
-    creatorFeatures: ["बिना दैनिक सीमा के सभी कार्य", "असीमित AI दृश्य", "बिना दैनिक सीमा के Premium गेम"],
   },
   pt: {
     title: "Touché Premium",
@@ -647,9 +639,6 @@ const SUBSCRIPTION: Record<Lang, { title: string; features: string[]; price: str
     price: "199 Stars / mês",
     note: "≈ R$15 · cancele quando quiser",
     cta: "Assinar — 199 ★",
-    creatorLabel: "Acesso ilimitado do criador",
-    creatorDescription: "Sem data de término",
-    creatorFeatures: ["Todas as tarefas sem limite diário", "Cenários de IA ilimitados", "Jogos Premium sem limite diário"],
   },
   es: {
     title: "Touché Premium",
@@ -663,9 +652,6 @@ const SUBSCRIPTION: Record<Lang, { title: string; features: string[]; price: str
     price: "199 Stars / mes",
     note: "≈ $2.60 · cancela cuando quieras",
     cta: "Suscribirse — 199 ★",
-    creatorLabel: "Acceso ilimitado del creador",
-    creatorDescription: "Sin fecha de vencimiento",
-    creatorFeatures: ["Todas las tareas sin límites diarios", "Escenarios de IA ilimitados", "Juegos Premium sin límites diarios"],
   },
 };
 
@@ -1015,7 +1001,7 @@ function MenuPanel({ lang, gender, onGenderSwitch, onClose, onLanguageOpen, onSu
   }, []);
 
   useEffect(() => {
-    if (section === "subscription") return refreshSubscription();
+    if (section === "main" || section === "subscription") return refreshSubscription();
   }, [section, refreshSubscription]);
 
   const rowStyle: React.CSSProperties = {
@@ -1093,11 +1079,13 @@ function MenuPanel({ lang, gender, onGenderSwitch, onClose, onLanguageOpen, onSu
           </svg>
         </div>
         <div style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", fontWeight: 700, fontSize: 22, color: "rgba(255,238,248,0.95)", marginBottom: 8 }}>{sub.title}</div>
-        <div style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", fontWeight: 700, fontSize: 20, color: PINK, marginBottom: 4 }}>{subUnlimited ? sub.creatorLabel : sub.price}</div>
-        <div style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", fontSize: 12, color: "rgba(255,238,248,0.32)" }}>{subUnlimited ? sub.creatorDescription : sub.note}</div>
+        <div style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", fontWeight: 700, fontSize: 20, color: PINK, marginBottom: 4 }}>
+          {subUnlimited ? HOME_STATUS_COPY[lang].premiumActive : sub.price}
+        </div>
+        {!subUnlimited && <div style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", fontSize: 12, color: "rgba(255,238,248,0.32)" }}>{sub.note}</div>}
       </div>
-      <div style={{ display: "flex", flexDirection: "column", gap: 9, marginBottom: 20 }}>
-        {(subUnlimited ? sub.creatorFeatures : sub.features).map((f, i) => (
+      {!subUnlimited && <div style={{ display: "flex", flexDirection: "column", gap: 9, marginBottom: 20 }}>
+        {sub.features.map((f, i) => (
           <div key={i} style={{
             padding: "12px 15px", borderRadius: 14,
             background: `rgba(${PR},${PG},${PB},0.06)`, border: `1px solid rgba(${PR},${PG},${PB},0.16)`,
@@ -1105,7 +1093,7 @@ function MenuPanel({ lang, gender, onGenderSwitch, onClose, onLanguageOpen, onSu
             animation: `fadeIn .40s ease ${i * 55}ms both`,
           }}>{f}</div>
         ))}
-      </div>
+      </div>}
       <button className="pop-menu-subscribe" onClick={async () => {
         setSubState("loading");
         setSubError("");
@@ -1122,7 +1110,7 @@ function MenuPanel({ lang, gender, onGenderSwitch, onClose, onLanguageOpen, onSu
         color: "rgba(255,238,248,0.97)",
         fontFamily: "'Plus Jakarta Sans',sans-serif", fontWeight: 700, fontSize: 16,
         cursor: "pointer", boxShadow: `0 4px 24px rgba(${PR},${PG},${PB},0.45)`,
-      }}>{subState === "loading" ? "…" : subState === "active" && subUnlimited ? sub.creatorLabel : subState === "active" ? HOME_STATUS_COPY[lang].premiumActive : sub.cta}</button>
+      }}>{subState === "loading" ? "…" : subState === "active" ? HOME_STATUS_COPY[lang].premiumActive : sub.cta}</button>
       {subExpires && subState === "active" && (
         <div style={{ textAlign: "center", color: `rgba(${PR},${PG},${PB},.72)`, fontSize: 11, marginTop: 8 }}>
           {new Date(subExpires).toLocaleDateString(lang === "ru" ? "ru-RU" : "en-US")}
@@ -1178,9 +1166,11 @@ function MenuPanel({ lang, gender, onGenderSwitch, onClose, onLanguageOpen, onSu
               <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
             </svg>
             <div style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", fontWeight: 700, fontSize: 13, color: "rgba(255,238,248,0.95)", lineHeight: 1.2 }}>{ml.subscription}</div>
-            <div style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", fontWeight: 600, fontSize: 10, color: `rgba(${PR},${PG},${PB},0.80)`, marginTop: 3, letterSpacing: "0.04em" }}>
-              {HOME_STATUS_COPY[lang].monthlyPrice}
-            </div>
+            {!subUnlimited && subState !== "loading" && (
+              <div style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", fontWeight: 600, fontSize: 10, color: `rgba(${PR},${PG},${PB},0.80)`, marginTop: 3, letterSpacing: "0.04em" }}>
+                {HOME_STATUS_COPY[lang].monthlyPrice}
+              </div>
+            )}
           </div>
         </button>
       </div>
@@ -1283,6 +1273,7 @@ export default function Home({
   const [showScenarioGate, setShowScenarioGate] = useState(false);
   const [homeSection, setHomeSection] = useState<HomeSection>("home");
   const [limits, setLimits] = useState<Partial<Record<Category, number | null>>>({});
+  const [ownerAccess, setOwnerAccess] = useState(false);
   const topPx = useTelegramTopInset();
 
   useEffect(() => {
@@ -1336,15 +1327,20 @@ export default function Home({
     const refresh = async () => {
       const initData = window.Telegram?.WebApp?.initData;
       if (!initData) return;
+      let hasOwnerAccess = false;
       const results = await Promise.all(CATEGORIES_ORDER.map(async (category) => {
         try {
           const res = await fetch(`/api/limits?category=${category}`, { headers: { "x-telegram-init-data": initData } });
           if (!res.ok) return [category, undefined] as const;
           const data = await res.json();
+          if (data.unlimited === true) hasOwnerAccess = true;
           return [category, data.unlimited === true || data.isPremium === true ? null : Number(data.remaining)] as const;
         } catch { return [category, undefined] as const; }
       }));
-      if (active) setLimits(Object.fromEntries(results.filter(([, n]) => n === null || Number.isFinite(n))));
+      if (active) {
+        setOwnerAccess(hasOwnerAccess);
+        setLimits(Object.fromEntries(results.filter(([, n]) => n === null || Number.isFinite(n))));
+      }
     };
     void refresh();
     window.addEventListener("focus", refresh);
@@ -1385,6 +1381,7 @@ export default function Home({
   const cardLimit = (category: Category) => ({
     remaining: limits[category],
     remainingLabel: lang === "ru" ? "Осталось" : lang === "hi" ? "शेष" : lang === "pt" ? "Restam" : lang === "es" ? "Quedan" : "Left",
+    hideUnlimited: ownerAccess,
   });
 
   const togetherCards = (

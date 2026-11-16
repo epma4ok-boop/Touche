@@ -430,7 +430,7 @@ export default function CategoryScreen({ lang, gender, category, onBack, onCateg
       const data = await res.json();
       setIsPremium(data.isPremium === true);
       setRemaining(data.remaining === null || data.remaining === undefined ? null : Number(data.remaining));
-      return data as { isPremium?: boolean; remaining?: number };
+      return data as { isPremium?: boolean; remaining?: number | null; unlimited?: boolean };
     } catch { return null; }
   }, [category]);
 
@@ -442,7 +442,7 @@ export default function CategoryScreen({ lang, gender, category, onBack, onCateg
       const startParam = window.Telegram?.WebApp?.initDataUnsafe?.start_param ?? "";
       if (/^invite_[1-9][0-9]*$/.test(startParam)) return;
       const count = Number(limits.remaining);
-      if (Number.isFinite(count) && count <= 0) {
+      if (limits.unlimited !== true && Number.isFinite(count) && count <= 0) {
         setPaywallNotice(null);
         setErrorKind(limits.isPremium === true ? "limit_exceeded" : "subscription_required");
       }
@@ -483,7 +483,9 @@ export default function CategoryScreen({ lang, gender, category, onBack, onCateg
       try { sessionStorage.setItem(requestKey, requestIdRef.current); } catch { /* retry still works in this view */ }
     }
     const recentVariationTags: TaskVariationTag[] = history
-      .filter((entry) => entry.category === "passion" || entry.category === "hard")
+      .filter((entry) => category === "passion" || category === "hard"
+        ? entry.category === "passion" || entry.category === "hard"
+        : entry.category === category)
       .slice(-19)
       .map((entry) => getTaskVariationTag(entry.text, lang) ?? "other");
     const generated = await generateAITask(category, lang, gender, mode, coupleId ?? null, requestIdRef.current, recentVariationTags);

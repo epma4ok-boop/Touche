@@ -483,7 +483,7 @@ export default function CategoryScreen({ lang, gender, category, onBack, onCateg
       try { sessionStorage.setItem(requestKey, requestIdRef.current); } catch { /* retry still works in this view */ }
     }
     const recentVariationTags: TaskVariationTag[] = history
-      .filter((entry) => entry.category === category)
+      .filter((entry) => entry.category === "passion" || entry.category === "hard")
       .slice(-19)
       .map((entry) => getTaskVariationTag(entry.text, lang) ?? "other");
     const generated = await generateAITask(category, lang, gender, mode, coupleId ?? null, requestIdRef.current, recentVariationTags);
@@ -614,7 +614,7 @@ export default function CategoryScreen({ lang, gender, category, onBack, onCateg
               <button type="button" data-testid="button-reopen-shared-task" onClick={() => setShowReveal(true)} style={{ flexShrink: 0, padding: "9px 11px", border: "1px solid rgba(64,51,79,.18)", borderRadius: 11, background: "#fbf9fe", color: "#40334f", fontSize: 10, fontWeight: 700, cursor: "pointer" }}>{sharedCopy.openTask}</button>
             </div>
           )}
-        {(remaining !== null || isPremium) && <div className="category-pop__remaining" data-testid="status-remaining">{remaining === null ? (lang === "ru" ? "Задания без ограничений" : "Unlimited tasks") : t.remaining(remaining)}</div>}
+        {remaining !== null && <div className="category-pop__remaining" data-testid="status-remaining">{t.remaining(remaining)}</div>}
          </div>
         <section className="category-pop__generator">
            <div className="category-pop__generator-head"><span>{t.hint}</span><b>{String(index + 1).padStart(2, "0")} / {String(CATEGORIES_ORDER.length).padStart(2, "0")}</b></div>

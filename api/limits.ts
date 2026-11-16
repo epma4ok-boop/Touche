@@ -1,7 +1,7 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { createClient } from "@supabase/supabase-js";
 import { validateTelegramInitData } from "./couple/_auth.js";
-import { getEffectivePremiumAccess } from "./_premium.js";
+import { OWNER_TELEGRAM_ID } from "../src/config.js";
 
 const sb = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!);
 const BOT_TOKEN = process.env.BOT_TOKEN;
@@ -10,9 +10,19 @@ export const PREMIUM_DAILY_LIMIT = 3;
 const APP_TIMEZONE = process.env.APP_TIMEZONE || "Europe/Moscow";
 const CATEGORIES = new Set(["compliments", "tenderness", "desire", "passion", "hard"]);
 const PAID = new Set(["passion", "hard"]);
+const OWNER_ID = OWNER_TELEGRAM_ID;
 
 export function appDate(date = new Date()): string {
   return new Intl.DateTimeFormat("en-CA", { timeZone: APP_TIMEZONE, year: "numeric", month: "2-digit", day: "2-digit" }).format(date);
+}
+
+async function hasSubscription(uid: number) {
+  const { data } = await sb.from("user_subscriptions").select("expires_at").eq("user_id", uid).maybeSingle();
+  return !!data?.expires_at && new Date(data.expires_at).getTime() > Date.now();
+}
+
+async function isPremium(uid: number) {
+  return uid === OWNER_ID || await hasSubscription(uid);
 }
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
@@ -28,21 +38,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const category = String(req.query.category ?? "");
   if (!CATEGORIES.has(category)) return res.status(400).json({ error: "invalid_category" });
   const date = appDate();
-  let premium: boolean;
-  let isOwner: boolean;
-  try {
-    const access = await getEffectivePremiumAccess(sb, caller.id);
-    premium = access.active;
-    isOwner = access.source === "owner";
-  } catch {
-    return res.status(500).json({ error: "premium_status_failed" });
-  }
-  if (isOwner) {
+  if (caller.id === OWNER_ID) {
     return res.status(200).json({
       ok: true, remaining: null, used: 0, bonus: 0, credits: 0, premiumTaskCredits: 0,
       total: null, unlimited: true, isPremium: true, date,
     });
   }
+  const premium = await isPremium(caller.id);
   const [{ data, error }, { data: credits, error: creditsError }, { data: paidCredits, error: paidCreditsError }] = await Promise.all([
     sb.from("user_daily_limits")
       .select("count,bonus")

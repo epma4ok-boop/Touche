@@ -46,6 +46,15 @@ function getVariationTagAcrossLanguages(text: string, preferredLang: string): Ta
   return null;
 }
 
+function getVariationTagForCategory(text: string, lang: string, category: string): TaskVariationTag | null {
+  const tag = getVariationTagAcrossLanguages(text, lang);
+  // Treat intimate selfies and intimate photos as one Desire family.
+  if (category === "desire" && (tag === "selfie" || tag === "intimate_photo")) {
+    return "intimate_photo";
+  }
+  return tag;
+}
+
 type StaticPool = Record<string, string[]>;
 const SOURCE_TASKS: Record<string, StaticPool> = {
   ru: TASKS_RU,
@@ -569,7 +578,7 @@ function getTaskExamples(category: string, lang: string, requestId: string, mode
   const examples: string[] = [];
   const familyCounts = new Map<string, number>();
   for (const candidate of ordered) {
-    const family = getTaskVariationTag(candidate, lang) ?? "unclassified";
+    const family = getVariationTagForCategory(candidate, lang, category) ?? "unclassified";
     if ((familyCounts.get(family) ?? 0) >= (family === "unclassified" ? 2 : 1)) continue;
     const candidateWords = new Set(candidate.toLowerCase().match(/[\p{L}\p{N}]{3,}/gu) ?? []);
     const tooSimilar = examples.some((selected) => {
@@ -993,7 +1002,7 @@ function getVariationInstruction(
   const examples = getTaskExamples(category, lang, requestId, mode, gender, recentVariationTags);
   const firstExampleByFamily = new Map<TaskVariationTag, number>();
   examples.forEach((example, index) => {
-    const tag = getTaskVariationTag(example, lang);
+    const tag = getVariationTagForCategory(example, lang, category);
     if (tag && !firstExampleByFamily.has(tag)) firstExampleByFamily.set(tag, index + 1);
   });
   const allFamilies = [...firstExampleByFamily.entries()].map(([tag, exampleNumber]) => ({ tag, exampleNumber }));
@@ -1070,12 +1079,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     .slice(-(MANUAL_STIMULATION_WINDOW - 1))
     .map((tag) => isTaskVariationTag(tag) ? tag : "other");
   let recentVariationTags = clientVariationTags;
-  if (PAID_CATEGORIES.has(category)) {
+  if (PAID_CATEGORIES.has(category) || category === "desire") {
+    const recentCategories = PAID_CATEGORIES.has(category) ? ["passion", "hard"] : [category];
     const { data: recentSavedTasks, error: recentTasksError } = await supabase
       .from("generated_tasks")
       .select("task_text")
       .eq("user_id", caller.id)
-      .in("category", ["passion", "hard"])
+      .in("category", recentCategories)
       .order("created_at", { ascending: false })
       .limit(MANUAL_STIMULATION_WINDOW - 1);
     if (recentTasksError) {
@@ -1086,7 +1096,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       recentVariationTags = [...(recentSavedTasks ?? [])]
         .reverse()
         .map((row: { task_text?: unknown }) =>
-          getVariationTagAcrossLanguages(String(row.task_text ?? ""), lang) ?? "other"
+          getVariationTagForCategory(String(row.task_text ?? ""), lang, category) ?? "other"
         );
     }
   }
@@ -1187,7 +1197,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             } else {
               const candidate = String(data.choices?.[0]?.message?.content ?? "").replace(/^["']|["']$/g, "").replace(/^\d+\.\s*/, "").trim();
               const forbidden = ["я рекомендую", "тебе стоит", "можешь попробовать"];
-              const candidateVariationTag = getTaskVariationTag(candidate, lang);
+              const candidateVariationTag = getVariationTagForCategory(candidate, lang, category);
               const manualStimulationAllowed = isManualStimulationAllowed(recentVariationTags);
               const repeatsRecentVariation = candidateVariationTag !== null
                 && recentVariationTags.includes(candidateVariationTag);

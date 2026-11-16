@@ -1247,14 +1247,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     console.warn("[task-generation] AI fallback", {
       category, lang, mode, reason, httpStatus: aiHttpStatus, elapsedMs: Date.now() - aiStartedAt,
     });
-    if (PAID_CATEGORIES.has(category)) {
-      return res.status(503).json({ error: "ai_unavailable", retryable: true });
-    }
     try {
       task = getFallback(category, lang, mode, requestId, gender, recentVariationTags);
       source = "fallback";
     } catch {
-      return res.status(503).json({ error: "task_generation_unavailable", retryable: true });
+      console.error("[task-generation] curated fallback unavailable", { category, lang, mode });
+      const error = PAID_CATEGORIES.has(category) ? "ai_unavailable" : "task_generation_unavailable";
+      return res.status(503).json({ error, retryable: true });
     }
   }
   if (source === "ai") {

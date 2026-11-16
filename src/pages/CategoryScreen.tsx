@@ -50,8 +50,8 @@ function getInitData(): string {
   return window.Telegram?.WebApp?.initData ?? "";
 }
 
-type TaskResult = { task: string; taskId: string | null; remaining?: number | null; unlimited?: boolean; source?: "ai" | "fallback" };
-type TaskError = { kind: "unauthorized" | "subscription_required" | "limit_exceeded" | "rate_limited" | "timeout" | "unknown"; message?: string };
+type TaskResult = { task: string; taskId: string | null; remaining?: number; source?: "ai" | "fallback" };
+type TaskError = { kind: "unauthorized" | "subscription_required" | "limit_exceeded" | "rate_limited" | "timeout" | "ai_unavailable" | "unknown"; message?: string };
 
 async function generateAITask(
   category: Category,
@@ -76,12 +76,14 @@ async function generateAITask(
       const kind = response.status === 401 ? "unauthorized"
         : response.status === 403 && body.error === "subscription_required" ? "subscription_required"
         : response.status === 403 && body.error === "limit_exceeded" ? "limit_exceeded"
-        : response.status === 429 ? "rate_limited" : "unknown";
+        : response.status === 429 ? "rate_limited"
+        : response.status === 503 && (body.error === "ai_unavailable" || body.error === "task_generation_unavailable") ? "ai_unavailable"
+        : "unknown";
       return { error: { kind, message: body.message ?? body.error } };
     }
     const data = await response.json();
     return data.task
-      ? { result: { task: data.task, taskId: data.taskId ?? null, remaining: data.remaining, unlimited: data.unlimited === true, source: data.source ?? "ai" } }
+      ? { result: { task: data.task, taskId: data.taskId ?? null, remaining: data.remaining, source: data.source ?? "ai" } }
       : { error: { kind: "unknown" } };
   } catch (error) {
     return { error: { kind: error instanceof Error && error.name === "AbortError" ? "timeout" : "unknown" } };
@@ -159,56 +161,19 @@ const TASK_SOURCE_COPY: Record<Lang, string> = {
   pt: "Criada por IA",
   es: "Creada por IA",
 };
-
-const TASK_ERROR_COPY: Record<Lang, Record<TaskError["kind"], string>> = {
-  ru: {
-    subscription_required: "Эта категория доступна в Premium.",
-    limit_exceeded: "Лимит на сегодня закончился. Можно вернуться завтра или купить ещё одно задание.",
-    rate_limited: "Слишком много запросов. Попробуйте чуть позже.",
-    unauthorized: "Откройте приложение из Telegram заново.",
-    timeout: "Сервер отвечает слишком долго. Попробуйте ещё раз.",
-    unknown: "Не удалось получить задание. Попробуйте ещё раз.",
-  },
-  en: {
-    subscription_required: "This category is available in Premium.",
-    limit_exceeded: "Today's limit is used. Come back tomorrow or buy one extra task.",
-    rate_limited: "Too many requests. Try again shortly.",
-    unauthorized: "Please reopen the app from Telegram.",
-    timeout: "The server took too long. Please try again.",
-    unknown: "Could not get a task. Try again.",
-  },
-  hi: {
-    subscription_required: "यह श्रेणी Premium में उपलब्ध है।",
-    limit_exceeded: "आज की सीमा पूरी हो गई है। कल लौटें या एक अतिरिक्त टास्क खरीदें।",
-    rate_limited: "बहुत ज़्यादा अनुरोध हैं। थोड़ी देर बाद फिर कोशिश करें।",
-    unauthorized: "कृपया Telegram से ऐप फिर खोलें।",
-    timeout: "सर्वर का जवाब आने में बहुत समय लगा। फिर कोशिश करें।",
-    unknown: "टास्क नहीं मिल सका। फिर कोशिश करें।",
-  },
-  pt: {
-    subscription_required: "Esta categoria está disponível no Premium.",
-    limit_exceeded: "Você atingiu o limite de hoje. Volte amanhã ou compre uma tarefa extra.",
-    rate_limited: "Muitas solicitações. Tente novamente em instantes.",
-    unauthorized: "Abra o aplicativo novamente pelo Telegram.",
-    timeout: "O servidor demorou para responder. Tente novamente.",
-    unknown: "Não foi possível obter a tarefa. Tente novamente.",
-  },
-  es: {
-    subscription_required: "Esta categoría está disponible en Premium.",
-    limit_exceeded: "Has alcanzado el límite de hoy. Vuelve mañana o compra una tarea adicional.",
-    rate_limited: "Hay demasiadas solicitudes. Inténtalo de nuevo en un momento.",
-    unauthorized: "Vuelve a abrir la aplicación desde Telegram.",
-    timeout: "El servidor tardó demasiado en responder. Inténtalo de nuevo.",
-    unknown: "No se pudo obtener la tarea. Inténtalo de nuevo.",
-  },
+const TASK_LIBRARY_COPY: Record<Lang, string> = {
+  ru: "Подборка Touché",
+  en: "From the Touché library",
+  hi: "Touché संग्रह से",
+  pt: "Da biblioteca Touché",
+  es: "De la biblioteca Touché",
 };
-
-const TASK_STATUS_COPY: Record<Lang, { unlimited: string; dismiss: string }> = {
-  ru: { unlimited: "Задания без ограничений", dismiss: "Понятно" },
-  en: { unlimited: "Unlimited tasks", dismiss: "Dismiss" },
-  hi: { unlimited: "बिना सीमा के टास्क", dismiss: "समझ गया" },
-  pt: { unlimited: "Tarefas ilimitadas", dismiss: "Entendi" },
-  es: { unlimited: "Tareas ilimitadas", dismiss: "Entendido" },
+const RETRY_GENERATION_COPY: Record<Lang, string> = {
+  ru: "Повторить генерацию",
+  en: "Try again",
+  hi: "फिर कोशिश करें",
+  pt: "Tentar novamente",
+  es: "Intentar de nuevo",
 };
 
 const TUTORIAL_SAMPLE: Record<Lang, { text: string; label: string; holdHint: string }> = {
@@ -325,6 +290,7 @@ function TaskReveal({ text, color, visible, onDismiss, onGenerateAgain, lang, ca
         </div>
       )}
       {!isTutorialDemo && source === "ai" && <span className="task-reveal__source">{TASK_SOURCE_COPY[lang]}</span>}
+      {!isTutorialDemo && source === "fallback" && <span className="task-reveal__source">{TASK_LIBRARY_COPY[lang]}</span>}
       {!isTutorialDemo && (
         <div className="task-reveal__actions">
           <button data-testid="button-task-again" onClick={onGenerateAgain}>{t.taskAgain}</button>
@@ -425,10 +391,23 @@ export default function CategoryScreen({ lang, gender, category, onBack, onCateg
   const sensitive = category === "passion" || category === "hard";
   const paywallCopy = PREMIUM_GATE_COPY[lang];
   const sharedCopy = SHARED_TASK_COPY[lang];
-  const statusCopy = TASK_STATUS_COPY[lang];
   const sharedTaskStatus = sharedCopy.shared;
   const sharedTaskHint = sharedCopy.checkInHint;
-  const errorCopy = TASK_ERROR_COPY[lang];
+  const errorCopy: Record<TaskError["kind"], string> = {
+    subscription_required: lang === "ru" ? "Эта категория доступна в Premium." : "This category is available in Premium.",
+    limit_exceeded: lang === "ru" ? "Лимит на сегодня закончился. Можно вернуться завтра или купить ещё одно задание." : "Today's limit is used. Come back tomorrow or buy one extra task.",
+    rate_limited: lang === "ru" ? "Слишком много запросов. Попробуйте чуть позже." : "Too many requests. Try again shortly.",
+    unauthorized: lang === "ru" ? "Откройте приложение из Telegram заново." : "Please reopen the app from Telegram.",
+    timeout: lang === "ru" ? "Сервер отвечает слишком долго. Попробуйте ещё раз." : "The server took too long. Please try again.",
+    ai_unavailable: ({
+      ru: "ИИ не смог подготовить задание. Попробуйте ещё раз — лимит и покупка не списаны.",
+      en: "AI couldn't prepare a task. Try again; your limit and purchase were not used.",
+      hi: "AI अभी काम तैयार नहीं कर पाया। फिर कोशिश करें; आपकी सीमा या खरीद का उपयोग नहीं हुआ।",
+      pt: "A IA não conseguiu criar a tarefa. Tente novamente; seu limite e sua compra não foram usados.",
+      es: "La IA no pudo crear la tarea. Inténtalo de nuevo; no se consumieron tu límite ni tu compra.",
+    } as Record<Lang, string>)[lang],
+    unknown: lang === "ru" ? "Не удалось получить задание. Попробуйте ещё раз." : "Could not get a task. Try again.",
+  };
 
   useEffect(() => {
     requestAnimationFrame(() => setMounted(true));
@@ -451,7 +430,7 @@ export default function CategoryScreen({ lang, gender, category, onBack, onCateg
       const data = await res.json();
       setIsPremium(data.isPremium === true);
       setRemaining(data.remaining === null || data.remaining === undefined ? null : Number(data.remaining));
-      return data as { isPremium?: boolean; remaining?: number | null; unlimited?: boolean };
+      return data as { isPremium?: boolean; remaining?: number };
     } catch { return null; }
   }, [category]);
 
@@ -460,7 +439,6 @@ export default function CategoryScreen({ lang, gender, category, onBack, onCateg
     const refresh = async (checkInitialAccess: boolean) => {
       const limits = await refreshLimits();
       if (!active || !checkInitialAccess || !sensitive || initialSharedTask || !limits) return;
-      if (limits.unlimited === true || limits.remaining === null || limits.remaining === undefined) return;
       const startParam = window.Telegram?.WebApp?.initDataUnsafe?.start_param ?? "";
       if (/^invite_[1-9][0-9]*$/.test(startParam)) return;
       const count = Number(limits.remaining);
@@ -520,8 +498,7 @@ export default function CategoryScreen({ lang, gender, category, onBack, onCateg
     try { sessionStorage.removeItem(requestKey); } catch { /* storage unavailable */ }
     const picked = generated.result.task;
     trackAnalyticsEvent("task_generated");
-    if (generated.result.unlimited) setRemaining(null);
-    else if (typeof generated.result.remaining === "number") setRemaining(generated.result.remaining);
+    if (typeof generated.result.remaining === "number") setRemaining(generated.result.remaining);
     const entry: HistoryEntry = { id: `${Date.now()}-${Math.random()}`, text: picked, category, date: new Date().toISOString() };
     const nextHistory = [...history, entry]; saveHistory(nextHistory); setHistory(nextHistory);
     setTaskId(generated.result.taskId);
@@ -620,7 +597,7 @@ export default function CategoryScreen({ lang, gender, category, onBack, onCateg
         <div className="category-pop__layout">
          <div className="category-pop__context">
         <section className="category-pop__hero">
-          {mode === "together" && <span className="category-pop__stamp">{t.sharedTask}</span>}
+          <span className="category-pop__stamp">{mode === "together" ? t.sharedTask : `18+ · ${t.lockSub}`}</span>
            <div className="category-pop__orb" style={{ backgroundImage: `url(${CATEGORY_ART[category]})` }} aria-hidden="true" />
           <p className="category-pop__eyebrow">{categorySub(category, t)}</p>
           <h1 data-testid="text-category-title">{label}</h1>
@@ -629,6 +606,7 @@ export default function CategoryScreen({ lang, gender, category, onBack, onCateg
              desire: t.catDesireDesc, passion: t.catPassionDesc, hard: t.catHardDesc,
            })[category]}</p>
         </section>
+         {sensitive && <div className="category-pop__warning" role="note">18+ · {t.lockSub}</div>}
          {mode === "together" && <div className="category-pop__mode"><span className="category-pop__mode-dot" style={{ background: `rgb(${popColor.r},${popColor.g},${popColor.b})` }} /><strong>{t.sharedTask}</strong><small>{coupleId ? t.linked : t.appSub}</small></div>}
           {mode === "together" && sharedTask && !showReveal && (
             <div data-testid="card-shared-task-status" role="status" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, padding: "12px 14px", borderRadius: 14, background: "rgba(64,51,79,.05)", border: "1px solid rgba(64,51,79,.10)" }}>
@@ -639,14 +617,14 @@ export default function CategoryScreen({ lang, gender, category, onBack, onCateg
               <button type="button" data-testid="button-reopen-shared-task" onClick={() => setShowReveal(true)} style={{ flexShrink: 0, padding: "9px 11px", border: "1px solid rgba(64,51,79,.18)", borderRadius: 11, background: "#fbf9fe", color: "#40334f", fontSize: 10, fontWeight: 700, cursor: "pointer" }}>{sharedCopy.openTask}</button>
             </div>
           )}
-        {(remaining !== null || isPremium) && <div className="category-pop__remaining" data-testid="status-remaining">{remaining === null ? statusCopy.unlimited : t.remaining(remaining)}</div>}
+        {(remaining !== null || isPremium) && <div className="category-pop__remaining" data-testid="status-remaining">{remaining === null ? (lang === "ru" ? "Задания без ограничений" : "Unlimited tasks") : t.remaining(remaining)}</div>}
          </div>
         <section className="category-pop__generator">
            <div className="category-pop__generator-head"><span>{t.hint}</span><b>{String(index + 1).padStart(2, "0")} / {String(CATEGORIES_ORDER.length).padStart(2, "0")}</b></div>
           <div className="category-pop__heartbeat" data-testid="tutorial-heartbeat-target">
               <HeartbeatCanvas onHoldComplete={tutorialDemo ? showTutorialSample : generate} isCasting={tutorialDemo ? false : isCasting} color={popColor} hintText={tutorialDemo ? TUTORIAL_SAMPLE[lang].holdHint : isCasting ? t.tapping : t.hint} holdDuration={2600} baseRScale={0.45} bgColor={GENERATOR_SURFACES[category]} />
           </div>
-          {errorKind && errorKind !== "subscription_required" && errorKind !== "limit_exceeded" && <div className="category-pop__error" role="alert" data-testid="status-task-error"><strong>{errorCopy[errorKind]}</strong>{errorKind === "unknown" && generatedErrorCode && <small>{generatedErrorCode}</small>}<button onClick={() => setErrorKind(null)}>{statusCopy.dismiss}</button></div>}
+          {errorKind && errorKind !== "subscription_required" && errorKind !== "limit_exceeded" && <div className="category-pop__error" role="alert" data-testid="status-task-error"><strong>{errorCopy[errorKind]}</strong>{errorKind === "unknown" && generatedErrorCode && <small>{generatedErrorCode}</small>}{errorKind === "ai_unavailable" && <button type="button" data-testid="button-retry-task" onClick={() => void generate()}>{RETRY_GENERATION_COPY[lang]}</button>}<button type="button" onClick={() => setErrorKind(null)}>{lang === "ru" ? "Понятно" : "Dismiss"}</button></div>}
         </section>
         <aside className="category-pop__aside">
         <div className="category-pop__dots" aria-label="Categories">
@@ -661,7 +639,7 @@ export default function CategoryScreen({ lang, gender, category, onBack, onCateg
       {(errorKind === "subscription_required" || errorKind === "limit_exceeded") && (
         <div className="category-paywall-backdrop" role="presentation" onClick={() => { if (!paywallBusy) setErrorKind(null); }}>
           <section className="category-paywall" role="dialog" aria-modal="true" aria-labelledby="category-paywall-title" onClick={(event) => event.stopPropagation()}>
-            <header className="category-paywall__topline"><span>Touché</span><button type="button" aria-label={paywallCopy.close} onClick={() => { setErrorKind(null); setPaywallNotice(null); }} disabled={!!paywallBusy}>×</button></header>
+            <header className="category-paywall__topline"><span>18+ · Touché</span><button type="button" aria-label={paywallCopy.close} onClick={() => { setErrorKind(null); setPaywallNotice(null); }} disabled={!!paywallBusy}>×</button></header>
             <div className="category-paywall__letter">
               <span className="category-paywall__index">{String(index + 1).padStart(2, "0")} / 05</span>
               <h2 id="category-paywall-title">{paywallCopy.title}</h2>

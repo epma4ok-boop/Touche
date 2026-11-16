@@ -6,13 +6,11 @@
 // Response: { invoiceLink: string }
 
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { createClient } from "@supabase/supabase-js";
 import { validateTelegramInitData } from "../couple/_auth.js";
-import { getEffectivePremiumAccess } from "../_premium.js";
+import { OWNER_TELEGRAM_ID } from "../../src/config.js";
 
 const BOT_TOKEN = process.env.BOT_TOKEN;
 const LANGS = new Set(["ru", "en", "hi", "pt", "es"]);
-const supabase = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!);
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   res.setHeader("Access-Control-Allow-Origin", "https://t.me");
@@ -25,14 +23,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (!BOT_TOKEN) return res.status(503).json({ error: "service_unconfigured" });
   const caller = validateTelegramInitData(initData, BOT_TOKEN);
   if (!caller) return res.status(401).json({ error: "Unauthorized" });
-
-  try {
-    const access = await getEffectivePremiumAccess(supabase, caller.id);
-    if (access.source === "owner") {
-      return res.status(409).json({ error: "creator_access_active", unlimited: true });
-    }
-  } catch {
-    return res.status(500).json({ error: "premium_status_failed" });
+  if (caller.id === OWNER_TELEGRAM_ID) {
+    return res.status(409).json({ error: "owner_access_included" });
   }
 
   const { lang = "ru" } = req.body as { lang?: string };

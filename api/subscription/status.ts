@@ -6,7 +6,7 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { createClient } from "@supabase/supabase-js";
 import { validateTelegramInitData } from "../couple/_auth.js";
-import { getEffectivePremiumAccess, type EffectivePremiumAccess } from "../_premium.js";
+import { OWNER_TELEGRAM_ID } from "../../src/config.js";
 
 const supabase = createClient(
   process.env.SUPABASE_URL!,
@@ -23,19 +23,22 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const initData = req.headers["x-telegram-init-data"] as string;
   const caller = validateTelegramInitData(initData, process.env.BOT_TOKEN!);
   if (!caller) return res.status(401).json({ error: "Unauthorized" });
-
-  let access: EffectivePremiumAccess;
-  try {
-    access = await getEffectivePremiumAccess(supabase, caller.id);
-  } catch {
-    return res.status(500).json({ error: "premium_status_failed" });
+  if (caller.id === OWNER_TELEGRAM_ID) {
+    return res.status(200).json({ active: true, expiresAt: null, unlimited: true, owner: true });
   }
 
+  const { data, error } = await supabase
+    .from("user_subscriptions")
+    .select("expires_at")
+    .eq("user_id", caller.id)
+    .maybeSingle();
+
+  if (error) return res.status(500).json({ error: error.message });
+
+  const active = data ? new Date(data.expires_at) > new Date() : false;
+
   return res.status(200).json({
-    active: access.active,
-    expiresAt: access.expiresAt,
-    shared: access.shared,
-    source: access.source,
-    unlimited: access.source === "owner",
+    active,
+    expiresAt: data?.expires_at ?? null,
   });
 }

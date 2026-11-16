@@ -10,8 +10,8 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { createClient } from "@supabase/supabase-js";
 import { validateTelegramInitData } from "../couple/_auth.js";
-import { getEffectivePremiumAccess } from "../_premium.js";
 import { appDate, FREE_LIMIT, PREMIUM_DAILY_LIMIT } from "../limits.js";
+import { OWNER_TELEGRAM_ID } from "../../src/config.js";
 
 const BOT_TOKEN = process.env.BOT_TOKEN;
 const CATEGORIES = new Set(["compliments", "tenderness", "desire", "passion", "hard"]);
@@ -41,25 +41,18 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (!CATEGORIES.has(category) || !LANGS.has(lang)) {
     return res.status(400).json({ error: "invalid_product" });
   }
+  if (caller.id === OWNER_TELEGRAM_ID) {
+    return res.status(409).json({ error: "owner_unlimited_access", remaining: null });
+  }
 
-  let premium: boolean;
-  let isOwner: boolean;
-  try {
-    const access = await getEffectivePremiumAccess(supabase, caller.id);
-    premium = access.active;
-    isOwner = access.source === "owner";
-  } catch {
-    return res.status(500).json({ error: "premium_status_failed" });
-  }
-  if (isOwner) {
-    return res.status(409).json({ error: "daily_limit_not_reached", remaining: null, unlimited: true });
-  }
-  const [{ data: daily, error: dailyError }, { data: referral, error: referralError }, { data: paidCredit, error: paidCreditError }] = await Promise.all([
+  const [{ data: subscription, error: subscriptionError }, { data: daily, error: dailyError }, { data: referral, error: referralError }, { data: paidCredit, error: paidCreditError }] = await Promise.all([
+    supabase.from("user_subscriptions").select("expires_at").eq("user_id", caller.id).maybeSingle(),
     supabase.from("user_daily_limits").select("count,bonus").eq("user_id", caller.id).eq("category", PAID_CATEGORIES.has(category) ? `premium_${category}` : category).eq("date", appDate()).maybeSingle(),
     supabase.from("referral_task_credits").select("balance").eq("user_id", caller.id).eq("category", category).maybeSingle(),
     supabase.from("premium_task_credits").select("balance").eq("user_id", caller.id).eq("category", category).maybeSingle(),
   ]);
-  if (dailyError || referralError || paidCreditError) return res.status(500).json({ error: "limits_read_failed" });
+  if (subscriptionError || dailyError || referralError || paidCreditError) return res.status(500).json({ error: "limits_read_failed" });
+  const premium = caller.id === OWNER_TELEGRAM_ID || Boolean(subscription?.expires_at && new Date(subscription.expires_at).getTime() > Date.now());
   const base = PAID_CATEGORIES.has(category) && !premium
     ? 0
     : (PAID_CATEGORIES.has(category) ? PREMIUM_DAILY_LIMIT : FREE_LIMIT) + Number(daily?.bonus ?? 0);

@@ -482,13 +482,10 @@ export default function CategoryScreen({ lang, gender, category, onBack, onCateg
       if (!requestIdRef.current) requestIdRef.current = crypto.randomUUID();
       try { sessionStorage.setItem(requestKey, requestIdRef.current); } catch { /* retry still works in this view */ }
     }
-    const recentVariationTags = [...new Set(
-      history
-        .filter((entry) => entry.category === category)
-        .slice(-12)
-        .map((entry) => getTaskVariationTag(entry.text, lang))
-        .filter((tag): tag is TaskVariationTag => tag !== null),
-    )].slice(-8);
+    const recentVariationTags: TaskVariationTag[] = history
+      .filter((entry) => entry.category === category)
+      .slice(-19)
+      .map((entry) => getTaskVariationTag(entry.text, lang) ?? "other");
     const generated = await generateAITask(category, lang, gender, mode, coupleId ?? null, requestIdRef.current, recentVariationTags);
     if (!generated.result) {
       setErrorKind(generated.error?.kind ?? "unknown"); setGeneratedErrorCode(generated.error?.message ?? null);

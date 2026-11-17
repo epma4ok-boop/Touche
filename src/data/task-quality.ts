@@ -7,7 +7,7 @@ const QUALITY_RULES: Record<string, string> = {
   - Чётко соблюдай границы категории: комплименты и нежность несексуальны; желание — прелюдия до секса; в страсти и харде используй разнообразные конкретные сексуальные действия из библиотеки примеров, а не только оральный секс, проникновение и мастурбацию. Не принимай вместо действия общие слова «скажи, чего хочешь» или «займитесь сексом». В страсти описывай действие нежно и красиво, в харде — прямо и немного грязно. В «Харде» обязательно назови прямое сексуальное действие: одной наготы, лежания, раздевания или общих прикосновений недостаточно. Ограниченная по времени динамика подчинения допустима только в Together.
  - Не описывай принуждение, игнорирование боли или опасную механику. Не добавляй в текст задания пояснения о договорённостях, стоп-словах или безопасности.
  - Если упоминается оргазм, обычно заверши задание на нём; не начинай после него следующий сексуальный акт автоматически.
-   - Медиа должны соответствовать категории: ласковые фото и видео без интимного содержания — в «Комплиментах» и «Нежности»; добровольные личные интимные фото или короткое видео-приветствие только для партнёра — в «Желании»; домашняя эротическая съёмка — только в «Харде», рядом с конкретным актом и если оба этого хотят. Ничего не публикуй и не предлагай пересылать. Не добавляй реквизит по шаблону.
+    - Медиа должны соответствовать категории: обычные ласковые фото и видео — в «Комплиментах» и «Нежности»; личные интимные фото и короткие видео обнажённого тела — в «Желании» или «Страсти»; эстетичная домашняя съёмка секса — в «Страсти», а съёмка от первого лица — в «Харде», всегда рядом с конкретным актом и только если оба этого хотят. Храни записи приватно; не публикуй и не пересылай. Не добавляй реквизит по шаблону.
    - Это реальное задание, не ролевая игра: без вымышленных персонажей, сюжета и длинных диалогов. Верни только текст задания, без вступления и пояснений.`,
   en: `Quality check — do this silently before answering:
   - Return one task with one central idea. It may unfold over the next 24 hours in 2–4 short moments during free time; do not require constant messaging or being together all day.
@@ -17,7 +17,7 @@ const QUALITY_RULES: Record<string, string> = {
     - Keep category boundaries clear: compliments and tenderness are nonsexual; desire is foreplay before sex; for Passion and Hard, use varied concrete sexual actions from the curated reference library, not only oral sex, penetration, and masturbation. Do not substitute vague wording such as “say what you want” or “have sex.” Make Passion tender and beautiful; make Hard direct and a little dirty. Every Hard task must name a direct sexual act; nudity, lying naked, undressing, or general touching alone do not qualify. A time-bounded submission dynamic is Together-only.
  - Do not describe coercion, ignoring pain, or physically dangerous actions. Do not put explanations about agreements, safewords, or safety in the task text.
  - If orgasm is mentioned, usually make it the endpoint; do not automatically start another sexual act afterward.
-    - Match media to the category: ordinary affectionate photos/videos in Compliments and Tenderness; voluntary private intimate photos or a short greeting video for the partner in Desire; home erotic filming only in Hard, alongside a concrete act and only if both want it. Never suggest sharing or posting. Do not add props by default.
+    - Match media to the category: ordinary affectionate photos/videos in Compliments and Tenderness; private intimate photos and short nude-body videos in Desire or Passion; aesthetic home-sex filming in Passion and first-person filming in Hard, always alongside a concrete act and only if both want it. Keep recordings private; never suggest sharing or posting. Do not add props by default.
    - This is a real activity, not roleplay: no fictional characters, plot, or long dialogue. Return only the task text, with no introduction or explanation.`,
   hi: `उत्तर देने से पहले चुपचाप जाँचें:
    - एक काम और एक मुख्य विचार दें। यह अगले 24 घंटों में खाली समय के 2–4 छोटे पलों में पूरा हो सकता है; लगातार संदेश भेजना या पूरे दिन साथ रहना आवश्यक न करें।
@@ -27,7 +27,7 @@ const QUALITY_RULES: Record<string, string> = {
     - श्रेणी की सीमा बनाएँ: प्रशंसा और कोमलता गैर-यौन हैं; इच्छा सेक्स से पहले की भूमिका है; जुनून और हार्ड में संदर्भ लाइब्रेरी से विविध ठोस यौन क्रियाएँ लें—इन्हें केवल ओरल सेक्स, प्रवेश और हस्तमैथुन तक सीमित न करें। “अपनी इच्छा बताओ” या “सेक्स करो” जैसे अस्पष्ट वाक्य पर्याप्त नहीं हैं। चुने हुए मोड के अनुसार भूमिकाएँ तय करें। जुनून को कोमल और सुंदर रखें; हार्ड को सीधा और थोड़ा अश्लील रखें। हर हार्ड काम में स्पष्ट यौन क्रिया होनी चाहिए; केवल नग्नता, साथ लेटना, कपड़े उतारना या सामान्य स्पर्श पर्याप्त नहीं हैं। सीमित अवधि वाला समर्पण-आधारित खेल केवल साथी मोड में हो।
  - ज़बरदस्ती, दर्द की अनदेखी या खतरनाक क्रियाएँ न लिखें। कार्य में समझौते, सुरक्षित शब्द या सुरक्षा की व्याख्या न जोड़ें।
  - अगर चरमोत्कर्ष का उल्लेख हो, तो आम तौर पर वहीं कार्य समाप्त करें; उसके बाद अपने-आप अगली यौन क्रिया न जोड़ें।
-    - मीडिया श्रेणी के अनुसार रखें: प्रशंसा और कोमलता में स्नेहपूर्ण सामान्य फोटो/वीडियो; इच्छा में साथी के लिए स्वेच्छा से निजी अंतरंग फोटो या छोटा अभिवादन वीडियो; हार्ड में ही ठोस क्रिया के साथ घरेलू कामुक वीडियो, यदि दोनों चाहें। कभी साझा या प्रकाशित करने को न कहें। सामान अपने-आप न जोड़ें।
+     - मीडिया को श्रेणी के अनुसार रखें: प्रशंसा और कोमलता में सामान्य स्नेहपूर्ण फोटो/वीडियो; इच्छा या जुनून में निजी अंतरंग फोटो और नग्न शरीर के छोटे वीडियो; जुनून में सुंदर घरेलू सेक्स-वीडियो और हार्ड में फर्स्ट-पर्सन वीडियो, हमेशा ठोस यौन क्रिया के साथ और तभी जब दोनों चाहें। रिकॉर्डिंग निजी रखें; साझा या प्रकाशित न करें। सामान अपने-आप न जोड़ें।
    - यह वास्तविक गतिविधि है, भूमिका-अभिनय नहीं: काल्पनिक पात्र, कहानी या लंबा संवाद नहीं। केवल कार्य का पाठ लौटाएँ।`,
   pt: `Verifique a qualidade em silêncio antes de responder:
    - Escreva uma tarefa com uma ideia central. Ela pode acontecer em 2–4 momentos curtos durante o tempo livre nas próximas 24 horas; não exija mensagens constantes nem que estejam juntos o dia todo.
@@ -37,7 +37,7 @@ const QUALITY_RULES: Record<string, string> = {
     - Respeite os limites da categoria: elogios e carinho são não sexuais; desejo é preliminar antes do sexo; em Paixão e hard, use ações sexuais concretas e variadas da biblioteca de referência, não apenas sexo oral, penetração e masturbação. Não substitua a ação por frases vagas como “diga o que deseja” ou “façam sexo”. Paixão deve ser terna e bonita; hard, direto e um pouco mais sujo. Toda tarefa hard deve nomear um ato sexual direto; nudez, ficar deitado nu, tirar a roupa ou toques genéricos não bastam.
  - Não descreva coerção, ignorar dor ou ações fisicamente perigosas. Não inclua explicações sobre acordos, palavra de segurança ou segurança no texto.
  - Se mencionar orgasmo, normalmente encerre a tarefa ali; não comece automaticamente outro ato sexual depois.
-    - Use mídia conforme a categoria: fotos/vídeos carinhosos comuns em Elogios e Ternura; fotos íntimas privadas e voluntárias ou um vídeo curto de saudação para o par em Desejo; gravação erótica caseira somente em hard, junto de um ato concreto, se ambos quiserem, sem compartilhar ou publicar. Não acrescente acessórios por padrão.
+     - Use mídia conforme a categoria: fotos/vídeos carinhosos comuns em Elogios e Ternura; fotos íntimas e vídeos curtos do corpo nu em Desejo ou Paixão; gravação sensual caseira de sexo em Paixão e em primeira pessoa em hard, sempre junto de um ato concreto e se ambos quiserem. Mantenha tudo privado; não compartilhe nem publique. Não acrescente acessórios por padrão.
    - Esta é uma atividade real, não uma interpretação: sem personagens fictícios, enredo ou diálogos longos. Retorne somente o texto da tarefa.`,
   es: `Comprueba la calidad en silencio antes de responder:
    - Escribe una tarea con una idea central. Puede desarrollarse durante las próximas 24 horas en 2–4 momentos breves durante el tiempo libre; no exijas mensajes constantes ni estar juntos todo el día.
@@ -47,29 +47,29 @@ const QUALITY_RULES: Record<string, string> = {
     - Respeta los límites de cada categoría: cumplidos y ternura no son sexuales; deseo es el juego previo antes del sexo; en Pasión y hard, usa acciones sexuales concretas y variadas de la biblioteca de referencia, no solo sexo oral, penetración y masturbación. No sustituyas la acción por frases vagas como «di lo que deseas» o «tengan sexo». Pasión debe ser tierna y bonita; hard, directo y algo más sucio. Cada tarea hard debe nombrar un acto sexual directo; la desnudez, tumbarse desnudos, quitarse la ropa o los toques generales no bastan.
  - No describas coerción, ignorar el dolor ni acciones físicamente peligrosas. No añadas explicaciones sobre acuerdos, palabras de seguridad o seguridad al texto.
  - Si mencionas el orgasmo, normalmente termina ahí la tarea; no empieces automáticamente otro acto sexual después.
-    - Ajusta los medios a la categoría: fotos/vídeos afectuosos normales en Cumplidos y Ternura; fotos íntimas privadas y voluntarias o un breve video de saludo para la pareja en Deseo; grabación erótica casera solo en hard, junto con un acto concreto, si ambos quieren, sin compartir ni publicar. No añadas accesorios por defecto.
+     - Ajusta los medios a la categoría: fotos/vídeos afectuosos normales en Cumplidos y Ternura; fotos íntimas y vídeos breves del cuerpo desnudo en Deseo o Pasión; grabación estética de sexo en casa en Pasión y en primera persona en hard, siempre junto con un acto concreto y solo si ambos quieren. Mantén las grabaciones privadas; no las compartas ni publiques. No añadas accesorios por defecto.
    - Es una actividad real, no una interpretación: sin personajes ficticios, trama ni diálogos largos. Devuelve solo el texto de la tarea.`,
 };
 
 const MODE_RULES: Record<string, Record<"solo" | "together", string>> = {
   ru: {
-    solo: "В одиночном режиме задание получает один пользователь. Обращайся к нему как к одному человеку и опиши одно действие, которое он может сделать для партнёра. В «Страсти» и «Харде» пользователь выполняет названное действие для партнёра; не используй взаимные действия, «по очереди» или отдельное задание партнёру.",
+    solo: "В одиночном режиме задание получает один пользователь. Обращайся к нему как к одному человеку и опиши одно действие, которое он может выполнить, направить или получить вместе с партнёром. Не используй взаимные действия, «по очереди» или отдельное задание партнёру.",
     together: "В парном режиме один инициирует задание, а оба получают один и тот же текст. Опиши одно общее действие для совершеннолетних мужчины и женщины, включив обоих в сексуальное действие; не превращай карточку в два отдельных задания.",
   },
   en: {
-    solo: "In solo mode, only the initiating user receives the task. Address that person individually and describe one action they can take for their partner. For Passion and Hard, the user performs the named act for the partner; do not use mutual actions, take-turns instructions, or a separate task for the partner.",
+    solo: "In solo mode, only the initiating user receives the task. Address that person individually and describe one action they can perform, direct, or receive with their partner. Do not use mutual actions, take-turns instructions, or a separate task for the partner.",
     together: "In together mode, one person starts and both receive the same text. Write one shared action for an adult man and woman and explicitly include both in the sexual act, not two separate tasks.",
   },
   hi: {
-    solo: "एकल मोड में केवल उपयोगकर्ता को काम मिलता है। उसी व्यक्ति को संबोधित करें और ऐसा एक काम बताएँ जो वह अपने साथी के लिए कर सकता है; साथी से जवाब या अलग काम की अपेक्षा न करें। जुनून और हार्ड में उपयोगकर्ता साथी के लिए नामित क्रिया करे; आपसी क्रिया या बारी-बारी के निर्देश न दें।",
+    solo: "एकल मोड में केवल उपयोगकर्ता को काम मिलता है। उसी व्यक्ति को संबोधित करें और ऐसा एक काम बताएँ जिसे वह साथी के साथ कर, निर्देशित या प्राप्त कर सकता है; साथी से अलग काम की अपेक्षा न करें। आपसी क्रिया या बारी-बारी के निर्देश न दें।",
     together: "साथी मोड में एक व्यक्ति शुरुआत करता है और दोनों को वही पाठ मिलता है। वयस्क पुरुष और महिला की साझा गतिविधि लिखें और यौन क्रिया में दोनों को स्पष्ट रूप से शामिल करें; दो अलग काम न दें।",
   },
   pt: {
-    solo: "No modo solo, somente o usuário recebe a tarefa. Dirija-se a essa pessoa e descreva uma ação que ela pode fazer para o parceiro; não exija resposta nem uma ação separada do parceiro. Em Paixão e hard, o usuário executa o ato nomeado no parceiro; não use ações mútuas nem instruções para alternar.",
+    solo: "No modo solo, somente o usuário recebe a tarefa. Dirija-se a essa pessoa e descreva uma ação que ela pode realizar, conduzir ou receber com o parceiro; não exija uma tarefa separada para ele. Não use ações mútuas nem instruções para alternar.",
     together: "No modo a dois, uma pessoa inicia e ambos recebem o mesmo texto. Escreva uma ação compartilhada por um homem e uma mulher adultos, incluindo claramente os dois no ato sexual, não duas tarefas separadas.",
   },
   es: {
-    solo: "En modo individual, solo quien inicia recibe la tarea. Dirígete a esa persona y describe una acción que pueda hacer por su pareja; no exijas una respuesta ni una acción separada. En Pasión y hard, quien inicia realiza el acto nombrado para su pareja; no uses acciones mutuas ni instrucciones para turnarse.",
+    solo: "En modo individual, solo quien inicia recibe la tarea. Dirígete a esa persona y describe una acción que pueda realizar, dirigir o recibir con su pareja; no asignes una tarea separada a la pareja ni uses acciones mutuas o turnos.",
     together: "En modo en pareja, una persona inicia y ambos reciben el mismo texto. Escribe una acción compartida para un hombre y una mujer adultos e incluye claramente a ambos en el acto sexual, no dos tareas separadas.",
   },
 };
@@ -101,6 +101,9 @@ export const TASK_VARIATION_TAGS = [
   "anal_play",
   "submission",
   "whipped_cream",
+  "edible_underwear",
+  "restraint_play",
+  "impact_play",
   "other",
 ] as const;
 
@@ -231,6 +234,9 @@ const ADDITIONAL_TASK_VARIATION_RULES: Record<string, Array<{ tag: TaskVariation
     { tag: "short_video", pattern: /коротк\p{L}*.{0,20}видео|видеообращ|видеосообщ/iu },
     { tag: "written_note", pattern: /записк\p{L}*|от\s+руки.{0,20}напис/iu },
     { tag: "slow_dance", pattern: /медленн\p{L}*.{0,15}(?:танц|танец)|(?:танц|танец)\p{L}*.{0,15}медленн/iu },
+    { tag: "edible_underwear", pattern: /съедобн\p{L}*.{0,20}(?:трус|бель)|(?:трус|бель).{0,20}съедобн\p{L}*/iu },
+    { tag: "restraint_play", pattern: /наручник|мягк\p{L}*\s+фиксац|зафиксир\p{L}*.{0,20}запяст/iu },
+    { tag: "impact_play", pattern: /шл[её]п|плетк|порка/iu },
   ],
   en: [
     { tag: "anal_play", pattern: /anal\s+(?:stimulation|play|penetration|sex)|anus.{0,30}(?:finger|toy|stimulat|penetrat)/iu },
@@ -238,6 +244,9 @@ const ADDITIONAL_TASK_VARIATION_RULES: Record<string, Array<{ tag: TaskVariation
     { tag: "short_video", pattern: /short video|video message/iu },
     { tag: "written_note", pattern: /handwritten note|note on paper/iu },
     { tag: "slow_dance", pattern: /slow dance|dance slowly/iu },
+    { tag: "edible_underwear", pattern: /edible underwear|edible panties|edible lingerie/iu },
+    { tag: "restraint_play", pattern: /soft cuffs|wrist cuffs|wrist restraint|restraint/iu },
+    { tag: "impact_play", pattern: /spank\w*|whip\w*|light flogger/iu },
   ],
   hi: [
     { tag: "anal_play", pattern: /गुदा\s+(?:उत्तेजना|प्रवेश|सेक्स)|गुदा.{0,30}(?:उंगली|खिलौना|स्पर्श)/u },
@@ -245,6 +254,9 @@ const ADDITIONAL_TASK_VARIATION_RULES: Record<string, Array<{ tag: TaskVariation
     { tag: "short_video", pattern: /छोटा वीडियो|संक्षिप्त वीडियो|वीडियो संदेश/u },
     { tag: "written_note", pattern: /हस्तलिखित नोट|हाथ से लिख[ीाे].{0,20}(?:चिट्ठी|नोट)/u },
     { tag: "slow_dance", pattern: /धीमा नृत्य|धीरे.{0,10}नाच/u },
+    { tag: "edible_underwear", pattern: /खाने योग्य.{0,20}(?:अंतर्वस्त्र|अंडरवियर)/u },
+    { tag: "restraint_play", pattern: /नरम कफ|हथकड़ी|कलाई.{0,15}बांध/u },
+    { tag: "impact_play", pattern: /थपकी|चाबुक|हल्की मार/u },
   ],
   pt: [
     { tag: "anal_play", pattern: /(?:estimulaç\p{L}*|penetraç\p{L}*|sexo|toque)\s+anal|ânus.{0,30}(?:dedo|brinquedo|estimula|penetra)/iu },
@@ -252,6 +264,9 @@ const ADDITIONAL_TASK_VARIATION_RULES: Record<string, Array<{ tag: TaskVariation
     { tag: "short_video", pattern: /vídeo curto|mensagem.{0,12}vídeo/iu },
     { tag: "written_note", pattern: /bilhete escrito à mão|nota manuscrita/iu },
     { tag: "slow_dance", pattern: /dança lenta|dançar lentamente/iu },
+    { tag: "edible_underwear", pattern: /lingerie comestível|calcinha comestível|cueca comestível/iu },
+    { tag: "restraint_play", pattern: /algemas macias|algemas nos pulsos|restriç\p{L}*/iu },
+    { tag: "impact_play", pattern: /tap\p{L}*|chicot\p{L}*|palmad\p{L}*/iu },
   ],
   es: [
     { tag: "anal_play", pattern: /(?:estimula\p{L}*|penetr\p{L}*|sexo|caricia)\s+anal|ano.{0,30}(?:dedo|juguete|estimula|penetr)/iu },
@@ -259,6 +274,9 @@ const ADDITIONAL_TASK_VARIATION_RULES: Record<string, Array<{ tag: TaskVariation
     { tag: "short_video", pattern: /vídeo corto|mensaje.{0,12}vídeo/iu },
     { tag: "written_note", pattern: /nota escrita a mano|nota manuscrita/iu },
     { tag: "slow_dance", pattern: /baile lento|bailar lentamente/iu },
+    { tag: "edible_underwear", pattern: /ropa interior comestible|bragas comestibles|bóxers comestibles/iu },
+    { tag: "restraint_play", pattern: /esposas suaves|esposas en las muñecas|sujeci\p{L}*/iu },
+    { tag: "impact_play", pattern: /palmad\p{L}*|azot\p{L}*|látigo/iu },
   ],
 };
 
@@ -271,7 +289,7 @@ const MANUAL_STIMULATION_MARKERS: Record<string, RegExp> = {
   en: /(?:masturbat\w*|manual stimulation|(?:finger\w*|hands?|palms?).{0,45}(?:clitoris|vulva|penis|genitals?|anus)|(?:clitoris|vulva|penis|genitals?|anus).{0,45}(?:finger\w*|hands?|palms?|massage\w*))/iu,
   hi: /(?:हस्तमैथुन|(?:हाथ|उंगली|उँगली|अंगुली).{0,35}(?:भगांकुर|क्लिटोरिस|लिंग|योनि|जननांग|गुदा)|(?:भगांकुर|क्लिटोरिस|लिंग|योनि|जननांग|गुदा).{0,35}(?:हाथ|उंगली|उँगली|अंगुली|मालिश|मसाज))/u,
   pt: /(?:masturb\p{L}*|(?:ded\p{L}*|mãos?|palmas?).{0,45}(?:clitóris|vulva|pênis|penis|genitais|ânus)|(?:clitóris|vulva|pênis|penis|genitais|ânus).{0,45}(?:ded\p{L}*|mãos?|palmas?|massag\p{L}*))/iu,
-  es: /(?:masturb\p{L}*|(?:ded\p{L}*|manos?|palmas?).{0,45}(?:clítoris|vulva|pene|genital\p{L}*|ano)|(?:clítoris|vulva|pene|genital\p{L}*|ano).{0,45}(?:ded\p{L}*|manos?|palmas?|masaje\p{L}*))/iu,
+  es: /(?:masturb\p{L}*|(?:ded\p{L}*|manos?|palmas?).{0,45}(?:clítoris|vulva|(?<![\p{L}\p{N}])pene(?![\p{L}\p{N}])|genital\p{L}*|ano)|(?:clítoris|vulva|(?<![\p{L}\p{N}])pene(?![\p{L}\p{N}])|genital\p{L}*|ano).{0,45}(?:ded\p{L}*|manos?|palmas?|masaje\p{L}*))/iu,
 };
 
 export function isManualStimulationTask(text: string, lang: string): boolean {
@@ -339,10 +357,9 @@ export function hasAnatomicallyClearOralAct(
 
   const targetsFemaleAnatomy = markers.femaleRecipient.test(text);
   const targetsMaleAnatomy = markers.maleRecipient.test(text);
-  if (mode === "together") return targetsFemaleAnatomy || targetsMaleAnatomy;
-  return gender === "male"
-    ? targetsFemaleAnatomy && !targetsMaleAnatomy
-    : targetsMaleAnatomy && !targetsFemaleAnatomy;
+  // Solo recipients may perform, direct, or receive the act. Validate named
+  // anatomy instead of assuming the recipient's gender determines the target.
+  return targetsFemaleAnatomy || targetsMaleAnatomy;
 }
 
 const META_PREFIXES: Record<string, RegExp> = {
@@ -412,9 +429,9 @@ const CONCRETE_SEXUAL_ACT_MARKERS: Record<string, RegExp> = {
 const HARD_SEXUAL_ACT_MARKERS: Record<string, RegExp> = {
   ru: /(?:взаимн\p{L}*.{0,30}оральн\p{L}*.{0,30}ласк|оральн\p{L}*\s+секс|минет|кунилингус|проникающ\p{L}*\s+секс|вагинальн\p{L}*\s+секс|анальн\p{L}*\s+секс|мастурбац\p{L}*|мастурбир\p{L}*|дроч\p{L}*|секс.{0,40}позици|позици.{0,25}секс|проник\p{L}*.{0,35}(?:влагалищ|анус|пенис|палец|игрушк)|(?:клитор|пенис|член|генитал\p{L}*|влагалищ\p{L}*|анус).{0,45}(?:стимулиру|ласкай|ласка|поглаж|лиж|сос|вибратор|пальц|ввод|проник|тр[иу])|(?:стимулиру|ласкай|ласка|поглаж|лиж|сос|вибратор|пальц|ввод|проник|тр[иу]).{0,45}(?:клитор|пенис|член|генитал\p{L}*|влагалищ\p{L}*|анус)|(?:сосок\p{L}*|груд\p{L}*|ягодиц\p{L}*).{0,35}(?:шл[её]п|сильно|жёстк|прикус)|доведи.{0,60}(?:оргазм|кра[юя]).{0,60}(?:рук|пальц|язык|рот|вибратор|пенис|клитор))/iu,
   en: /(?:oral sex|mutual oral stimulation|mutual oral pleasure|cunnilingus|fellatio|blow ?job|vaginal sex|anal sex|intercourse|penetrat\w*|masturbat\w*|hand ?job|fingering|sex.{0,40}position|position.{0,25}sex|finger.{0,35}(?:vagina|clit|genital|anus)|(?:clitoris|penis|genitals|vulva|vagina|anus).{0,45}(?:stimulat|lick|suck|finger|rub|stroke|vibrator|penetrat|enter|grind)|(?:stimulat|lick|suck|finger|rub|stroke|vibrator|penetrat|enter|grind).{0,45}(?:clitoris|penis|genitals|vulva|vagina|anus)|(?:nipples?|breasts?|buttocks|ass).{0,35}(?:spank|slap|bite|squeeze)|(?:spank|slap|bite|squeeze).{0,35}(?:nipples?|breasts?|buttocks|ass)|bring.{0,50}(?:orgasm|climax|edge).{0,50}(?:hand|finger|mouth|tongue|vibrator|penis|clitoris|penetrat))/iu,
-  hi: /(?:ओरल\s+सेक्स|मुख\s+मैथुन|योनि\s+सेक्स|गुदा\s+सेक्स|हस्तमैथुन|मास्टर्बेशन|सेक्स.{0,30}स्थिति|स्थिति.{0,25}सेक्स|प्रवेश.{0,35}(?:योनि|गुदा|लिंग|उंगली|खिलौना)|(?:क्लिटोरिस|लिंग|जननांग|योनि|गुदा).{0,40}(?:उत्तेजित|सहल|स्पर्श|रगड़|वाइब्रेटर|उंगली|प्रवेश|चाट|चूस)|(?:उत्तेजित|सहल|स्पर्श|रगड़|वाइब्रेटर|उंगली|प्रवेश|चाट|चूस).{0,40}(?:क्लिटोरिस|लिंग|जननांग|योनि|गुदा)|(?:स्तन|नितंब|निप्पल).{0,30}(?:थप्पड़|काट|दबाव)|(?:थप्पड़|काट|दबाव).{0,30}(?:स्तन|नितंब|निप्पल))/u,
-  pt: /(?:sexo oral|sexo vaginal|sexo anal|penetraç\p{L}*|penetr\p{L}*|masturb\p{L}*|sexo.{0,40}posição|posição.{0,25}sexo|(?:clitóris|pênis|genitais|vulva|vagina|ânus).{0,45}(?:estimula|acaricia|esfrega|lambe|chupa|dedilha|vibrador|penetra|introduz)|(?:estimula|acaricia|esfrega|lambe|chupa|dedilha|vibrador|penetra|introduz).{0,45}(?:clitóris|pênis|genitais|vulva|vagina|ânus)|(?:mamilos?|seios|nádegas).{0,35}(?:bate|palmad|morde|aperta)|(?:bate|palmad|morde|aperta).{0,35}(?:mamilos?|seios|nádegas)|leva.{0,50}(?:orgasmo|limite).{0,50}(?:mão|dedo|boca|língua|vibrador|penetra))/iu,
-  es: /(?:sexo oral|sexo vaginal|sexo anal|penetr\p{L}*|masturb\p{L}*|sexo.{0,40}posición|posición.{0,25}sexo|(?:clítoris|pene|genital\p{L}*|vulva|vagina|ano).{0,45}(?:estimula|acaricia|frota|lame|chupa|dedilha|vibrador|penetra|introduce)|(?:estimula|acaricia|frota|lame|chupa|dedilha|vibrador|penetra|introduce).{0,45}(?:clítoris|pene|genital\p{L}*|vulva|vagina|ano)|(?:pezones?|pechos?|nalgas).{0,35}(?:azota|golpea|muerde|aprieta)|(?:azota|golpea|muerde|aprieta).{0,35}(?:pezones?|pechos?|nalgas)|lleva.{0,50}(?:orgasmo|límite|borde).{0,50}(?:mano|dedo|boca|lengua|vibrador|penetra))/iu,
+  hi: /(?:ओरल\s+सेक्स|मुख\s+मैथुन|योनि\s+सेक्स|गुदा\s+सेक्स|प्रवेश\s+वाल[ाे]\s+सेक्स|हस्तमैथुन|मास्टर्बेशन|सेक्स.{0,30}स्थिति|स्थिति.{0,25}सेक्स|प्रवेश.{0,35}(?:योनि|गुदा|लिंग|उंगली|खिलौना)|(?:क्लिटोरिस|लिंग|जननांग|योनि|गुदा).{0,40}(?:उत्तेजित|सहल|स्पर्श|रगड़|वाइब्रेटर|उंगली|प्रवेश|चाट|चूस)|(?:उत्तेजित|सहल|स्पर्श|रगड़|वाइब्रेटर|उंगली|प्रवेश|चाट|चूस).{0,40}(?:क्लिटोरिस|लिंग|जननांग|योनि|गुदा)|(?:स्तन|नितंब|निप्पल).{0,30}(?:थप्पड़|काट|दबाव)|(?:थप्पड़|काट|दबाव).{0,30}(?:स्तन|नितंब|निप्पल))/u,
+  pt: /(?:sexo oral|cunnilingus|fellatio|boquete|sexo vaginal|sexo anal|penetraç\p{L}*|penetr\p{L}*|masturb\p{L}*|sexo.{0,40}posição|posição.{0,25}sexo|(?:clitóris|pênis|genitais|vulva|vagina|ânus).{0,45}(?:estimula|acaricia|esfrega|lambe|chupa|dedilha|vibrador|penetra|introduz)|(?:estimula|acaricia|esfrega|lambe|chupa|dedilha|vibrador|penetra|introduz).{0,45}(?:clitóris|pênis|genitais|vulva|vagina|ânus)|(?:mamilos?|seios|nádegas).{0,35}(?:bate|palmad|morde|aperta)|(?:bate|palmad|morde|aperta).{0,35}(?:mamilos?|seios|nádegas)|leva.{0,50}(?:orgasmo|limite).{0,50}(?:mão|dedo|boca|língua|vibrador|penetra))/iu,
+  es: /(?:sexo oral|cunnilingus|felaci[oó]n|mamad[ao]|sexo vaginal|sexo anal|penetr\p{L}*|masturb\p{L}*|sexo.{0,40}posición|posición.{0,25}sexo|(?:clítoris|pene|genital\p{L}*|vulva|vagina|ano).{0,45}(?:estimula|acaricia|frota|lame|chupa|dedilha|vibrador|penetra|introduce)|(?:estimula|acaricia|frota|lame|chupa|dedilha|vibrador|penetra|introduce).{0,45}(?:clítoris|pene|genital\p{L}*|vulva|vagina|ano)|(?:pezones?|pechos?|nalgas).{0,35}(?:azota|golpea|muerde|aprieta)|(?:azota|golpea|muerde|aprieta).{0,35}(?:pezones?|pechos?|nalgas)|lleva.{0,50}(?:orgasmo|límite|borde).{0,50}(?:mano|dedo|boca|lengua|vibrador|penetra))/iu,
 };
 
 const HARD_AUXILIARY_ACT_MARKERS: Record<string, RegExp> = {
@@ -482,6 +499,14 @@ const NONSEXUAL_CATEGORY_MARKERS: Record<string, RegExp> = {
   es: /(?:pene|clítoris|genital\p{L}*|vulva|vagina|ano|zona\s+íntima|erótic\p{L}*|porno|desnúd\p{L}*|quítate.{0,30}ropa)/iu,
 };
 
+const PASSION_INTIMATE_MEDIA_MARKERS: Record<string, RegExp> = {
+  ru: /(?:интимн\p{L}*.{0,20}(?:фото|видео|сним)|(?:фото|видео|сним).{0,20}(?:интимн\p{L}*|обнаж[её]нн\p{L}*|гол\p{L}*\s+тел)|нюдс|обнаж[её]нн\p{L}*.{0,15}(?:фото|видео))/iu,
+  en: /(?:intimate.{0,20}(?:photo|picture|video|clip)|(?:photo|picture|video|clip).{0,20}(?:intimate|nude|naked)|(?:nude|naked).{0,20}(?:photo|picture|video|clip)|erotic selfie)/iu,
+  hi: /(?:अंतरंग.{0,20}(?:फ़ोटो|फोटो|तस्वीर|वीडियो)|(?:फ़ोटो|फोटो|तस्वीर|वीडियो).{0,20}(?:अंतरंग|नग्न)|नग्न.{0,20}(?:फ़ोटो|फोटो|तस्वीर|वीडियो))/u,
+  pt: /(?:foto[s]?\s+íntim[ao]s?|vídeo[s]?\s+íntim[ao]s?|(?:foto|vídeo).{0,20}(?:nu[ao]|despid[ao])|(?:nu[ao]|despid[ao]).{0,20}(?:foto|vídeo)|selfie erótic[ao])/iu,
+  es: /(?:foto[s]?\s+íntim[ao]s?|vídeo[s]?\s+íntim[ao]s?|(?:foto|vídeo).{0,20}(?:desnud[ao]|íntim[ao])|(?:desnud[ao]|íntim[ao]).{0,20}(?:foto|vídeo)|selfi erótic[ao])/iu,
+};
+
 const CLINICAL_INTERCOURSE_LABELS: Record<string, RegExp> = {
   ru: /вагинальн\p{L}*\s+(?:секс|проникнов\p{L}*)/iu,
   en: /\bvaginal\s+(?:sex|intercourse)\b/iu,
@@ -497,7 +522,11 @@ export function isTaskTextCategoryAppropriate(text: string, category: string, la
   const analActs = ANAL_SEXUAL_ACT_MARKERS[lang] ?? ANAL_SEXUAL_ACT_MARKERS.en;
   const nonsexualMarkers = NONSEXUAL_CATEGORY_MARKERS[lang] ?? NONSEXUAL_CATEGORY_MARKERS.en;
   const isSexualAct = sexActs.test(normalized) || analActs.test(normalized);
-  if (category === "hard" || category === "passion") return hasHardSexualAct(normalized, lang);
+  if (category === "hard") return hasHardSexualAct(normalized, lang);
+  if (category === "passion") {
+    return hasHardSexualAct(normalized, lang)
+      || (PASSION_INTIMATE_MEDIA_MARKERS[lang] ?? PASSION_INTIMATE_MEDIA_MARKERS.en).test(normalized);
+  }
   if (category === "desire") return !isSexualAct;
   if (category === "tenderness" || category === "compliments") {
     return !isSexualAct && !nonsexualMarkers.test(normalized);

@@ -879,31 +879,118 @@
   background: #c9bdd9;
 }
 .intensity-item.blue .intensity-item__image img {
-  object-position: center 78%;
+  object-position: center 18%;
   transform: none !important;
 }
-.intensity-item.blue .intensity-item__image::after {
-  display: block !important;
-  background:
-    linear-gradient(90deg,
-      rgba(241,235,248,.76) 0%,
-      rgba(241,235,248,.32) 9%,
-      rgba(241,235,248,.08) 22%,
-      transparent 38%,
-      transparent 62%,
-      rgba(241,235,248,.08) 78%,
-      rgba(241,235,248,.32) 91%,
-      rgba(241,235,248,.76) 100%),
-    linear-gradient(0deg,
-      rgba(241,235,248,.30) 0%,
-      transparent 18%,
-      transparent 82%,
-      rgba(241,235,248,.14) 100%);
-  filter: blur(7px);
-  opacity: .9;
-}
+.intensity-item.blue .intensity-item__image::after { display: none; }
 @media (prefers-reduced-motion: reduce) {
   .intensity-item,
   .intensity-item:hover,
   .intensity-item.active { transform: none !important; }
+}
+
+/* Portrait choices: the selected card moves forward without a corner check. */
+.intensity-select {
+  display: grid;
+  grid-template-columns: repeat(3,minmax(0,1fr)) !important;
+  width: min(100% - 28px,500px) !important;
+  max-width: 500px !important;
+  gap: 8px !important;
+  margin: 5px auto 0 !important;
+  padding: 0 !important;
+  overflow: visible;
+  z-index: 3 !important;
+}
+.intensity-item {
+  position: relative;
+  z-index: 1;
+  display: block !important;
+  width: 100%;
+  height: clamp(150px,24vh,205px) !important;
+  min-height: 0 !important;
+  overflow: hidden;
+  padding: 0 !important;
+  border: 2px solid rgba(255,255,255,.84) !important;
+  border-radius: 17px !important;
+  background: #c9bdd9 !important;
+  color: #fff !important;
+  box-shadow:
+    0 7px 18px rgba(64,51,79,.12),
+    0 0 17px rgba(248,245,252,.56),
+    inset 0 0 0 1px rgba(255,255,255,.38);
+  transform: none !important;
+  transition: transform .26s cubic-bezier(.2,.8,.2,1), box-shadow .26s ease, border-color .26s ease;
+}
+.intensity-item__image {
+  position: absolute;
+  z-index: 0;
+  inset: 0 !important;
+  display: block;
+  width: 100% !important;
+}
+.intensity-item__image img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 28% !important;
+  filter: none;
+  transition: transform .32s ease;
+}
+.intensity-item::after { display: none !important; }
+.intensity-item__image::after {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg,rgba(30,19,39,.02) 38%,rgba(30,19,39,.12) 58%,rgba(30,19,39,.76) 100%),
+    radial-gradient(ellipse at center,transparent 64%,rgba(248,245,252,.16) 100%);
+  content: "";
+  pointer-events: none;
+}
+.intensity-item__copy {
+  position: absolute !important;
+  z-index: 2;
+  right: 4px !important;
+  bottom: 10px !important;
+  left: 4px !important;
+  display: block !important;
+  width: auto;
+  max-width: none !important;
+  text-align: center;
+}
+.intensity-item__copy strong { margin-inline: auto; }
+.intensity-item__check { display: none !important; }
+.intensity-item:hover:not(.active) {
+  z-index: 2;
+  transform: translateY(-2px) scale(1.02) !important;
+}
+.intensity-item.active {
+  z-index: 5;
+  border-color: rgba(255,255,255,.98) !important;
+  box-shadow:
+    0 0 0 2px rgba(128,100,162,.82),
+    0 0 0 5px rgba(248,245,252,.62),
+    0 0 26px 7px rgba(128,100,162,.3),
+    0 20px 36px rgba(64,51,79,.28),
+    inset 0 0 0 1px rgba(255,255,255,.7);
+  transform: translateY(-4px) scale(1.065) !important;
+}
+.intensity-item.active .intensity-item__image img { transform: scale(1.035); }
+.intensity-item:focus-visible {
+  outline: 3px solid #8064a2;
+  outline-offset: 4px;
+}
+@media (max-height: 700px) {
+  .intensity-item { height: clamp(126px,21vh,154px) !important; }
+  .intensity-item__copy { bottom: 8px !important; }
+  .intensity-item.active { transform: translateY(-2px) scale(1.045) !important; }
+}
+@media (max-width: 360px) {
+  .intensity-item__copy strong { padding: 6px 5px; font-size: 11px !important; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .intensity-item,
+  .intensity-item:hover,
+  .intensity-item.active,
+  .intensity-item__image img { transition: none; }
 }

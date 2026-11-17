@@ -185,7 +185,7 @@ function RoleCard({ title, roleText, intensity, lang, notified, isMissed, onHide
 }
 
 function IntensitySelector({ value, onChange, lang }: { value: Intensity; onChange: (v: Intensity) => void; lang: Lang }) {
-  return <div className="intensity-select">{(["romantic", "passion", "hard"] as Intensity[]).map((key) => { const item = INTENSITY_META[key]; const label = item.labels[lang] ?? item.labels.en; const selected = value === key; return <button key={key} className={`intensity-item ${item.tone} ${selected ? "active" : ""}`} onClick={() => onChange(key)} aria-label={label.label} aria-pressed={selected} data-testid={`button-intensity-${key}`}><span className="intensity-item__image" aria-hidden="true"><img src={INTENSITY_IMAGES[key]} alt="" /></span><span className="intensity-item__copy"><strong>{label.label}</strong></span><span className="intensity-item__check" aria-hidden="true">{selected ? "✓" : ""}</span></button>; })}</div>;
+  return <div className="intensity-select">{(["romantic", "passion", "hard"] as Intensity[]).map((key) => { const item = INTENSITY_META[key]; const label = item.labels[lang] ?? item.labels.en; const selected = value === key; return <button key={key} className={`intensity-item ${item.tone} ${selected ? "active" : ""}`} onClick={() => onChange(key)} aria-label={label.label} aria-pressed={selected} data-testid={`button-intensity-${key}`}><span className="intensity-item__image" aria-hidden="true"><img src={INTENSITY_IMAGES[key]} alt="" /></span><span className="intensity-item__copy"><strong>{label.label}</strong></span></button>; })}</div>;
 }
 
 interface ScenarioScreenProps { lang: Lang; gender?: Gender; onBack: () => void; onUpgrade?: () => Promise<boolean>; }

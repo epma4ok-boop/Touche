@@ -1106,6 +1106,11 @@ export default function WishMap({ lang, coupleId, refreshKey, onOpenTask }: Wish
         .wm-dialog-hint{color:#62566f}
         @media(min-width:560px){.wm-diary-panel .wm-inner{padding:24px 29px 28px}.wm-content-grid{gap:18px}}
         @media(max-width:420px){.wm-diary-panel .wm-inner{padding:16px 15px 18px}.wm-diary-cover{height:148px}}
+        .wm-diary-trigger{position:relative;isolation:isolate}
+        .wm-diary-trigger:before{content:"";position:absolute;z-index:0;inset:4px;border:1px solid rgba(255,255,255,.62);border-radius:17px;box-shadow:0 0 17px 2px rgba(255,255,255,.24);pointer-events:none}
+        .wm-entry-top,.wm-entry-bottom,.wm-entry-track{position:relative;z-index:1}
+        .wm-diary-cover img{object-position:center 39%;transform:none}
+        .wm-diary-cover:after{inset:0;background:linear-gradient(180deg,rgba(248,245,252,.02) 0%,transparent 48%,rgba(248,245,252,.68) 100%),linear-gradient(90deg,rgba(248,245,252,.1),transparent 18%,transparent 84%,rgba(248,245,252,.12))}
       `}</style>
       <button
         ref={diaryTriggerRef}

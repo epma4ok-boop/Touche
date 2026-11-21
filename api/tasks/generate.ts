@@ -497,12 +497,37 @@ const MUTUAL_ONLY_TASK_MARKERS: Record<string, RegExp> = {
 };
 
 const UNSAFE_TASK_MARKERS: Record<string, RegExp> = {
-  ru: /(?:без\s+согласия|игнорир\w*\s+(?:отказ|боль)|не\s+может\s+(?:двигаться|отказаться)|не\s+двигается|не\s+(?:двигайся|шевелись|двигаться)|не\s+слышат\s+и\s+не\s+видят|делай\s+что\s+хочешь|без\s+вопросов|подчин\w*\s+без|застав\w*|принуд\w*|удуш\w*|души\s|не\s+спрашивай|насиль\w*)/iu,
-  en: /(?:without consent|can't (?:move|refuse)|cannot (?:move|refuse)|at their mercy|do whatever you want|don't move|do not move|stay still|obey without question|can't hear (?:or|and) see|force(?:d)?|coerc|chok|strangl|ignore (?:their )?(?:no|stop|pain)|don't ask)/iu,
-  hi: /(?:सहमति के बिना|हिल नहीं सकता|हिल नहीं सकती|हिलते नहीं|न\s+हिलें|न\s+हिलना|मत\s+हिलो|बिना\s+सवाल.*(?:मान|आज्ञा)|जो चाहो करो|जबरदस्ती|ज़बरदस्ती|मना करने पर भी|गला घोंट|दर्द की अनदेखी)/u,
-  pt: /(?:sem consentimento|não pode se mover|não consegue se mexer|não\s+se\s+(?:mova|mex\w*)|ordene\w*.{0,40}não\s+se\s+mova|obedeç\w*\s+sem\s+question\w*|à mercê|faça o que quiser|forç\w*|coag\w*|estrang\w*|ignore.*(?:não|pare|dor))/iu,
-  es: /(?:sin consentimiento|no puede moverse|no puede negarse|no\s+te\s+muevas|que\s+no\s+se\s+mueva|ordena\w*.{0,40}no\s+se\s+mueva|obedec\w*\s+sin\s+cuestionar|a su merced|haz lo que quieras|forz\w*|coaccion\w*|estrang\w*|ignora.*(?:no|para|dolor))/iu,
+  ru: /(?:без\s+согласия|игнорир\w*\s+(?:отказ|боль|стоп|сигнал)|не\s+может\s+отказаться|не\s+слышат\s+и\s+не\s+видят|удуш\w*|души\s|насиль\w*|травм\w*|перелом\w*|кровотеч\w*|калеч\w*|муч\w*|больн\w*)/iu,
+  en: /(?:without consent|cannot? refuse|ignore.{0,20}(?:no|stop|pain|signal)|can't hear (?:or|and) see|chok(?:e|ing)|strangl|suffocat|sexual assault|tortur\w*|injur\w*|break.{0,15}bone|bleed\w*|\bpain\b|hurt\w*)/iu,
+  hi: /(?:सहमति के बिना|मना नहीं कर सकता|मना नहीं कर सकती|इनकार.{0,20}नहीं|इनकार.{0,20}अनदेखा|रोकने के संकेत की अनदेखी|गला घोंट|दर्द|चोट|हड्डी तोड़|खून|यातना)/u,
+  pt: /(?:sem consentimento|não pode recusar|não consegue recusar|ignore.{0,20}(?:não|pare|dor|sinal)|estrangul|sufoc|agressão sexual|tortur\p{L}*|lesion\p{L}*|quebr\p{L}*.{0,15}osso|sangr\p{L}*|\bdor\b|machuc\p{L}*)/iu,
+  es: /(?:sin consentimiento|no puede negarse|no puede rechazar|ignora.{0,20}(?:no|para|dolor|señal)|estrangul|asfixi|agresión sexual|tortur\p{L}*|lesion\p{L}*|herid\p{L}*|romp\p{L}*.{0,15}hueso|sangr\p{L}*|\bdolor\b|lastim\p{L}*)/iu,
 };
+
+const FORCE_PLAY_MARKERS: Record<string, RegExp> = {
+  ru: /(?:принужд\p{L}*|застав\p{L}*|насиль\p{L}*|силой|сопротивля\p{L}*)/iu,
+  en: /(?:coerc\w*|forc(?:e|ed|ing)|resist\w*|against.{0,20}will)/iu,
+  hi: /(?:जबरदस्ती|ज़बरदस्ती|मजबूर|विरोध.{0,15}कर)/u,
+  pt: /(?:coerç\p{L}*|forç\p{L}*|resist\p{L}*|contra a vontade)/iu,
+  es: /(?:coerc\p{L}*|forz\p{L}*|resist\p{L}*|contra su voluntad)/iu,
+};
+
+const STAGED_PLAY_MARKERS: Record<string, RegExp> = {
+  ru: /(?:ролева\p{L}*\s+игр\p{L}*|разыгр\p{L}*|отыгр\p{L}*|игров\p{L}*\s+принужд\p{L}*|постановоч\p{L}*)/iu,
+  en: /(?:role[- ]?play|act(?:ing)? out|pretend|staged|acted resistance)/iu,
+  hi: /(?:भूमिका निभ|अभिनय|खेल-खेल में|काल्पनिक भूमिका)/u,
+  pt: /(?:role[- ]?play|encen\p{L}*|represent\p{L}*|interpreta\p{L}*)/iu,
+  es: /(?:role[- ]?play|represent\p{L}*|interpreta\p{L}*|escen\p{L}*)/iu,
+};
+
+function hasUnsafeTaskContent(text: string, lang: string, category: string, mode: TaskMode): boolean {
+  const unsafeMarkers = UNSAFE_TASK_MARKERS[lang] ?? UNSAFE_TASK_MARKERS.en;
+  if (unsafeMarkers.test(text)) return true;
+  const forcePlay = FORCE_PLAY_MARKERS[lang] ?? FORCE_PLAY_MARKERS.en;
+  if (!forcePlay.test(text)) return false;
+  const stagedPlay = STAGED_PLAY_MARKERS[lang] ?? STAGED_PLAY_MARKERS.en;
+  return !(category === "hard" && mode === "together" && stagedPlay.test(text));
+}
 
 const SEXUAL_FILMING_MARKERS: Record<string, RegExp> = {
   ru: /(?:порно|эротическ\p{L}*\s+съ[её]мк|снять\p{L}*\s+порно|(?:сним|запис|видео).{0,35}(?:секс|проникающ\p{L}*\s+секс|оральн\p{L}*\s+секс)|(?:секс|оральн\p{L}*\s+секс).{0,35}(?:сним|запис|видео))/iu,
@@ -536,6 +561,22 @@ const INTIMATE_MEDIA_MARKERS: Record<string, RegExp> = {
   es: /(?:foto[s]?\s+íntim[ao]s?|vídeo[s]?\s+íntim[ao]s?|(?:foto|vídeo).{0,20}(?:desnud[ao]|íntim[ao])|(?:desnud[ao]|íntim[ao]).{0,20}(?:foto|vídeo)|selfi erótic[ao])/iu,
 };
 
+const GENERIC_TASK_WARNING_MARKERS: Record<string, RegExp> = {
+  ru: /(?:заранее\s+выбер\p{L}*\s+стоп|стоп[- ]?(?:слово|сигнал)|останов\p{L}*\s+по\s+сигналу|при\s+боли|дискомфорт|если\s+оба\s+(?:хотят|согласны)|если\s+вы\s+оба|с\s+согласия\s+партн[её]р|предварительн\p{L}*\s+договор|обсуд\p{L}*.{0,20}границ)/iu,
+  en: /(?:stop word|stop signal|stop at (?:any )?(?:signal|pain)|if you both want|if both want|with consent|agree on limits|discomfort|if your partner wants)/iu,
+  hi: /(?:स्टॉप[- ]?वर्ड|रुकने का शब्द|रोकने के संकेत|दर्द|असुविधा|अगर आप दोनों चाहें|दोनों सहमत|सहमति से|सीमाएँ तय|पहले तय करें)/u,
+  pt: /(?:palavra de parada|sinal para parar|pare ao sinal|se ambos quiserem|se vocês dois quiserem|com consentimento|combinar limites|\bdor\b|desconforto)/iu,
+  es: /(?:palabra de parada|señal para parar|detente ante|si ambos quieren|si los dos quieren|con consentimiento|acuerden límites|dolor|molestia)/iu,
+};
+
+function hasGenericTaskWarning(text: string, lang: string): boolean {
+  const warningMarkers = GENERIC_TASK_WARNING_MARKERS[lang] ?? GENERIC_TASK_WARNING_MARKERS.en;
+  if (!warningMarkers.test(text)) return false;
+  const intimateMedia = (INTIMATE_MEDIA_MARKERS[lang] ?? INTIMATE_MEDIA_MARKERS.en).test(text);
+  const sexualFilming = (SEXUAL_FILMING_MARKERS[lang] ?? SEXUAL_FILMING_MARKERS.en).test(text);
+  return !intimateMedia && !sexualFilming;
+}
+
 function isTaskExampleMediaAllowed(task: string, category: string, lang: string, mode: TaskMode): boolean {
   const mediaMarkers = EXAMPLE_MEDIA_MARKERS[lang] ?? EXAMPLE_MEDIA_MARKERS.en;
   if (!mediaMarkers.test(task)) return true;
@@ -563,12 +604,11 @@ function getTaskExamples(category: string, lang: string, requestId: string, mode
   const fallbackPool = expandedFallbackPool ?? (mode === "solo"
     ? SOLO_SEXUAL_FALLBACKS[lang]?.[category as "passion" | "hard"] ?? []
     : DAILY_TASK_FALLBACKS[lang]?.[category] ?? []);
-  const unsafeMarkers = UNSAFE_TASK_MARKERS[lang] ?? UNSAFE_TASK_MARKERS.en;
   const allowManualStimulation = !PAID_CATEGORIES.has(category) || isManualStimulationAllowed(recentVariationTags);
   const eligibleSource = sourcePool.filter((example) =>
-    isTaskTextWellFormed(example, lang)
-    && !unsafeMarkers.test(example)
-    && !((category === "hard" || category === "passion") && getTaskVariationTag(example, lang) === "sex_toy")
+    isTaskTextWellFormed(example, lang, mode, category)
+    && !hasUnsafeTaskContent(example, lang, category, mode)
+    && !hasGenericTaskWarning(example, lang)
     && hasCategorySexualAct(example, category, lang)
     && (allowManualStimulation || !isManualStimulationTask(example, lang))
     && !(mode === "solo" && (MUTUAL_ONLY_TASK_MARKERS[lang] ?? MUTUAL_ONLY_TASK_MARKERS.en).test(example))
@@ -578,8 +618,9 @@ function getTaskExamples(category: string, lang: string, requestId: string, mode
   const modeMatched = eligibleSource.filter((example) => isTaskTextModeAppropriate(example, lang, mode));
   const modeAdapted = eligibleSource.filter((example) => !isTaskTextModeAppropriate(example, lang, mode));
   const eligibleFallbacks = fallbackPool.filter((example) =>
-    isTaskTextWellFormed(example, lang, mode)
-    && !unsafeMarkers.test(example)
+    isTaskTextWellFormed(example, lang, mode, category)
+    && !hasUnsafeTaskContent(example, lang, category, mode)
+    && !hasGenericTaskWarning(example, lang)
     && hasCategorySexualAct(example, category, lang)
     && (allowManualStimulation || !isManualStimulationTask(example, lang))
     && isTaskTextModeAppropriate(example, lang, mode)
@@ -660,12 +701,12 @@ function getFallback(
       ? SOLO_SEXUAL_FALLBACKS[lang]?.[cat] ?? []
       : SOLO_DAILY_FALLBACKS[lang]?.[cat as "compliments" | "tenderness" | "desire"] ?? []
     : localeFallbacks[cat] ?? []);
-  const unsafeMarkers = UNSAFE_TASK_MARKERS[lang] ?? UNSAFE_TASK_MARKERS.en;
   const allowManualStimulation = !PAID_CATEGORIES.has(cat) || isManualStimulationAllowed(recentVariationTags);
   const wellFormed = fallbackTasks.filter((task) =>
     task.length <= MAX_TASK_CHARS
-    && isTaskTextWellFormed(task, lang, mode)
-    && !unsafeMarkers.test(task)
+    && isTaskTextWellFormed(task, lang, mode, cat)
+    && !hasUnsafeTaskContent(task, lang, cat, mode)
+    && !hasGenericTaskWarning(task, lang)
     && isTaskTextModeAppropriate(task, lang, mode)
     && hasCategorySexualAct(task, cat, lang)
     && (allowManualStimulation || !isManualStimulationTask(task, lang))
@@ -903,9 +944,43 @@ const CATEGORY_VARIETY_GUIDANCE: Record<string, Record<string, string>> = {
 };
 
 function getCategoryVarietyGuidance(category: string, lang: string): string {
-  return CATEGORY_VARIETY_GUIDANCE[lang]?.[category]
+  const guidance = CATEGORY_VARIETY_GUIDANCE[lang]?.[category]
     ?? CATEGORY_VARIETY_GUIDANCE.en[category]
     ?? "";
+  if (category !== "passion" && category !== "hard") return guidance;
+  const obsoleteToyExclusions: Record<string, RegExp> = {
+    ru: /Не предлагай секс-игрушки\.?/giu,
+    en: /Do not suggest sex toys\.?/giu,
+    hi: /सेक्स टॉय न सुझाएँ।?/gu,
+    pt: /Não sugira brinquedos sexuais\.?/giu,
+    es: /No sugieras juguetes sexuales\.?/giu,
+  };
+  const toyGuidance: Record<string, string> = {
+    ru: "Иногда используй секс-игрушку как конкретный способ ласки.",
+    en: "Sometimes use a sex toy as a concrete form of stimulation.",
+    hi: "कभी-कभी सेक्स टॉय को स्पष्ट उत्तेजना के तरीके के रूप में शामिल करें।",
+    pt: "Às vezes, use um brinquedo sexual como forma concreta de estímulo.",
+    es: "A veces, usa un juguete sexual como forma concreta de estimulación.",
+  };
+  let result = guidance.replace(obsoleteToyExclusions[lang] ?? obsoleteToyExclusions.en, "").trim();
+  if (category === "hard") {
+    const obsoletePowerPlayRules: Record<string, RegExp> = {
+      ru: /Подчинение — только Together, с короткой длительностью и стоп-сигналом\.?/giu,
+      en: /Submission is Together-only, time-bounded, and includes a stop signal\.?/giu,
+      hi: /समर्पण केवल Together में, सीमित समय और स्टॉप-सिग्नल के साथ हो।?/gu,
+      pt: /Submissão apenas em Together, por tempo limitado e com sinal para parar\.?/giu,
+      es: /La sumisión solo va en Together, por tiempo limitado y con una señal para parar\.?/giu,
+    };
+    const powerPlayGuidance: Record<string, string> = {
+      ru: "В Together допустима короткая ролевая игра с властью и игровым принуждением, связанная с конкретным сексуальным действием; не добавляй общих предупреждений.",
+      en: "Together may use brief power-play and acted coercion tied to a concrete sexual act; do not add generic warnings.",
+      hi: "Together में ठोस यौन क्रिया से जुड़ा संक्षिप्त पावर-प्ले और अभिनय वाला दबाव शामिल हो सकता है; सामान्य चेतावनियाँ न जोड़ें।",
+      pt: "Together pode incluir uma breve dinâmica de poder e coerção encenada, ligada a um ato sexual concreto; não acrescente avisos genéricos.",
+      es: "Together puede incluir una dinámica de poder breve y coerción actuada, ligada a un acto sexual concreto; no añadas advertencias genéricas.",
+    };
+    result = result.replace(obsoletePowerPlayRules[lang] ?? obsoletePowerPlayRules.en, powerPlayGuidance[lang] ?? powerPlayGuidance.en);
+  }
+  return `${result} ${toyGuidance[lang] ?? toyGuidance.en}`;
 }
 
 const SEXUAL_VARIATION_FOCI: Array<{
@@ -987,6 +1062,28 @@ const SEXUAL_VARIATION_FOCI: Array<{
       es: "una dinámica breve de sumisión con un acto sexual concreto y duración limitada",
     },
   },
+  {
+    tag: "sex_toy",
+    copy: {
+      ru: "конкретная стимуляция клитора партнёрши вибратором",
+      en: "using a vibrator directly on the partner's clitoris",
+      hi: "वाइब्रेटर से साथी के भगांकुर को सीधे उत्तेजित करना",
+      pt: "estimular diretamente o clitóris do parceiro com um vibrador",
+      es: "estimular directamente el clítoris de la pareja con un vibrador",
+    },
+  },
+  {
+    tag: "submission",
+    togetherOnly: true,
+    hardOnly: true,
+    copy: {
+      ru: "короткая ролевая игра с подчинением и игровым сопротивлением вокруг конкретного акта проникающего секса",
+      en: "brief submission roleplay around penetrative sex, with one partner leading and the other playfully resisting",
+      hi: "प्रवेश वाले सेक्स के साथ छोटी समर्पण-भूमिका, जिसमें एक साथी नेतृत्व करे और दूसरा खेल-खेल में विरोध का अभिनय करे",
+      pt: "um role-play breve de submissão durante sexo com penetração, com uma pessoa conduzindo e a outra encenando resistência",
+      es: "un role-play breve de sumisión durante el sexo con penetración, con una persona guiando y la otra representando resistencia",
+    },
+  },
 ];
 
 function getVariationInstruction(
@@ -999,8 +1096,7 @@ function getVariationInstruction(
 ): string {
   if (category === "passion" || category === "hard") {
     const availableFoci = SEXUAL_VARIATION_FOCI.filter((focus) =>
-      focus.tag !== "sex_toy"
-      && (!focus.togetherOnly || mode === "together")
+      (!focus.togetherOnly || mode === "together")
       && (!focus.hardOnly || category === "hard")
     );
     const freshFoci = availableFoci.filter(({ tag }) => !recentVariationTags.includes(tag));
@@ -1050,7 +1146,43 @@ function getVariationInstruction(
 }
 
 function getPrompt(category: string, lang: string): string {
-  return PROMPTS[category]?.[lang] ?? PROMPTS[category]?.["en"] ?? PROMPTS["compliments"]["en"];
+  const prompt = PROMPTS[category]?.[lang] ?? PROMPTS[category]?.["en"] ?? PROMPTS["compliments"]["en"];
+  if (category !== "passion" && category !== "hard") return prompt;
+  const obsoleteToyExclusions: Record<string, RegExp> = {
+    ru: /Не предлагай секс-игрушки\.?/giu,
+    en: /Do not suggest sex toys\.?/giu,
+    hi: /सेक्स टॉय न सुझाएँ।?/gu,
+    pt: /Não sugira brinquedos sexuais\.?/giu,
+    es: /No sugieras juguetes sexuales\.?/giu,
+  };
+  const toyGuidance: Record<string, string> = {
+    ru: "Секс-игрушки тоже могут быть частью конкретного сексуального действия.",
+    en: "Sex toys may also be part of one concrete sexual act.",
+    hi: "सेक्स टॉय भी किसी ठोस यौन क्रिया का हिस्सा हो सकते हैं।",
+    pt: "Brinquedos sexuais também podem fazer parte de um ato sexual concreto.",
+    es: "Los juguetes sexuales también pueden formar parte de un acto sexual concreto.",
+  };
+  let result = prompt.replace(obsoleteToyExclusions[lang] ?? obsoleteToyExclusions.en, "").trim();
+  if (category === "hard") {
+    const obsoleteHardRoleplayRules: Record<string, RegExp> = {
+      ru: /Роль подчинения допустима только во «Вместе», ограничена по времени и включает стоп-сигнал\.?/giu,
+      en: /A time-bounded submission dynamic is Together-only and includes a stop signal\.?/giu,
+    };
+    const obsoleteNoRoleplayRules: Record<string, RegExp> = {
+      ru: /Это короткая карточка, не ролевая сцена: без персонажей, сюжета и длинных диалогов\./giu,
+      en: /This is a short task, not roleplay: no characters, plot, or long dialogue\./giu,
+    };
+    const powerPlayGuidance: Record<string, string> = {
+      ru: "Во «Вместе» допустима короткая ролевая игра с властью и игровым принуждением, привязанная к конкретному сексуальному действию; без общих предупреждений.",
+      en: "Together may use brief power-play and acted coercion tied to a concrete sexual act; avoid generic warnings.",
+    };
+    result = result
+      .replace(obsoleteHardRoleplayRules[lang] ?? obsoleteHardRoleplayRules.en, "")
+      .replace(obsoleteNoRoleplayRules[lang] ?? obsoleteNoRoleplayRules.en, "")
+      .trim();
+    return `${result}\n${powerPlayGuidance[lang] ?? powerPlayGuidance.en}\n${toyGuidance[lang] ?? toyGuidance.en}`;
+  }
+  return `${result}\n${toyGuidance[lang] ?? toyGuidance.en}`;
 }
 
 const LANGUAGE_INSTRUCTIONS: Record<string, string> = {
@@ -1225,20 +1357,32 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
                 && recentVariationTags.includes(candidateVariationTag);
               if (!candidate) {
                 attemptReason = "empty_response";
-              } else if (candidate.length >= 15 && candidate.length <= MAX_TASK_CHARS
-                && matchesRequestedLanguage(candidate, lang)
-                && isTaskTextWellFormed(candidate, lang, mode)
-                && isTaskTextModeAppropriate(candidate, lang, mode)
-                && hasAnatomicallyClearOralAct(candidate, lang, mode, gender === "female" ? "female" : "male")
-                && hasCategorySexualAct(candidate, category, lang)
-                && (manualStimulationAllowed || !isManualStimulationTask(candidate, lang))
-                && !repeatsRecentVariation
-                && !(mode === "solo" && (MUTUAL_ONLY_TASK_MARKERS[lang] ?? MUTUAL_ONLY_TASK_MARKERS.en).test(candidate))
-                && isTaskExampleMediaAllowed(candidate, category, lang, mode)
-                && !forbidden.some(f => candidate.toLowerCase().includes(f))) {
-                task = candidate;
               } else {
-                attemptReason = "quality_rejected";
+                const rejectionReasons: string[] = [];
+                if (candidate.length < 15 || candidate.length > MAX_TASK_CHARS) rejectionReasons.push("length");
+                if (!matchesRequestedLanguage(candidate, lang)) rejectionReasons.push("language");
+                if (!isTaskTextWellFormed(candidate, lang, mode, category)) rejectionReasons.push("structure");
+                if (!isTaskTextModeAppropriate(candidate, lang, mode)) rejectionReasons.push("mode");
+                if (hasUnsafeTaskContent(candidate, lang, category, mode)) rejectionReasons.push("unsafe_or_unframed_force_play");
+                if (hasGenericTaskWarning(candidate, lang)) rejectionReasons.push("generic_warning");
+                if (!hasAnatomicallyClearOralAct(candidate, lang, mode, gender === "female" ? "female" : "male")) rejectionReasons.push("oral_anatomy");
+                if (!hasCategorySexualAct(candidate, category, lang)) rejectionReasons.push("category_act");
+                if (!manualStimulationAllowed && isManualStimulationTask(candidate, lang)) rejectionReasons.push("manual_frequency");
+                if (repeatsRecentVariation) rejectionReasons.push("recent_family");
+                if (mode === "solo" && (MUTUAL_ONLY_TASK_MARKERS[lang] ?? MUTUAL_ONLY_TASK_MARKERS.en).test(candidate)) {
+                  rejectionReasons.push("together_only_act");
+                }
+                if (!isTaskExampleMediaAllowed(candidate, category, lang, mode)) rejectionReasons.push("media_privacy_or_mode");
+                if (forbidden.some((phrase) => candidate.toLowerCase().includes(phrase))) rejectionReasons.push("assistant_preface");
+
+                if (rejectionReasons.length === 0) {
+                  task = candidate;
+                } else {
+                  attemptReason = "quality_rejected";
+                  console.info("[task-generation] candidate rejected", {
+                    category, lang, mode, checks: rejectionReasons,
+                  });
+                }
               }
             }
           }

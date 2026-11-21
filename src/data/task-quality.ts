@@ -5,7 +5,7 @@ const QUALITY_RULES: Record<string, string> = {
  - Сохраняй заданные пол и роли мужчины и женщины. Проверяй, кто действует, на ком и какие части тела участвуют.
  - Расположи действия в физически выполнимом порядке. Не пропускай необходимый переход и не обещай автоматическую телесную реакцию.
   - Чётко соблюдай границы категории: комплименты и нежность несексуальны; желание — прелюдия до секса; в страсти и харде используй разнообразные конкретные сексуальные действия из библиотеки примеров, а не только оральный секс, проникновение и мастурбацию. Не принимай вместо действия общие слова «скажи, чего хочешь» или «займитесь сексом». В страсти описывай действие нежно и красиво, в харде — прямо и немного грязно. В «Харде» обязательно назови прямое сексуальное действие: одной наготы, лежания, раздевания или общих прикосновений недостаточно. Ограниченная по времени динамика подчинения допустима только в Together.
- - Не описывай принуждение, игнорирование боли или опасную механику. Не добавляй в текст задания пояснения о договорённостях, стоп-словах или безопасности.
+ - В «Харде» допускай короткую игру с властью и ролевое принуждение как часть фантазии пары. Не описывай реальное игнорирование отказа, боли или опасные действия; не добавляй общих предупреждений в карточку.
  - Если упоминается оргазм, обычно заверши задание на нём; не начинай после него следующий сексуальный акт автоматически.
     - Медиа должны соответствовать категории: обычные ласковые фото и видео — в «Комплиментах» и «Нежности»; личные интимные фото и короткие видео обнажённого тела — в «Желании» или «Страсти»; эстетичная домашняя съёмка секса — в «Страсти», а съёмка от первого лица — в «Харде», всегда рядом с конкретным актом и только если оба этого хотят. Храни записи приватно; не публикуй и не пересылай. Не добавляй реквизит по шаблону.
    - Это реальное задание, не ролевая игра: без вымышленных персонажей, сюжета и длинных диалогов. Верни только текст задания, без вступления и пояснений.`,
@@ -15,7 +15,7 @@ const QUALITY_RULES: Record<string, string> = {
  - Keep the man-woman roles fixed. Check who acts, who receives the action, and which body parts are involved.
  - Put actions in a physically possible order. Do not skip necessary transitions or promise an automatic bodily response.
     - Keep category boundaries clear: compliments and tenderness are nonsexual; desire is foreplay before sex; for Passion and Hard, use varied concrete sexual actions from the curated reference library, not only oral sex, penetration, and masturbation. Do not substitute vague wording such as “say what you want” or “have sex.” Make Passion tender and beautiful; make Hard direct and a little dirty. Every Hard task must name a direct sexual act; nudity, lying naked, undressing, or general touching alone do not qualify. A time-bounded submission dynamic is Together-only.
- - Do not describe coercion, ignoring pain, or physically dangerous actions. Do not put explanations about agreements, safewords, or safety in the task text.
+ - In Hard, allow short power-play and acted coercion as part of the couple's fantasy. Do not portray a real ignored refusal, pain, or dangerous acts; do not add generic warnings to the task.
  - If orgasm is mentioned, usually make it the endpoint; do not automatically start another sexual act afterward.
     - Match media to the category: ordinary affectionate photos/videos in Compliments and Tenderness; private intimate photos and short nude-body videos in Desire or Passion; aesthetic home-sex filming in Passion and first-person filming in Hard, always alongside a concrete act and only if both want it. Keep recordings private; never suggest sharing or posting. Do not add props by default.
    - This is a real activity, not roleplay: no fictional characters, plot, or long dialogue. Return only the task text, with no introduction or explanation.`,
@@ -25,7 +25,7 @@ const QUALITY_RULES: Record<string, string> = {
  - पुरुष और महिला की भूमिकाएँ स्थिर रखें। जाँचें कि कौन क्रिया कर रहा है, किस पर, और शरीर के कौन-से हिस्से शामिल हैं।
  - क्रियाओं का क्रम शारीरिक रूप से संभव हो। आवश्यक बदलाव न छोड़ें और शरीर की प्रतिक्रिया की गारंटी न दें।
     - श्रेणी की सीमा बनाएँ: प्रशंसा और कोमलता गैर-यौन हैं; इच्छा सेक्स से पहले की भूमिका है; जुनून और हार्ड में संदर्भ लाइब्रेरी से विविध ठोस यौन क्रियाएँ लें—इन्हें केवल ओरल सेक्स, प्रवेश और हस्तमैथुन तक सीमित न करें। “अपनी इच्छा बताओ” या “सेक्स करो” जैसे अस्पष्ट वाक्य पर्याप्त नहीं हैं। चुने हुए मोड के अनुसार भूमिकाएँ तय करें। जुनून को कोमल और सुंदर रखें; हार्ड को सीधा और थोड़ा अश्लील रखें। हर हार्ड काम में स्पष्ट यौन क्रिया होनी चाहिए; केवल नग्नता, साथ लेटना, कपड़े उतारना या सामान्य स्पर्श पर्याप्त नहीं हैं। सीमित अवधि वाला समर्पण-आधारित खेल केवल साथी मोड में हो।
- - ज़बरदस्ती, दर्द की अनदेखी या खतरनाक क्रियाएँ न लिखें। कार्य में समझौते, सुरक्षित शब्द या सुरक्षा की व्याख्या न जोड़ें।
+ - हार्ड में जोड़े की कल्पना के रूप में थोड़े समय का पावर-प्ले और अभिनय किया हुआ ज़बरदस्ती वाला खेल शामिल हो सकता है। वास्तविक इनकार की अनदेखी, दर्द या खतरनाक क्रिया न दिखाएँ; काम में सामान्य चेतावनियाँ न जोड़ें।
  - अगर चरमोत्कर्ष का उल्लेख हो, तो आम तौर पर वहीं कार्य समाप्त करें; उसके बाद अपने-आप अगली यौन क्रिया न जोड़ें।
      - मीडिया को श्रेणी के अनुसार रखें: प्रशंसा और कोमलता में सामान्य स्नेहपूर्ण फोटो/वीडियो; इच्छा या जुनून में निजी अंतरंग फोटो और नग्न शरीर के छोटे वीडियो; जुनून में सुंदर घरेलू सेक्स-वीडियो और हार्ड में फर्स्ट-पर्सन वीडियो, हमेशा ठोस यौन क्रिया के साथ और तभी जब दोनों चाहें। रिकॉर्डिंग निजी रखें; साझा या प्रकाशित न करें। सामान अपने-आप न जोड़ें।
    - यह वास्तविक गतिविधि है, भूमिका-अभिनय नहीं: काल्पनिक पात्र, कहानी या लंबा संवाद नहीं। केवल कार्य का पाठ लौटाएँ।`,
@@ -35,7 +35,7 @@ const QUALITY_RULES: Record<string, string> = {
  - Mantenha fixos os papéis do homem e da mulher. Confira quem age, quem recebe a ação e quais partes do corpo estão envolvidas.
  - Organize as ações em uma ordem fisicamente possível. Não pule transições nem prometa uma reação corporal automática.
     - Respeite os limites da categoria: elogios e carinho são não sexuais; desejo é preliminar antes do sexo; em Paixão e hard, use ações sexuais concretas e variadas da biblioteca de referência, não apenas sexo oral, penetração e masturbação. Não substitua a ação por frases vagas como “diga o que deseja” ou “façam sexo”. Paixão deve ser terna e bonita; hard, direto e um pouco mais sujo. Toda tarefa hard deve nomear um ato sexual direto; nudez, ficar deitado nu, tirar a roupa ou toques genéricos não bastam.
- - Não descreva coerção, ignorar dor ou ações fisicamente perigosas. Não inclua explicações sobre acordos, palavra de segurança ou segurança no texto.
+ - Em Hard, permita uma breve dinâmica de poder e coerção encenada como parte da fantasia do casal. Não retrate uma recusa real ignorada, dor ou ações perigosas; não acrescente avisos genéricos à tarefa.
  - Se mencionar orgasmo, normalmente encerre a tarefa ali; não comece automaticamente outro ato sexual depois.
      - Use mídia conforme a categoria: fotos/vídeos carinhosos comuns em Elogios e Ternura; fotos íntimas e vídeos curtos do corpo nu em Desejo ou Paixão; gravação sensual caseira de sexo em Paixão e em primeira pessoa em hard, sempre junto de um ato concreto e se ambos quiserem. Mantenha tudo privado; não compartilhe nem publique. Não acrescente acessórios por padrão.
    - Esta é uma atividade real, não uma interpretação: sem personagens fictícios, enredo ou diálogos longos. Retorne somente o texto da tarefa.`,
@@ -45,7 +45,7 @@ const QUALITY_RULES: Record<string, string> = {
  - Mantén fijos los papeles del hombre y la mujer. Comprueba quién actúa, quién recibe la acción y qué partes del cuerpo intervienen.
  - Ordena las acciones de forma físicamente posible. No omitas transiciones ni prometas una reacción corporal automática.
     - Respeta los límites de cada categoría: cumplidos y ternura no son sexuales; deseo es el juego previo antes del sexo; en Pasión y hard, usa acciones sexuales concretas y variadas de la biblioteca de referencia, no solo sexo oral, penetración y masturbación. No sustituyas la acción por frases vagas como «di lo que deseas» o «tengan sexo». Pasión debe ser tierna y bonita; hard, directo y algo más sucio. Cada tarea hard debe nombrar un acto sexual directo; la desnudez, tumbarse desnudos, quitarse la ropa o los toques generales no bastan.
- - No describas coerción, ignorar el dolor ni acciones físicamente peligrosas. No añadas explicaciones sobre acuerdos, palabras de seguridad o seguridad al texto.
+ - En Hard, permite una dinámica de poder breve y una coerción actuada como parte de la fantasía de la pareja. No representes una negativa real ignorada, dolor ni acciones peligrosas; no añadas advertencias genéricas a la tarea.
  - Si mencionas el orgasmo, normalmente termina ahí la tarea; no empieces automáticamente otro acto sexual después.
      - Ajusta los medios a la categoría: fotos/vídeos afectuosos normales en Cumplidos y Ternura; fotos íntimas y vídeos breves del cuerpo desnudo en Deseo o Pasión; grabación estética de sexo en casa en Pasión y en primera persona en hard, siempre junto con un acto concreto y solo si ambos quieren. Mantén las grabaciones privadas; no las compartas ni publiques. No añadas accesorios por defecto.
    - Es una actividad real, no una interpretación: sin personajes ficticios, trama ni diálogos largos. Devuelve solo el texto de la tarea.`,
@@ -443,7 +443,25 @@ const HARD_AUXILIARY_ACT_MARKERS: Record<string, RegExp> = {
 };
 
 export function getTaskQualityRules(lang: string, mode: "solo" | "together" = "together"): string {
-  const languageRules = QUALITY_RULES[lang] ?? QUALITY_RULES.en;
+  const sourceRules = QUALITY_RULES[lang] ?? QUALITY_RULES.en;
+  const obsoleteRoleplayRules: Record<string, RegExp> = {
+    ru: /Это реальное задание, не ролевая игра: без вымышленных персонажей, сюжета и длинных диалогов\./u,
+    en: /This is a real activity, not roleplay: no fictional characters, plot, or long dialogue\./u,
+    hi: /यह वास्तविक गतिविधि है, भूमिका-अभिनय नहीं: काल्पनिक पात्र, कहानी या लंबा संवाद नहीं।/u,
+    pt: /Esta é uma atividade real, não uma interpretação: sem personagens fictícios, enredo ou diálogos longos\./u,
+    es: /Es una actividad real, no una interpretación: sin personajes ficticios, trama ni diálogos largos\./u,
+  };
+  const conciseTaskRules: Record<string, string> = {
+    ru: "Не превращай задание в длинную сцену, сюжет или диалог; короткая игра с властью допустима только в «Харде» во «Вместе» и с конкретным сексуальным действием.",
+    en: "Keep the task short, without a plot or long dialogue; brief power-play roleplay is allowed only in Together Hard and must include a concrete sexual act.",
+    hi: "काम को छोटा रखें—कहानी या लंबा संवाद नहीं; संक्षिप्त पावर-प्ले भूमिका केवल Together Hard में और ठोस यौन क्रिया के साथ हो सकती है।",
+    pt: "Mantenha a tarefa curta, sem enredo ou diálogo longo; uma breve interpretação de poder só é permitida em Together Hard e deve incluir um ato sexual concreto.",
+    es: "Mantén la tarea breve, sin trama ni diálogo largo; una interpretación breve de poder solo se permite en Together Hard y debe incluir un acto sexual concreto.",
+  };
+  const languageRules = sourceRules.replace(
+    obsoleteRoleplayRules[lang] ?? obsoleteRoleplayRules.en,
+    conciseTaskRules[lang] ?? conciseTaskRules.en,
+  );
   const modeRule = MODE_RULES[lang]?.[mode] ?? MODE_RULES.en[mode];
   const sharedFormatRule = SHARED_TASK_FORMAT_RULES[lang] ?? SHARED_TASK_FORMAT_RULES.en;
   return mode === "together"
@@ -475,12 +493,24 @@ const ANAL_SEXUAL_ACT_MARKERS: Record<string, RegExp> = {
   es: /(?:estimula\p{L}*|penetr\p{L}*|sexo|caricia)\s+anal|ano.{0,35}(?:caricia|dedo|juguete|penetr)/iu,
 };
 
+const SEX_TOY_ACT_MARKERS: Record<string, RegExp> = {
+  ru: /(?:вибратор|секс[- ]?игрушк\p{L}*|страпон).{0,70}(?:клитор|вульв\p{L}*|пенис|член|генитал\p{L}*|анус)|(?:клитор|вульв\p{L}*|пенис|член|генитал\p{L}*|анус).{0,70}(?:вибратор|секс[- ]?игрушк\p{L}*|страпон)/iu,
+  en: /(?:vibrator|sex toy|strap[- ]?on|dildo).{0,70}(?:clitoris|vulva|penis|cock|genitals?|anus)|(?:clitoris|vulva|penis|cock|genitals?|anus).{0,70}(?:vibrator|sex toy|strap[- ]?on|dildo)/iu,
+  hi: /(?:वाइब्रेटर|सेक्स\s*टॉय|डिल्डो).{0,70}(?:भगांकुर|क्लिटोरिस|लिंग|जननांग|गुदा|योनि)|(?:भगांकुर|क्लिटोरिस|लिंग|जननांग|गुदा|योनि).{0,70}(?:वाइब्रेटर|सेक्स\s*टॉय|डिल्डो)/u,
+  pt: /(?:vibrador|brinquedo sexual|consolo|dildo).{0,70}(?:clitóris|vulva|pênis|penis|genitais|ânus)|(?:clitóris|vulva|pênis|penis|genitais|ânus).{0,70}(?:vibrador|brinquedo sexual|consolo|dildo)/iu,
+  es: /(?:vibrador|juguete sexual|consolador|dildo).{0,70}(?:clítoris|vulva|pene|genital\p{L}*|ano)|(?:clítoris|vulva|pene|genital\p{L}*|ano).{0,70}(?:vibrador|juguete sexual|consolador|dildo)/iu,
+};
+
 export function hasHardSexualAct(text: string, lang: string): boolean {
   const normalized = text.replace(/\s+/gu, " ").trim();
   const directMarker = HARD_SEXUAL_ACT_MARKERS[lang] ?? HARD_SEXUAL_ACT_MARKERS.en;
   const auxiliaryMarker = HARD_AUXILIARY_ACT_MARKERS[lang] ?? HARD_AUXILIARY_ACT_MARKERS.en;
   const analMarker = ANAL_SEXUAL_ACT_MARKERS[lang] ?? ANAL_SEXUAL_ACT_MARKERS.en;
-  return directMarker.test(normalized) || auxiliaryMarker.test(normalized) || analMarker.test(normalized);
+  const sexToyMarker = SEX_TOY_ACT_MARKERS[lang] ?? SEX_TOY_ACT_MARKERS.en;
+  return directMarker.test(normalized)
+    || auxiliaryMarker.test(normalized)
+    || analMarker.test(normalized)
+    || sexToyMarker.test(normalized);
 }
 
 const EXPLICIT_SEX_ACT_MARKERS: Record<string, RegExp> = {
@@ -499,14 +529,6 @@ const NONSEXUAL_CATEGORY_MARKERS: Record<string, RegExp> = {
   es: /(?:pene|clítoris|genital\p{L}*|vulva|vagina|ano|zona\s+íntima|erótic\p{L}*|porno|desnúd\p{L}*|quítate.{0,30}ropa)/iu,
 };
 
-const PASSION_INTIMATE_MEDIA_MARKERS: Record<string, RegExp> = {
-  ru: /(?:интимн\p{L}*.{0,20}(?:фото|видео|сним)|(?:фото|видео|сним).{0,20}(?:интимн\p{L}*|обнаж[её]нн\p{L}*|гол\p{L}*\s+тел)|нюдс|обнаж[её]нн\p{L}*.{0,15}(?:фото|видео))/iu,
-  en: /(?:intimate.{0,20}(?:photo|picture|video|clip)|(?:photo|picture|video|clip).{0,20}(?:intimate|nude|naked)|(?:nude|naked).{0,20}(?:photo|picture|video|clip)|erotic selfie)/iu,
-  hi: /(?:अंतरंग.{0,20}(?:फ़ोटो|फोटो|तस्वीर|वीडियो)|(?:फ़ोटो|फोटो|तस्वीर|वीडियो).{0,20}(?:अंतरंग|नग्न)|नग्न.{0,20}(?:फ़ोटो|फोटो|तस्वीर|वीडियो))/u,
-  pt: /(?:foto[s]?\s+íntim[ao]s?|vídeo[s]?\s+íntim[ao]s?|(?:foto|vídeo).{0,20}(?:nu[ao]|despid[ao])|(?:nu[ao]|despid[ao]).{0,20}(?:foto|vídeo)|selfie erótic[ao])/iu,
-  es: /(?:foto[s]?\s+íntim[ao]s?|vídeo[s]?\s+íntim[ao]s?|(?:foto|vídeo).{0,20}(?:desnud[ao]|íntim[ao])|(?:desnud[ao]|íntim[ao]).{0,20}(?:foto|vídeo)|selfi erótic[ao])/iu,
-};
-
 const CLINICAL_INTERCOURSE_LABELS: Record<string, RegExp> = {
   ru: /вагинальн\p{L}*\s+(?:секс|проникнов\p{L}*)/iu,
   en: /\bvaginal\s+(?:sex|intercourse)\b/iu,
@@ -521,12 +543,10 @@ export function isTaskTextCategoryAppropriate(text: string, category: string, la
   const sexActs = EXPLICIT_SEX_ACT_MARKERS[lang] ?? EXPLICIT_SEX_ACT_MARKERS.en;
   const analActs = ANAL_SEXUAL_ACT_MARKERS[lang] ?? ANAL_SEXUAL_ACT_MARKERS.en;
   const nonsexualMarkers = NONSEXUAL_CATEGORY_MARKERS[lang] ?? NONSEXUAL_CATEGORY_MARKERS.en;
-  const isSexualAct = sexActs.test(normalized) || analActs.test(normalized);
+  const sexToyAct = (SEX_TOY_ACT_MARKERS[lang] ?? SEX_TOY_ACT_MARKERS.en).test(normalized);
+  const isSexualAct = sexActs.test(normalized) || analActs.test(normalized) || sexToyAct;
   if (category === "hard") return hasHardSexualAct(normalized, lang);
-  if (category === "passion") {
-    return hasHardSexualAct(normalized, lang)
-      || (PASSION_INTIMATE_MEDIA_MARKERS[lang] ?? PASSION_INTIMATE_MEDIA_MARKERS.en).test(normalized);
-  }
+  if (category === "passion") return hasHardSexualAct(normalized, lang);
   if (category === "desire") return !isSexualAct;
   if (category === "tenderness" || category === "compliments") {
     return !isSexualAct && !nonsexualMarkers.test(normalized);
@@ -534,12 +554,21 @@ export function isTaskTextCategoryAppropriate(text: string, category: string, la
   return false;
 }
 
-export function isTaskTextWellFormed(text: string, lang: string, mode?: "solo" | "together"): boolean {
+export function isTaskTextWellFormed(
+  text: string,
+  lang: string,
+  mode?: "solo" | "together",
+  category?: string,
+): boolean {
   const normalized = text.replace(/\s+/gu, " ").trim();
   if (!normalized) return false;
   if (META_PREFIXES[lang]?.test(normalized)) return false;
   if (INCOMPLETE_ENDINGS[lang]?.test(normalized)) return false;
-  if (ROLEPLAY_SCENARIO_MARKERS[lang]?.test(normalized)) return false;
+  const hasRoleplayFraming = ROLEPLAY_SCENARIO_MARKERS[lang]?.test(normalized) ?? false;
+  const isHardTogetherPowerPlay = category === "hard"
+    && mode === "together"
+    && hasHardSexualAct(normalized, lang);
+  if (hasRoleplayFraming && !isHardTogetherPowerPlay) return false;
   if (CLIMAX_BEFORE_SEXUAL_CONTINUATION[lang]?.test(normalized)
     || SEXUAL_CONTINUATION_AFTER_CLIMAX[lang]?.test(normalized)) return false;
   return true;

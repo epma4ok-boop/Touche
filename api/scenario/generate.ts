@@ -10,6 +10,12 @@ import { validateTelegramInitData } from "../couple/_auth.js";
 import { appDate } from "../limits.js";
 import { OWNER_TELEGRAM_ID } from "../../src/config.js";
 import { sanitizeScenarioTitle } from "../../src/data/scenarioTitle.js";
+import {
+  scenarioIdeaContext,
+  scenarioIdeaTag,
+  selectScenarioIdea,
+  type ScenarioIdeaIntensity,
+} from "./_ideas.js";
 
 const DEEPSEEK_API_KEY = process.env.DEEPSEEK_API_KEY!;
 const DEEPSEEK_URL = "https://api.deepseek.com/v1/chat/completions";
@@ -19,6 +25,7 @@ const OWNER_ID = OWNER_TELEGRAM_ID;
 const LANGS = new Set(["ru", "en", "hi", "pt", "es"]);
 const INTENSITIES = new Set(["romantic", "passion", "hard"]);
 const GENDERS = new Set(["male", "female"]);
+const MAX_ROLE_CARD_CHARS = 420;
 
 const supabase = createClient(
   process.env.SUPABASE_URL!,
@@ -133,39 +140,39 @@ const FALLBACKS: FallbackPool = {
   hard: {
     ru: {
       male: {
-        title: "Позже вечером",
-        role_a: "Ты совершеннолетний режиссёр вымышленного порнокастинга. Проведи закрытую пробу для совершеннолетней актрисы: попроси выбрать выразительную позу и произнести короткую смелую реплику. Играй уверенно, но помни, что это только ролевая сцена: ничего не снимай и не сохраняй. Переходи к близости только после ясного встречного сигнала.",
-        role_b: "Ты совершеннолетняя актриса на вымышленном порнокастинге. Сначала отнесись к пробе профессионально, затем удиви режиссёра своей позой или смелой репликой. Сама решай, что готова разыграть. Когда захочешь перейти к близости, покажи явный интерес и сама задай следующий шаг.",
+        title: "Условия освобождения",
+        role_a: "Ты — мужчина, который играет похитителя в вымышленном триллере. Веди допрос уверенно, потребуй признание и назови условие свободы. С усмешкой скажи: «Ты правда думаешь, что сможешь меня переиграть?»",
+        role_b: "Ты — женщина, которую поймали в вымышленной сцене. Держись дерзко, сопротивляйся в роли и торгуйся за свободу. С прямым взглядом брось: «Сначала назови цену — потом решу, соглашаться ли».",
       },
       female: {
-        title: "Позже вечером",
-        role_a: "Ты совершеннолетняя режиссёрка вымышленного порнокастинга. Проведи закрытую пробу для совершеннолетнего актёра: попроси выбрать выразительную позу и произнести короткую смелую реплику. Играй уверенно, но помни, что это только ролевая сцена: ничего не снимай и не сохраняй. Переходи к близости только после ясного встречного сигнала.",
-        role_b: "Ты совершеннолетний актёр на вымышленном порнокастинге. Сначала отнесись к пробе профессионально, затем удиви режиссёрку своей позой или смелой репликой. Сам решай, что готов разыграть. Когда захочешь перейти к близости, покажи явный интерес и сам задай следующий шаг.",
+        title: "Условия освобождения",
+        role_a: "Ты — женщина, которая играет похитительницу в вымышленном триллере. Веди допрос уверенно, потребуй признание и назови условие свободы. С усмешкой скажи: «Ты правда думаешь, что сможешь меня переиграть?»",
+        role_b: "Ты — мужчина, которого поймали в вымышленной сцене. Держись дерзко, сопротивляйся в роли и торгуйся за свободу. С прямым взглядом брось: «Сначала назови цену — потом решу, соглашаться ли».",
       },
     },
     en: {
       male: {
-        title: "After Hours",
-        role_a: "You're an adult director at a fictional porn casting. Run a private screen test with an adult performer: ask for a striking pose and a short, bold line. Keep your delivery confident, but this is roleplay only—do not record or save anything. Move toward intimacy only after a clear, positive cue.",
-        role_b: "You're an adult performer at a fictional porn casting. Start by treating the audition professionally, then surprise the director with a pose or bold line of your own. Decide what you are willing to act out. When you want to move toward intimacy, show clear interest and lead the next step yourself.",
+        title: "Terms of Release",
+        role_a: "You're a man playing a captor in a fictional thriller. Lead the interrogation, demand a confession, and name the price of release. Smirk: “You really think you can outplay me?”",
+        role_b: "You're a woman caught in a fictional scene. Stay defiant, resist in character, and bargain for freedom. Meet his gaze: “Name your price first—then I'll decide.”",
       },
       female: {
-        title: "After Hours",
-        role_a: "You're an adult woman directing a fictional porn casting. Run a private screen test with an adult performer: ask for a striking pose and a short, bold line. Keep your delivery confident, but this is roleplay only—do not record or save anything. Move toward intimacy only after a clear, positive cue.",
-        role_b: "You're an adult male performer at a fictional porn casting. Start by treating the audition professionally, then surprise the director with a pose or bold line of your own. Decide what you are willing to act out. When you want to move toward intimacy, show clear interest and lead the next step yourself.",
+        title: "Terms of Release",
+        role_a: "You're a woman playing a captor in a fictional thriller. Lead the interrogation, demand a confession, and name the price of release. Smirk: “You really think you can outplay me?”",
+        role_b: "You're a man caught in a fictional scene. Stay defiant, resist in character, and bargain for freedom. Meet her gaze: “Name your price first—then I'll decide.”",
       },
     },
     hi: {
-      male: { title: "शाम के बाद", role_a: "आप एक काल्पनिक वयस्क फ़िल्म ऑडिशन के पुरुष निर्देशक हैं। एक वयस्क कलाकार से प्रभावशाली पोज़ और छोटी, साहसी पंक्ति देने को कहें। यह केवल अभिनय है—कुछ भी रिकॉर्ड या सेव न करें। निकटता तभी बढ़ाएँ जब सामने से साफ़ सकारात्मक संकेत मिले।", role_b: "आप काल्पनिक वयस्क फ़िल्म ऑडिशन के वयस्क महिला कलाकार हैं। पहले ऑडिशन को पेशेवर ढंग से लें, फिर अपनी पोज़ या साहसी पंक्ति से निर्देशक को चौंकाएँ। आप तय करें कि क्या अभिनय करना है। जब निकटता चाहें, स्पष्ट रुचि दिखाएँ और अगला कदम खुद तय करें।" },
-      female: { title: "शाम के बाद", role_a: "आप एक काल्पनिक वयस्क फ़िल्म ऑडिशन की महिला निर्देशक हैं। एक वयस्क कलाकार से प्रभावशाली पोज़ और छोटी, साहसी पंक्ति देने को कहें। यह केवल अभिनय है—कुछ भी रिकॉर्ड या सेव न करें। निकटता तभी बढ़ाएँ जब सामने से साफ़ सकारात्मक संकेत मिले।", role_b: "आप काल्पनिक वयस्क फ़िल्म ऑडिशन के वयस्क पुरुष कलाकार हैं। पहले ऑडिशन को पेशेवर ढंग से लें, फिर अपनी पोज़ या साहसी पंक्ति से निर्देशक को चौंकाएँ। आप तय करें कि क्या अभिनय करना है। जब निकटता चाहें, स्पष्ट रुचि दिखाएँ और अगला कदम खुद तय करें।" },
+      male: { title: "रिहाई की शर्त", role_a: "आप काल्पनिक थ्रिलर में अपहरणकर्ता की भूमिका निभा रहे पुरुष हैं। पूछताछ का नेतृत्व करें, कबूलनामा माँगें और रिहाई की कीमत तय करें। मुस्कराकर कहें: “क्या सच में लगता है कि तुम मुझे मात दे सकते हो?”", role_b: "आप काल्पनिक दृश्य में पकड़ी गई महिला हैं। किरदार में बेखौफ़ रहें, विरोध करें और आज़ादी के लिए सौदा करें। उसकी आँखों में देखकर कहें: “पहले अपनी कीमत बताओ—फिर सोचूँगी।”" },
+      female: { title: "रिहाई की शर्त", role_a: "आप काल्पनिक थ्रिलर में अपहरणकर्ता की भूमिका निभा रही महिला हैं। पूछताछ का नेतृत्व करें, कबूलनामा माँगें और रिहाई की कीमत तय करें। मुस्कराकर कहें: “क्या सच में लगता है कि तुम मुझे मात दे सकते हो?”", role_b: "आप काल्पनिक दृश्य में पकड़े गए पुरुष हैं। किरदार में बेख़ौफ़ रहें, विरोध करें और आज़ादी के लिए सौदा करें। उसकी आँखों में देखकर कहें: “पहले अपनी कीमत बताओ—फिर सोचूँगा।”" },
     },
     pt: {
-      male: { title: "Depois do expediente", role_a: "Você é um diretor adulto de um casting fictício de filmes adultos. Faça um teste privado com uma artista adulta: peça uma pose marcante e uma fala curta e ousada. É apenas encenação—não grave nem salve nada. Só avance para a intimidade depois de um sinal claramente positivo.", role_b: "Você é uma artista adulta em um casting fictício. Comece tratando o teste com profissionalismo e depois surpreenda o diretor com uma pose ou fala ousada. Decida o que aceita encenar. Quando quiser avançar para a intimidade, demonstre interesse com clareza e conduza o próximo passo." },
-      female: { title: "Depois do expediente", role_a: "Você é uma diretora adulta de um casting fictício de filmes adultos. Faça um teste privado com um artista adulto: peça uma pose marcante e uma fala curta e ousada. É apenas encenação—não grave nem salve nada. Só avance para a intimidade depois de um sinal claramente positivo.", role_b: "Você é um artista adulto em um casting fictício. Comece tratando o teste com profissionalismo e depois surpreenda a diretora com uma pose ou fala ousada. Decida o que aceita encenar. Quando quiser avançar para a intimidade, demonstre interesse com clareza e conduza o próximo passo." },
+      male: { title: "Condições para sair", role_a: "Você é um homem que interpreta o sequestrador de um thriller fictício. Conduza o interrogatório, exija uma confissão e diga o preço da liberdade. Sorria: “Acha mesmo que pode me vencer?”", role_b: "Você é uma mulher capturada numa cena fictícia. Mantenha a postura desafiante, resista no papel e negocie sua liberdade. Encare-o: “Diga seu preço primeiro; depois eu decido.”" },
+      female: { title: "Condições para sair", role_a: "Você é uma mulher que interpreta a sequestradora de um thriller fictício. Conduza o interrogatório, exija uma confissão e diga o preço da liberdade. Sorria: “Acha mesmo que pode me vencer?”", role_b: "Você é um homem capturado numa cena fictícia. Mantenha a postura desafiante, resista no papel e negocie sua liberdade. Encare-a: “Diga seu preço primeiro; depois eu decido.”" },
     },
     es: {
-      male: { title: "Después del cierre", role_a: "Eres un director adulto de un casting ficticio de cine para adultos. Haz una prueba privada con una intérprete adulta: pídele una pose llamativa y una frase breve y atrevida. Es solo una escena de rol; no grabes ni guardes nada. Avanza hacia la intimidad solo después de una señal claramente positiva.", role_b: "Eres una intérprete adulta en un casting ficticio. Empieza tratando la prueba con profesionalidad y luego sorprende al director con una pose o frase atrevida. Decide qué quieres representar. Cuando quieras avanzar hacia la intimidad, muestra interés con claridad y guía tú el siguiente paso." },
-      female: { title: "Después del cierre", role_a: "Eres una directora adulta de un casting ficticio de cine para adultos. Haz una prueba privada con un intérprete adulto: pídele una pose llamativa y una frase breve y atrevida. Es solo una escena de rol; no grabes ni guardes nada. Avanza hacia la intimidad solo después de una señal claramente positiva.", role_b: "Eres un intérprete adulto en un casting ficticio. Empieza tratando la prueba con profesionalidad y luego sorprende a la directora con una pose o frase atrevida. Decide qué quieres representar. Cuando quieras avanzar hacia la intimidad, muestra interés con claridad y guía tú el siguiente paso." },
+      male: { title: "Precio de la libertad", role_a: "Eres un hombre que interpreta a un secuestrador en un thriller ficticio. Dirige el interrogatorio, exige una confesión y fija el precio de la libertad. Sonríe: «¿De verdad crees que puedes ganarme?»", role_b: "Eres una mujer atrapada en una escena ficticia. Mantente desafiante, resiste en personaje y negocia tu libertad. Míralo: «Primero dime tu precio; después decidiré»." },
+      female: { title: "Precio de la libertad", role_a: "Eres una mujer que interpreta a una secuestradora en un thriller ficticio. Dirige el interrogatorio, exige una confesión y fija el precio de la libertad. Sonríe: «¿De verdad crees que puedes ganarme?»", role_b: "Eres un hombre atrapado en una escena ficticia. Mantente desafiante, resiste en personaje y negocia tu libertad. Mírala: «Primero dime tu precio; después decidiré»." },
     },
   },
 };
@@ -241,8 +248,8 @@ async function getScenarioVariationSignals(coupleId: string): Promise<ScenarioVa
 
 function variationContext(lang: string, signals: ScenarioVariationSignals): string {
   const instructions = lang === "ru"
-    ? "Придумай свежую сцену, не выбирай из фиксированного меню. Меняй роли, место, повод, баланс инициативы и эмоциональный тон. Не повторяй недавние сочетания. Элементы, которые обоим партнёрам понравились, можно иногда вернуть, но сочетай их с несколькими новыми элементами. Избегай элементов, которые кому-то из партнёров не подошли. Эти метки и оценки — только внутренний контекст модели: никогда не упоминай их и не раскрывай чужой отклик в карточках."
-    : "Invent a fresh scene instead of choosing from a fixed menu. Vary the roles, setting, trigger, balance of initiative, and emotional tone. Do not repeat recent combinations. You may occasionally revisit an element both partners liked, but combine it with several new elements. Avoid elements that either partner rated poorly. These tags and ratings are private model context: never mention them or reveal the other partner's response in either card.";
+    ? "Развивай выбранную оригинальную завязку в свежую сцену; не копируй её фразы и не подменяй другой знакомой темой. Меняй характеры, детали места и ход сближения. Не повторяй недавние сочетания. Понравившийся обоим элемент можно иногда вернуть рядом с новыми. Избегай элементов, которые кому-то не подошли. Метки и оценки — только внутренний контекст: не упоминай их и не раскрывай чужой отклик в карточках."
+    : "Develop the selected original seed into a fresh scene; do not copy its wording or replace it with a familiar trope. Vary character traits, setting details, and the progression toward intimacy. Avoid recent combinations. An element both partners liked may return occasionally alongside new ones. Avoid elements either partner rated poorly. Tags and ratings are private model context: never mention them or reveal the other partner's response.";
   const lines = [instructions];
   if (signals.recent.length) lines.push(`Recent elements to vary away from: ${signals.recent.join(", ")}.`);
   if (signals.mutuallyLiked.length) lines.push(`Elements both partners liked before (use sparingly with fresh combinations): ${signals.mutuallyLiked.join(", ")}.`);
@@ -276,13 +283,14 @@ const ROLE_LIST_EN = `
 Scenario ideas are examples, not a fixed menu:
 - romantic: an intriguing first meeting, private performance, neighbors sharing a late-night conversation, a playful photo session, or an original low-stakes fantasy.
 - passion: adult lecturer/adult university student with acted resistance and a clear positive turn, or any other original adult dynamic with mutual intimacy.
-- hard: fictional adult-film casting, an adult power-play scene, or another bold adult roleplay where both characters keep agency.
+- hard: bold adult roleplay across a wide range, including dark thrillers, staged capture, interrogation, prison roles, authority, acted resistance, and force-play.
 Invent many different role pairings and premises. Do not default to photographer/model, lecturer/student, or casting. Never use minors, schoolchildren, or characters whose age is unclear.
+For hard, rotate dark suspense and coercive fantasy with rivalries, private performances, casting, escorts, dancers, and other provocative encounters. Do not soften a scene merely because its fictional premise is intense.
 
 Intensity:
 - romantic: intrigue and flirting, no explicit sexual content.
 - passion: sensual, direct adult flirting and intimacy after clear reciprocation.
-- hard: bold adult roleplay and confident power dynamics, while each character keeps agency and an actual refusal is respected.
+- hard: bold, sexually charged roleplay with confident power dynamics, staged resistance, and dramatic fictional stakes.
 
 Private-card rules:
 - Return one neutral title and two separate role cards. Both partners see the title, so it must not name roles, the pairing, or either character's secret goal.
@@ -290,8 +298,9 @@ Private-card rules:
 - Never reveal, summarize, or give instructions from the other card. The cards should complement each other without disclosing one another's private plan.
 - If you use teacher/student, both characters are adults at a university. Resistance is acted, never a real refusal; intimacy begins only after clear reciprocation. Never tell a character to ignore a real no, silence, hesitation, or stop.
 - Casting is fictional: no actual recording, image capture, or saved material.
+- Staged coercion, captivity, threats, and danger are valid fictional themes. Keep them as story, not instructions for real-world harm or hazardous actions; do not add out-of-character safety disclaimers to the cards.
 
-Write exactly 3 short sentences per card, one sentence in each section, and do not add extra explanation. Aim for 12–14 words or fewer per sentence where natural: one direct assignment, one brief role-context sentence, and one concrete opening move with a natural line in quotes. Use the exact translated section labels specified by CARD_FORMAT, each on its own line. Keep the cards distinct and coherent. Actions must be feasible at home without purchases, risky props, or real restraint.
+Write exactly 3 compact sections per card, one short sentence in each, and keep the whole card under ${MAX_ROLE_CARD_CHARS} characters including labels. Across those lines, show the character through behavior and build 2–3 connected, escalating beats; include one brief, natural line in quotes. Use the exact translated section labels specified by CARD_FORMAT, each on its own line. Keep the two cards complementary but private, and end at the scene's intimate moment, not an epilogue. Actions must be feasible at home without purchases, risky props, or real restraint.
 Add 3–6 private variation_tags as short lowercase English slugs prefixed by setting:, dynamic:, tone:, or hook:. Describe broad scene elements only, not names, ages, or private card objectives. Tags are internal metadata and must never appear in either role card or title.
 Return ONLY valid JSON: {"title":"...","role_a":"...","role_b":"...","variation_tags":["setting:...","dynamic:...","tone:..."]}`;
 
@@ -300,13 +309,14 @@ const ROLE_LIST_RU = `
 Примеры — не фиксированный список:
 - romantic: интригующее знакомство, домашний мини-концерт, ночной разговор соседей, фотосессия с телефоном-реквизитом или необычная фантазия без риска.
 - passion: преподаватель и совершеннолетний студент университета с игровым уклонением и ясным встречным сигналом или любая другая оригинальная взрослая динамика с взаимной близостью.
-- hard: вымышленный порнокастинг, ролевая игра взрослых с распределением власти или другая смелая сцена, где каждый сохраняет самостоятельность.
+- hard: смелая игра взрослых с широким выбором тем — от вымышленного кастинга до тёмного триллера, захвата, допроса, плена, властной роли и игрового сопротивления.
 Придумывай разные пары ролей и завязки. Не зацикливайся на фотографе/модели, преподавателе/студенте или кастинге. Не используй несовершеннолетних, школьников или персонажей с неясным возрастом.
+В «Жёстко» чередуй тёмный саспенс и фантазии о принуждении с соперничеством, приватными выступлениями, кастингом, эскортом, танцорами и другими дерзкими встречами. Не смягчай сюжет только потому, что его вымышленная завязка напряжённая.
 
 Уровни:
 - romantic: интрига и флирт без откровенного сексуального контента.
 - passion: чувственный флирт и близость взрослых только после ясной взаимности.
-- hard: смелая ролевая динамика взрослых; каждый сохраняет право выбирать действия, настоящий отказ принимается.
+- hard: смелые, сексуально заряженные роли взрослых, властная динамика, игровое сопротивление и яркое вымышленное напряжение.
 
 Правила скрытых карточек:
 - Верни одно нейтральное название и две отдельные карточки. Название увидят оба, поэтому в нём нельзя называть роли, их пару или скрытую цель персонажа.
@@ -314,8 +324,9 @@ const ROLE_LIST_RU = `
 - Не раскрывай и не пересказывай инструкции или тайную цель другой карточки. Карточки должны сочетаться, но не выдавать планы друг друга.
 - Если выбрана сцена «преподаватель и студент», оба персонажа — взрослые участники университета. Сопротивление — только игровая роль; близость начинается после ясной взаимности. Нельзя приказывать игнорировать настоящий отказ, молчание, сомнение или стоп-сигнал.
 - Кастинг — только вымышленная ролевая сцена: никаких реальных записей, фото или сохранения материалов.
+- Игровое принуждение, плен, угрозы и опасность допустимы как вымышленные темы; оставляй их частью сюжета, не превращай в реальные опасные действия или инструкции. Не добавляй в карточки оговорки вне роли.
 
-В каждой карточке ровно 3 коротких предложения — по одному в разделе, без дополнительных пояснений. По возможности не больше 12–14 слов в предложении: ясное задание, краткий контекст роли и первый шаг с естественной репликой в кавычках. Используй точные заголовки из CARD_FORMAT, каждый с новой строки. Сделай карточки разными и связанными между собой. Всё должно быть выполнимо дома, без покупок, опасного реквизита и реального связывания.
+В каждой карточке ровно 3 компактных раздела — по одному короткому предложению в каждом; весь текст вместе с заголовками — не больше ${MAX_ROLE_CARD_CHARS} символов. Покажи характер через поступок и выстрой в трёх строках 2–3 связанных, постепенно усиливающихся хода; добавь одну короткую естественную реплику. Используй точные заголовки из CARD_FORMAT, каждый с новой строки. Карточки связаны, но не раскрывают тайные планы друг друга; финал — кульминационный ход сцены, не эпилог. Всё должно быть выполнимо дома, без покупок, опасного реквизита и реального связывания.
 Добавь 3–6 приватных variation_tags: короткие строчные английские теги с префиксом setting:, dynamic:, tone: или hook:. Описывай только общие элементы сцены — без имён, возраста и тайных целей карточек. Теги нужны только для внутреннего разнообразия и не должны попадать в название или карточки.
 Верни ТОЛЬКО JSON: {"title":"...","role_a":"...","role_b":"...","variation_tags":["setting:...","dynamic:...","tone:..."]}`;
 
@@ -330,13 +341,13 @@ const CARD_FORMAT: Record<string, string> = {
 const INTENSITY_RULES_EN: Record<string, string> = {
   romantic: "Current level: romantic. Keep it playful and curious, with no explicit sexual action.",
   passion: "Current level: passion. Any adult role dynamic is allowed; the lecturer/student example is optional, not a default. If used, resistance is playful acting and the student chooses when to give a clear positive signal that opens the path to intimacy.",
-  hard: "Current level: hard. Any bold adult role dynamic is allowed; fictional adult-film casting is optional, not a default. Keep scenes fictional and unrecorded; every character chooses what to act out and signals any move toward intimacy.",
+  hard: "Current level: hard. Write intense, provocative adult roleplay with seduction, undressing, and a concrete intimate action. Dark thriller, staged coercion, captivity, interrogation, threats, acted resistance, and power exchange are welcome themes, not rare exceptions. Keep dangerous events fictional rather than actionable or physically hazardous; keep role cards in-world without safety boilerplate.",
 };
 
 const INTENSITY_RULES_RU: Record<string, string> = {
   romantic: "Текущий уровень: romantic. Сохраняй игривую интригу и не описывай сексуальные действия.",
   passion: "Текущий уровень: passion. Подходит любая взрослая ролевая динамика; преподаватель и студент — лишь один из вариантов, не сюжет по умолчанию. Если он выбран, уклонение только игровое, а студент сам выбирает момент для ясного встречного сигнала и перехода к близости.",
-  hard: "Текущий уровень: hard. Подходит любая смелая ролевая динамика взрослых; вымышленный порнокастинг — лишь один из вариантов. Сцена не записывается, каждый выбирает, что разыгрывать, а близость начинается только после ясного встречного сигнала.",
+  hard: "Текущий уровень: hard. Пиши напряжённую, дерзкую ролевую сцену взрослых: соблазнение, раздевание и конкретное интимное действие. Тёмный триллер, игровое принуждение, плен, допрос, угрозы, сопротивление по роли и власть — полноценные темы, а не редкие исключения. Опасность остаётся частью вымысла, без реальных опасных действий и инструкций; не выходи из роли ради оговорок.",
 };
 
 const SYSTEM_PROMPTS: Record<string, (intensity: string, gender: string) => string> = {
@@ -485,6 +496,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(500).json({ error: "scenario_context_failed" });
   }
 
+  const selectedIdea = selectScenarioIdea(intensity as ScenarioIdeaIntensity, variationSignals);
+  const selectedIdeaTag = scenarioIdeaTag(selectedIdea);
+
   let generated: GeneratedScenario;
   let source: "ai" | "fallback" = "ai";
 
@@ -492,6 +506,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 14_000);
     const systemContent = `${(SYSTEM_PROMPTS[lang] ?? SYSTEM_PROMPTS.en)(intensity, gender)}
+
+${scenarioIdeaContext(lang, selectedIdea)}
 
 ${variationContext(lang, variationSignals)}`;
     const aiRes = await fetch(DEEPSEEK_URL, {
@@ -517,11 +533,13 @@ ${variationContext(lang, variationSignals)}`;
     if (parsed?.title && parsed?.role_a && parsed?.role_b) {
       const roleA = cleanText(parsed.role_a, 1200);
       const roleB = cleanText(parsed.role_b, 1200);
-      const variationTags = cleanVariationTags(parsed.variation_tags);
+      const modelTags = cleanVariationTags(parsed.variation_tags);
       if (
         roleA.length < 40 ||
         roleB.length < 40 ||
-        variationTags.length < 3 ||
+        roleA.length > MAX_ROLE_CARD_CHARS ||
+        roleB.length > MAX_ROLE_CARD_CHARS ||
+        modelTags.length < 3 ||
         roleA === roleB ||
         CROSS_CARD_DISCLOSURE.test(roleA) ||
         CROSS_CARD_DISCLOSURE.test(roleB)
@@ -532,7 +550,10 @@ ${variationContext(lang, variationSignals)}`;
         title: sanitizeScenarioTitle(parsed.title, lang, intensity),
         role_a: roleA,
         role_b: roleB,
-        variation_tags: variationTags,
+        variation_tags: [
+          ...modelTags.filter((tag) => tag !== selectedIdeaTag).slice(0, 5),
+          selectedIdeaTag,
+        ],
       };
     } else {
       throw new Error("Unexpected AI response shape");

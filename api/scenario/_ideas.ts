@@ -1,4 +1,4 @@
-import { SCENARIO_IDEA_TRANSLATIONS, type ScenarioIdeaLocale } from "./_idea-translations";
+import { SCENARIO_IDEA_TRANSLATIONS, type ScenarioIdeaLocale } from "./_idea-translations.js";
 
 export type ScenarioIdeaIntensity = "romantic" | "passion" | "hard";
 

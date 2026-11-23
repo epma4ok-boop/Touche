@@ -336,6 +336,21 @@ button:focus-visible,
 .no-partner h1 { color: #40334f !important; }
 .no-partner p { color: #62566f !important; }
 .scenario-feedback-ratings button:hover:not(:disabled), .scenario-feedback-ratings button:focus-visible { background: #f8f5fc !important; color: #40334f !important; }
+.scenario-main .scenario-header .pop-back,
+.no-partner .pop-back {
+  border: 1px solid #d8cde7 !important;
+  border-radius: 999px !important;
+  background: rgba(251,249,254,.92) !important;
+  box-shadow: 0 4px 13px rgba(64,51,79,.08) !important;
+  color: #514365 !important;
+}
+.scenario-intensity-prompt { color: #40334f !important; }
+.scenario-private-note {
+  border-color: #e0d8ea !important;
+  background: rgba(251,249,254,.88) !important;
+  color: #62566f !important;
+}
+.scenario-private-note svg { stroke: #765b99 !important; }
 
 /* Games, wheel, dice, and both Strip-or-Dare presentations */
 .touche-games, .touche-dice, .pose-lottery, .strip {
@@ -512,6 +527,42 @@ button:focus-visible,
 .strip-premium .strip__turn strong, .strip-premium .strip-btn--secondary, .strip-premium .strip-btn--text { color: #765b99 !important; }
 .strip-premium__progress span { background: #d5c9e2 !important; }
 .strip-premium__progress span[data-removed="true"] { background: #bdb0cf !important; }
+.strip-premium .strip__header .strip__back {
+  border-color: #d1c6e0 !important;
+  background: rgba(251,249,254,.96) !important;
+  color: #514365 !important;
+}
+.strip-premium .strip__result-toast {
+  border-color: #c9bdd9 !important;
+  background: #eee8f5 !important;
+  color: #40334f !important;
+  font-weight: 700 !important;
+}
+.strip-premium .strip__result-toast[data-outcome="completed"] {
+  border-color: #9b82bd !important;
+  background: #e9e1f2 !important;
+}
+.strip-premium .strip__result-toast[data-outcome="failed"] {
+  border-color: #ad8aa8 !important;
+  background: #efe3ec !important;
+}
+.strip-premium .strip__result-icon { background: #765b99 !important; color: #fffaff !important; }
+.strip-premium .strip__result-toast[data-outcome="failed"] .strip__result-icon { background: #62465f !important; }
+.strip-premium .strip-premium__reveal-actions .strip-btn:not(.strip-btn--fail) {
+  border: 1px solid #594573 !important;
+  background: #765b99 !important;
+  color: #fffaff !important;
+  box-shadow: 0 5px 12px rgba(64,51,79,.17) !important;
+}
+.strip-premium .strip-premium__reveal-actions .strip-btn--fail {
+  border: 1px solid #62465f !important;
+  background: #62465f !important;
+  color: #fffaff !important;
+  box-shadow: 0 5px 12px rgba(64,51,79,.14) !important;
+}
+.strip-premium .strip-premium__reveal-actions .strip-btn:disabled {
+  opacity: .82 !important;
+}
 
 /* Tarot and Love Path retain their original card art and illustration colors. */
 .tarot {

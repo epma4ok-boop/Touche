@@ -6,10 +6,14 @@ export const STRIP_CLOTHES: [string[], string[]] = [
   ["Носки", "Пиджак", "Штаны", "Футболка", "Трусы"],
 ];
 export const RPS_CHOICES = ["Камень", "Бумага", "Ножницы"] as const;
-export const BODY_CHOICES = ["Рука", "Нога", "Голова", "Женские гениталии", "Мужские гениталии", "Попа", "Спина", "Грудь"] as const;
+export const BODY_CHOICES = [
+  "hand", "female-genitals", "male-genitals", "buttocks", "female-chest",
+] as const;
+export const POSE_CHOICES = Array.from({ length: 20 }, (_, index) => String(index + 1).padStart(2, "0"));
+const LEGACY_BODY_CHOICES = ["Рука", "Нога", "Голова", "Женские гениталии", "Мужские гениталии", "Попа", "Спина", "Грудь"] as const;
 export type RpsChoice = typeof RPS_CHOICES[number];
 export type MiniRound = {
-  kind: "number" | "body" | "gesture" | "final";
+  kind: "number" | "body" | "pose" | "gesture" | "final";
   target: string;
   revealed: boolean;
   choice: RpsChoice | null;
@@ -23,10 +27,11 @@ export function rpsOutcome(choice: RpsChoice, target: RpsChoice): "win" | "tie" 
 
 export function createMiniRound(cardId: string, random = Math.random): MiniRound | null {
   const kind = cardId === "l2-number" ? "number" : cardId === "l3-guess" ? "body"
-    : cardId === "l2-rps" ? "gesture" : cardId === "l5-rps" ? "final" : null;
+    : cardId === "l4-pose" || cardId === "l4-pose-wall" ? "pose"
+      : cardId === "l2-rps" ? "gesture" : cardId === "l5-rps" ? "final" : null;
   if (!kind) return null;
   const choices: readonly string[] = kind === "number" ? Array.from({ length: 10 }, (_, i) => String(i + 1))
-    : kind === "body" ? BODY_CHOICES : RPS_CHOICES;
+    : kind === "body" ? BODY_CHOICES : kind === "pose" ? POSE_CHOICES : RPS_CHOICES;
   return { kind, target: choices[Math.min(choices.length - 1, Math.floor(random() * choices.length))], revealed: false, choice: null };
 }
 
@@ -36,7 +41,8 @@ export function validMiniRound(value: unknown, cardId: string): value is MiniRou
   const expected = createMiniRound(cardId, () => 0);
   if (!expected || expected.kind !== item.kind || typeof item.revealed !== "boolean") return false;
   const choices: readonly string[] = item.kind === "number" ? Array.from({ length: 10 }, (_, i) => String(i + 1))
-    : item.kind === "body" ? BODY_CHOICES : RPS_CHOICES;
+    : item.kind === "body" ? [...BODY_CHOICES, ...LEGACY_BODY_CHOICES]
+      : item.kind === "pose" ? POSE_CHOICES : RPS_CHOICES;
   return choices.includes(item.target) && (item.choice === null || RPS_CHOICES.includes(item.choice))
     && !(item.kind === "final" && item.revealed && item.choice === null);
 }

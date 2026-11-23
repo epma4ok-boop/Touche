@@ -122,9 +122,9 @@
     },
     {
       "category": "Guess the Body Part",
-      "criteria": "The named body part must match the app's answer.",
+      "criteria": "The body part named before revealing the image must match the dice illustration.",
       "id": "l3-guess",
-      "task": "The app has selected a body part. Say one guess aloud, then reveal the blurred image."
+      "task": "The app has picked one of the dice illustrations. Say the body part aloud, then tap the blurred image."
     },
     {
       "category": "Compliment",
@@ -176,9 +176,9 @@
     },
     {
       "category": "Guess the Pose",
-      "criteria": "Name the pose correctly on the first attempt.",
+      "criteria": "Name the pose correctly before revealing the image.",
       "id": "l4-pose",
-      "task": "Your partner will silently show a pose from three options: sitting, standing at a wall, or lying on the side. Guess the option."
+      "task": "The app has picked one of the 20 poses from the Pose Ball. Say your guess aloud, then tap the blurred image."
     },
     {
       "category": "Erotic Photo",
@@ -200,9 +200,9 @@
     },
     {
       "category": "Guess the Pose",
-      "criteria": "Correctly name one of the three poses on the first try.",
+      "criteria": "Name the pose correctly before revealing the image.",
       "id": "l4-pose-wall",
-      "task": "Your partner shows one of the poses: sitting, standing at a wall, or lying on the side. Guess on the first try."
+      "task": "The app has picked one of the 20 poses from the Pose Ball. Say your guess aloud, then tap the blurred image."
     },
     {
       "category": "Erotic Action",
@@ -394,9 +394,9 @@
     },
     {
       "category": "अंग का अनुमान",
-      "criteria": "नाम ऐप के उत्तर से मेल खाना चाहिए।",
+      "criteria": "तस्वीर खुलने से पहले बोला गया अंग का नाम डाइस के चित्र से मेल खाना चाहिए।",
       "id": "l3-guess",
-      "task": "ऐप ने एक शरीर का अंग चुना है। एक अनुमान जोर से बोलें और धुंधली तस्वीर खोलें।"
+      "task": "ऐप ने डाइस के चित्रों में से एक चुना है। अंग का नाम ज़ोर से बोलें, फिर धुंधली तस्वीर पर टैप करें।"
     },
     {
       "category": "तारीफ",
@@ -448,9 +448,9 @@
     },
     {
       "category": "मुद्रा का अनुमान",
-      "criteria": "पहली कोशिश में सही मुद्रा पहचानें।",
+      "criteria": "तस्वीर खोलने से पहले मुद्रा का सही नाम बताएं।",
       "id": "l4-pose",
-      "task": "साथी बिना बोले तीन में से एक मुद्रा करेगा: बैठना, दीवार के पास खड़ा होना, या करवट लेना। अनुमान लगाएं।"
+      "task": "ऐप ने Pose Ball की 20 मुद्राओं में से एक चुनी है। मुद्रा का नाम ज़ोर से बोलें, फिर धुंधली तस्वीर पर टैप करें।"
     },
     {
       "category": "कामुक फोटो",
@@ -472,9 +472,9 @@
     },
     {
       "category": "मुद्रा का अनुमान",
-      "criteria": "तीन में से एक का पहली बार में सही अनुमान लगाएं।",
+      "criteria": "तस्वीर खोलने से पहले मुद्रा का सही नाम बताएं।",
       "id": "l4-pose-wall",
-      "task": "साथी कोई मुद्रा दिखाता है (बैठना, दीवार के पास, करवट)। पहली बार में सही बताएं।"
+      "task": "ऐप ने Pose Ball की 20 मुद्राओं में से एक चुनी है। मुद्रा का नाम ज़ोर से बोलें, फिर धुंधली तस्वीर पर टैप करें।"
     },
     {
       "category": "कामुक क्रिया",
@@ -666,9 +666,9 @@
     },
     {
       "category": "Adivinhe a parte do corpo",
-      "criteria": "A parte do corpo mencionada deve coincidir com a resposta do aplicativo.",
+      "criteria": "A parte do corpo dita antes de abrir a imagem deve corresponder ao desenho do dado.",
       "id": "l3-guess",
-      "task": "O aplicativo escolheu uma parte do corpo. Diga um palpite em voz alta e abra a imagem borrada."
+      "task": "O app escolheu uma das ilustrações dos dados. Diga a parte do corpo em voz alta e toque na imagem desfocada."
     },
     {
       "category": "Elogio",
@@ -720,9 +720,9 @@
     },
     {
       "category": "Adivinhe a pose",
-      "criteria": "Adivinhe a pose corretamente na primeira tentativa.",
+      "criteria": "Diga o nome correto da pose antes de revelar a imagem.",
       "id": "l4-pose",
-      "task": "O parceiro faz uma pose sem palavras dentre três opções: sentado, em pé na parede ou deitado de lado. Tente adivinhar."
+      "task": "O app escolheu uma das 20 poses da Bola das poses. Diga seu palpite em voz alta e toque na imagem desfocada."
     },
     {
       "category": "Foto erótica",
@@ -744,9 +744,9 @@
     },
     {
       "category": "Adivinhe a pose",
-      "criteria": "Adivinhe corretamente uma das três poses na primeira tentativa.",
+      "criteria": "Diga o nome correto da pose antes de revelar a imagem.",
       "id": "l4-pose-wall",
-      "task": "O parceiro faz uma das poses: sentado, em pé na parede ou deitado de lado. Tente adivinhar na primeira tentativa."
+      "task": "O app escolheu uma das 20 poses da Bola das poses. Diga seu palpite em voz alta e toque na imagem desfocada."
     },
     {
       "category": "Ação erótica",
@@ -938,9 +938,9 @@
     },
     {
       "category": "Adivina la parte del cuerpo",
-      "criteria": "La parte del cuerpo nombrada debe coincidir con la respuesta de la aplicación.",
+      "criteria": "La parte del cuerpo que dices antes de abrir la imagen debe coincidir con la ilustración del dado.",
       "id": "l3-guess",
-      "task": "La aplicación eligió una parte del cuerpo. Di una suposición en voz alta y abre la imagen borrosa."
+      "task": "La app eligió una de las ilustraciones de los dados. Di la parte del cuerpo en voz alta y toca la imagen borrosa."
     },
     {
       "category": "Cumplido",
@@ -992,9 +992,9 @@
     },
     {
       "category": "Adivina la pose",
-      "criteria": "Nombra la pose correctamente al primer intento.",
+      "criteria": "Nombra correctamente la pose antes de revelar la imagen.",
       "id": "l4-pose",
-      "task": "Tu pareja muestra sin palabras una pose de tres opciones: sentado, de pie contra la pared o acostado de lado. Adivina la opción."
+      "task": "La app eligió una de las 20 poses de la Bola de poses. Di tu respuesta en voz alta y toca la imagen borrosa."
     },
     {
       "category": "Foto erótica",
@@ -1016,9 +1016,9 @@
     },
     {
       "category": "Adivina la pose",
-      "criteria": "Nombra correctamente una de las tres poses al primer intento.",
+      "criteria": "Nombra correctamente la pose antes de revelar la imagen.",
       "id": "l4-pose-wall",
-      "task": "Tu pareja muestra una de las poses: sentado, de pie contra la pared o acostado de lado. Adivina al primer intento."
+      "task": "La app eligió una de las 20 poses de la Bola de poses. Di tu respuesta en voz alta y toca la imagen borrosa."
     },
     {
       "category": "Acción erótica",

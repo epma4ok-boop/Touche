@@ -12,28 +12,42 @@ const CHARACTER_LABELS: Record<Lang, { woman: string; man: string; state: string
 };
 
 const OPTION_LABELS: Record<Lang, Record<string, string>> = {
-  ru: {},
+  ru: {
+    Камень: "Камень", Бумага: "Бумага", Ножницы: "Ножницы",
+    hand: "Рука", "female-genitals": "Женские гениталии", "male-genitals": "Мужские гениталии",
+    buttocks: "Попа", "female-chest": "Грудь (женская)",
+    Рука: "Рука", Нога: "Нога", Голова: "Голова", "Женские гениталии": "Женские гениталии",
+    "Мужские гениталии": "Мужские гениталии", Попа: "Попа", Спина: "Спина", Грудь: "Грудь",
+  },
   en: {
-    Камень: "Rock", Бумага: "Paper", Ножницы: "Scissors", Рука: "Arm", Нога: "Leg", Голова: "Head",
+    Камень: "Rock", Бумага: "Paper", Ножницы: "Scissors",
+    hand: "Hand", "female-genitals": "Female genitals", "male-genitals": "Male genitals",
+    buttocks: "Buttocks", "female-chest": "Chest (female)", Рука: "Hand", Нога: "Leg", Голова: "Head",
     "Женские гениталии": "Female genitals", "Мужские гениталии": "Male genitals", Попа: "Buttocks", Спина: "Back", Грудь: "Chest",
   },
   hi: {
-    Камень: "पत्थर", Бумага: "कागज़", Ножницы: "कैंची", Рука: "बाँह", Нога: "टांग", Голова: "सिर",
+    Камень: "पत्थर", Бумага: "कागज़", Ножницы: "कैंची",
+    hand: "बाँह", "female-genitals": "महिला जननांग", "male-genitals": "पुरुष जननांग",
+    buttocks: "नितंब", "female-chest": "छाती (महिला)", Рука: "बाँह", Нога: "टांग", Голова: "सिर",
     "Женские гениталии": "महिला जननांग", "Мужские гениталии": "पुरुष जननांग", Попа: "नितंब", Спина: "पीठ", Грудь: "छाती",
   },
   pt: {
-    Камень: "Pedra", Бумага: "Papel", Ножницы: "Tesoura", Рука: "Braço", Нога: "Perna", Голова: "Cabeça",
+    Камень: "Pedra", Бумага: "Papel", Ножницы: "Tesoura",
+    hand: "Mão", "female-genitals": "Genitais femininos", "male-genitals": "Genitais masculinos",
+    buttocks: "Nádegas", "female-chest": "Peito (feminino)", Рука: "Braço", Нога: "Perna", Голова: "Cabeça",
     "Женские гениталии": "Genitais femininos", "Мужские гениталии": "Genitais masculinos", Попа: "Nádegas", Спина: "Costas", Грудь: "Peito",
   },
   es: {
-    Камень: "Piedra", Бумага: "Papel", Ножницы: "Tijeras", Рука: "Brazo", Нога: "Pierna", Голова: "Cabeza",
+    Камень: "Piedra", Бумага: "Papel", Ножницы: "Tijeras",
+    hand: "Mano", "female-genitals": "Genitales femeninos", "male-genitals": "Genitales masculinos",
+    buttocks: "Glúteos", "female-chest": "Pecho (femenino)", Рука: "Brazo", Нога: "Pierna", Голова: "Cabeza",
     "Женские гениталии": "Genitales femeninos", "Мужские гениталии": "Genitales masculinos", Попа: "Glúteos", Спина: "Espalda", Грудь: "Pecho",
   },
 };
 
 const MINI_COPY: Record<Lang, {
   finalPrompt: string; guessPrompt: string; revealAnswer: string; revealHidden: string; appChoice: string;
-  tapToReveal: string; options: string; numberRange: string; checkAnswer: string; tie: string; win: string;
+  tapToReveal: string; options: string; poseOptions: string; poseAnswer: string; numberRange: string; checkAnswer: string; tie: string; win: string;
   loss: string; yourChoice: string; femaleChest: string; replay: string;
 }> = {
   ru: {
@@ -41,6 +55,7 @@ const MINI_COPY: Record<Lang, {
     guessPrompt: "Сначала назови ответ вслух, затем коснись размытой картинки.",
     revealAnswer: "Ответ приложения: {answer}", revealHidden: "Открыть скрытый ответ приложения",
     appChoice: "ВЫБОР ПРИЛОЖЕНИЯ", tapToReveal: "КОСНИСЬ, ЧТОБЫ ОТКРЫТЬ", options: "Варианты",
+    poseOptions: "20 поз из «Шара ответов»", poseAnswer: "Поза {number}",
     numberRange: "от 1 до 10", checkAnswer: "Сверь с ответом, который ты назвал вслух. Совпало — «Выполнил», не совпало — «Провалил». Микрофон не используется.",
     tie: "Ничья — переиграй без штрафа.", win: "Ты выиграл. Одежда остаётся, ход переходит партнёру.",
     loss: "Приложение выиграло. Снимается последний слой.", yourChoice: "Твой знак:",
@@ -51,6 +66,7 @@ const MINI_COPY: Record<Lang, {
     guessPrompt: "Say your answer aloud first, then tap the blurred image.",
     revealAnswer: "App's answer: {answer}", revealHidden: "Reveal the app's hidden answer",
     appChoice: "APP'S CHOICE", tapToReveal: "TAP TO REVEAL", options: "Options",
+    poseOptions: "20 poses from the Pose Ball", poseAnswer: "Pose {number}",
     numberRange: "from 1 to 10", checkAnswer: "Check the answer you said aloud. If it matches, tap Completed; otherwise tap Failed. No microphone is used.",
     tie: "It's a tie—play again with no penalty.", win: "You won. Keep your clothes on; the other player goes next.",
     loss: "The app won. Remove the final layer.", yourChoice: "Your sign:",
@@ -61,6 +77,7 @@ const MINI_COPY: Record<Lang, {
     guessPrompt: "पहले अपना जवाब ज़ोर से बताएं, फिर धुंधली तस्वीर पर टैप करें।",
     revealAnswer: "ऐप का जवाब: {answer}", revealHidden: "ऐप का छिपा जवाब दिखाएँ",
     appChoice: "ऐप का चुनाव", tapToReveal: "देखने के लिए टैप करें", options: "विकल्प",
+    poseOptions: "Pose Ball की 20 मुद्राएँ", poseAnswer: "मुद्रा {number}",
     numberRange: "1 से 10 तक", checkAnswer: "अपने बताए जवाब से मिलाएँ। सही हो तो «पूरा हुआ», नहीं तो «असफल» चुनें। माइक्रोफ़ोन इस्तेमाल नहीं होता।",
     tie: "बराबरी—बिना किसी दंड के फिर खेलें।", win: "आप जीते। कपड़े वैसे ही रहेंगे; अब साथी की बारी है।",
     loss: "ऐप जीता। आख़िरी परत हटाएँ।", yourChoice: "आपका संकेत:",
@@ -71,6 +88,7 @@ const MINI_COPY: Record<Lang, {
     guessPrompt: "Diga sua resposta em voz alta e toque na imagem desfocada.",
     revealAnswer: "Resposta do app: {answer}", revealHidden: "Revelar a resposta escondida do app",
     appChoice: "ESCOLHA DO APP", tapToReveal: "TOQUE PARA REVELAR", options: "Opções",
+    poseOptions: "20 poses da Bola das poses", poseAnswer: "Pose {number}",
     numberRange: "de 1 a 10", checkAnswer: "Confira com a resposta que você disse. Se acertou, toque em Cumpri; se errou, em Falhei. O microfone não é usado.",
     tie: "Empate — joguem de novo sem penalidade.", win: "Você venceu. As roupas ficam; a outra pessoa joga agora.",
     loss: "O app venceu. Retire a última camada.", yourChoice: "Seu sinal:",
@@ -81,6 +99,7 @@ const MINI_COPY: Record<Lang, {
     guessPrompt: "Di tu respuesta en voz alta y toca la imagen borrosa.",
     revealAnswer: "Respuesta de la app: {answer}", revealHidden: "Revelar la respuesta oculta de la app",
     appChoice: "ELECCIÓN DE LA APP", tapToReveal: "TOCA PARA REVELAR", options: "Opciones",
+    poseOptions: "20 poses de la Bola de poses", poseAnswer: "Pose {number}",
     numberRange: "del 1 al 10", checkAnswer: "Compárala con tu respuesta. Si acertaste, toca Completado; si no, Fallé. No se usa el micrófono.",
     tie: "Empate: jueguen otra vez sin penalización.", win: "Ganaste. La ropa se queda; ahora le toca a la otra persona.",
     loss: "Ganó la app. Quítate la última capa.", yourChoice: "Tu señal:",
@@ -95,6 +114,16 @@ function optionLabel(value: string, lang: Lang) {
 const assetBase = `${import.meta.env.BASE_URL.replace(/\/$/, "")}/`;
 const imagePath = (player: number, stage: number) =>
   `${assetBase}images/strip-game/touche-mini-games-${player === 0 ? "woman" : "man"}-${stage}.webp?v=uploaded-20261103`;
+const BODY_IMAGE_FILES: Record<typeof BODY_CHOICES[number], string> = {
+  hand: "male-hand",
+  "female-genitals": "female-pelvis",
+  "male-genitals": "male-pelvis",
+  buttocks: "female-buttocks",
+  "female-chest": "female-chest",
+};
+const miniImagePath = (round: MiniRound) => round.kind === "pose"
+  ? `${assetBase}images/lottery-poses/pose-${round.target}.svg`
+  : `${assetBase}images/dice-parts/${BODY_IMAGE_FILES[round.target as keyof typeof BODY_IMAGE_FILES] ?? round.target}.png`;
 
 export function ClothingGlyph({ player, item }: { player: 0 | 1; item: number }) {
   const paths = item === 0
@@ -161,7 +190,10 @@ export function StripMiniGame({ lang, round, onChange }: { lang: Lang; round: Mi
   const final = round.kind === "final";
   const outcome = final && round.choice && round.revealed ? rpsOutcome(round.choice, round.target as RpsChoice) : null;
   const copy = MINI_COPY[lang];
-  const targetLabel = optionLabel(round.target, lang);
+  const targetLabel = round.kind === "pose"
+    ? copy.poseAnswer.replace("{number}", String(Number(round.target)))
+    : optionLabel(round.target, lang);
+  const hasDiceIllustration = round.kind === "body" && BODY_CHOICES.includes(round.target as typeof BODY_CHOICES[number]);
   return <div className="strip-final-mini">
     <p>{final ? copy.finalPrompt : copy.guessPrompt}</p>
     {final && !round.revealed && <div className="strip-final-choices">
@@ -172,13 +204,17 @@ export function StripMiniGame({ lang, round, onChange }: { lang: Lang; round: Mi
       aria-label={round.revealed ? copy.revealAnswer.replace("{answer}", targetLabel) : copy.revealHidden}>
       <span aria-hidden={!round.revealed} className="strip-final-hidden__art">
         {round.revealed ? <>
-          {round.kind === "number" ? <b className="strip-final-number">{round.target}</b> : round.kind === "body" ? <BodyArt value={round.target} label={targetLabel} /> : <RpsArt value={round.target} label={targetLabel} />}
+          {round.kind === "number" ? <b className="strip-final-number">{round.target}</b>
+            : round.kind === "pose" || hasDiceIllustration
+              ? <img className="strip-final-image" src={miniImagePath(round)} alt="" aria-hidden="true" draggable={false} />
+              : round.kind === "body" ? <BodyArt value={round.target} label={targetLabel} />
+                : <RpsArt value={round.target} label={targetLabel} />}
           <strong>{round.target === "Грудь" ? copy.femaleChest : targetLabel}</strong>
         </> : <span className="strip-final-mystery" />}
       </span>
       <small>{round.revealed ? copy.appChoice : copy.tapToReveal}</small>
     </button>
-    {!round.revealed && <p className="strip-final-options">{copy.options}: {round.kind === "body" ? BODY_CHOICES.map(choice => optionLabel(choice, lang)).join(" · ") : round.kind === "number" ? copy.numberRange : RPS_CHOICES.map(choice => optionLabel(choice, lang)).join(" · ")}</p>}
+    {!round.revealed && <p className="strip-final-options">{copy.options}: {round.kind === "body" ? BODY_CHOICES.map(choice => optionLabel(choice, lang)).join(" · ") : round.kind === "pose" ? copy.poseOptions : round.kind === "number" ? copy.numberRange : RPS_CHOICES.map(choice => optionLabel(choice, lang)).join(" · ")}</p>}
     {round.revealed && !final && <p>{copy.checkAnswer}</p>}
     {outcome && <p role="status"><strong>{outcome === "tie" ? copy.tie : outcome === "win" ? copy.win : copy.loss}</strong> {copy.yourChoice} {optionLabel(round.choice ?? "", lang)}.</p>}
     {outcome === "tie" && <button className="strip-btn" type="button" onClick={() => onChange({ ...round, target: RPS_CHOICES[Math.floor(Math.random() * 3)], choice: null, revealed: false })}>{copy.replay}</button>}

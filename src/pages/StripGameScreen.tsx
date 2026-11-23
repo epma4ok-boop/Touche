@@ -55,7 +55,7 @@ const CARDS: Card[][] = [
     { id: "l3-pose", category: "Изобрази позу", task: "Прими выразительную позу, в которой ты чувствуешь себя особенно привлекательным или привлекательной.", criteria: "Удерживай позу 20 секунд, не смеясь." },
     { id: "l3-selfie", category: "Селфи с намёком", task: "Сделай селфи с пальцем у губ, томным взглядом и приоткрытым ртом. Отправь партнёру.", criteria: "Сделай кадр с указанными жестом и выражением лица и отправь его партнёру." },
     { id: "l3-message", category: "Эротичное сообщение", task: "Напиши партнёру три предложения о том, чего тебе хочется от вашего сегодняшнего вечера — чувственно, без спешки.", criteria: "Сообщение состоит ровно из трёх законченных предложений и показано партнёру." },
-    { id: "l3-guess", category: "Угадай часть тела", task: "Приложение выбрало часть тела. Назови одну догадку вслух, затем открой размытую картинку.", criteria: "Названная часть тела должна совпасть с ответом приложения." },
+    { id: "l3-guess", category: "Угадай часть тела", task: "Приложение выбрало одну из иллюстраций кубиков. Назови часть тела вслух, затем нажми на размытую картинку.", criteria: "Названная часть тела должна совпасть с изображением кубика." },
     { id: "l3-compliment", category: "Комплимент", task: "Скажи партнёру, что именно в его или её взгляде, голосе или руках кажется тебе особенно привлекательным.", criteria: "Скажи один конкретный комплимент, глядя партнёру в глаза, не рассмеявшись." },
     { id: "l3-anticipation", category: "Намёк", task: "Напиши партнёру три предложения о том, чего хочешь сегодня вечером.", criteria: "Напиши ровно три законченных предложения и покажи сообщение партнёру." },
     { id: "l3-breath", category: "Комплимент", task: "Глядя партнёру в глаза, скажи, что именно в его или её теле тебе нравится.", criteria: "Назови одну конкретную часть тела и скажи о ней один законченный комплимент." },
@@ -66,11 +66,11 @@ const CARDS: Card[][] = [
     { id: "l4-photo", category: "Эротичное фото в позе", task: "Сделай эротичное фото в позе лёжа на боку, с намёком. Отправь партнёру.", criteria: "Сделай и отправь один кадр в указанной позе." },
     { id: "l4-video", category: "Эротичное видео", task: "Запиши видео на пять секунд: медленно проведи рукой по телу и задержи взгляд в камере. Отправь партнёру.", criteria: "Отправь партнёру непрерывное видео длительностью пять секунд." },
     { id: "l4-dance", category: "Эротичный танец", task: "Станцуй перед партнёром одну минуту, будто раздеваешься, но не снимай одежду.", criteria: "Танцуй ровно одну минуту, не снимая одежду." },
-    { id: "l4-pose", category: "Угадай позу", task: "Партнёр без слов показывает позу из трёх вариантов: сидя, стоя у стены или лёжа на боку. Угадай вариант.", criteria: "Назови позу правильно с первой попытки." },
+    { id: "l4-pose", category: "Угадай позу", task: "Приложение выбрало одну из 20 поз «Шара ответов». Назови её вслух, затем нажми на размытую картинку.", criteria: "Назови позу правильно до того, как откроешь картинку." },
     { id: "l4-sensory", category: "Эротичное фото", task: "Сделай фото стоя у стены в чувственной позе и отправь партнёру.", criteria: "Сделай и отправь один кадр стоя у стены." },
     { id: "l4-whisper", category: "Эротичный танец", task: "Станцуй сидя одну минуту, используя только корпус и руки.", criteria: "Продолжай танцевать одну минуту, не вставая." },
     { id: "l4-video-top", category: "Эротичное видео", task: "Запиши видео на пять секунд, медленно снимая или приспуская верх одежды. Отправь партнёру.", criteria: "Отправь партнёру непрерывное видео длительностью пять секунд с указанным действием." },
-    { id: "l4-pose-wall", category: "Угадай позу", task: "Партнёр показывает одну из поз: сидя, стоя у стены или лёжа на боку. Угадай с первой попытки.", criteria: "Назови правильно одну из трёх поз с первой попытки." },
+    { id: "l4-pose-wall", category: "Угадай позу", task: "Приложение выбрало одну из 20 поз «Шара ответов». Назови её вслух, затем нажми на размытую картинку.", criteria: "Назови позу правильно до того, как откроешь картинку." },
   ],
   [
     { id: "l5-touch", category: "Эротичное действие", task: "Прижмись сосками к губам партнёра и оставайся так 10 секунд.", criteria: "Удерживай положение 10 секунд." },
@@ -415,6 +415,7 @@ export default function StripGameScreen({ lang, onBack, onUpgrade }: Props) {
   const [first, setFirst] = useState<PlayerIndex>(0);
   const [confirming, setConfirming] = useState(false);
   const [lastResult, setLastResult] = useState("");
+  const [lastResultState, setLastResultState] = useState<"completed" | "failed" | null>(null);
   const [removal, setRemoval] = useState<{ player: PlayerIndex; from: number } | null>(null);
   const challengeHeadingRef = useRef<HTMLHeadingElement | null>(null);
   const currentLevel = session ? Math.min(session.players[session.turn].layersRemoved, 4) : 0;
@@ -435,6 +436,7 @@ export default function StripGameScreen({ lang, onBack, onUpgrade }: Props) {
     setSession(createSession(first));
     setConfirming(false);
     setLastResult("");
+    setLastResultState(null);
   };
   const drawCard = () => {
     if (!session || session.card || session.phase !== "playing") return;
@@ -451,6 +453,7 @@ export default function StripGameScreen({ lang, onBack, onUpgrade }: Props) {
     const used = { ...session.used, [key]: available.length ? [...alreadyUsed, card.id] : [card.id] };
     setSession({ ...session, card, used, mini: createMiniRound(card.id) });
     setLastResult("");
+    setLastResultState(null);
   };
   const resolveTurn = (completed: boolean) => {
     if (!session || !session.card || session.phase !== "playing") return;
@@ -472,6 +475,7 @@ export default function StripGameScreen({ lang, onBack, onUpgrade }: Props) {
       phase: next.finished ? "finished" : "playing", winner: next.winner,
     });
     setLastResult(next.finished ? "" : completed ? copy.completed : copy.layerChanged.replace("{layer}", removedLayer));
+    setLastResultState(next.finished ? null : completed ? "completed" : "failed");
   };
   const restart = () => {
     setRemoval(null);
@@ -479,12 +483,13 @@ export default function StripGameScreen({ lang, onBack, onUpgrade }: Props) {
     setSession(null);
     setConfirming(false);
     setLastResult("");
+    setLastResultState(null);
   };
 
   const header = (
     <header className="strip__header">
       <button type="button" className="strip__back" onClick={onBack} aria-label={copy.back} data-testid="button-strip-back">
-        <BackIcon />
+        <BackIcon /><span>{copy.back}</span>
       </button>
       <span className="strip__brand">Touch<em>é</em></span>
       <span />
@@ -576,7 +581,10 @@ export default function StripGameScreen({ lang, onBack, onUpgrade }: Props) {
           {!session.card ? (
             <>
               <div className="strip__level-line"><span>{copy.level} {Math.min(session.players[session.turn].layersRemoved + 1, 5)}</span><span>{copy.layers} {5 - session.players[session.turn].layersRemoved} {copy.left}</span></div>
-              {lastResult && <p className="strip__result-toast" role="status" data-testid="status-strip-result">{lastResult}</p>}
+              {lastResult && <p className="strip__result-toast" role="status" data-outcome={lastResultState} data-testid="status-strip-result">
+                <span className="strip__result-icon" aria-hidden="true">{lastResultState === "completed" ? "✓" : "!"}</span>
+                <span>{lastResult}</span>
+              </p>}
               <button type="button" className="strip-btn" onClick={drawCard} data-testid="button-strip-draw">{copy.draw}</button>
             </>
           ) : (

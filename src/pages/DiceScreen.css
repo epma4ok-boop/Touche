@@ -31,7 +31,6 @@
 .touche-dice__brand em { color: var(--dice-wine); font-style: normal; }
 .touche-dice__body { position: relative; z-index: 1; width: min(100%, 560px); flex: 1; min-height: 0; margin: 0 auto; padding: 21px 20px max(18px, env(safe-area-inset-bottom)); display: flex; flex-direction: column; align-items: center; }
 .touche-dice__intro { text-align: center; }
-.touche-dice__eyebrow { display: inline-flex; align-items: center; gap: 8px; color: var(--dice-wine); font-size: 9px; font-weight: 800; letter-spacing: .2em; }
 .touche-dice__intro h1 { margin: 9px 0 6px; font: 700 clamp(32px, 8vw, 41px)/1.02 "Space Grotesk", sans-serif; letter-spacing: -.065em; }
 .touche-dice__intro p { max-width: 320px; margin: 0 auto; color: var(--dice-muted); font-size: 13px; line-height: 1.45; }
 .touche-dice__table { width: 100%; flex: 1; min-height: 0; display: flex; flex-direction: column; justify-content: center; }
@@ -93,8 +92,7 @@
 .touche-dice { background:linear-gradient(180deg,#e9ded2 0%,#f4eee4 42%,#eee4d9 100%) !important; }
 .touche-dice__body { width:min(100%,600px) !important; padding:17px 24px max(22px,env(safe-area-inset-bottom)) !important; }
 .touche-dice__intro { width:100%; text-align:left !important; padding:10px 2px 18px; }
-.touche-dice__eyebrow { font:700 9px var(--font-mono) !important; }
-.touche-dice__intro h1 { max-width:10ch; margin:15px 0 7px !important; font-size:clamp(38px,10vw,52px) !important; }
+.touche-dice__intro h1 { max-width:10ch; margin:0 0 7px !important; font-size:clamp(38px,10vw,52px) !important; }
 .touche-dice__intro p { margin:0 !important; max-width:29ch !important; }
 .touche-dice__table {
   flex:0 1 auto !important; min-height:0 !important; width:100%;

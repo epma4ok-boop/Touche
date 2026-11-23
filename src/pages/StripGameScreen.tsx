@@ -127,7 +127,7 @@ function localizedCard(card: Card, lang: Lang): Card {
 }
 
 type Copy = {
-  back: string; title: string; subtitle: string; start: string;
+  back: string; title: string; start: string;
   rulesTitle: string; rules: string[]; firstTurn: string; woman: string; man: string;
   chooseFirst: string; startGame: string; restart: string; restartConfirm: string; confirm: string; cancel: string;
   turn: string; level: string; draw: string; card: string; criteria: string; completed: string; failed: string;
@@ -138,7 +138,7 @@ type Copy = {
 
 const COPY: Record<Lang, Copy> = {
   ru: {
-    back: "Назад к играм", title: "Стрип или действие", subtitle: "Игра для двоих на одном телефоне",
+    back: "Назад к играм", title: "Стрип или действие",
     start: "Начать игру",
     rulesTitle: "Как играть", rules: ["Ходите по очереди и тяните карту своего уровня.", "Выполнено — одежда остаётся, ход переходит партнёру.", "Провал — снимается следующий слой, уровень растёт, ход переходит.", "Пропустить карту нельзя. Слои снимаются только с себя и строго по порядку."],
     firstTurn: "Кто ходит первым?", woman: "Женщина", man: "Мужчина", chooseFirst: "Выберите первого игрока",
@@ -154,7 +154,7 @@ const COPY: Record<Lang, Copy> = {
     layerChanged: "Снят слой: {layer}. Теперь ход партнёра.",
   },
   en: {
-    back: "Back to games", title: "Strip or dare", subtitle: "A two-player game for one phone",
+    back: "Back to games", title: "Strip or dare",
     start: "Start game",
     rulesTitle: "How to play", rules: ["Take turns drawing a card for your current level.", "Complete it: your clothes stay on and the turn passes.", "Fail it: remove your next layer, advance a level, and pass the turn.", "There is no skip. Remove only your own layers, in order."],
     firstTurn: "Who goes first?", woman: "Woman", man: "Man", chooseFirst: "Choose the first player",
@@ -170,7 +170,7 @@ const COPY: Record<Lang, Copy> = {
     layerChanged: "Removed: {layer}. The other player is up.",
   },
   hi: {
-    back: "खेलों पर वापस", title: "स्ट्रिप या डेयर", subtitle: "एक फ़ोन पर दो लोगों का खेल",
+    back: "खेलों पर वापस", title: "स्ट्रिप या डेयर",
     start: "खेल शुरू करें",
     rulesTitle: "कैसे खेलें", rules: ["बारी-बारी से अपने स्तर का कार्ड लें।", "पूरा करने पर कपड़े वैसे ही रहते हैं और बारी साथी की होती है।", "असफल होने पर अपनी अगली परत हटाएँ, स्तर बढ़ाएँ और बारी साथी को दें।", "कोई कार्ड छोड़ा नहीं जा सकता। अपनी परतें क्रम से हटाएँ।"],
     firstTurn: "पहली बारी किसकी?", woman: "महिला", man: "पुरुष", chooseFirst: "पहला खिलाड़ी चुनें",
@@ -186,7 +186,7 @@ const COPY: Record<Lang, Copy> = {
     layerChanged: "परत हटी: {layer}। अब साथी की बारी है।",
   },
   pt: {
-    back: "Voltar aos jogos", title: "Tire uma peça ou ouse", subtitle: "Um jogo para dois em um só celular",
+    back: "Voltar aos jogos", title: "Tire uma peça ou ouse",
     start: "Começar jogo",
     rulesTitle: "Como jogar", rules: ["Alternem as jogadas e tirem uma carta do nível atual.", "Cumpriu: as roupas ficam e a vez passa para a outra pessoa.", "Falhou: retire a próxima camada, avance um nível e passe a vez.", "Não é possível pular. Retire apenas suas próprias camadas, na ordem."],
     firstTurn: "Quem começa?", woman: "Mulher", man: "Homem", chooseFirst: "Escolha quem começa",
@@ -202,7 +202,7 @@ const COPY: Record<Lang, Copy> = {
     layerChanged: "Camada removida: {layer}. Agora é a vez da outra pessoa.",
   },
   es: {
-    back: "Volver a juegos", title: "Quítate o atrévete", subtitle: "Un juego para dos en un solo móvil",
+    back: "Volver a juegos", title: "Quítate o atrévete",
     start: "Empezar juego",
     rulesTitle: "Cómo jugar", rules: ["Tomen turnos y saquen una carta de su nivel actual.", "Completada: la ropa se queda y el turno pasa a la otra persona.", "Fallida: quítate la siguiente capa, sube un nivel y pasa el turno.", "No se puede saltar. Cada persona se quita sus propias capas, en orden."],
     firstTurn: "¿Quién empieza?", woman: "Mujer", man: "Hombre", chooseFirst: "Elijan quién empieza",
@@ -489,7 +489,7 @@ export default function StripGameScreen({ lang, onBack, onUpgrade }: Props) {
   const header = (
     <header className="strip__header">
       <button type="button" className="strip__back" onClick={onBack} aria-label={copy.back} data-testid="button-strip-back">
-        <BackIcon /><span>{copy.back}</span>
+        <BackIcon />
       </button>
       <span className="strip__brand">Touch<em>é</em></span>
       <span />
@@ -501,7 +501,6 @@ export default function StripGameScreen({ lang, onBack, onUpgrade }: Props) {
     body = (
       <section className="strip__intro strip-enter">
         <h1 tabIndex={-1} data-testid="text-strip-title">{copy.title}</h1>
-        <p className="strip__lead">{copy.subtitle}</p>
         <div className="strip-premium__intro-stage" aria-hidden="true">
           {[0, 1].map(index => (
             <div className="strip-premium__intro-doll" key={index}>

@@ -10,7 +10,13 @@ import { LANG_KEY, ONBOARDED_KEY, CATEGORIES_ORDER, type Lang, type Category } f
 import { ACTIVE_SCENARIO_KEY, getActiveScenarioStorageKey, type ActiveScenario } from "@/pages/ScenarioScreen";
 import type { SharedTaskSnapshot } from "@/data/sharedPair";
 import FirstRunTutorial, { type TutorialStep } from "@/components/FirstRunTutorial";
-import { saveLanguagePreference, trackAnalyticsEvent } from "@/analytics";
+import {
+  createAnalyticsAttemptId,
+  getAnalyticsSessionId,
+  installAnalyticsClickTracking,
+  saveLanguagePreference,
+  trackAnalyticsEvent,
+} from "@/analytics";
 import LovePathScreen from "@/pages/LovePathScreen";
 import GamesScreen from "@/pages/GamesScreen";
 import TarotScreen from "@/pages/TarotScreen";
@@ -252,11 +258,14 @@ async function apiUnlinkCouple(): Promise<boolean> {
 export async function apiSubscribe(lang: Lang): Promise<boolean> {
   const initData = window.Telegram?.WebApp?.initData;
   if (!initData) return false;
+  const attemptId = createAnalyticsAttemptId();
+  const sessionId = getAnalyticsSessionId();
+  const paymentDetails = { productKey: "premium_subscription" as const, attemptId };
   try {
     const res = await fetch("/api/subscription/invoice", {
       method: "POST",
       headers: { "Content-Type": "application/json", "x-telegram-init-data": initData },
-      body: JSON.stringify({ lang }),
+      body: JSON.stringify({ lang, attempt_id: attemptId, session_id: sessionId }),
     });
     if (!res.ok) return false;
     const { invoiceLink } = await res.json();
@@ -264,13 +273,27 @@ export async function apiSubscribe(lang: Lang): Promise<boolean> {
     const tg = window.Telegram?.WebApp as any;
     if (typeof tg?.openInvoice === "function") {
       return await new Promise<boolean>((resolve) => {
-        tg.openInvoice(invoiceLink, (status: string) => resolve(status === "paid"));
+        tg.openInvoice(invoiceLink, (status: string) => {
+          if (status === "cancelled") {
+            trackAnalyticsEvent("payment_cancelled", undefined, paymentDetails);
+          } else if (status === "failed") {
+            trackAnalyticsEvent("payment_failed", undefined, {
+              ...paymentDetails,
+              errorCode: "telegram_payment_failed",
+            });
+          }
+          resolve(status === "paid");
+        });
       });
     } else {
       tg?.openTelegramLink?.(invoiceLink);
       return true;
     }
   } catch {
+    trackAnalyticsEvent("payment_failed", undefined, {
+      ...paymentDetails,
+      errorCode: "invoice_request_failed",
+    });
     return false;
   }
 }
@@ -278,11 +301,21 @@ export async function apiSubscribe(lang: Lang): Promise<boolean> {
 export async function apiBuyPremiumTask(category: Category, lang: Lang): Promise<boolean> {
   const initData = window.Telegram?.WebApp?.initData;
   if (!initData) return false;
+  const attemptId = createAnalyticsAttemptId();
+  const sessionId = getAnalyticsSessionId();
+  const paymentDetails = { productKey: "extra_task" as const, attemptId };
+  trackAnalyticsEvent("button_tap", undefined, { actionKey: "buy_extra_task" });
   try {
     const res = await fetch("/api/payments/invoice", {
       method: "POST",
       headers: { "Content-Type": "application/json", "x-telegram-init-data": initData },
-      body: JSON.stringify({ product: "premium_task", category, lang }),
+      body: JSON.stringify({
+        product: "premium_task",
+        category,
+        lang,
+        attempt_id: attemptId,
+        session_id: sessionId,
+      }),
     });
     if (!res.ok) return false;
     const { invoiceLink } = await res.json();
@@ -290,12 +323,26 @@ export async function apiBuyPremiumTask(category: Category, lang: Lang): Promise
     const tg = window.Telegram?.WebApp as any;
     if (typeof tg?.openInvoice === "function") {
       return await new Promise<boolean>((resolve) => {
-        tg.openInvoice(invoiceLink, (status: string) => resolve(status === "paid"));
+        tg.openInvoice(invoiceLink, (status: string) => {
+          if (status === "cancelled") {
+            trackAnalyticsEvent("payment_cancelled", undefined, paymentDetails);
+          } else if (status === "failed") {
+            trackAnalyticsEvent("payment_failed", undefined, {
+              ...paymentDetails,
+              errorCode: "telegram_payment_failed",
+            });
+          }
+          resolve(status === "paid");
+        });
       });
     }
     tg?.openTelegramLink?.(invoiceLink);
     return true;
   } catch {
+    trackAnalyticsEvent("payment_failed", undefined, {
+      ...paymentDetails,
+      errorCode: "invoice_request_failed",
+    });
     return false;
   }
 }
@@ -307,6 +354,7 @@ export default function App() {
         tg.ready();
         tg.expand();
       }
+      installAnalyticsClickTracking();
     }, []);
 
     const [phase, setPhase] = useState<AppPhase>("splash");
@@ -342,11 +390,11 @@ export default function App() {
     }, []);
 
     useEffect(() => {
-      if (!["lang", "onboarding", "gender", "home", "category", "scenario", "shared_task_error"].includes(phase)) return;
+      if (!["lang", "onboarding", "gender", "home", "category", "scenario", "shared_task_error", "games", "tarot", "love_path"].includes(phase)) return;
       if (analyticsScreenRef.current === phase) return;
       analyticsScreenRef.current = phase;
       const screen = phase === "lang" ? "language" : phase;
-      trackAnalyticsEvent("screen_view", screen as "language" | "onboarding" | "gender" | "home" | "category" | "scenario" | "shared_task_error");
+      trackAnalyticsEvent("screen_view", screen as "language" | "onboarding" | "gender" | "home" | "category" | "scenario" | "shared_task_error" | "games" | "tarot" | "love_path");
     }, [phase]);
 
     useEffect(() => {

@@ -9,7 +9,6 @@ import OnboardingScreen from "@/components/OnboardingScreen";
 import { LANG_KEY, ONBOARDED_KEY, CATEGORIES_ORDER, type Lang, type Category } from "@/data/i18n";
 import { ACTIVE_SCENARIO_KEY, getActiveScenarioStorageKey, type ActiveScenario } from "@/pages/ScenarioScreen";
 import type { SharedTaskSnapshot } from "@/data/sharedPair";
-import FirstRunTutorial, { type TutorialStep } from "@/components/FirstRunTutorial";
 import {
   createAnalyticsAttemptId,
   getAnalyticsSessionId,
@@ -30,7 +29,6 @@ const COUPLE_ID_KEY = "touche_couple_id";
 const MODE_KEY = "touche_mode";
 const USER_ID_KEY = "touche_user_id";
 const HISTORY_KEY = "touche_history_v2";
-const TUTORIAL_KEY = "touche_tutorial_v1";
 
 const SHARED_TASK_ERROR_COPY: Record<Lang, { back: string; title: string; body: string; retry: string; home: string }> = {
   ru: {
@@ -59,10 +57,6 @@ const SHARED_TASK_ERROR_COPY: Record<Lang, { back: string; title: string; body: 
     retry: "Intentar de nuevo", home: "Ir al inicio",
   },
 };
-
-function getTutorialStorageKey(userId: number): string {
-  return `${TUTORIAL_KEY}_${userId}`;
-}
 
 function getTelegramStartParam(): string {
   const fromInitData = window.Telegram?.WebApp?.initDataUnsafe?.start_param;
@@ -368,10 +362,6 @@ export default function App() {
     const [pendingRefUserId, setPendingRefUserId] = useState<number | null>(null);
      const [sharedTask, setSharedTask] = useState<SharedTaskSnapshot | null>(null);
      const [failedSharedTaskId, setFailedSharedTaskId] = useState<string | null>(null);
-     const [tutorialStep, setTutorialStep] = useState<TutorialStep | null>(null);
-     const [tutorialPairFlowOpen, setTutorialPairFlowOpen] = useState(false);
-     const tutorialEligibleRef = useRef(true);
-     const tutorialSeenRef = useRef(false);
     const analyticsOpenTrackedRef = useRef(false);
     const analyticsScreenRef = useRef<AppPhase | null>(null);
     const languagePreferenceSyncedRef = useRef<Lang | null>(null);
@@ -468,14 +458,6 @@ export default function App() {
       const savedGender = getSavedGender();
       const startParam = getTelegramStartParam();
        const initialParams = new URLSearchParams(window.location.search);
-       if (
-         /^invite_[1-9][0-9]*$/.test(startParam) ||
-         /^ref_[1-9][0-9]*$/.test(startParam) ||
-         initialParams.has("shared_task") ||
-         initialParams.has("scenario") ||
-          initialParams.get("wish_map") === "1" ||
-          initialParams.get("love_path") === "1"
-       ) tutorialEligibleRef.current = false;
 
       const pairInvite = /^ref_([1-9][0-9]*)$/.exec(startParam);
       if (pairInvite) {
@@ -566,34 +548,6 @@ export default function App() {
       }
     }, []);
 
-     useEffect(() => {
-       if (phase !== "home" || !tutorialEligibleRef.current || tutorialSeenRef.current) return;
-       const telegramUserId = window.Telegram?.WebApp?.initDataUnsafe?.user?.id;
-       if (!telegramUserId) return;
-       try {
-         if (localStorage.getItem(getTutorialStorageKey(telegramUserId)) === "1") {
-           tutorialSeenRef.current = true;
-           return;
-         }
-       } catch {
-         // The tour remains skippable if Telegram storage is unavailable.
-       }
-       tutorialSeenRef.current = true;
-       setTutorialStep(1);
-     }, [phase]);
-
-     const completeTutorial = useCallback(() => {
-       const telegramUserId = window.Telegram?.WebApp?.initDataUnsafe?.user?.id;
-       if (telegramUserId) {
-         try { localStorage.setItem(getTutorialStorageKey(telegramUserId), "1"); } catch {}
-       }
-       tutorialSeenRef.current = true;
-       setTutorialStep(null);
-       setTutorialPairFlowOpen(false);
-       setSharedTask(null);
-       if (phase !== "home") setPhase("home");
-     }, [phase]);
-
     const handleLangSelect = useCallback((chosen: Lang) => {
       try { localStorage.setItem(LANG_KEY, chosen); } catch {}
       trackAnalyticsEvent("language_selected");
@@ -624,9 +578,8 @@ export default function App() {
       setSwipeDir(newIdx >= curIdx ? "left" : "right");
       setActiveCategory(cat);
       setSharedTask(null);
-      if (tutorialStep === 3 && cat === "compliments") setTutorialStep(4);
       setPhase("category");
-    }, [activeCategory, tutorialStep]);
+    }, [activeCategory]);
 
     const handleCategorySelectWithAgeCheck = useCallback((cat: Category) => {
       handleCategorySelect(cat);
@@ -726,8 +679,6 @@ export default function App() {
             onLinkCouple={handleLinkCouple}
              onUnlinkCouple={handleUnlinkCouple}
              onSubscribe={() => apiSubscribe(lang)}
-            onTutorialPairFlow={setTutorialPairFlowOpen}
-             onTutorialModeSelected={() => setTutorialStep((current) => current === 2 ? 3 : current)}
             onLovePathOpen={() => setPhase("love_path")}
             onGamesOpen={() => setPhase("games")}
             onTarotOpen={() => setPhase("tarot")}
@@ -757,8 +708,6 @@ export default function App() {
             coupleId={coupleId}
              mode={mode}
              initialSharedTask={sharedTask}
-              tutorialDemo={tutorialStep === 4 || tutorialStep === 5}
-              onTutorialDemoComplete={() => setTutorialStep(5)}
              onUpgrade={() => apiSubscribe(lang)}
              onBuyPremiumTask={(category) => apiBuyPremiumTask(category, lang)}
           />
@@ -774,16 +723,6 @@ export default function App() {
             <button type="button" onClick={handleRetrySharedTask} style={{ padding: "13px 18px", borderRadius: 14, border: 0, background: "#8064a2", color: "#fffaff", fontWeight: 700 }}>{SHARED_TASK_ERROR_COPY[lang].retry}</button>
             <button type="button" onClick={() => setPhase("home")} style={{ padding: "10px 18px", borderRadius: 14, border: "1px solid #c9bdd9", background: "transparent", color: "#594573" }}>{SHARED_TASK_ERROR_COPY[lang].home}</button>
           </main>
-        )}
-        {tutorialStep !== null && (
-          <FirstRunTutorial
-            lang={lang}
-            step={tutorialStep}
-            suspended={tutorialPairFlowOpen}
-            onStart={() => setTutorialStep(2)}
-            onFinish={completeTutorial}
-            onSkip={completeTutorial}
-          />
         )}
       </>
     );

@@ -634,19 +634,7 @@ button:focus-visible,
 .lp-match-status.is-match { background: #e5e8df !important; color: #39463b !important; }
 .lp-match-status.is-mismatch { background: #f1e9d9 !important; color: #594b36 !important; }
 
-/* Tutorial, support/history panels, diary and index overlays. */
-.first-run-tour { color: #342a42 !important; }
-.first-run-tour__shade--full { background: rgba(43,34,55,.66) !important; }
-.first-run-tour__spotlight { border-color: #a48abf !important; box-shadow: 0 0 0 4px rgba(248,245,252,.94),0 8px 22px rgba(43,34,55,.2) !important; }
-.first-run-tour__card { border-color: #cfc3df !important; background: #f8f5fc !important; color: #342a42 !important; box-shadow: 5px 6px 0 rgba(74,57,94,.38) !important; }
-.first-run-tour__brand, .first-run-tour__eyebrow { color: #765b99 !important; }
-.first-run-tour__brand i { color: #a48abf !important; }
-.first-run-tour__skip { border-color: #c9bdd9 !important; color: #62566f !important; }
-.first-run-tour__progress span { background: #e2d9ec !important; }
-.first-run-tour__progress span.is-active { background: #8064a2 !important; }
-.first-run-tour__card h2 { color: #40334f !important; }
-.first-run-tour__card > p:not(.first-run-tour__eyebrow) { color: #62566f !important; }
-.first-run-tour__primary { border-color: #594573 !important; background: #8064a2 !important; color: #fffaff !important; box-shadow: 3px 3px 0 #594573 !important; }
+/* Support/history panels, diary and index overlays. */
 .wm-shell {
   --wm-paper: #f8f5fc !important;
   --wm-ink: #342a42 !important;

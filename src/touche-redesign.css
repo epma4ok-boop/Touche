@@ -432,23 +432,6 @@ button:focus-visible, [role="button"]:focus-visible {
 .lp-match-status.is-mismatch { background:#fff0ce !important; color:#63431e !important; }
 .lp-scenario-panel h2 { color:#45251a !important; }
 
-/* First-run coach marks and support dialogs share the same tactile cream-on-coral language. */
-.first-run-tour { color:#3b2018 !important; font-family:"Manrope",sans-serif !important; }
-.first-run-tour__shade--full { background:rgba(76,27,12,.64) !important; }
-.first-run-tour__spotlight { border-color:#ff7458 !important; box-shadow:0 0 0 4px rgba(255,245,236,.95),0 10px 28px rgba(78,27,11,.28) !important; }
-.first-run-tour__card {
-  border:0 !important; border-radius:25px !important; background:#fff5eb !important; color:#3b2018 !important;
-  box-shadow:0 12px 0 rgba(123,43,19,.52),0 22px 40px rgba(60,20,8,.25) !important;
-}
-.first-run-tour__brand,.first-run-tour__eyebrow { color:#ae3b20 !important; }
-.first-run-tour__brand i { color:#ff7458 !important; }
-.first-run-tour__skip { border:1px solid #e7c3aa !important; color:#754b3d !important; }
-.first-run-tour__progress span { background:#f0cfb5 !important; }
-.first-run-tour__progress span.is-active { background:#ed542d !important; }
-.first-run-tour__card h2 { color:#43251a !important; font-family:"Playfair Display",serif !important; }
-.first-run-tour__card > p:not(.first-run-tour__eyebrow) { color:#76503e !important; }
-.first-run-tour__primary { border:0 !important; border-radius:999px !important; background:#ed4d22 !important; color:#fff8ef !important; box-shadow:0 5px 0 rgba(103,34,13,.22) !important; }
-
 /* Wish Diary — inline component styles are deliberately overridden at the component boundary. */
 .wm-shell { color:var(--sun-ink) !important; font-family:"Manrope",sans-serif !important; }
 .wm-diary-trigger {
@@ -550,7 +533,6 @@ button:focus-visible, [role="button"]:focus-visible {
 .tarot__pos-title,
 .tarot__question,
 .lp-intro h1,
-.first-run-tour__card h2,
 .wm-entry-title,
 .wm-title,
 .wm-dialog-text {

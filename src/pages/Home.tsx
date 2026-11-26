@@ -8,6 +8,7 @@ import SmokeBackground from "@/components/SmokeBackground";
 import splashHands from "@/assets/touche-splash-hands.jpg";
 import { BRAND } from "@/theme/palette";
 import { BOT_USERNAME, TELEGRAM_MINI_APP_SHORT_NAME } from "@/config";
+import { trackAnalyticsEvent } from "@/analytics";
 import "./HomePop.css";
 
 const HERO_COPY: Record<Lang, { first: string; last: string; sub: string }> = {
@@ -1004,6 +1005,12 @@ function MenuPanel({ lang, gender, onGenderSwitch, onClose, onLanguageOpen, onSu
     if (section === "main" || section === "subscription") return refreshSubscription();
   }, [section, refreshSubscription]);
 
+  useEffect(() => {
+    if (section === "subscription") {
+      trackAnalyticsEvent("paywall_viewed", "subscription");
+    }
+  }, [section]);
+
   const rowStyle: React.CSSProperties = {
     display: "flex", alignItems: "center", justifyContent: "space-between",
     padding: "14px 16px", borderRadius: 16,
@@ -1094,7 +1101,7 @@ function MenuPanel({ lang, gender, onGenderSwitch, onClose, onLanguageOpen, onSu
           }}>{f}</div>
         ))}
       </div>}
-      <button className="pop-menu-subscribe" onClick={async () => {
+      <button data-testid="button-subscribe-premium" className="pop-menu-subscribe" onClick={async () => {
         setSubState("loading");
         setSubError("");
         const ok = await onSubscribe();
@@ -1154,7 +1161,7 @@ function MenuPanel({ lang, gender, onGenderSwitch, onClose, onLanguageOpen, onSu
           </div>
         </button>
 
-        <button className="pop-menu-card pop-menu-card--premium" onClick={() => setSection("subscription")} style={{
+        <button data-testid="button-open-premium" className="pop-menu-card pop-menu-card--premium" onClick={() => setSection("subscription")} style={{
           position: "relative", height: 130, borderRadius: 20, overflow: "hidden",
           border: `1.5px solid rgba(${PR},${PG},${PB},0.42)`, cursor: "pointer", padding: 0, background: "none",
           backgroundImage: "url('/images/menu-tiles/premium.jpg')", backgroundSize: "cover", backgroundPosition: "center 16%",
@@ -1430,7 +1437,7 @@ export default function Home({
         {/* ── Header ── */}
         <div className="pop-header" style={{ paddingTop: topPx, paddingLeft: 20, paddingRight: 20, paddingBottom: 4, display: "flex", alignItems: "center", justifyContent: "space-between", position: "relative", zIndex: 1, flexShrink: 0 }}>
           {/* Hamburger */}
-            <button aria-label={HOME_STATUS_COPY[lang].openMenu} onClick={() => { setShowMenu(true); window.Telegram?.WebApp?.HapticFeedback?.impactOccurred("light"); }} style={{ width: 38, height: 38, borderRadius: 12, background: "rgba(255,238,248,0.05)", border: `1px solid rgba(${PR},${PG},${PB},0.22)`, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 4.5, cursor: "pointer", flexShrink: 0, padding: 0, animation: "menuBtnPulse 4s ease-in-out 2s infinite" }}>
+            <button data-testid="button-open-menu" aria-label={HOME_STATUS_COPY[lang].openMenu} onClick={() => { setShowMenu(true); window.Telegram?.WebApp?.HapticFeedback?.impactOccurred("light"); }} style={{ width: 38, height: 38, borderRadius: 12, background: "rgba(255,238,248,0.05)", border: `1px solid rgba(${PR},${PG},${PB},0.22)`, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 4.5, cursor: "pointer", flexShrink: 0, padding: 0, animation: "menuBtnPulse 4s ease-in-out 2s infinite" }}>
             {[0,1,2].map(i => <div key={i} style={{ width: i===1?12:16, height: 1.5, borderRadius: 99, background: `rgba(${PR},${PG},${PB},0.80)` }} />)}
           </button>
 

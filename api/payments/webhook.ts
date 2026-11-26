@@ -9,6 +9,12 @@ const WEBHOOK_SECRET = process.env.WEBHOOK_SECRET ?? "";
 const APP_URL        = (process.env.APP_URL ?? "").replace(/\/$/, "");
 const BOT_USERNAME   = process.env.BOT_USERNAME ?? "ToucheCoupleBot";
 
+function openAppButton(text: string) {
+  return APP_URL
+    ? { text, web_app: { url: APP_URL } }
+    : { text, url: `https://t.me/${BOT_USERNAME}/app` };
+}
+
 const supabase = createClient(
   process.env.SUPABASE_URL!,
   process.env.SUPABASE_SERVICE_ROLE_KEY!
@@ -359,10 +365,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         copy.welcome,
         {
           reply_markup: {
-            inline_keyboard: [[{
-              text: copy.open,
-              url: `${APP_URL || `https://t.me/${BOT_USERNAME}/app`}`,
-            }]],
+            inline_keyboard: [[openAppButton(copy.open)]],
           },
         }
       );
@@ -595,10 +598,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
          `🔓 <b>Touché Premium активирован!</b>\n\nСтрасть и Хард — по 3 задания в день. ИИ-сценарии — 1 в день. Дополнительное задание стоит 5 ⭐.\n\nПодписка активна 30 дней 💕`,
         {
           reply_markup: {
-            inline_keyboard: [[{
-              text: "💕 Открыть Touché",
-              url: `${APP_URL || `https://t.me/${BOT_USERNAME}/app`}`,
-            }]],
+            inline_keyboard: [[openAppButton("💕 Открыть Touché")]],
           },
         }
       );

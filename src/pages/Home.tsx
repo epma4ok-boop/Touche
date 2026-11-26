@@ -91,8 +91,6 @@ interface HomeProps {
   onLinkCouple: (refUserId: number) => Promise<boolean>;
   onUnlinkCouple: () => Promise<boolean>;
   onSubscribe: () => Promise<boolean>;
-  onTutorialPairFlow?: (open: boolean) => void;
-  onTutorialModeSelected?: () => void;
   onLovePathOpen: () => void;
   onGamesOpen: () => void;
   onTarotOpen: () => void;
@@ -1268,7 +1266,7 @@ export default function Home({
   lang, gender, coupleId, mode, pendingRefUserId,
   onCategorySelect, onScenarioOpen, onOpenSharedTask, onLanguageOpen, onGenderSwitch,
   onModeChange,
-  onLinkCouple, onUnlinkCouple, onSubscribe, onTutorialPairFlow, onTutorialModeSelected,
+  onLinkCouple, onUnlinkCouple, onSubscribe,
   onLovePathOpen, onGamesOpen, onTarotOpen,
 }: HomeProps) {
   const t = UI[lang];
@@ -1307,22 +1305,14 @@ export default function Home({
     if (pendingRefUserId) setShowCoupleModal(true);
   }, [pendingRefUserId, coupleId]);
 
-  useEffect(() => {
-    onTutorialPairFlow?.(showCoupleModal);
-    return () => onTutorialPairFlow?.(false);
-  }, [onTutorialPairFlow, showCoupleModal]);
-
   const handleModeSelection = useCallback((nextMode: AppMode) => {
     if (nextMode === "together" && !coupleId) {
-      onTutorialPairFlow?.(true);
       setShowCoupleModal(true);
       window.Telegram?.WebApp?.HapticFeedback?.impactOccurred("light");
-      onTutorialModeSelected?.();
       return;
     }
     onModeChange(nextMode);
-    onTutorialModeSelected?.();
-  }, [coupleId, onModeChange, onTutorialModeSelected, onTutorialPairFlow]);
+  }, [coupleId, onModeChange]);
 
   const openHomeSection = useCallback((nextSection: AppMode) => {
     setHomeSection(nextSection);

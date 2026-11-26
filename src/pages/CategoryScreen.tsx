@@ -176,34 +176,6 @@ const RETRY_GENERATION_COPY: Record<Lang, string> = {
   es: "Intentar de nuevo",
 };
 
-const TUTORIAL_SAMPLE: Record<Lang, { text: string; label: string; holdHint: string }> = {
-  ru: {
-    text: "По очереди назовите одну маленькую вещь, за которую вы особенно цените друг друга сегодня.",
-    label: "Демо · пример",
-    holdHint: "УДЕРЖИВАЙТЕ ДЛЯ ПРИМЕРА",
-  },
-  en: {
-    text: "Take turns naming one small thing the other did today that made you feel cared for.",
-    label: "Demo · sample",
-    holdHint: "HOLD TO VIEW SAMPLE",
-  },
-  hi: {
-    text: "बारी-बारी से आज की एक छोटी-सी बात बताएं जिसके लिए आप एक-दूसरे को खास मानते हैं।",
-    label: "डेमो · नमूना",
-    holdHint: "नमूना देखने के लिए दबाए रखें",
-  },
-  pt: {
-    text: "Cada um diga uma pequena coisa que o outro fez hoje e que fez você se sentir acolhido.",
-    label: "Demonstração · exemplo",
-    holdHint: "SEGURE PARA VER A AMOSTRA",
-  },
-  es: {
-    text: "Túrnense para nombrar algo pequeño que hizo hoy la otra persona y les hizo sentir queridos.",
-    label: "Demostración · ejemplo",
-    holdHint: "MANTÉN PARA VER LA MUESTRA",
-  },
-};
-
 function categorySub(category: Category, t: typeof UI["en"]): string {
   return ({
     compliments: t.catComplimentsSub,
@@ -226,11 +198,10 @@ function wrapText(ctx: CanvasRenderingContext2D, text: string, maxWidth: number)
   return lines;
 }
 
-function TaskReveal({ text, color, visible, onDismiss, onGenerateAgain, lang, catLabel, source, isShared, isTutorialDemo }: {
+function TaskReveal({ text, color, visible, onDismiss, onGenerateAgain, lang, catLabel, source, isShared }: {
   text: string; color: { r: number; g: number; b: number }; visible: boolean;
   onDismiss: () => void; onGenerateAgain: () => void; lang: Lang; catLabel: string; source?: "ai" | "fallback";
   isShared?: boolean;
-  isTutorialDemo?: boolean;
 }) {
   const t = UI[lang];
   const pairCopy = SHARED_TASK_COPY[lang];
@@ -278,32 +249,25 @@ function TaskReveal({ text, color, visible, onDismiss, onGenerateAgain, lang, ca
       <div className="task-reveal__folio">
       <span className="task-reveal__label">{catLabel}</span>
       <p className="task-reveal__text" data-testid="text-task-result">{text}</p>
-      {isTutorialDemo && (
-        <span className="task-reveal__source" role="status" data-testid="status-tutorial-demo">
-          {TUTORIAL_SAMPLE[lang].label}
-        </span>
-      )}
       {isShared && (
         <div className="task-reveal__shared-status" role="status" data-testid="status-shared-task" style={{ maxWidth: 560, padding: "13px 16px", border: "1px solid rgba(64,51,79,.18)", borderRadius: 14, background: "rgba(248,245,252,.72)", color: "var(--pop-ink)", textAlign: "left" }}>
           <strong style={{ display: "block", fontSize: 13 }}>{pairCopy.shared}</strong>
           <small style={{ display: "block", marginTop: 4, lineHeight: 1.45 }}>{pairCopy.checkInHint}</small>
         </div>
       )}
-      {!isTutorialDemo && source === "ai" && <span className="task-reveal__source">{TASK_SOURCE_COPY[lang]}</span>}
-      {!isTutorialDemo && source === "fallback" && <span className="task-reveal__source">{TASK_LIBRARY_COPY[lang]}</span>}
-      {!isTutorialDemo && (
-        <div className="task-reveal__actions">
-          <button data-testid="button-task-again" onClick={onGenerateAgain}>{t.taskAgain}</button>
-          <button data-testid="button-share-task" onClick={share} disabled={sharing}>{sharing ? "..." : t.share}</button>
-          <button
-            className="task-reveal__done"
-            data-testid={isShared ? "button-close-shared-task" : "button-task-done"}
-            onClick={onDismiss}
-          >
-            {isShared ? pairCopy.close : t.taskDone}
-          </button>
-        </div>
-      )}
+      {source === "ai" && <span className="task-reveal__source">{TASK_SOURCE_COPY[lang]}</span>}
+      {source === "fallback" && <span className="task-reveal__source">{TASK_LIBRARY_COPY[lang]}</span>}
+      <div className="task-reveal__actions">
+        <button data-testid="button-task-again" onClick={onGenerateAgain}>{t.taskAgain}</button>
+        <button data-testid="button-share-task" onClick={share} disabled={sharing}>{sharing ? "..." : t.share}</button>
+        <button
+          className="task-reveal__done"
+          data-testid={isShared ? "button-close-shared-task" : "button-task-done"}
+          onClick={onDismiss}
+        >
+          {isShared ? pairCopy.close : t.taskDone}
+        </button>
+      </div>
       </div>
     </div>
   );
@@ -315,8 +279,6 @@ interface Props {
   coupleId?: string | null; mode?: AppMode; onUpgrade?: () => Promise<boolean>;
   onBuyPremiumTask?: (category: Category) => Promise<boolean>;
   initialSharedTask?: SharedTaskSnapshot | null;
-  tutorialDemo?: boolean;
-  onTutorialDemoComplete?: () => void;
 }
 
 const PREMIUM_GATE_COPY: Record<Lang, {
@@ -361,7 +323,7 @@ const PREMIUM_GATE_COPY: Record<Lang, {
   },
 };
 
-export default function CategoryScreen({ lang, gender, category, onBack, onCategoryChange, swipeDir, coupleId, mode = "solo", onUpgrade, onBuyPremiumTask, initialSharedTask, tutorialDemo = false, onTutorialDemoComplete }: Props) {
+export default function CategoryScreen({ lang, gender, category, onBack, onCategoryChange, swipeDir, coupleId, mode = "solo", onUpgrade, onBuyPremiumTask, initialSharedTask }: Props) {
   const cfg = CATEGORY_CONFIG[category];
   const popColor = POP_COLORS[category];
   const t = UI[lang];
@@ -571,16 +533,6 @@ export default function CategoryScreen({ lang, gender, category, onBack, onCateg
     setTimeout(() => setTaskText(""), 400);
   }, []);
 
-  const showTutorialSample = useCallback(() => {
-    const sample = TUTORIAL_SAMPLE[lang];
-    setTaskId(null);
-    setTaskText(sample.text);
-    setTaskSource("fallback");
-    setSharedTask(null);
-    setShowReveal(true);
-    onTutorialDemoComplete?.();
-  }, [lang, onTutorialDemoComplete]);
-
   const height = viewportHeight ? `${viewportHeight}px` : "100dvh";
   const enterX = swipeDir === "left" ? 60 : -60;
   return (
@@ -620,8 +572,8 @@ export default function CategoryScreen({ lang, gender, category, onBack, onCateg
          </div>
         <section className="category-pop__generator">
            <div className="category-pop__generator-head"><span>{t.hint}</span><b>{String(index + 1).padStart(2, "0")} / {String(CATEGORIES_ORDER.length).padStart(2, "0")}</b></div>
-          <div className="category-pop__heartbeat" data-testid="tutorial-heartbeat-target">
-              <HeartbeatCanvas onHoldComplete={tutorialDemo ? showTutorialSample : generate} isCasting={tutorialDemo ? false : isCasting} color={popColor} hintText={tutorialDemo ? TUTORIAL_SAMPLE[lang].holdHint : isCasting ? t.tapping : t.hint} holdDuration={2600} baseRScale={0.45} bgColor={GENERATOR_SURFACES[category]} />
+          <div className="category-pop__heartbeat">
+              <HeartbeatCanvas onHoldComplete={generate} isCasting={isCasting} color={popColor} hintText={isCasting ? t.tapping : t.hint} holdDuration={2600} baseRScale={0.45} bgColor={GENERATOR_SURFACES[category]} />
           </div>
           {errorKind && errorKind !== "subscription_required" && errorKind !== "limit_exceeded" && <div className="category-pop__error" role="alert" data-testid="status-task-error"><strong>{errorCopy[errorKind]}</strong>{errorKind === "unknown" && generatedErrorCode && <small>{generatedErrorCode}</small>}{errorKind === "ai_unavailable" && <button type="button" data-testid="button-retry-task" onClick={() => void generate()}>{RETRY_GENERATION_COPY[lang]}</button>}<button type="button" onClick={() => setErrorKind(null)}>{lang === "ru" ? "Понятно" : "Dismiss"}</button></div>}
         </section>
@@ -666,7 +618,6 @@ export default function CategoryScreen({ lang, gender, category, onBack, onCateg
         catLabel={label}
         source={taskSource}
         isShared={mode === "together" && !!sharedTask}
-        isTutorialDemo={tutorialDemo}
       />
       <HistoryPanel entries={history.filter((entry) => entry.category === category)} open={historyOpen} onClose={() => setHistoryOpen(false)} accentRgb={cfg} lang={lang} />
     </main>

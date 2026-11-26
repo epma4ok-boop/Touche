@@ -7,10 +7,13 @@
 
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { validateTelegramInitData } from "../couple/_auth.js";
+import { recordPaymentAnalytics } from "../_analytics.js";
 import { OWNER_TELEGRAM_ID } from "../../src/config.js";
 
 const BOT_TOKEN = process.env.BOT_TOKEN;
 const LANGS = new Set(["ru", "en", "hi", "pt", "es"]);
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+const PAYMENT_ATTEMPT = /^(?:[0-9a-f]{24}|[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})$/i;
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   res.setHeader("Access-Control-Allow-Origin", "https://t.me");
@@ -30,6 +33,25 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const { lang = "ru" } = req.body as { lang?: string };
   if (!LANGS.has(lang)) return res.status(400).json({ error: "invalid_product" });
   const isEn = lang === "en";
+  const body = req.body && typeof req.body === "object"
+    ? req.body as Record<string, unknown>
+    : {};
+  const attemptId = typeof body.attempt_id === "string" && PAYMENT_ATTEMPT.test(body.attempt_id)
+    ? body.attempt_id
+    : null;
+  const sessionId = typeof body.session_id === "string" && UUID.test(body.session_id)
+    ? body.session_id
+    : null;
+  const paymentAnalytics = {
+    userId: caller.id,
+    attemptId,
+    sessionId,
+    productKey: "premium_subscription" as const,
+  };
+  await recordPaymentAnalytics({
+    ...paymentAnalytics,
+    eventName: "payment_started",
+  });
 
   try {
     const r = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/createInvoiceLink`, {
@@ -40,7 +62,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         description: isEn
           ? "Passion and Hard: 3 tasks each day. AI scenarios: 1 per day. One extra task costs 5 Stars for Premium members."
           : "Страсть и Хард: по 3 задания в день. ИИ-сценарии: 1 в день. Дополнительное задание для Premium — 5 ⭐.",
-        payload: JSON.stringify({ version: 1, userId: caller.id, type: "subscription", months: 1 }),
+        payload: JSON.stringify({
+          version: 1,
+          userId: caller.id,
+          type: "subscription",
+          months: 1,
+          ...(attemptId ? { attemptId } : {}),
+        }),
         provider_token: "",
         currency: "XTR",
         prices: [{ label: isEn ? "1 month" : "1 месяц", amount: 199 }],
@@ -48,10 +76,20 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     });
 
     const data = await r.json();
-    if (!data.ok) throw new Error(data.description ?? "createInvoiceLink failed");
+    if (!data.ok || typeof data.result !== "string" || !data.result) {
+      throw new Error("invoice_generation_failed");
+    }
+    await recordPaymentAnalytics({
+      ...paymentAnalytics,
+      eventName: "invoice_created",
+    });
     return res.status(200).json({ invoiceLink: data.result });
-  } catch (e: unknown) {
-    const msg = e instanceof Error ? e.message : String(e);
-    return res.status(500).json({ error: msg });
+  } catch {
+    await recordPaymentAnalytics({
+      ...paymentAnalytics,
+      eventName: "payment_failed",
+      errorCode: "invoice_generation_failed",
+    });
+    return res.status(500).json({ error: "invoice_generation_failed" });
   }
 }

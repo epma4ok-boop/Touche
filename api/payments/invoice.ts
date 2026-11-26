@@ -10,6 +10,7 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { createClient } from "@supabase/supabase-js";
 import { validateTelegramInitData } from "../couple/_auth.js";
+import { recordPaymentAnalytics } from "../_analytics.js";
 import { appDate, FREE_LIMIT, PREMIUM_DAILY_LIMIT } from "../limits.js";
 import { OWNER_TELEGRAM_ID } from "../../src/config.js";
 
@@ -17,6 +18,8 @@ const BOT_TOKEN = process.env.BOT_TOKEN;
 const CATEGORIES = new Set(["compliments", "tenderness", "desire", "passion", "hard"]);
 const PAID_CATEGORIES = new Set(["passion", "hard"]);
 const LANGS = new Set(["ru", "en", "hi", "pt", "es"]);
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+const PAYMENT_ATTEMPT = /^(?:[0-9a-f]{24}|[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})$/i;
 const supabase = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!);
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
@@ -35,6 +38,18 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const category = String(body.category ?? "");
   const lang = String(body.lang ?? "ru");
   const product = String(body.product ?? "");
+  const attemptId = typeof body.attempt_id === "string" && PAYMENT_ATTEMPT.test(body.attempt_id)
+    ? body.attempt_id
+    : null;
+  const sessionId = typeof body.session_id === "string" && UUID.test(body.session_id)
+    ? body.session_id
+    : null;
+  const paymentAnalytics = {
+    userId: caller.id,
+    attemptId,
+    sessionId,
+    productKey: "extra_task" as const,
+  };
   if (product !== "premium_task") {
     return res.status(400).json({ error: "invalid_product" });
   }
@@ -44,7 +59,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (caller.id === OWNER_TELEGRAM_ID) {
     return res.status(409).json({ error: "owner_unlimited_access", remaining: null });
   }
-
   const [{ data: subscription, error: subscriptionError }, { data: daily, error: dailyError }, { data: referral, error: referralError }, { data: paidCredit, error: paidCreditError }] = await Promise.all([
     supabase.from("user_subscriptions").select("expires_at").eq("user_id", caller.id).maybeSingle(),
     supabase.from("user_daily_limits").select("count,bonus").eq("user_id", caller.id).eq("category", PAID_CATEGORIES.has(category) ? `premium_${category}` : category).eq("date", appDate()).maybeSingle(),
@@ -58,6 +72,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     : (PAID_CATEGORIES.has(category) ? PREMIUM_DAILY_LIMIT : FREE_LIMIT) + Number(daily?.bonus ?? 0);
   const remaining = Math.max(0, base - Number(daily?.count ?? 0)) + Number(referral?.balance ?? 0) + Number(paidCredit?.balance ?? 0);
   if (remaining > 0) return res.status(409).json({ error: "daily_limit_not_reached", remaining });
+  await recordPaymentAnalytics({
+    ...paymentAnalytics,
+    eventName: "payment_started",
+  });
 
   const isEn = lang === "en";
   const amount = premium ? 5 : 20;
@@ -79,12 +97,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           ? `One task in ${categoryLabel}`
           : `Одно задание в категории «${categoryLabel}»`,
         payload: JSON.stringify({
-          version: 1, userId: caller.id,
-          type: product,
-          category,
-          count: 1,
-          amount,
-          priceTier: premium ? "premium" : "standard",
+          v: 1,
+          u: caller.id,
+          t: product,
+          c: category,
+          n: 1,
+          a: amount,
+          q: premium ? "premium" : "standard",
+          ...(attemptId ? { i: attemptId } : {}),
         }),
         provider_token: "",
         currency: "XTR",
@@ -96,10 +116,20 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     });
 
     const data = await r.json();
-    if (!data.ok) throw new Error(data.description ?? "createInvoiceLink failed");
+    if (!data.ok || typeof data.result !== "string" || !data.result) {
+      throw new Error("invoice_generation_failed");
+    }
+    await recordPaymentAnalytics({
+      ...paymentAnalytics,
+      eventName: "invoice_created",
+    });
     return res.status(200).json({ invoiceLink: data.result });
-  } catch (e: unknown) {
-    const msg = e instanceof Error ? e.message : String(e);
-    return res.status(500).json({ error: msg });
+  } catch {
+    await recordPaymentAnalytics({
+      ...paymentAnalytics,
+      eventName: "payment_failed",
+      errorCode: "invoice_generation_failed",
+    });
+    return res.status(500).json({ error: "invoice_generation_failed" });
   }
 }

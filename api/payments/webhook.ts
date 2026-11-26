@@ -1,6 +1,7 @@
 // api/payments/webhook.ts — Telegram bot webhook + Stars payments
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { createClient } from "@supabase/supabase-js";
+import { recordPaymentAnalytics } from "../_analytics.js";
 import { ADMIN_TELEGRAM_ID } from "../../src/config.js";
 
 const BOT_TOKEN      = process.env.BOT_TOKEN;
@@ -417,11 +418,46 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const chatId   = msg.chat.id as number;
     const payment  = msg.successful_payment;
 
-    let payload: { version?: number; userId?: number; type?: string; category?: string; count?: number; date?: string; months?: number; amount?: number; priceTier?: string } = {};
-    try { payload = JSON.parse(payment.invoice_payload); } catch {}
+    let rawPayload: Record<string, unknown> = {};
+    try {
+      const parsed = JSON.parse(payment.invoice_payload);
+      if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) {
+        rawPayload = parsed as Record<string, unknown>;
+      }
+    } catch {}
+    const firstNumber = (...keys: string[]) => {
+      for (const key of keys) {
+        if (typeof rawPayload[key] === "number") return rawPayload[key] as number;
+      }
+      return undefined;
+    };
+    const firstString = (...keys: string[]) => {
+      for (const key of keys) {
+        if (typeof rawPayload[key] === "string") return rawPayload[key] as string;
+      }
+      return undefined;
+    };
+    const payload = {
+      version: firstNumber("version", "v"),
+      userId: firstNumber("userId", "u"),
+      type: firstString("type", "t"),
+      category: firstString("category", "c"),
+      count: firstNumber("count", "n"),
+      date: firstString("date", "d"),
+      months: firstNumber("months", "m"),
+      amount: firstNumber("amount", "a"),
+      priceTier: firstString("priceTier", "q"),
+      attemptId: firstString("attemptId", "i"),
+      sessionId: firstString("sessionId"),
+    };
 
     const userId = payload.userId;
     const chargeId = String(payment.telegram_payment_charge_id ?? "");
+    const analyticsProductKey = payload.type === "subscription"
+      ? "premium_subscription" as const
+      : payload.type === "premium_task"
+        ? "extra_task" as const
+        : null;
     const isPremiumTask = payload.type === "premium_task"
       && ["compliments", "tenderness", "desire", "passion", "hard"].includes(payload.category ?? "")
       && payload.count === 1
@@ -448,6 +484,16 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       && Number(payment.total_amount) === expectedAmount
       && chargeId.length > 0;
     if (!validPayload) {
+      if (analyticsProductKey) {
+        await recordPaymentAnalytics({
+          userId: Number.isSafeInteger(userId) ? Number(userId) : 0,
+          sessionId: payload.sessionId,
+          attemptId: payload.attemptId,
+          eventName: "payment_failed",
+          productKey: analyticsProductKey,
+          errorCode: "payment_validation_failed",
+        });
+      }
       console.error("[telegram-webhook] successful payment rejected", {
         update_id: updateId,
         user_id: Number.isSafeInteger(userId) ? userId : null,
@@ -477,6 +523,16 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       });
       paymentResult = result.data;
       if (result.error) {
+        if (analyticsProductKey) {
+          await recordPaymentAnalytics({
+            userId: payerId,
+            sessionId: payload.sessionId,
+            attemptId: payload.attemptId,
+            eventName: "payment_failed",
+            productKey: analyticsProductKey,
+            errorCode: "payment_processing_failed",
+          });
+        }
         console.error("[telegram-webhook] payment RPC failed", {
           update_id: updateId,
           user_id: payerId,
@@ -488,6 +544,16 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         return res.status(500).json({ error: "payment_processing_failed" });
       }
     } catch (error) {
+      if (analyticsProductKey) {
+        await recordPaymentAnalytics({
+          userId: payerId,
+          sessionId: payload.sessionId,
+          attemptId: payload.attemptId,
+          eventName: "payment_failed",
+          productKey: analyticsProductKey,
+          errorCode: "payment_processing_failed",
+        });
+      }
       console.error("[telegram-webhook] payment RPC threw", {
         update_id: updateId,
         user_id: payerId,
@@ -507,6 +573,22 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       duplicate: Boolean(paymentResult?.already_processed),
     });
     if (paymentResult?.already_processed) return res.status(200).json({ ok: true, duplicate: true });
+    if (analyticsProductKey) {
+      await recordPaymentAnalytics({
+        userId: payerId,
+        sessionId: payload.sessionId,
+        attemptId: payload.attemptId,
+        eventName: "payment_succeeded",
+        productKey: analyticsProductKey,
+      });
+      await recordPaymentAnalytics({
+        userId: payerId,
+        sessionId: payload.sessionId,
+        attemptId: payload.attemptId,
+        eventName: "entitlement_granted",
+        productKey: analyticsProductKey,
+      });
+    }
 
     if (payload.type === "subscription") {
       await sendMessage(chatId,

@@ -11,6 +11,7 @@ const BOT = process.env.BOT_TOKEN!;
 const APP_URL = (process.env.APP_URL ?? "").replace(/\/$/, "");
 const LANGS = new Set(["ru", "en", "hi", "pt", "es"]);
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+const PAYMENT_ATTEMPT = /^(?:[0-9a-f]{24}|[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})$/i;
 const ANALYTICS_EVENTS = new Set([
   "app_open",
   "screen_view",
@@ -18,6 +19,10 @@ const ANALYTICS_EVENTS = new Set([
   "language_selected",
   "onboarding_completed",
   "gender_selected",
+  "button_tap",
+  "paywall_viewed",
+  "payment_cancelled",
+  "payment_failed",
 ]);
 const ANALYTICS_SCREENS = new Set([
   "language",
@@ -27,6 +32,31 @@ const ANALYTICS_SCREENS = new Set([
   "category",
   "scenario",
   "shared_task_error",
+  "games",
+  "tarot",
+  "love_path",
+  "subscription",
+]);
+const ANALYTICS_ACTIONS = new Set([
+  "open_menu",
+  "open_tasks",
+  "open_tarot",
+  "open_games",
+  "invite_partner",
+  "mode_solo",
+  "mode_together",
+  "open_love_path",
+  "open_premium",
+  "subscribe_premium",
+  "buy_extra_task",
+]);
+const ANALYTICS_PRODUCTS = new Set(["premium_subscription", "extra_task"]);
+const ANALYTICS_ERROR_CODES = new Set([
+  "invoice_generation_failed",
+  "invoice_request_failed",
+  "telegram_payment_failed",
+  "payment_processing_failed",
+  "payment_validation_failed",
 ]);
 
 function safeAnalyticsUtm(value: unknown): string | null {
@@ -773,6 +803,28 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     if (eventName === "screen_view" && !screen) {
       return res.status(400).json({ error: "invalid_screen" });
     }
+    const actionKey = typeof body.action_key === "string" && ANALYTICS_ACTIONS.has(body.action_key)
+      ? body.action_key
+      : null;
+    const productKey = typeof body.product_key === "string" && ANALYTICS_PRODUCTS.has(body.product_key)
+      ? body.product_key
+      : null;
+    const attemptId = typeof body.attempt_id === "string" && PAYMENT_ATTEMPT.test(body.attempt_id)
+      ? body.attempt_id
+      : null;
+    const errorCode = typeof body.error_code === "string" && ANALYTICS_ERROR_CODES.has(body.error_code)
+      ? body.error_code
+      : null;
+    if (eventName === "button_tap" && !actionKey) {
+      return res.status(400).json({ error: "invalid_action" });
+    }
+    if (["payment_started", "payment_cancelled", "payment_failed"].includes(eventName)
+      && (!productKey || !attemptId)) {
+      return res.status(400).json({ error: "invalid_payment_event" });
+    }
+    if (eventName === "payment_failed" && !errorCode) {
+      return res.status(400).json({ error: "invalid_error_code" });
+    }
 
     try {
       const signedStartParam = new URLSearchParams(
@@ -783,7 +835,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         user_id: user.id,
         username: user.username ?? null,
         event_name: eventName,
-        screen: eventName === "screen_view" ? screen : null,
+        screen,
+        action_key: actionKey,
+        product_key: productKey,
+        attempt_id: attemptId,
+        error_code: errorCode,
         source: classifyAnalyticsSource(signedStartParam),
         utm_source: safeAnalyticsUtm(body.utm_source),
         utm_medium: safeAnalyticsUtm(body.utm_medium),
